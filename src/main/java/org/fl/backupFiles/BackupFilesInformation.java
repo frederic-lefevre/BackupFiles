@@ -11,8 +11,8 @@ public class BackupFilesInformation {
 	private long   nbFilesProcessed ;
 	
 	public BackupFilesInformation(String st, String info, long nb) {
-		status 			 = st ;
-		information 	 = info ;
+		status 			 = nullToEmpty(st) ;
+		information 	 = nullToEmpty(info) ;
 		nbFilesProcessed = nb ;
 	}
 
@@ -21,7 +21,7 @@ public class BackupFilesInformation {
 	}
 
 	public void setStatus(String status) {
-		this.status = status;
+		this.status = nullToEmpty(status) ;
 	}
 
 	public String getInformation() {
@@ -29,7 +29,7 @@ public class BackupFilesInformation {
 	}
 
 	public void setInformation(String information) {
-		this.information = information;
+		this.information = nullToEmpty(information) ;
 	}
 
 	public long getNbFilesProcessed() {
@@ -40,4 +40,12 @@ public class BackupFilesInformation {
 		this.nbFilesProcessed = nbFilesProcessed;
 	}
 
+	private String nullToEmpty(String s) {
+		
+		if (s == null) {
+			return "" ;
+		} else {
+			return s ;
+		}
+	}
 }
