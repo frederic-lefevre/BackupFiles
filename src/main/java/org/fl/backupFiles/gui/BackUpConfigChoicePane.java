@@ -18,7 +18,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.fl.backupFiles.BackUpJob;
-import org.fl.backupFiles.BackUpJobs;
+import org.fl.backupFiles.BackUpJobList;
 import org.fl.backupFiles.JobsChoice;
 import org.fl.backupFiles.BackUpJob.JobTaskType;
 
@@ -49,7 +49,7 @@ public class BackUpConfigChoicePane extends JPanel {
 		// List of all possible back up jobs
 		// The back up jobs are defined in Json files (one file per back up job)
 		// The first user action is to choose the back up job to execute
-		BackUpJobs backUpJobs = new BackUpJobs(configFileDir, bLog) ;
+		BackUpJobList backUpJobs = new BackUpJobList(configFileDir, bLog) ;
 		
 		Vector<BackUpJob> jobs = backUpJobs.getBackUpJobs() ;
 

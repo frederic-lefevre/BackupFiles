@@ -7,7 +7,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class BackUpJobs {
+public class BackUpJobList {
 
 	private Vector<BackUpJob> backUpJobs ;
 	private Logger bLog ;
@@ -16,7 +16,7 @@ public class BackUpJobs {
 	// Each back up job is defined by a Json configuration
 	// All the Json configurations are in files located in the directory path "configFilesDir"
 	// which is passed in parameter of the constructor
-	public BackUpJobs(Path configFilesDir, Logger l) {
+	public BackUpJobList(Path configFilesDir, Logger l) {
 		
 		bLog = l ;
 		backUpJobs = new Vector<BackUpJob>() ;
