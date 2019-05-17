@@ -107,10 +107,8 @@ public class BackupFilesGui  extends JFrame {
 			
 			if (bkpTablesPanel.getSelectedComponent().equals(appInfoPane)) {
 				appInfoPane.setInfos();
-			}
-			
+			}			
 		}
-		
 	}
 	
 	private class ShutdownAppli extends WindowAdapter {
