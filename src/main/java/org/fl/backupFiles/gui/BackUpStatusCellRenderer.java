@@ -10,7 +10,6 @@ import javax.swing.SwingConstants;
 
 import org.fl.backupFiles.BackUpItem.BackupStatus;
 
-
 public class BackUpStatusCellRenderer extends DefaultTableCellRenderer {
 
 	private static final long serialVersionUID = 1L;
@@ -26,13 +25,16 @@ public class BackUpStatusCellRenderer extends DefaultTableCellRenderer {
         setFont(getFont().deriveFont(Font.BOLD));
         if (backupStatus.equals(BackupStatus.DIFFERENT)) {
 			setBackground(DIFFERENT_COLOR);
+			setForeground(Color.BLACK);
         } else if (backupStatus.equals(BackupStatus.DONE)) {
 			setBackground(Color.YELLOW);
+			setForeground(Color.BLACK);
 		} else if (backupStatus.equals(BackupStatus.FAILED)) {
 			setBackground(Color.LIGHT_GRAY);
 			setForeground(Color.RED);
 		} else if (backupStatus.equals(BackupStatus.DIFF_BY_CONTENT)) {
 			setBackground(DIFF_BY_CONTENT_COLOR) ;
+			setForeground(Color.BLACK);
 		}
 		setHorizontalAlignment(SwingConstants.CENTER) ;
         return this;
