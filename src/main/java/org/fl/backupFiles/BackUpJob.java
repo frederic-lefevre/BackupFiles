@@ -63,36 +63,8 @@ public class BackUpJob {
 					jElem = jsonObjectConf.get(ITEMS) ;
 					if (jElem != null) {
 						
-						JsonArray jItems = jElem.getAsJsonArray() ;
-						
-						backUpTasks = new HashMap<JobTaskType, ArrayList<BackUpTask>>() ;
-						for (JobTaskType jtt : JobTaskType.values()) {
-							ArrayList<BackUpTask> tasksForJtt = new ArrayList<BackUpTask>() ;
-							backUpTasks.put(jtt, tasksForJtt) ;
-						}
+						getBackUpTasks(jElem.getAsJsonArray());
 
-						for (JsonElement jItem : jItems) {
-							
-							JsonObject jObjItem = jItem.getAsJsonObject() ;
-														
-							Path srcPath = getPathElement(jObjItem, SOURCE) ;
-							Path tgtPath = getPathElement(jObjItem, TARGET) ;
-							Path bufPath = getPathElement(jObjItem, BUFFER) ;
-
-							if ((srcPath != null) && (bufPath != null)) {
-								if (Files.isRegularFile(srcPath)) {
-									Path bufFile = bufPath.resolve(srcPath.getFileName()) ;
-									 backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile, bLog)) ;
-								} else {
-									 backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath, bLog)) ;
-								}
-							} else {
-								bLog.warning("No source / buffer element definition for back up job " + title);
-							}
-							if ((tgtPath != null) && (bufPath != null)) {
-								 backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath, bLog)) ;
-							}
-						}
 					} else {
 						bLog.severe("No items found inJSON configuration: " + jsonConfig );
 					}
@@ -105,6 +77,38 @@ public class BackUpJob {
 		}
 	}
 
+	private void getBackUpTasks(JsonArray jItems) {
+		
+		backUpTasks = new HashMap<JobTaskType, ArrayList<BackUpTask>>() ;
+		for (JobTaskType jtt : JobTaskType.values()) {
+			ArrayList<BackUpTask> tasksForJtt = new ArrayList<BackUpTask>() ;
+			backUpTasks.put(jtt, tasksForJtt) ;
+		}
+
+		for (JsonElement jItem : jItems) {
+			
+			JsonObject jObjItem = jItem.getAsJsonObject() ;
+										
+			Path srcPath = getPathElement(jObjItem, SOURCE) ;
+			Path tgtPath = getPathElement(jObjItem, TARGET) ;
+			Path bufPath = getPathElement(jObjItem, BUFFER) ;
+
+			if ((srcPath != null) && (bufPath != null)) {
+				if (Files.isRegularFile(srcPath)) {
+					Path bufFile = bufPath.resolve(srcPath.getFileName()) ;
+					 backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile, bLog)) ;
+				} else {
+					 backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath, bLog)) ;
+				}
+			} else {
+				bLog.warning("No source / buffer element definition for back up job " + title);
+			}
+			if ((tgtPath != null) && (bufPath != null)) {
+				 backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath, bLog)) ;
+			}
+		}
+	}
+	
 	public String toString() {
 		return title ;
 	}
