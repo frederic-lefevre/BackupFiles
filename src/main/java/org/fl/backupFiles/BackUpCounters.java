@@ -50,9 +50,10 @@ public class BackUpCounters {
 	public String toString() {
 		
 		StringBuilder res = new StringBuilder() ;
-		res.append(COPY_NEW_LABEL).append(copyNewNb).append(DELETE_LABEL).append(deleteNb).append("\n") ;
+		
+		res.append(COPY_NEW_LABEL	 ).append(copyNewNb	   ).append(DELETE_LABEL	).append(deleteNb	).append("\n") ;
 		res.append(COPY_REPLACE_LABEL).append(copyReplaceNb).append(DELETE_DIR_LABEL).append(deleteDirNb).append("\n") ;
-		res.append(COPY_TREE_LABEL).append(copyTreeNb).append(AMBIGUOUS_LABEL).append(ambiguousNb).append("\n") ;
+		res.append(COPY_TREE_LABEL	 ).append(copyTreeNb   ).append(AMBIGUOUS_LABEL	).append(ambiguousNb).append("\n") ;
 		
 		res.append(SOURCE_FILE_PROCESSED_LABEL).append(nbSourceFilesProcessed).append(SOURCE_FILE_FAILED_LABEL).append(nbSourceFilesFailed).append("\n") ;
 		res.append(TARGET_FILE_PROCESSED_LABEL).append(nbTargetFilesProcessed).append(TARGET_FILE_FAILED_LABEL).append(nbTargetFilesFailed).append("\n") ;
