@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -51,11 +50,9 @@ public class BackUpConfigChoicePane extends JPanel {
 		// The first user action is to choose the back up job to execute
 		BackUpJobList backUpJobs = new BackUpJobList(configFileDir, bLog) ;
 		
-		Vector<BackUpJob> jobs = backUpJobs.getBackUpJobs() ;
-
 		JLabel choiceLbl = new JLabel("Choix de la configuration de sauvegarde") ;
 		bkpChoicePanel.add(choiceLbl);
-		backUpJobChoice = new JList<BackUpJob>(jobs) ;
+		backUpJobChoice = new JList<BackUpJob>(backUpJobs) ;
 		backUpJobChoice.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		bkpChoicePanel.add(backUpJobChoice) ;
 			
