@@ -27,8 +27,7 @@ public class BackUpTask {
 		
 		if (source == null) {
 			bLog.severe("source path null when creating back up task") ;
-		}
-		
+		}		
 		compareContent  = false ;
 	}
 
