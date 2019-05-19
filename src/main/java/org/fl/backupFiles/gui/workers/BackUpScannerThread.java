@@ -233,7 +233,7 @@ public class BackUpScannerThread implements Callable<ScannerThreadResponse> {
 							backUpItemList.add(new BackUpItem(null, tgtPath, sourceDirectory, BackupAction.DELETE_DIR, pLog)) ;
 							backUpItemList.add(new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, pLog)) ;
 						} else {
-							compareFile(srcPath, tgtPath, sourceAttributes, targetAttributes, compareContent) ;	
+							compareFile(srcPath, tgtPath, sourceAttributes, targetAttributes) ;	
 						}
 					}
 				}
@@ -242,7 +242,7 @@ public class BackUpScannerThread implements Callable<ScannerThreadResponse> {
 		}
 	}
 	
-	private void compareFile(Path srcPath, Path tgtPath, BasicFileAttributes sourceAttributes, BasicFileAttributes targetAttributes, boolean compareContent) {
+	private void compareFile(Path srcPath, Path tgtPath, BasicFileAttributes sourceAttributes, BasicFileAttributes targetAttributes) {
 		
 		try {
 			
@@ -297,7 +297,7 @@ public class BackUpScannerThread implements Callable<ScannerThreadResponse> {
 				backUpItemList.add(new BackUpItem(null, tgtPath, srcPath, BackupAction.DELETE_DIR, pLog)) ;
 				backUpItemList.add(new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, pLog)) ;
 			}  else {
-				compareFile(srcPath, tgtPath, sourceAttributes, targetAttributes, compareContent) ;	
+				compareFile(srcPath, tgtPath, sourceAttributes, targetAttributes) ;
 			}
 		} catch (Exception e) {
 			filesVisitFailed.add(tgtPath) ;
