@@ -182,7 +182,7 @@ public class BackUpItem {
 				// compare files
 				
 				 FileComparator fileCompare = new FileComparator(bLog) ;
-				 if (fileCompare.areTheSame(sourcePath, targetPath)) {
+				 if (fileCompare.haveSameContent(sourcePath, targetPath)) {
 					 infos.append("\nThe contents of source and target files are the same\n") ;
 				 } else if (fileCompare.isOnError()) {
 					 infos.append("\nThe files comparaison raised an error\n") ;					 

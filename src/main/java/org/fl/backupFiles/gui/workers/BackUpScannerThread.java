@@ -249,7 +249,7 @@ public class BackUpScannerThread implements Callable<ScannerThreadResponse> {
 			 if (fileComparator != null) {
 				// Content comparison is asked to be sure
 				 
-				 if (! fileComparator.areTheSame(srcPath, tgtPath)) {
+				 if (! fileComparator.haveSameContent(srcPath, tgtPath)) {
 					 // file content are not the same (or there has been an error)
 					 if (fileComparator.isOnError()) {
 						 filesVisitFailed.add(tgtPath) ;
