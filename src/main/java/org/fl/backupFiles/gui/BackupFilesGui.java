@@ -3,6 +3,7 @@ package org.fl.backupFiles.gui;
 import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -24,15 +25,15 @@ import com.ibm.lge.fl.util.RunningContext;
 // Main class for the back up files application
 public class BackupFilesGui  extends JFrame {
 
-	private static final String DEFAULT_PROP_FILE = "backupFiles.properties";
-	
+	private static final String DEFAULT_PROP_FILE = "file:///FredericPersonnel/PortableApps/BackUpFiles/backupFiles.properties";
+
 	private static final long serialVersionUID = -2691160306708075667L;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					BackupFilesGui window = new BackupFilesGui();
+					BackupFilesGui window = new BackupFilesGui(DEFAULT_PROP_FILE);
 					window.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -47,57 +48,67 @@ public class BackupFilesGui  extends JFrame {
 	
 	private ApplicationInfoPane appInfoPane ;
 	
-	public BackupFilesGui() {
+	public BackupFilesGui(String propertiesUri) {
 
-		// Get context, properties, logger
-		RunningContext runningContext = new RunningContext("BackupFiles", null, DEFAULT_PROP_FILE);
-		bLog = runningContext.getpLog() ;
-		AdvancedProperties backupProperty = runningContext.getProps() ;
-		
-		// Get the different config files
-		Path configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir") ;
-		
-		// Init config
-		Config.initConfig(backupProperty) ;
-		
-		// Display GUI
-		setBounds(10, 10, 1880, 1000);
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setTitle("Sauvegarde de fichiers") ;
-		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));		
-				
-		BackUpJobInfoTableModel jobInformationTable = new BackUpJobInfoTableModel() ;
-		// Tabbed Panel for configuration, tables and controls, and history
-		bkpTablesPanel = new JTabbedPane() ;
+		RunningContext runningContext = null ;
+		Path 		   configFileDir  = null ;
+		try {
+			// Get context, properties, logger
+			runningContext = new RunningContext("BackupFiles", null, new URI(propertiesUri));
+			bLog = runningContext.getpLog() ;
+			AdvancedProperties backupProperty = runningContext.getProps() ;
 			
-		ArrayList<BackUpPane> backUpPanes = new ArrayList<BackUpPane>() ;
-		for (JobTaskType jtt : JobTaskType.values()) {
-			BackUpPane taskTypePane = new BackUpPane(jtt, jobInformationTable, bLog) ;
-			backUpPanes.add(taskTypePane) ;
-			bkpTablesPanel.add(jtt.toString(), taskTypePane) ;
+			// Get the different config files
+			configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir") ;
+			
+			// Init config
+			Config.initConfig(backupProperty) ;
+			
+		} catch (Exception e) {
+			System.out.println("Exception caught in Main (see default prop file processing)") ;
+			e.printStackTrace() ;
 		}
 		
-		BackUpConfigChoicePane configChoicePane = new BackUpConfigChoicePane(configFileDir, backUpPanes, bLog) ;	
-		
-		//  Tabbed Panel to choose back up configuration
-		bkpTablesPanel.add(configChoicePane, "Configuration", 0) ;
-
-		// Tabbed Panel to display a summary of oprations done
-		BackUpJobInfoPanel historiqueTab = new BackUpJobInfoPanel(jobInformationTable) ;
-		bkpTablesPanel.add("Historique", historiqueTab);
-		
-		// Tabbed Panel for application information
-		appInfoPane = new ApplicationInfoPane(runningContext) ;
-		bkpTablesPanel.add("Informations", appInfoPane) ;
-		
-		bkpTablesPanel.setSelectedIndex(0) ;
-		
-		bkpTablesPanel.addChangeListener(new BackUpTabChangeListener());
-		
-		getContentPane().add(bkpTablesPanel) ;
-		
-		addWindowListener(new ShutdownAppli()) ;
-		
+		if ((runningContext != null) && (configFileDir != null)) {
+		// Display GUI
+			
+			setBounds(10, 10, 1880, 1000);
+			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			setTitle("Sauvegarde de fichiers") ;
+			getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));		
+					
+			BackUpJobInfoTableModel jobInformationTable = new BackUpJobInfoTableModel() ;
+			// Tabbed Panel for configuration, tables and controls, and history
+			bkpTablesPanel = new JTabbedPane() ;
+				
+			ArrayList<BackUpPane> backUpPanes = new ArrayList<BackUpPane>() ;
+			for (JobTaskType jtt : JobTaskType.values()) {
+				BackUpPane taskTypePane = new BackUpPane(jtt, jobInformationTable, bLog) ;
+				backUpPanes.add(taskTypePane) ;
+				bkpTablesPanel.add(jtt.toString(), taskTypePane) ;
+			}
+			
+			BackUpConfigChoicePane configChoicePane = new BackUpConfigChoicePane(configFileDir, backUpPanes, bLog) ;	
+			
+			//  Tabbed Panel to choose back up configuration
+			bkpTablesPanel.add(configChoicePane, "Configuration", 0) ;
+	
+			// Tabbed Panel to display a summary of oprations done
+			BackUpJobInfoPanel historiqueTab = new BackUpJobInfoPanel(jobInformationTable) ;
+			bkpTablesPanel.add("Historique", historiqueTab);
+			
+			// Tabbed Panel for application information
+			appInfoPane = new ApplicationInfoPane(runningContext) ;
+			bkpTablesPanel.add("Informations", appInfoPane) ;
+			
+			bkpTablesPanel.setSelectedIndex(0) ;
+			
+			bkpTablesPanel.addChangeListener(new BackUpTabChangeListener());
+			
+			getContentPane().add(bkpTablesPanel) ;
+			
+			addWindowListener(new ShutdownAppli()) ;
+		}
 	}
 	
 	private class BackUpTabChangeListener implements ChangeListener {
