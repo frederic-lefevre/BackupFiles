@@ -6,8 +6,8 @@ import java.util.logging.Logger;
 
 public class BackUpTask {
 
-	private Path source ;
-	private Path target ;
+	private final Path source ;
+	private final Path target ;
 	
 	private boolean compareContent ;
 	
@@ -43,19 +43,6 @@ public class BackUpTask {
 		return source.toString() + " ==> " + target.toString() ;  
 	}
 	
-	@Override
-	public boolean equals(Object object) {
-		
-		if (object instanceof BackUpTask) {
-			
-			BackUpTask anotherTasks = (BackUpTask)object ;
-			return ( (source.equals(anotherTasks.getSource())) &&
-					 (target.equals(anotherTasks.getTarget()))) ;
-		} else {
-			return false ;
-		}
-	}
-	
 	public String eventualWarning() {
 		
 		String warning ;
@@ -79,6 +66,44 @@ public class BackUpTask {
 
 	public void setCompareContent(boolean compareContent) {
 		this.compareContent = compareContent;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((source == null) ? 0 : source.hashCode());
+		result = prime * result + ((target == null) ? 0 : target.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof BackUpTask)) {
+			return false;
+		}
+		BackUpTask other = (BackUpTask) obj;
+		if (source == null) {
+			if (other.source != null) {
+				return false;
+			}
+		} else if (!source.equals(other.source)) {
+			return false;
+		}
+		if (target == null) {
+			if (other.target != null) {
+				return false;
+			}
+		} else if (!target.equals(other.target)) {
+			return false;
+		}
+		return true;
 	}
 
 }
