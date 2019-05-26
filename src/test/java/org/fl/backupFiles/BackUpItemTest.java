@@ -2,7 +2,6 @@ package org.fl.backupFiles;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,8 +36,8 @@ public class BackUpItemTest {
 		final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/TestDir1/File1.pdf" ;
 		final String TGT_FILE1 =  "file:///ForTests/BackUpFiles/TestDir2/File1.pdf" ;
 		
-		Path src  = getPathFromUriString(SRC_FILE1) ;
-		Path tgt  = getPathFromUriString(TGT_FILE1) ;
+		Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
+		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 		
 		BackUpItem backUpItem = new BackUpItem(src, tgt, src, BackupAction.COPY_NEW, log) ;
 		
@@ -64,10 +63,6 @@ public class BackUpItemTest {
 		assertEquals(1, counters.nbTargetFilesProcessed) ;
 		assertEquals(4, getTotalCounters(counters)) ;
 		
-	}
-	
-	private Path getPathFromUriString(String uriString) {
-		return Paths.get(URI.create(uriString)) ;
 	}
 	
 	private long getTotalCounters(BackUpCounters counters) {
