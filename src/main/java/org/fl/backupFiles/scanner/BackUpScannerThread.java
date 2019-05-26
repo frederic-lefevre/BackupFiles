@@ -1,4 +1,4 @@
-package org.fl.backupFiles.gui.workers;
+package org.fl.backupFiles.scanner;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -97,9 +97,9 @@ public class BackUpScannerThread implements Callable<ScannerThreadResponse> {
 		}
 		backUpCounters.nbSourceFilesProcessed++ ;
 
-		done = true ;
 		long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed ;
 		status = status + "| Scan done " ;
+		done = true ;
 		if (compareContent) {
 			status = status + "with content compare " ;
 		}

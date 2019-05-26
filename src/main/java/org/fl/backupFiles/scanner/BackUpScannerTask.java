@@ -1,4 +1,4 @@
-package org.fl.backupFiles.gui.workers;
+package org.fl.backupFiles.scanner;
 
 import java.util.concurrent.Future;
 
