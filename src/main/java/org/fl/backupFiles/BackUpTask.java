@@ -40,22 +40,30 @@ public class BackUpTask {
 	}
 
 	public String toString() {
-		return source.toString() + " ==> " + target.toString() ;  
+		String toString ;
+		if ((source != null) && (target != null)) {
+			toString = source.toString() + " ==> " + target.toString() ; 
+		} else {
+			toString = null ;
+		}
+		return toString ;
 	}
 	
 	public String eventualWarning() {
 		
-		String warning ;
-		boolean sourceExists = Files.exists(source) ;
-		boolean targetExists = Files.exists(target) ;
-		if (!sourceExists && !targetExists) {
-			warning = warning1 ;
-		} else if (!sourceExists) {
-			warning = warning2 ;
-		} else if (!targetExists) {
-			warning = warning3 ;
-		} else {
-			warning = noWarning ;
+		String warning = null ;
+		if ((source != null) && (target != null)) {
+			boolean sourceExists = Files.exists(source) ;
+			boolean targetExists = Files.exists(target) ;
+			if (!sourceExists && !targetExists) {
+				warning = warning1 ;
+			} else if (!sourceExists) {
+				warning = warning2 ;
+			} else if (!targetExists) {
+				warning = warning3 ;
+			} else {
+				warning = noWarning ;
+			}
 		}
 		return warning ;
 	}
