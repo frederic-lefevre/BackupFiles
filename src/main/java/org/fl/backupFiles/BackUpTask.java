@@ -44,14 +44,16 @@ public class BackUpTask {
 	}
 	
 	@Override
-	public boolean equals(Object anotherTasks) {
+	public boolean equals(Object object) {
 		
-		return this.equals((BackUpTask)anotherTasks) ;
-	}
-	
-	private boolean equals(BackUpTask anotherTasks) {
-		return ( (source.equals(anotherTasks.getSource())) &&
-				 (target.equals(anotherTasks.getTarget()))) ;
+		if (object instanceof BackUpTask) {
+			
+			BackUpTask anotherTasks = (BackUpTask)object ;
+			return ( (source.equals(anotherTasks.getSource())) &&
+					 (target.equals(anotherTasks.getTarget()))) ;
+		} else {
+			return false ;
+		}
 	}
 	
 	public String eventualWarning() {

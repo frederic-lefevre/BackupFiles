@@ -23,6 +23,10 @@ class BackUpTaskTest {
 		BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
 		
 		assertFalse(backUpTask.compareContent()) ;
+		
+		BackUpTask backUpTask2 = new BackUpTask(src, tgt, log) ;
+		
+		assertTrue(backUpTask.equals(backUpTask2)) ;
 	}
 
 }
