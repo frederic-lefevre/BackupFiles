@@ -68,38 +68,38 @@ public class BackUpTask {
 		this.compareContent = compareContent;
 	}
 
+	// Hashcode with lazy init
+	private int hashcode = 0 ;
+	
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((source == null) ? 0 : source.hashCode());
-		result = prime * result + ((target == null) ? 0 : target.hashCode());
-		return result;
+		
+		int result = hashcode ;
+		
+		if (result == 0) {
+			final int prime = 31 ;
+			result = 1 ;
+			result = prime * result + ((source == null) ? 0 : source.hashCode()) ;
+			result = prime * result + ((target == null) ? 0 : target.hashCode()) ;
+		}
+		return result ;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof BackUpTask)) {
-			return false;
-		}
+		
+		if (this == obj) 				  	return true  ;
+		if (obj == null) 				  	return false ;		
+		if (!(obj instanceof BackUpTask)) 	return false ;
+		
 		BackUpTask other = (BackUpTask) obj;
 		if (source == null) {
-			if (other.source != null) {
-				return false;
-			}
+			if (other.source != null) 		return false ;
 		} else if (!source.equals(other.source)) {
 			return false;
 		}
 		if (target == null) {
-			if (other.target != null) {
-				return false;
-			}
+			if (other.target != null)		return false ;
 		} else if (!target.equals(other.target)) {
 			return false;
 		}
