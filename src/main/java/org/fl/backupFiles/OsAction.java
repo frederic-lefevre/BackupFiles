@@ -1,4 +1,4 @@
-package org.fl.backupFiles.gui;
+package org.fl.backupFiles;
 
 public class OsAction {
 

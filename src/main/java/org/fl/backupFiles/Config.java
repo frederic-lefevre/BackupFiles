@@ -7,7 +7,6 @@ import java.util.concurrent.Executors;
 
 import org.fl.backupFiles.gui.BackUpItemActionListener;
 import org.fl.backupFiles.gui.BackUpItemActionListener.CustomAction;
-import org.fl.backupFiles.gui.OsAction;
 
 import com.ibm.lge.fl.util.AdvancedProperties;
 
