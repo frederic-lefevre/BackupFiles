@@ -16,29 +16,34 @@ import com.ibm.lge.fl.util.file.FileComparator;
 public class BackUpItemTest {
 
 	@Test
-	void test() {
-		
-		Logger log = Logger.getGlobal();
+	void test1() {
 		
 		Path src 		 = Paths.get("") ;
 		Path tgt 		 = Paths.get("") ;
 		Path srcExisting = Paths.get("") ;
 		
-		BackUpItem backUpItem = new BackUpItem(src, tgt, srcExisting, BackupAction.COPY_REPLACE, log) ;
+		BackUpItem backUpItem = new BackUpItem(src, tgt, srcExisting, BackupAction.COPY_REPLACE, Logger.getGlobal()) ;
 		
 		BackupAction action = backUpItem.getBackupAction() ;
 		
 		assertEquals(BackupAction.COPY_REPLACE, action) ;
+	}
+		
+	@Test
+	void test2() {
+		
+		Logger log = Logger.getGlobal() ;
 		
 		final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/TestDir1/File1.pdf" ;
 		final String TGT_FILE1 =  "file:///ForTests/BackUpFiles/TestDir2/File1.pdf" ;
 		
-		src  = getPathFromUriString(SRC_FILE1) ;
-		tgt  = getPathFromUriString(TGT_FILE1) ;
-		backUpItem = new BackUpItem(src, tgt, src, BackupAction.COPY_NEW, log) ;
+		Path src  = getPathFromUriString(SRC_FILE1) ;
+		Path tgt  = getPathFromUriString(TGT_FILE1) ;
+		
+		BackUpItem backUpItem = new BackUpItem(src, tgt, src, BackupAction.COPY_NEW, log) ;
 		
 		BackUpCounters counters = new BackUpCounters() ;
-		assertEquals(0, counters.copyNewNb) ;
+		assertEquals(0, getTotalCounters(counters)) ;
 		backUpItem.execute(counters);
 		
 		FileComparator fileComparator = new FileComparator(log) ;
@@ -46,15 +51,37 @@ public class BackUpItemTest {
 		boolean same = fileComparator.haveSameContent(src, tgt) ;
 		assertTrue(same) ;		
 		assertEquals(1, counters.copyNewNb) ;
+		assertEquals(1, counters.nbSourceFilesProcessed) ;
+		assertEquals(2, getTotalCounters(counters)) ;
 		
 		backUpItem = new BackUpItem(null, tgt, src.getParent(), BackupAction.DELETE, log) ;
 		backUpItem.execute(counters);
 		
-		assertEquals(1, counters.deleteNb) ;
 		assertFalse(Files.exists(tgt)) ;
+		assertEquals(1, counters.copyNewNb) ;
+		assertEquals(1, counters.nbSourceFilesProcessed) ;
+		assertEquals(1, counters.deleteNb) ;
+		assertEquals(1, counters.nbTargetFilesProcessed) ;
+		assertEquals(4, getTotalCounters(counters)) ;
+		
 	}
 	
 	private Path getPathFromUriString(String uriString) {
 		return Paths.get(URI.create(uriString)) ;
+	}
+	
+	private long getTotalCounters(BackUpCounters counters) {
+		
+		return	counters.ambiguousNb			+
+				counters.contentDifferentNb		+
+				counters.copyNewNb				+
+				counters.copyReplaceNb			+
+				counters.copyTreeNb				+
+				counters.deleteDirNb			+
+				counters.deleteNb				+
+				counters.nbSourceFilesFailed	+
+				counters.nbSourceFilesProcessed	+
+				counters.nbTargetFilesFailed	+
+				counters.nbTargetFilesProcessed	;
 	}
 }
