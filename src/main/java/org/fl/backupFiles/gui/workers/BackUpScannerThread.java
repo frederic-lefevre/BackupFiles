@@ -19,7 +19,6 @@ import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.BackUpItem.BackupAction;
-import org.fl.backupFiles.gui.UiControl;
 
 import com.ibm.lge.fl.util.file.FileComparator;
 
@@ -45,7 +44,7 @@ public class BackUpScannerThread implements Callable<ScannerThreadResponse> {
 	private int 	maxDepth ;
 	private int		currDepth ;
 	
-	public BackUpScannerThread(UiControl u, BackUpTask but, Logger l) {
+	public BackUpScannerThread(BackUpTask but, Logger l) {
 		
 		stopAsked	= false ;
 		backUpTask  = but ;

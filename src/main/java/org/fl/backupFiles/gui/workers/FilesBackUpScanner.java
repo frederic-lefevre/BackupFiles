@@ -91,7 +91,7 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 					
 					if (Files.exists(sourcePath)) {
 						
-						BackUpScannerThread backUpScannerThread = new BackUpScannerThread(uiControl, backUpTask, pLog) ;
+						BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, pLog) ;
 						Future<ScannerThreadResponse> backUpRes =  scannerExecutor.submit(backUpScannerThread) ;
 						results.add(new BackUpScannerTask(backUpScannerThread, backUpRes)) ;
 						
