@@ -9,6 +9,7 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.BackUpCounters;
 import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.TestUtils;
@@ -37,16 +38,30 @@ class BackUpScannerThreadTest {
 			try {
 				Thread.sleep(300);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				log.log(Level.SEVERE, "Interruption exception in BackUpScannerThread test", e);
 				fail("Interrupted Exception");
 			}
 		}
 		try {
 			ScannerThreadResponse scannerResp = backUpRes.get() ;
-			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
+						
+			BackUpCounters backUpCounters = scannerResp.getBackUpCounters() ;			
+			assertEquals(0, backUpCounters.ambiguousNb) ;
+			assertEquals(0, backUpCounters.contentDifferentNb) ;
+			assertEquals(0, backUpCounters.copyNewNb) ;
+			assertEquals(0, backUpCounters.copyReplaceNb) ;
+			assertEquals(2, backUpCounters.copyTreeNb) ;
+			assertEquals(0, backUpCounters.deleteDirNb) ;
+			assertEquals(0, backUpCounters.deleteNb) ;
+			assertEquals(0, backUpCounters.nbSourceFilesFailed) ;
+			assertEquals(3, backUpCounters.nbSourceFilesProcessed) ;
+			assertEquals(0, backUpCounters.nbTargetFilesFailed) ;
+			assertEquals(0, backUpCounters.nbTargetFilesProcessed) ;
 			
+			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
 			assertNotNull(backUpItemList) ;
+			assertEquals(2, backUpItemList.size()) ;
+			
 		} catch (Exception e) {
 			log.log(Level.SEVERE, "Exception in BackUpScannerThread test", e);
 			fail("Exception");
