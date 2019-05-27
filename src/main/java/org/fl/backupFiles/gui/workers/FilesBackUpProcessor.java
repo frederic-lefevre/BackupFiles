@@ -20,19 +20,19 @@ public class FilesBackUpProcessor extends SwingWorker<String,BackupFilesInformat
 
 	private Logger pLog ;
 	
-	private UiControl uiControl ;
+	private final UiControl uiControl ;
 	
-	private BackUpTableModel backUpTableModel ;
+	private final BackUpTableModel backUpTableModel ;
 	private BackUpItemList 	 backUpItemList ;
 	private BackUpJobInfoTableModel backUpJobInfoTableModel ;
 	
 	private ProgressInformationPanel progressPanel;
 	
-	private JobsChoice jobsChoice ;
-	private JobTaskType 	jobTaskType ;
+	private final JobsChoice  jobsChoice ;
+	private final JobTaskType jobTaskType ;
 
-	private int  refreshRate ;
-	private long maxRefreshInterval ;
+	private final int  refreshRate ;
+	private final long maxRefreshInterval ;
 	
 	private BackUpCounters backUpCounters ;
 	
