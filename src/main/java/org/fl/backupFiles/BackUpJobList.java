@@ -23,9 +23,13 @@ public class BackUpJobList extends Vector<BackUpJob> {
 		
 		try (DirectoryStream<Path> paths = Files.newDirectoryStream(configFilesDir, "*.json")) {
 			for (Path configFile : paths) {
-				bLog.fine("Find config file " + configFile.toString());
+				if (bLog.isLoggable(Level.FINE)) {
+					bLog.fine("Find config file " + configFile.toString());
+				}
 				String jsonConfig =  new String(Files.readAllBytes(configFile)) ;
-				bLog.finest("New configuration : " + jsonConfig);
+				if (bLog.isLoggable(Level.FINEST)) {
+					bLog.finest("New configuration : " + jsonConfig);
+				}
 				addElement(new BackUpJob(jsonConfig, bLog));
 			}
 		} catch (Exception e) {
