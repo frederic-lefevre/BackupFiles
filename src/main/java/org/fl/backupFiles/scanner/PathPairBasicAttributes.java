@@ -9,9 +9,11 @@ import java.util.logging.Logger;
 
 public class PathPairBasicAttributes {
 
-	private Path   				sourcePath ;
-	private BasicFileAttributes sourceBasicAttributes ;
+	private final Path   		sourcePath ;
 	private Path   				targetPath ;
+	
+	private BasicFileAttributes sourceBasicAttributes ;
+	
 	private BasicFileAttributes targetBasicAttributes ;
 	private Logger 				pLog ;
 	

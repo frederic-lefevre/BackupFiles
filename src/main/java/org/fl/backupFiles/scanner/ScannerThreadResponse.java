@@ -9,11 +9,11 @@ import org.fl.backupFiles.BackUpTask;
 
 public class ScannerThreadResponse {
 
-	private BackUpTask backUpTask ;
-	private ArrayList<Path> filesVisitFailed ;	
+	private final BackUpTask 	  backUpTask ;
+	private final ArrayList<Path> filesVisitFailed ;	
 
-	private BackUpItemList 	backUpItemList ;	
-	private BackUpCounters backUpCounters ;
+	private final BackUpItemList backUpItemList ;	
+	private final BackUpCounters backUpCounters ;
 	
 	public ScannerThreadResponse(BackUpTask but, BackUpItemList bil, BackUpCounters buc, ArrayList<Path> fvf) {
 		

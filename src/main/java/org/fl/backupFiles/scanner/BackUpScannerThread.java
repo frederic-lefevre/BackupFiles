@@ -32,7 +32,7 @@ public class BackUpScannerThread implements Callable<ScannerThreadResponse> {
 	
 	private BackUpCounters backUpCounters ;
 	
-	private BackUpTask backUpTask ;
+	private final BackUpTask backUpTask ;
 	
 	private Logger pLog ;
 	

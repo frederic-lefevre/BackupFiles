@@ -4,9 +4,9 @@ import java.util.concurrent.Future;
 
 public class BackUpScannerTask {
 
-	private BackUpScannerThread backUpScannerThread ;
-	private Future<ScannerThreadResponse> futureResponse ;
-	private boolean resultRecorded ;
+	private final BackUpScannerThread 			backUpScannerThread ;
+	private final Future<ScannerThreadResponse> futureResponse ;
+	private boolean 							resultRecorded ;
 	
 	public BackUpScannerTask(BackUpScannerThread bst, Future<ScannerThreadResponse> fr) {
 		backUpScannerThread = bst ;
