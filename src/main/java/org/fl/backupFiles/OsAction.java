@@ -2,9 +2,9 @@ package org.fl.backupFiles;
 
 public class OsAction {
 
-	private String  actionTitle ;
-	private String  actionCommand ;
-	private boolean separateParam ;
+	private final String  actionTitle ;
+	private final String  actionCommand ;
+	private final boolean separateParam ;
 	
 	public OsAction(String t, String c, boolean s) {
 		actionTitle   = t ;
