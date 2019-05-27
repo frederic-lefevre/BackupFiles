@@ -12,24 +12,27 @@ import com.ibm.lge.fl.util.file.FilesUtils;
 
 public class TargetFileStore {
 
-	private FileStore fileStore ;
-	private Path mountPoint ;
+	private final FileStore fileStore ;
+	private final Path mountPoint ;
 	private Logger tLog ;
 	private long initialRemainingSpace ;
 	
 	public TargetFileStore(Path path, Logger l) {
 		
 		tLog = l ;
+		FileStore fs = null ;
+		Path	  mp = null ;
 		if ((path != null) && (Files.exists(path))) {
 			try {
-				fileStore  			  = Files.getFileStore(path) ;
-				mountPoint 			  = FilesUtils.getMountPoint(path, tLog) ;
-				initialRemainingSpace = fileStore.getUsableSpace() ;
-			} catch (IOException e) {
-				fileStore = null ;			
+				fs  			  	  = Files.getFileStore(path) ;
+				mp 			  		  = FilesUtils.getMountPoint(path, tLog) ;
+				initialRemainingSpace = fs.getUsableSpace() ;
+			} catch (IOException e) {	
 				tLog.log(Level.SEVERE, "IOException when getting filestore and mount point for " + path, e) ;
 			}
 		}
+		fileStore   = fs ;
+		mountPoint = mp ;
 	}
 
 	public void setInitialRemainingSpace() {
