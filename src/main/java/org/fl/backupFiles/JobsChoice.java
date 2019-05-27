@@ -12,11 +12,12 @@ import org.fl.backupFiles.BackUpJob.JobTaskType;
 
 public class JobsChoice {
 
-	private List<BackUpJob> backUpJobs ;
-	private String 			jobsTitleString ;
-	private String 			jobsTitleHtml ;
-	private String 			jobsDetail ;
-	private StringBuilder 	details ;
+	private final List<BackUpJob> backUpJobs ;
+	private final String 		  jobsTitleString ;
+	private final String 		  jobsTitleHtml ;
+	private final String 		  jobsDetail ;
+	private final StringBuilder   details ;
+	
 	private boolean			compareContent ;
 	
 	private Logger jLog ;
@@ -25,7 +26,7 @@ public class JobsChoice {
 	private final static String taskJobSeparator = "\n\n" ;
 	private final static String taskSeparator 	 = "\n" ;
 	
-	private HashMap<JobTaskType, ArrayList<BackUpTask>> backUpTasks ;
+	private final HashMap<JobTaskType, ArrayList<BackUpTask>> backUpTasks ;
 	
 	private HashMap<FileStore,TargetFileStore> targetFileStores ;
 	
