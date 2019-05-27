@@ -112,7 +112,7 @@ public class JobsChoice {
 					} else {
 						// Target file store exists in the map
 						// just update remaining space
-						targetFileStores.get(fs).setInitialRemainingSpace() ;
+						targetFileStores.get(fs).memorizeInitialRemainingSpace() ;
 					}
 				}
 			}

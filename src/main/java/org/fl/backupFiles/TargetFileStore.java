@@ -35,7 +35,7 @@ public class TargetFileStore {
 		mountPoint = mp ;
 	}
 
-	public void setInitialRemainingSpace() {
+	public void memorizeInitialRemainingSpace() {
 		if (fileStore != null) {
 			try {
 				initialRemainingSpace = fileStore.getUsableSpace() ;
