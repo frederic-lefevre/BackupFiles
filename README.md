@@ -16,6 +16,6 @@ as possible. After this first phase, you may open whatever application in parall
 This has also 2 other advantages : the possibility to have a local fast access backup and to have several target backup done from
 a single buffer backup (2 backup on 2 USB keys for instance).
 
-It has acceptable performances (something like 400K files scanning in 20 seconds in the buffer phase).
+It has acceptable performances (something like 400K files scanning in 20 seconds in the buffer phase). The scanning is multi-threaded.
 
 It has a content comparaison option (which slows down the process naturally).
