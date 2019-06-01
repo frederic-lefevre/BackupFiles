@@ -12,7 +12,7 @@ public class BackUpItemList extends LinkedList<BackUpItem> {
 		super() ;
 	}
 	
-	public void clearDone() {
+	public void removeItemsDone() {
 		
 		int idx = 0 ;
 		while (size() > idx) {

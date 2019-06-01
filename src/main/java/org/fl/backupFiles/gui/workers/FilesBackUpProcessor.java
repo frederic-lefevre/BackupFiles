@@ -115,7 +115,7 @@ public class FilesBackUpProcessor extends SwingWorker<String,BackupFilesInformat
 	 @Override
 	 protected void done() {
 		 
-		 backUpItemList.clearDone() ;
+		 backUpItemList.removeItemsDone() ;
 		 backUpTableModel.fireTableDataChanged() ;
 		 backUpJobInfoTableModel.fireTableDataChanged() ;
 	 }
