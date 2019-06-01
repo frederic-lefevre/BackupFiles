@@ -20,13 +20,13 @@ public class BackUpItem {
 	
 	public enum BackupStatus { DIFFERENT, DIFF_BY_CONTENT, DONE, FAILED } ;
 
-	private Path 		 sourcePath ;
-	private Path 		 sourceClosestExistingPath ;
-	private Path 		 targetPath ;
-	private BackupAction backupAction ;
-	private BackupStatus backupStatus ;
-	private boolean		 diffByContent ;
-	private Logger		 bLog ;
+	private final Path	 		sourcePath ;
+	private final Path 		 	sourceClosestExistingPath ;
+	private final Path 		 	targetPath ;
+	private final BackupAction 	backupAction ;
+	private BackupStatus 		backupStatus ;
+	private boolean		 		diffByContent ;
+	private Logger		 		bLog ;
 	
 	// A back up item is :
 	// * a source path (file or directory) to back up 
