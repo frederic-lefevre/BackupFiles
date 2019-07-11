@@ -21,6 +21,7 @@ import org.fl.backupFiles.BackUpJob.JobTaskType;
 
 import com.ibm.lge.fl.util.AdvancedProperties;
 import com.ibm.lge.fl.util.RunningContext;
+import com.ibm.lge.fl.util.swing.ApplicationInfoPane;
 
 // Main class for the back up files application
 public class BackupFilesGui  extends JFrame {
