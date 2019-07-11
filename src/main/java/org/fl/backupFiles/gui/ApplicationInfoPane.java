@@ -22,7 +22,7 @@ public class ApplicationInfoPane extends JPanel {
 	private RunningContext runningContext ;
 	
 	private JTextArea infosText ;
-	private JScrollPane scrollInfos ;
+	private final JScrollPane scrollInfos ;
 	
 	public ApplicationInfoPane(RunningContext rc) {
 		super() ;
