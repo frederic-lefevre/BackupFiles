@@ -22,6 +22,7 @@ import org.fl.backupFiles.BackUpJob.JobTaskType;
 import com.ibm.lge.fl.util.AdvancedProperties;
 import com.ibm.lge.fl.util.RunningContext;
 import com.ibm.lge.fl.util.swing.ApplicationInfoPane;
+import com.ibm.lge.fl.util.swing.LogsDisplayPane;
 
 // Main class for the back up files application
 public class BackupFilesGui  extends JFrame {
@@ -101,6 +102,10 @@ public class BackupFilesGui  extends JFrame {
 			// Tabbed Panel for application information
 			appInfoPane = new ApplicationInfoPane(runningContext) ;
 			bkpTablesPanel.add("Informations", appInfoPane) ;
+			
+			// Tabbed Panel for logs display
+			LogsDisplayPane lPane = new LogsDisplayPane(bLog) ;
+			bkpTablesPanel.addTab("Logs display", lPane) ;
 			
 			bkpTablesPanel.setSelectedIndex(0) ;
 			
