@@ -155,9 +155,8 @@ public class UiControl extends JPanel {
 				bLog.fine("Scan action launched");
 				uiControl.setIsRunning(true);
 				
-				if (compareContentSelect.isSelected()) {
-					jobsChoice.setCompareContent(jobTaskType, true) ;
-				}
+				jobsChoice.setCompareContent(jobTaskType, compareContentSelect.isSelected()) ;
+				
 				FilesBackUpScanner   fScan 	 = new FilesBackUpScanner(uiControl, jobTaskType, jobsChoice, backUpTableModel, progressPanel, backUpJobInfoTableModel, bLog) ;				
 				fScan.execute() ;
 			}  else if (ae.getSource() == stopButton) {	
