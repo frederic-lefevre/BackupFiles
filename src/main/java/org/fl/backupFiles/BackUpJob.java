@@ -118,14 +118,6 @@ public class BackUpJob {
 		return backUpTasks.get(jobTaskType) ;
 	}
 	
-	public void setCompareContent(JobTaskType jobTaskType, boolean cc) {
-		
-		ArrayList<BackUpTask> bupTasks = getTasks(jobTaskType) ;
-		for (BackUpTask backUpTask : bupTasks) {
-			backUpTask.setCompareContent(cc);
-		}
-	}
-	
 	private Path getPathElement(JsonObject jObjItem, String prop) {
 		
 		Path returnPath = null ;
