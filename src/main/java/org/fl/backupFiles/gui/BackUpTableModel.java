@@ -17,8 +17,7 @@ public class BackUpTableModel extends AbstractTableModel {
 	
 	public BackUpTableModel(BackUpItemList bt) {
 		super();
-		backUpItems = bt ;
-		
+		backUpItems = bt ;		
 	}
 
 	public BackUpItemList getBackUpItems() {

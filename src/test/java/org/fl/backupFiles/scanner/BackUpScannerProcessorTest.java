@@ -28,11 +28,13 @@ class BackUpScannerProcessorTest {
 	@Test
 	void test() {
 		
-		Logger log = Logger.getGlobal() ;
 		try {
 					
 			RunningContext runningContext = new RunningContext("BackupFilesTest", null, new URI(DEFAULT_PROP_FILE));
 			Config.initConfig(runningContext.getProps());
+			
+			Logger log = runningContext.getpLog() ;
+			
 			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
 			
 			final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Buffer" ;
@@ -116,10 +118,8 @@ class BackUpScannerProcessorTest {
 			Files.createDirectory(tgt) ;
 			
 		} catch (Exception e) {
-			log.log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
-			fail("Exception");
-		}
-		
+			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
+			fail("Exception " + e.getMessage());
+		}	
 	}
-
 }
