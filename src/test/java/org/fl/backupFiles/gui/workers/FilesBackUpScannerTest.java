@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpJob;
 import org.fl.backupFiles.BackUpJob.JobTaskType;
 import org.fl.backupFiles.BackUpJobList;
@@ -50,17 +51,25 @@ class FilesBackUpScannerTest {
 		BackUpJob backUpJob = backUpJobs.firstElement() ;
 		JobsChoice jobsChoice = new JobsChoice(Arrays.asList(backUpJob), log) ;
 		
-		BackUpJobInfoTableModel  bujitm = new BackUpJobInfoTableModel() ;
-		ProgressInformationPanel pip    = new ProgressInformationPanel() ;
-		BackUpTableModel         btm    = new BackUpTableModel(null) ;
-		UiControl				 uicS2B	= new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm, log) ;
-		UiControl				 uicB2T	= new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm, log) ;
+		BackUpJobInfoTableModel  bujitm 	 = new BackUpJobInfoTableModel() ;
+		ProgressInformationPanel pip    	 = new ProgressInformationPanel() ;
+		BackUpItemList 			 backUpItems = new BackUpItemList() ;
+		BackUpTableModel         btm    	 = new BackUpTableModel(backUpItems) ;
+		UiControl				 uicS2B		 = new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm, log) ;
+		UiControl				 uicB2T		 = new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm, log) ;
 		
 		FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm, log) ;
-
-		// TODO : clean generated source files, buffer and target
+		assertEquals(0, backUpItems.size()) ;
 		
-		fail("Not yet implemented");		
+		filesBackUpScanner.execute();
+		
+		// Wait for filesBackUpScanner end
+		filesBackUpScanner.get() ;
+		
+		assertNotEquals(0, backUpItems.size()) ;
+		
+		// TODO : clean generated source files, buffer and target
+			
 		
 	} catch (Exception e) {
 		Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
