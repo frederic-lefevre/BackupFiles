@@ -3,8 +3,11 @@ package org.fl.backupFiles.gui.workers;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URI;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,66 +32,88 @@ class FilesBackUpScannerTest {
 	
 	@Test
 	void test() {
-		
-	try {	
-		RunningContext runningContext = new RunningContext("BackupFilesTest", null, new URI(DEFAULT_PROP_FILE));
-		Logger log = runningContext.getpLog() ;
-		
-		AdvancedProperties backupProperty = runningContext.getProps() ;
-		Config.initConfig(runningContext.getProps());
-		
-		// Get the different config files
-		Path configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir") ;
-		
-		// TODO : generate source files
-		
-		BackUpJobList backUpJobs = new BackUpJobList(configFileDir, log) ;
-		
-		if ((backUpJobs == null) || (backUpJobs.isEmpty())) {
-			fail("Null or empty BackUpJobList");
-		}
-		
-		BackUpJob backUpJob = backUpJobs.firstElement() ;
-		JobsChoice jobsChoice = new JobsChoice(Arrays.asList(backUpJob), log) ;
-		
-		BackUpJobInfoTableModel  bujitm 	 = new BackUpJobInfoTableModel() ;
-		ProgressInformationPanel pip    	 = new ProgressInformationPanel() ;
-		BackUpItemList 			 backUpItems = new BackUpItemList() ;
-		BackUpTableModel         btm    	 = new BackUpTableModel(backUpItems) ;
-		UiControl				 uicS2B		 = new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm, log) ;
-		UiControl				 uicB2T		 = new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm, log) ;
-		
-		// SOURCE_TO_BUFFER
-		FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm, log) ;
-		assertEquals(0, backUpItems.size()) ;
-		
-		filesBackUpScanner.execute();
-		
-		// Wait for filesBackUpScanner end
-		filesBackUpScanner.get() ;
-		
-		// buffer is supposed to be the same as source
-		assertEquals(0, backUpItems.size()) ;
-		
-		// BUFFER_TO_TARGET
-		filesBackUpScanner = new FilesBackUpScanner(uicB2T, JobTaskType.BUFFER_TO_TARGET, jobsChoice, btm, pip, bujitm, log) ;
-		assertEquals(0, backUpItems.size()) ;
-		
-		filesBackUpScanner.execute();
-		
-		// Wait for filesBackUpScanner end
-		filesBackUpScanner.get() ;
-		
-		// target is supposed to be empty
-		assertNotEquals(0, backUpItems.size()) ;
-		
-		// TODO : clean generated source files, buffer and target
+
+		try {	
+			RunningContext runningContext = new RunningContext("BackupFilesTest", null, new URI(DEFAULT_PROP_FILE));
+			Logger log = runningContext.getpLog() ;
+
+			AdvancedProperties backupProperty = runningContext.getProps() ;
+			Config.initConfig(runningContext.getProps());
+
+			// Get the different config files
+			Path configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir") ;
 			
-		
-	} catch (Exception e) {
-		Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
-		fail("Exception");
+			generateTestData(configFileDir, log) ;
+
+			BackUpJobList backUpJobs = new BackUpJobList(configFileDir, log) ;
+
+			if ((backUpJobs == null) || (backUpJobs.isEmpty())) {
+				fail("Null or empty BackUpJobList");
+			} else if (backUpJobs.size() > 1) {
+				fail("There should be only 1 BackUpJob");
+			}
+
+			BackUpJob backUpJob = backUpJobs.firstElement() ;
+			JobsChoice jobsChoice = new JobsChoice(Arrays.asList(backUpJob), log) ;
+
+			BackUpJobInfoTableModel  bujitm 	 = new BackUpJobInfoTableModel() ;
+			ProgressInformationPanel pip    	 = new ProgressInformationPanel() ;
+			BackUpItemList 			 backUpItems = new BackUpItemList() ;
+			BackUpTableModel         btm    	 = new BackUpTableModel(backUpItems) ;
+			UiControl				 uicS2B		 = new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm, log) ;
+			UiControl				 uicB2T		 = new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm, log) ;
+
+			// SOURCE_TO_BUFFER
+			FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm, log) ;
+			assertEquals(0, backUpItems.size()) ;
+
+			filesBackUpScanner.execute();
+
+			// Wait for filesBackUpScanner end
+			filesBackUpScanner.get() ;
+
+			// buffer is supposed to be the same as source
+			assertEquals(0, backUpItems.size()) ;
+
+			// BUFFER_TO_TARGET
+			filesBackUpScanner = new FilesBackUpScanner(uicB2T, JobTaskType.BUFFER_TO_TARGET, jobsChoice, btm, pip, bujitm, log) ;
+			assertEquals(0, backUpItems.size()) ;
+
+			filesBackUpScanner.execute();
+
+			// Wait for filesBackUpScanner end
+			filesBackUpScanner.get() ;
+
+			// target is supposed to be empty
+			assertNotEquals(0, backUpItems.size()) ;
+
+			// TODO : clean generated source files, buffer and target
+
+
+		} catch (Exception e) {
+			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
+			fail("Exception");
+		}
 	}
+
+	private void generateTestData(Path configFilesDir, Logger bLog) throws Exception {
+		// TODO : generate source and buffer files
+		
+		Optional<Path> jsonConfOpt = 
+				Files.find(configFilesDir, 
+				     	   2,
+				     	   (path, basicFileAttributes) -> path.toFile().getName().matches(".*.json"))
+					.findFirst() ;
+		
+		if (jsonConfOpt.isPresent()) {
+			Path jsonConfPath = jsonConfOpt.get() ;
+			
+			String jsonConfig =  new String(Files.readAllBytes(jsonConfPath)) ;
+			
+		} else {
+			fail("No config file found in " + configFilesDir) ;
+		}			
+		
 	}
 
 }
