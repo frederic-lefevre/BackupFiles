@@ -58,6 +58,7 @@ class FilesBackUpScannerTest {
 		UiControl				 uicS2B		 = new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm, log) ;
 		UiControl				 uicB2T		 = new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm, log) ;
 		
+		// SOURCE_TO_BUFFER
 		FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm, log) ;
 		assertEquals(0, backUpItems.size()) ;
 		
@@ -66,6 +67,19 @@ class FilesBackUpScannerTest {
 		// Wait for filesBackUpScanner end
 		filesBackUpScanner.get() ;
 		
+		// buffer is supposed to be the same as source
+		assertEquals(0, backUpItems.size()) ;
+		
+		// BUFFER_TO_TARGET
+		filesBackUpScanner = new FilesBackUpScanner(uicB2T, JobTaskType.BUFFER_TO_TARGET, jobsChoice, btm, pip, bujitm, log) ;
+		assertEquals(0, backUpItems.size()) ;
+		
+		filesBackUpScanner.execute();
+		
+		// Wait for filesBackUpScanner end
+		filesBackUpScanner.get() ;
+		
+		// target is supposed to be empty
 		assertNotEquals(0, backUpItems.size()) ;
 		
 		// TODO : clean generated source files, buffer and target
