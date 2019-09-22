@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -46,7 +47,7 @@ class BackUpScannerProcessorTest {
 			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
-			Future<ScannerThreadResponse> backUpRes = scannerExecutor.submit(backUpScannerThread) ;
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
 			
 			while (! backUpRes.isDone()) {
 				try {
@@ -96,7 +97,7 @@ class BackUpScannerProcessorTest {
 			// Recompare directory
 			backUpTask.setCompareContent(true) ;
 			backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
-			backUpRes = scannerExecutor.submit(backUpScannerThread) ;
+			backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
 			
 			while (! backUpRes.isDone()) {
 				try {

@@ -94,7 +94,15 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 					if (Files.exists(sourcePath)) {
 						
 						BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, pLog) ;
-						CompletableFuture<ScannerThreadResponse> backUpRes  = CompletableFuture.supplyAsync(backUpScannerThread::call, scannerExecutor) ;
+						CompletableFuture<ScannerThreadResponse> backUpRes  = 
+							CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor)
+											.thenApply(scannerResp -> { 
+												backUpCounters.add(scannerResp.getBackUpCounters());
+												filesVisitFailed.addAll(scannerResp.getFilesVisitFailed()) ;
+												backUpItemList.addAll(scannerResp.getBackUpItemList());
+												return scannerResp ;
+											});
+						
 						results.add(new BackUpScannerTask(backUpScannerThread, backUpRes)) ;
 						
 						
@@ -116,14 +124,6 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 							// one backUpTask has finished
 								
 							nbActiveTasks-- ;								
-							try {
-								ScannerThreadResponse scannerResp = oneResult.getFutureResponse().get() ;
-								backUpCounters.add(scannerResp.getBackUpCounters());
-								filesVisitFailed.addAll(scannerResp.getFilesVisitFailed()) ;
-								backUpItemList.addAll(scannerResp.getBackUpItemList());
-							} catch (Exception e) {
-								pLog.log(Level.SEVERE, "Exception in scanner thread " + oneResult.getBackUpScannerThread().getCurrentStatus(uiControl.isStopAsked()));
-							}
 							oneResult.setResultRecorded(true) ;
 						
 						} 
@@ -169,8 +169,7 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 		uiControl.setStopAsked(false) ;
 		return null;
 	}
-
-
+	
 	 @Override
      protected void process(java.util.List<BackupFilesInformation> chunks) {
 		 

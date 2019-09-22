@@ -9,7 +9,6 @@ import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,7 +21,7 @@ import org.fl.backupFiles.BackUpItem.BackupAction;
 
 import com.ibm.lge.fl.util.file.FileComparator;
 
-public class BackUpScannerThread implements Callable<ScannerThreadResponse> {
+public class BackUpScannerThread {
 
 	private boolean stopAsked ;
 
@@ -68,8 +67,7 @@ public class BackUpScannerThread implements Callable<ScannerThreadResponse> {
 		}
 	}
 
-	@Override
-	public ScannerThreadResponse call() {
+	public ScannerThreadResponse scan() {
 
 		Path sourcePath  = backUpTask.getSource() ; 
 		Path targetPath  = backUpTask.getTarget() ;

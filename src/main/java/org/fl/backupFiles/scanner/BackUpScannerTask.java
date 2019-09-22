@@ -1,5 +1,6 @@
 package org.fl.backupFiles.scanner;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 public class BackUpScannerTask {
@@ -8,7 +9,7 @@ public class BackUpScannerTask {
 	private final Future<ScannerThreadResponse> futureResponse ;
 	private boolean 							resultRecorded ;
 	
-	public BackUpScannerTask(BackUpScannerThread bst, Future<ScannerThreadResponse> fr) {
+	public BackUpScannerTask(BackUpScannerThread bst, CompletableFuture<ScannerThreadResponse> fr) {
 		backUpScannerThread = bst ;
 		futureResponse		= fr ;
 		resultRecorded		= false ;
