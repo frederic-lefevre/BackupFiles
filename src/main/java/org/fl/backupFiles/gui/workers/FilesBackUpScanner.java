@@ -33,10 +33,9 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 	
 	private UiControl uiControl ;
 	
-	private BackUpTableModel 		backUpTableModel ;
-	private BackUpItemList 			backUpItemList ;
-	private BackUpJobInfoTableModel backUpJobInfoTableModel ;
-	
+	private BackUpTableModel 		 backUpTableModel ;
+	private BackUpItemList 			 backUpItemList ;
+	private BackUpJobInfoTableModel  backUpJobInfoTableModel ;	
 	private ProgressInformationPanel progressPanel;
 	
 	private JobsChoice		jobsChoice ;
@@ -57,9 +56,8 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 		// back up items
 		backUpItemList = backUpTableModel.getBackUpItems() ;
 		
-		jobsChoice 	= jc ;
-		jobTaskType	= jtt ;
-		
+		jobsChoice 				= jc ;
+		jobTaskType				= jtt ;		
 		backUpJobInfoTableModel = bj ;
 		
 		backUpCounters = new BackUpCounters() ;
@@ -112,9 +110,12 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 					jobProgress.setLength(0) ;
 					for (BackUpScannerTask oneResult : results) {
 						
-						if (oneResult.getFutureResponse().isDone()) {
-							// one backUpTask has finished								
-							nbActiveTasks-- ;													
+						if ( (! oneResult.isResultRecorded()) &&
+							 (oneResult.getFutureResponse().isDone())) {
+							// one backUpTask has finished
+								
+							nbActiveTasks-- ;								
+							oneResult.setResultRecorded(true) ;						
 						} 
 						jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus(uiControl.isStopAsked())).append("\n") ;
 					}
@@ -200,8 +201,7 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 		 backUpTableModel.fireTableDataChanged() ;
 		 backUpJobInfoTableModel.fireTableDataChanged() ;
 	 }
-	 
- 
+	  
 	 private String getScanInfoHtml(long duration) {
 		 
 		 StringBuilder scanInfo = new StringBuilder(1024) ;
@@ -228,6 +228,5 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 			 }
 		 }
 		 return jobsChoice.getTitleAsString() + "\n" + scanInfo.toString() ;
-	 }
-	 
+	 }	 
 }
