@@ -3,6 +3,7 @@ package org.fl.backupFiles.gui.workers;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -18,6 +19,8 @@ import org.fl.backupFiles.gui.BackUpJobInfoTableModel;
 import org.fl.backupFiles.gui.BackUpTableModel;
 import org.fl.backupFiles.gui.ProgressInformationPanel;
 import org.fl.backupFiles.gui.UiControl;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.ibm.lge.fl.util.AdvancedProperties;
@@ -29,27 +32,43 @@ class FilesBackUpScannerTest {
 	
 	private static final int THREAD_TO_NB_DIR_CORRELATION = 2 ;
 	
-	@Test
-	void test() {
-
-		try {	
+	private static Logger 		   log ;
+	private static TestDataManager testDataManager ;
+	private static Path 		   configFileDir ;
+	private static int 			   threadPoolSize ;
+	
+	@BeforeAll
+	static void generateTestData() {
+				
+		try {
 			RunningContext runningContext = new RunningContext("BackupFilesTest", null, new URI(DEFAULT_PROP_FILE));
-			Logger log = runningContext.getpLog() ;
+
+			log = runningContext.getpLog() ;
 
 			AdvancedProperties backupProperty = runningContext.getProps() ;
 			Config.initConfig(runningContext.getProps());
 
 			// Get the different config path
-			Path configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir") ;
-			
-			int threadPoolSize = backupProperty.getInt("backupFiles.scan.threadPoolSize", THREAD_TO_NB_DIR_CORRELATION) ;
-			
-			TestDataManager testDataManager = new TestDataManager(configFileDir, log) ;
-			boolean genearationSuccessful = testDataManager.generateTestData(threadPoolSize*2) ;
+			configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir") ;
+
+			threadPoolSize = backupProperty.getInt("backupFiles.scan.threadPoolSize", 100) ;
+
+			testDataManager = new TestDataManager(configFileDir, log) ;
+			boolean genearationSuccessful = testDataManager.generateTestData(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION) ;
 			if (! genearationSuccessful) {
 				fail("Fail to generate test data") ;
 			}
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			fail("Fail to generate test data") ;
+		}
+	}
+	
+	@Test
+	void test() {
 
+		try {	
+			
 			BackUpJobList backUpJobs = new BackUpJobList(configFileDir, log) ;
 
 			if ((backUpJobs == null) || (backUpJobs.isEmpty())) {
@@ -69,31 +88,28 @@ class FilesBackUpScannerTest {
 			UiControl				 uicB2T		 = new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm, log) ;
 
 			// SOURCE_TO_BUFFER			
-//			FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm, log) ;
-//			assertEquals(0, backUpItems.size()) ;
-//
-//			filesBackUpScanner.execute();
-//
-//			// Wait for filesBackUpScanner end
-//			filesBackUpScanner.get() ;
-//
-//			// buffer is supposed to be the same as source
-//			assertEquals(0, backUpItems.size()) ;
-//
-//			// BUFFER_TO_TARGET
-//			filesBackUpScanner = new FilesBackUpScanner(uicB2T, JobTaskType.BUFFER_TO_TARGET, jobsChoice, btm, pip, bujitm, log) ;
-//			assertEquals(0, backUpItems.size()) ;
-//
-//			filesBackUpScanner.execute();
-//
-//			// Wait for filesBackUpScanner end
-//			filesBackUpScanner.get() ;
-//
-//			// target is supposed to be empty
-//			assertNotEquals(0, backUpItems.size()) ;
+			FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm, log) ;
+			assertEquals(0, backUpItems.size()) ;
 
-			// clean generated config, source files, buffer and target
-			testDataManager.deleteTestData() ;
+			filesBackUpScanner.execute();
+
+			// Wait for filesBackUpScanner end
+			filesBackUpScanner.get() ;
+
+			// buffer is supposed to be the same as source
+			assertEquals(0, backUpItems.size()) ;
+
+			// BUFFER_TO_TARGET
+			filesBackUpScanner = new FilesBackUpScanner(uicB2T, JobTaskType.BUFFER_TO_TARGET, jobsChoice, btm, pip, bujitm, log) ;
+			assertEquals(0, backUpItems.size()) ;
+
+			filesBackUpScanner.execute();
+
+			// Wait for filesBackUpScanner end
+			filesBackUpScanner.get() ;
+
+			// target is supposed to be empty
+			assertEquals(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION, backUpItems.size()) ;
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
@@ -101,4 +117,10 @@ class FilesBackUpScannerTest {
 		}
 	}
 
+	@AfterAll
+	static void deleteTestData() {
+		// clean generated config, source files, buffer and target
+		testDataManager.deleteTestData() ;
+	}
+	
 }
