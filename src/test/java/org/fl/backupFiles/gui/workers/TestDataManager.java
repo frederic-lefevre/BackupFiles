@@ -1,14 +1,18 @@
 package org.fl.backupFiles.gui.workers;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.ibm.lge.fl.util.file.FilesUtils;
 import com.ibm.lge.fl.util.json.JsonUtils;
 
 public class TestDataManager {
@@ -26,7 +30,7 @@ public class TestDataManager {
 	private final static String TARGET_BASE_DIR = "file:///C:/ForTests/BackUpFiles/FP_Test_Target2/" ;
 	private final static String BUFFER_BASE_DIR = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer2/" ;
 	
-	private final static String TESTDATA_DIR = "file:///C:/ForTests/BackUpFiles/TestDataForMultiThread/Concert" ;
+	private final static String TESTDATA_DIR = "file:///C:/ForTests/BackUpFiles/TestDataForMultiThread" ;
 	
 	private final static int NB_DIR_TO_GENERATE = 3 ;
 	
@@ -40,7 +44,8 @@ public class TestDataManager {
 
 	public boolean generateTestData() {
 
-//		Path testDataDir = Paths.get(new URI(TESTDATA_DIR)) ;
+		try {
+		Path testDataDir = Paths.get(new URI(TESTDATA_DIR)) ;
 		
 		JsonObject confJson = new JsonObject() ;
 		
@@ -48,19 +53,26 @@ public class TestDataManager {
 		
 		JsonArray items = new JsonArray() ;
 		
+		
 		for (int i=0; i < NB_DIR_TO_GENERATE; i++) {
 			
 			String dirName = "dir" + i ;
-			
-			// Copy test data to source and buffer
-						
+			String srcUri = SOURCE_BASE_DIR + dirName ;
+			String tgtUri = TARGET_BASE_DIR + dirName ;
+			String bufUri = BUFFER_BASE_DIR + dirName ;
+									
 			// update config
 			JsonObject backUpTask = new JsonObject() ;
-			backUpTask.addProperty(SOURCE, SOURCE_BASE_DIR + dirName) ;
-			backUpTask.addProperty(TARGET, TARGET_BASE_DIR + dirName) ;
-			backUpTask.addProperty(BUFFER, BUFFER_BASE_DIR + dirName) ;
+			backUpTask.addProperty(SOURCE, srcUri) ;
+			backUpTask.addProperty(TARGET, tgtUri) ;
+			backUpTask.addProperty(BUFFER, bufUri) ;
 			
 			items.add(backUpTask) ;
+			
+			// Copy test data to source and buffer
+			Path srcPath = Paths.get(new URI(srcUri)) ;
+			FilesUtils.copyDirectoryTree(testDataDir, srcPath, bLog) ;
+			
 		}
 		
 		confJson.add(ITEMS, items);
@@ -68,13 +80,19 @@ public class TestDataManager {
 		// write config file
 		Path cfFilePath = configFilesDir.resolve(CONFIG_FILE_NAME) ;
 		String confToWrite = JsonUtils.jsonPrettyPrint(confJson) ;
-		try {
+		
 			Files.write(cfFilePath, confToWrite.getBytes(StandardCharsets.UTF_8)) ;
 			return true ;
 		} catch (IOException e) {
 			bLog.log(Level.SEVERE, "Exception writing config file", e) ;
 			return false ;
-		}
-				
+		} catch (URISyntaxException e) {
+			bLog.log(Level.SEVERE, "URI exception for " + TESTDATA_DIR, e) ;
+			return false ;
+		}				
+	}
+	
+	public boolean deleteTestData() {
+		return true ;
 	}
 }

@@ -88,8 +88,8 @@ class FilesBackUpScannerTest {
 //			// target is supposed to be empty
 //			assertNotEquals(0, backUpItems.size()) ;
 
-			// TODO : clean generated source files, buffer and target
-
+			// clean generated config, source files, buffer and target
+			testDataManager.deleteTestData() ;
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
