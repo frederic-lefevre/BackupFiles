@@ -45,42 +45,43 @@ public class TestDataManager {
 	public boolean generateTestData() {
 
 		try {
-		Path testDataDir = Paths.get(new URI(TESTDATA_DIR)) ;
-		
-		JsonObject confJson = new JsonObject() ;
-		
-		confJson.addProperty(TITLE, "Test multi thread");
-		
-		JsonArray items = new JsonArray() ;
-		
-		
-		for (int i=0; i < NB_DIR_TO_GENERATE; i++) {
-			
-			String dirName = "dir" + i ;
-			String srcUri = SOURCE_BASE_DIR + dirName ;
-			String tgtUri = TARGET_BASE_DIR + dirName ;
-			String bufUri = BUFFER_BASE_DIR + dirName ;
-									
-			// update config
-			JsonObject backUpTask = new JsonObject() ;
-			backUpTask.addProperty(SOURCE, srcUri) ;
-			backUpTask.addProperty(TARGET, tgtUri) ;
-			backUpTask.addProperty(BUFFER, bufUri) ;
-			
-			items.add(backUpTask) ;
-			
-			// Copy test data to source and buffer
-			Path srcPath = Paths.get(new URI(srcUri)) ;
-			FilesUtils.copyDirectoryTree(testDataDir, srcPath, bLog) ;
-			
-		}
-		
-		confJson.add(ITEMS, items);
-		
-		// write config file
-		Path cfFilePath = configFilesDir.resolve(CONFIG_FILE_NAME) ;
-		String confToWrite = JsonUtils.jsonPrettyPrint(confJson) ;
-		
+			Path testDataDir = Paths.get(new URI(TESTDATA_DIR)) ;
+
+			JsonObject confJson = new JsonObject() ;
+
+			confJson.addProperty(TITLE, "Test multi thread");
+
+			JsonArray items = new JsonArray() ;
+
+
+			for (int i=0; i < NB_DIR_TO_GENERATE; i++) {
+
+				String dirName = "dir" + i ;
+				String srcUri = SOURCE_BASE_DIR + dirName ;
+				String tgtUri = TARGET_BASE_DIR + dirName ;
+				String bufUri = BUFFER_BASE_DIR + dirName ;
+
+				// update config
+				JsonObject backUpTask = new JsonObject() ;
+				backUpTask.addProperty(SOURCE, srcUri) ;
+				backUpTask.addProperty(TARGET, tgtUri) ;
+				backUpTask.addProperty(BUFFER, bufUri) ;
+
+				items.add(backUpTask) ;
+
+				// Copy test data to source and buffer
+				Path srcPath = Paths.get(new URI(srcUri)) ;
+				Path bufPath = Paths.get(new URI(bufUri)) ;
+				FilesUtils.copyDirectoryTree(testDataDir, srcPath, bLog) ;
+				FilesUtils.copyDirectoryTree(testDataDir, bufPath, bLog) ;
+			}
+
+			confJson.add(ITEMS, items);
+
+			// write config file
+			Path cfFilePath = configFilesDir.resolve(CONFIG_FILE_NAME) ;
+			String confToWrite = JsonUtils.jsonPrettyPrint(confJson) ;
+
 			Files.write(cfFilePath, confToWrite.getBytes(StandardCharsets.UTF_8)) ;
 			return true ;
 		} catch (IOException e) {
