@@ -27,6 +27,8 @@ class FilesBackUpScannerTest {
 
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles2.properties";
 	
+	private static final int THREAD_TO_NB_DIR_CORRELATION = 2 ;
+	
 	@Test
 	void test() {
 
@@ -40,7 +42,7 @@ class FilesBackUpScannerTest {
 			// Get the different config path
 			Path configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir") ;
 			
-			int threadPoolSize = backupProperty.getInt("backupFiles.scan.threadPoolSize", 2) ;
+			int threadPoolSize = backupProperty.getInt("backupFiles.scan.threadPoolSize", THREAD_TO_NB_DIR_CORRELATION) ;
 			
 			TestDataManager testDataManager = new TestDataManager(configFileDir, log) ;
 			boolean genearationSuccessful = testDataManager.generateTestData(threadPoolSize*2) ;

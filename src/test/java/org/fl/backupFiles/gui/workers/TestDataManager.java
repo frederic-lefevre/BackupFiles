@@ -89,12 +89,39 @@ public class TestDataManager {
 			bLog.log(Level.SEVERE, "URI exception for " + TESTDATA_DIR, e) ;
 			return false ;
 		} catch (Exception e) {
-			bLog.log(Level.SEVERE, "Exception writing config file", e) ;
+			bLog.log(Level.SEVERE, "Exception writing config and testdata files", e) ;
 			return false ;
 		}				
 	}
 	
 	public boolean deleteTestData() {
-		return true ;
+			
+		try {
+			
+			Path cfFilePath = configFilesDir.resolve(CONFIG_FILE_NAME) ;
+			Files.delete(cfFilePath);
+			
+			return (deteleOneDirContent(SOURCE_BASE_DIR) &&
+					deteleOneDirContent(BUFFER_BASE_DIR) &&
+					deteleOneDirContent(TARGET_BASE_DIR) ) ; 
+			
+		} catch (Exception e) {
+			bLog.log(Level.SEVERE, "Exception deleting config and testdata files", e) ;
+			return false ;
+		}	
+		
+	}
+	
+	private boolean deteleOneDirContent(String uri) throws IOException, URISyntaxException {
+		return Files.list(Paths.get(new URI(uri)))
+				 .map(path -> {
+					try {
+						return FilesUtils.deleteDirectoryTree(path, true, bLog);
+					} catch (IOException e) {
+						bLog.log(Level.SEVERE, "Exception deleting config and testdata files", e) ;
+						return false ;
+					}
+				})
+				.allMatch(res -> res); 
 	}
 }
