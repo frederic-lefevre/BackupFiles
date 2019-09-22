@@ -41,7 +41,7 @@ class FilesBackUpScannerTest {
 			Path configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir") ;
 			
 			TestDataManager testDataManager = new TestDataManager(configFileDir, log) ;
-			boolean genearationSuccessful = testDataManager.generateTestData() ;
+			boolean genearationSuccessful = testDataManager.generateTestData(4) ;
 			if (! genearationSuccessful) {
 				fail("Fail to generate test data") ;
 			}

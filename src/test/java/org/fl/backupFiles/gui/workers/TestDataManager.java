@@ -32,8 +32,6 @@ public class TestDataManager {
 	
 	private final static String TESTDATA_DIR = "file:///C:/ForTests/BackUpFiles/TestDataForMultiThread" ;
 	
-	private final static int NB_DIR_TO_GENERATE = 3 ;
-	
 	private final static String CONFIG_FILE_NAME = "config.json" ;
 	
 	public TestDataManager(Path config, Logger l) {
@@ -42,7 +40,7 @@ public class TestDataManager {
 		configFilesDir = config ;
 	}
 
-	public boolean generateTestData() {
+	public boolean generateTestData(int nbDirToGenerate) {
 
 		try {
 			Path testDataDir = Paths.get(new URI(TESTDATA_DIR)) ;
@@ -54,7 +52,7 @@ public class TestDataManager {
 			JsonArray items = new JsonArray() ;
 
 
-			for (int i=0; i < NB_DIR_TO_GENERATE; i++) {
+			for (int i=0; i < nbDirToGenerate; i++) {
 
 				String dirName = "dir" + i ;
 				String srcUri = SOURCE_BASE_DIR + dirName ;
@@ -72,8 +70,11 @@ public class TestDataManager {
 				// Copy test data to source and buffer
 				Path srcPath = Paths.get(new URI(srcUri)) ;
 				Path bufPath = Paths.get(new URI(bufUri)) ;
-				FilesUtils.copyDirectoryTree(testDataDir, srcPath, bLog) ;
-				FilesUtils.copyDirectoryTree(testDataDir, bufPath, bLog) ;
+				boolean b1 = FilesUtils.copyDirectoryTree(testDataDir, srcPath, bLog) ;
+				boolean b2 = FilesUtils.copyDirectoryTree(testDataDir, bufPath, bLog) ;
+				if (! (b1 && b2)) {
+					return false ;
+				}
 			}
 
 			confJson.add(ITEMS, items);
@@ -84,11 +85,11 @@ public class TestDataManager {
 
 			Files.write(cfFilePath, confToWrite.getBytes(StandardCharsets.UTF_8)) ;
 			return true ;
-		} catch (IOException e) {
-			bLog.log(Level.SEVERE, "Exception writing config file", e) ;
-			return false ;
-		} catch (URISyntaxException e) {
+		}  catch (URISyntaxException e) {
 			bLog.log(Level.SEVERE, "URI exception for " + TESTDATA_DIR, e) ;
+			return false ;
+		} catch (Exception e) {
+			bLog.log(Level.SEVERE, "Exception writing config file", e) ;
 			return false ;
 		}				
 	}
