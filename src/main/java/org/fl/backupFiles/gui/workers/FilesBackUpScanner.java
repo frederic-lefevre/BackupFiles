@@ -3,8 +3,8 @@ package org.fl.backupFiles.gui.workers;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +25,6 @@ import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.BackupFilesInformation;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.JobsChoice;
-
 
 public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformation> {
 
@@ -95,8 +94,9 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 					if (Files.exists(sourcePath)) {
 						
 						BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, pLog) ;
-						Future<ScannerThreadResponse> backUpRes =  scannerExecutor.submit(backUpScannerThread) ;
+						CompletableFuture<ScannerThreadResponse> backUpRes  = CompletableFuture.supplyAsync(backUpScannerThread::call, scannerExecutor) ;
 						results.add(new BackUpScannerTask(backUpScannerThread, backUpRes)) ;
+						
 						
 					} else {
 						pLog.warning("Source path does not exist: " + sourcePath) ;
