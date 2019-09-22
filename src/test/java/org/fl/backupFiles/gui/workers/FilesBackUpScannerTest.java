@@ -40,8 +40,10 @@ class FilesBackUpScannerTest {
 			// Get the different config path
 			Path configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir") ;
 			
+			int threadPoolSize = backupProperty.getInt("backupFiles.scan.threadPoolSize", 2) ;
+			
 			TestDataManager testDataManager = new TestDataManager(configFileDir, log) ;
-			boolean genearationSuccessful = testDataManager.generateTestData(4) ;
+			boolean genearationSuccessful = testDataManager.generateTestData(threadPoolSize*2) ;
 			if (! genearationSuccessful) {
 				fail("Fail to generate test data") ;
 			}
