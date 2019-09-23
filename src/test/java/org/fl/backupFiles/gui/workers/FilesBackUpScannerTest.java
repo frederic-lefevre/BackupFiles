@@ -39,7 +39,8 @@ class FilesBackUpScannerTest {
 	
 	@BeforeAll
 	static void generateTestData() {
-				
+		
+		log = Logger.getGlobal() ;
 		try {
 			RunningContext runningContext = new RunningContext("BackupFilesTest", null, new URI(DEFAULT_PROP_FILE));
 
@@ -59,7 +60,7 @@ class FilesBackUpScannerTest {
 				fail("Fail to generate test data") ;
 			}
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			log.log(Level.SEVERE, "Exception getting property file URI", e);
 			fail("Fail to generate test data") ;
 		}
 	}
