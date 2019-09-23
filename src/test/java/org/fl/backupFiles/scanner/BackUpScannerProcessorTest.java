@@ -2,9 +2,12 @@ package org.fl.backupFiles.scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
@@ -16,6 +19,7 @@ import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.TestUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.ibm.lge.fl.util.RunningContext;
@@ -25,16 +29,49 @@ class BackUpScannerProcessorTest {
 
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles.properties";
 	
+	private final static String SOURCE_DATA_DIR1 = "file:///C:/FredericPersonnel/tmp" ;
+	private final static String SOURCE_DATA_DIR2 = "file:///C:/FredericPersonnel/sports" ;
+	
+	private final static String TARGET_DATA_DIR1 = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer/dir1/" ;
+	private final static String TARGET_DATA_DIR2 = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer/dir2/" ;
+
+	private static Logger log ;
+	
+	@BeforeAll
+	static void generateTestData() {
+
+		log = Logger.getGlobal() ;
+		
+		try {
+			RunningContext runningContext = new RunningContext("BackupFilesTest", null, new URI(DEFAULT_PROP_FILE));
+			Config.initConfig(runningContext.getProps());
+
+			log = runningContext.getpLog() ;
+
+			// Copy test data
+			Path srcPath1 = Paths.get(new URI(SOURCE_DATA_DIR1));
+			Path srcPath2 = Paths.get(new URI(SOURCE_DATA_DIR2)) ;
+			Path testDataDir1 = Paths.get(new URI(TARGET_DATA_DIR1)) ;
+			Path testDataDir2 = Paths.get(new URI(TARGET_DATA_DIR2)) ;
+			boolean b1 = FilesUtils.copyDirectoryTree(srcPath1, testDataDir1, log) ;
+			boolean b2 = FilesUtils.copyDirectoryTree(srcPath2, testDataDir2, log) ;
+			if (! (b1 && b2)) {
+				fail("Errors writing test data (BeforeAll method)") ;
+			}
+		} catch (URISyntaxException e) {
+			log.log(Level.SEVERE, "URI exception writing test data", e);
+			fail("URI exception writing test data (BeforeAll method)") ;
+		} catch (IOException e) {
+			log.log(Level.SEVERE, "IO exception writing test data", e);
+			fail("IO exception writing test data (BeforeAll method)") ;
+		}
+	}
+	
 	@Test
 	void test() {
 		
 		try {
-					
-			RunningContext runningContext = new RunningContext("BackupFilesTest", null, new URI(DEFAULT_PROP_FILE));
-			Config.initConfig(runningContext.getProps());
-			
-			Logger log = runningContext.getpLog() ;
-			
+								
 			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
 			
 			final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Buffer" ;
