@@ -19,6 +19,7 @@ import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.TestUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -158,5 +159,27 @@ class BackUpScannerProcessorTest {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
 			fail("Exception " + e.getMessage());
 		}	
+	}
+	
+	@AfterAll
+	static void deleteTestData() {
+		
+		try {
+			Path testDataDir1 = Paths.get(new URI(TARGET_DATA_DIR1)) ;
+			Path testDataDir2 = Paths.get(new URI(TARGET_DATA_DIR2)) ;
+		
+			boolean b1 = FilesUtils.deleteDirectoryTree(testDataDir1, true, log) ;
+			boolean b2 = FilesUtils.deleteDirectoryTree(testDataDir2, true, log) ;
+			if (! (b1 && b2)) {
+				fail("Errors deleting test data (AfterAll method)") ;
+			}
+		} catch (URISyntaxException e) {
+			log.log(Level.SEVERE, "URI exception deleting test data", e) ;
+			fail("URI exception deleting test data (AfterAll method)") ;
+		} catch (IOException e) {
+			log.log(Level.SEVERE, "IO exception writing test data", e) ;
+			fail("IO exception writing test data (BeforeAll method)") ;
+		}
+
 	}
 }
