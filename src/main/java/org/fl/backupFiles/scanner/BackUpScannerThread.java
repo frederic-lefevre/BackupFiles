@@ -91,7 +91,7 @@ public class BackUpScannerThread {
 			currDepth = 0 ;
 			directoryCompare(sourcePath, targetPath, compareContent) ;
 		} else {
-			fileCompare(sourcePath, targetPath, compareContent) ;
+			topLevelFileCompare(sourcePath, targetPath, compareContent) ;
 		}
 		backUpCounters.nbSourceFilesProcessed++ ;
 
@@ -282,7 +282,8 @@ public class BackUpScannerThread {
 		 }		
 	}
 	
-	private void fileCompare(Path srcPath, Path tgtPath, boolean compareContent) {
+	// This method is only called if the top level source path is a file
+	private void topLevelFileCompare(Path srcPath, Path tgtPath, boolean compareContent) {
 
 		try {
 			BasicFileAttributes sourceAttributes = Files.readAttributes(srcPath, BasicFileAttributes.class);
