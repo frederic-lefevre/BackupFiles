@@ -287,6 +287,10 @@ public class BackUpScannerThread {
 
 		try {
 			BasicFileAttributes sourceAttributes = Files.readAttributes(srcPath, BasicFileAttributes.class);
+			
+			if (! Files.exists(tgtPath)) {
+				Files.createFile(tgtPath) ;
+			}
 			BasicFileAttributes targetAttributes = Files.readAttributes(tgtPath, BasicFileAttributes.class);
 			
 			if (targetAttributes.isDirectory()) {

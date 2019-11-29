@@ -8,6 +8,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
@@ -33,9 +35,11 @@ class BackUpScannerProcessorTest {
 	private final static String SOURCE_DATA_DIR1 = "file:///C:/FredericPersonnel/tmp" ;
 	private final static String SOURCE_DATA_DIR2 = "file:///C:/FredericPersonnel/sports" ;
 	
-	private final static String TARGET_DATA_DIR1 = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer/dir1/" ;
-	private final static String TARGET_DATA_DIR2 = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer/dir2/" ;
-
+	private final static String BUFFER_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer/" ;
+	private final static String BUFFER_DATA_DIR1 = BUFFER_DATA_DIR + "dir1/" ;
+	private final static String BUFFER_DATA_DIR2 = BUFFER_DATA_DIR + "dir2/" ;
+	private final static String TARGET_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Target/" ;
+	
 	private static Logger log ;
 	
 	@BeforeAll
@@ -52,13 +56,15 @@ class BackUpScannerProcessorTest {
 			// Copy test data
 			Path srcPath1 = Paths.get(new URI(SOURCE_DATA_DIR1));
 			Path srcPath2 = Paths.get(new URI(SOURCE_DATA_DIR2)) ;
-			Path testDataDir1 = Paths.get(new URI(TARGET_DATA_DIR1)) ;
-			Path testDataDir2 = Paths.get(new URI(TARGET_DATA_DIR2)) ;
+			Path testDataDir1 = Paths.get(new URI(BUFFER_DATA_DIR1)) ;
+			Path testDataDir2 = Paths.get(new URI(BUFFER_DATA_DIR2)) ;
 			boolean b1 = FilesUtils.copyDirectoryTree(srcPath1, testDataDir1, log) ;
 			boolean b2 = FilesUtils.copyDirectoryTree(srcPath2, testDataDir2, log) ;
 			if (! (b1 && b2)) {
 				fail("Errors writing test data (BeforeAll method)") ;
 			}
+			Path targetDataDir = Paths.get(new URI(TARGET_DATA_DIR)) ;
+			Files.createDirectory(targetDataDir) ;
 		} catch (URISyntaxException e) {
 			log.log(Level.SEVERE, "URI exception writing test data", e);
 			fail("URI exception writing test data (BeforeAll method)") ;
@@ -75,11 +81,8 @@ class BackUpScannerProcessorTest {
 								
 			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
 			
-			final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Buffer" ;
-			final String TGT_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Target" ;
-			
-			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
-			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
+			Path src  = TestUtils.getPathFromUriString(BUFFER_DATA_DIR) ;
+			Path tgt  = TestUtils.getPathFromUriString(TARGET_DATA_DIR) ;
 			
 			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
 			
@@ -161,18 +164,57 @@ class BackUpScannerProcessorTest {
 		}	
 	}
 	
+	@Test
+	void testSingleFileUnexistingTarget() {
+		
+		try {
+			
+			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
+			
+			final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Buffer/singleFile" ;
+			final String TGT_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Target/doesNotExists" ;
+			
+			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
+			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
+
+			Files.write(src, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne"))) ;
+			
+			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
+			
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
+			
+			while (! backUpRes.isDone()) {
+				try {
+					Thread.sleep(300);
+				} catch (InterruptedException e) {
+					log.log(Level.SEVERE, "Interruption exception in BackUpScannerThread test", e);
+					fail("Interrupted Exception");
+				}
+			}
+		
+			ScannerThreadResponse scannerResp = backUpRes.get() ;
+			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
+			assertNotNull(backUpItemList) ;
+
+		} catch (Exception e) {
+			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
+			fail("Exception " + e.getMessage());
+		}	
+	}
+	
 	@AfterAll
 	static void deleteTestData() {
 		
 		try {
-			Path testDataDir1 = Paths.get(new URI(TARGET_DATA_DIR1)) ;
-			Path testDataDir2 = Paths.get(new URI(TARGET_DATA_DIR2)) ;
+			Path bufferDataDir = Paths.get(new URI(BUFFER_DATA_DIR)) ;
+			Path targetDataDir = Paths.get(new URI(TARGET_DATA_DIR)) ;
 		
-			boolean b1 = FilesUtils.deleteDirectoryTree(testDataDir1, true, log) ;
-			boolean b2 = FilesUtils.deleteDirectoryTree(testDataDir2, true, log) ;
+			boolean b1 = FilesUtils.deleteDirectoryTree(bufferDataDir, true, log) ;
+			boolean b2 = FilesUtils.deleteDirectoryTree(targetDataDir, true, log) ;
 			if (! (b1 && b2)) {
 				fail("Errors deleting test data (AfterAll method)") ;
-			}
+			} 
 		} catch (URISyntaxException e) {
 			log.log(Level.SEVERE, "URI exception deleting test data", e) ;
 			fail("URI exception deleting test data (AfterAll method)") ;
