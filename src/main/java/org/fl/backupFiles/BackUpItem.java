@@ -28,6 +28,9 @@ public class BackUpItem {
 	private boolean		 		diffByContent ;
 	private Logger		 		bLog ;
 	
+	private BasicFileAttributes sourceAttributes ;
+	private BasicFileAttributes targetAttributes ;
+	
 	// A back up item is :
 	// * a source path (file or directory) to back up 
 	// * a destination path (file or directory) to back up
@@ -52,6 +55,8 @@ public class BackUpItem {
 		backupStatus 	 		  = BackupStatus.DIFFERENT ;
 		diffByContent		  	  = false ;
 		bLog 		 	 		  = l ;
+		sourceAttributes		  = null ;
+		targetAttributes		  = null ;
 	}
 
 	public Path getSourcePath() {
@@ -204,6 +209,14 @@ public class BackUpItem {
 	public void setDiffByContent(boolean dbc) {
 		backupStatus  = BackupStatus.DIFF_BY_CONTENT ;
 		diffByContent = dbc;
+	}
+
+	public void setSourceAttributes(BasicFileAttributes sourceAttributes) {
+		this.sourceAttributes = sourceAttributes;
+	}
+
+	public void setTargetAttributes(BasicFileAttributes targetAttributes) {
+		this.targetAttributes = targetAttributes;
 	}
 	
 }

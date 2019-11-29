@@ -184,6 +184,7 @@ public class BackUpScannerThread {
 			for (Map.Entry<Path, PathPairBasicAttributes> entry : filesBasicAttributes.entrySet()) {
 				
 				PathPairBasicAttributes pairBasicAttributes = entry.getValue() ;
+				BasicFileAttributes sourceAttributes = pairBasicAttributes.getSourceBasicAttributes() ;
 				Path srcPath = pairBasicAttributes.getSourcePath() ;
 				currentFile = srcPath ;
 				if (pairBasicAttributes.noTargetPath()) {
@@ -191,7 +192,7 @@ public class BackUpScannerThread {
 									
 					Path tgtPath = targetDirectory.resolve(sourceDirectory.relativize(srcPath)) ;
 					
-					if (pairBasicAttributes.getSourceBasicAttributes().isDirectory()) {
+					if (sourceAttributes.isDirectory()) {
 						// source is a directory
 						
 						backUpItemList.add(new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_TREE, pLog)) ;
@@ -200,13 +201,15 @@ public class BackUpScannerThread {
 					} else {
 						// source is a file
 						
-						backUpItemList.add(new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, pLog)) ;
+						BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, pLog) ;
+						copyNewItem.setSourceAttributes(sourceAttributes) ;
+						backUpItemList.add(copyNewItem) ;						
 						backUpCounters.copyNewNb++ ;
 					}
 				} else {
 					
 					Path tgtPath = pairBasicAttributes.getTargetPath() ;
-					BasicFileAttributes sourceAttributes = pairBasicAttributes.getSourceBasicAttributes() ;
+					
 					if (sourceAttributes.isDirectory()) {
 						// source is a directory
 						
@@ -228,7 +231,9 @@ public class BackUpScannerThread {
 							// source is a file but target is a directory : delete target dir, copy source file 
 							pLog.warning("Source " + srcPath + " is a file\n" + "but target is a directory " + tgtPath);
 							backUpItemList.add(new BackUpItem(null, tgtPath, sourceDirectory, BackupAction.DELETE_DIR, pLog)) ;
-							backUpItemList.add(new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, pLog)) ;
+							BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, pLog) ;
+							copyNewItem.setSourceAttributes(sourceAttributes) ;
+							backUpItemList.add(copyNewItem) ;
 						} else {
 							compareFile(srcPath, tgtPath, sourceAttributes, targetAttributes) ;	
 						}
@@ -240,46 +245,71 @@ public class BackUpScannerThread {
 	}
 	
 	private void compareFile(Path srcPath, Path tgtPath, BasicFileAttributes sourceAttributes, BasicFileAttributes targetAttributes) {
-		
-		try {
-			
-			 if (fileComparator != null) {
-				// Content comparison is asked to be sure
-				 
-				 if (! fileComparator.haveSameContent(srcPath, tgtPath)) {
-					 // file content are not the same (or there has been an error)
-					 if (fileComparator.isOnError()) {
-						 filesVisitFailed.add(tgtPath) ;
-						 backUpCounters.nbTargetFilesFailed++ ; 
-					 } else {
-						 // content are not the same
-						 BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, pLog) ;
-						 backUpItem.setDiffByContent(true) ;
-						 backUpItemList.add(backUpItem) ;
-						 backUpCounters.copyReplaceNb++ ;
-						 backUpCounters.contentDifferentNb++ ;
-					 }
-				 }
-				 
-			 } else {
-					
-				 // Check if files seems to be the same or not						 
-				 int compareFile = seemsToBeTheSame(sourceAttributes, targetAttributes) ;
-	
-				 if (compareFile > 0) {
-					 backUpItemList.add(new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, pLog)) ;
-					 backUpCounters.copyReplaceNb++ ;
-				 } else if (compareFile < 0) {	
-					 backUpItemList.add(new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.AMBIGUOUS, pLog)) ;
-					 backUpCounters.ambiguousNb++ ;
-				 } 
-			 }
-		 } catch (Exception e) {
-			 filesVisitFailed.add(tgtPath) ;
-			 backUpCounters.nbTargetFilesFailed++ ;
-			 pLog.log(Level.SEVERE, "Exception when comparing file " + srcPath + " and " + tgtPath, e);
 
-		 }		
+		try {
+
+			if (fileComparator != null) {
+				// Content comparison is asked to be sure
+
+				if (! fileComparator.haveSameContent(srcPath, tgtPath)) {
+					// file content are not the same (or there has been an error)
+					if (fileComparator.isOnError()) {
+						filesVisitFailed.add(tgtPath) ;
+						backUpCounters.nbTargetFilesFailed++ ; 
+					} else {
+						// content are not the same
+						BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, pLog) ;
+						backUpItem.setDiffByContent(true) ;
+						backUpItem.setSourceAttributes(sourceAttributes) ;
+						backUpItem.setTargetAttributes(targetAttributes) ;
+						backUpItemList.add(backUpItem) ;
+						backUpCounters.copyReplaceNb++ ;
+						backUpCounters.contentDifferentNb++ ;
+					}
+				}
+
+			} else {
+
+				// Check if files seems to be the same or no
+				// Compare last modfied time
+				FileTime f1t = sourceAttributes.lastModifiedTime() ;
+				FileTime f2t = targetAttributes.lastModifiedTime() ;
+				int compareFile = f1t.compareTo(f2t) ;
+
+				if (compareFile == 0) {
+					// Same last modified time
+
+					// compare size
+					long f1s = sourceAttributes.size() ;
+					long f2s = targetAttributes.size() ;
+					if (f1s != f2s) {
+						// different size
+						BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, pLog) ;
+						backUpItem.setSourceAttributes(sourceAttributes) ;
+						backUpItem.setTargetAttributes(targetAttributes) ;
+						backUpItemList.add(backUpItem) ;
+						backUpCounters.copyReplaceNb++ ;
+					}
+				} else if (compareFile > 0) {
+					BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, pLog) ;
+					backUpItem.setSourceAttributes(sourceAttributes) ;
+					backUpItem.setTargetAttributes(targetAttributes) ;
+					backUpItemList.add(backUpItem) ;
+					backUpCounters.copyReplaceNb++ ;
+				} else if (compareFile < 0) {
+					BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.AMBIGUOUS, pLog) ;
+					backUpItem.setSourceAttributes(sourceAttributes) ;
+					backUpItem.setTargetAttributes(targetAttributes) ;
+					backUpItemList.add(backUpItem) ;
+					backUpCounters.ambiguousNb++ ;
+				} 
+			}
+		} catch (Exception e) {
+			filesVisitFailed.add(tgtPath) ;
+			backUpCounters.nbTargetFilesFailed++ ;
+			pLog.log(Level.SEVERE, "Exception when comparing file " + srcPath + " and " + tgtPath, e);
+
+		}		
 	}
 	
 	// This method is only called if the top level source path is a file
@@ -297,7 +327,9 @@ public class BackUpScannerThread {
 				// source is a file but target is a directory : delete target dir, copy source file 
 				pLog.warning("Source " + srcPath + " is a file\n" + "but target is a directory " + tgtPath);
 				backUpItemList.add(new BackUpItem(null, tgtPath, srcPath, BackupAction.DELETE_DIR, pLog)) ;
-				backUpItemList.add(new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, pLog)) ;
+				BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, pLog) ;
+				copyNewItem.setSourceAttributes(sourceAttributes) ;
+				backUpItemList.add(copyNewItem) ;
 			}  else {
 				compareFile(srcPath, tgtPath, sourceAttributes, targetAttributes) ;
 			}
@@ -308,26 +340,5 @@ public class BackUpScannerThread {
 
 		}	
 	}
-	
-	private int seemsToBeTheSame(BasicFileAttributes attrsF1, BasicFileAttributes attrsF2) throws IOException {
-		
-		// Compare last modfied time
-		FileTime f1t = attrsF1.lastModifiedTime() ;
-		FileTime f2t = attrsF2.lastModifiedTime() ;
-		int compare = f1t.compareTo(f2t) ;
-		
-		if (compare == 0) {
-			// Same last modified time
-			
-			// compare size
-			long f1s = attrsF1.size() ;
-			long f2s = attrsF2.size() ;
-			if (f1s != f2s) {
-				// different size
-				compare = 1 ;
-			}
-		}
-		return compare ;
-	}	
 	
 }
