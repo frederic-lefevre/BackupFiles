@@ -32,10 +32,10 @@ public class BackUpJTable extends JTable {
 		getColumnModel().getColumn(2).setCellRenderer(new BackUpActionCellRenderer()) ;
 		getColumnModel().getColumn(3).setCellRenderer(new BackUpStatusCellRenderer()) ;
 		getColumnModel().getColumn(0).setPreferredWidth(810);
-		getColumnModel().getColumn(1).setPreferredWidth(120);
+		getColumnModel().getColumn(1).setPreferredWidth(60);
 		getColumnModel().getColumn(2).setPreferredWidth(120);
 		getColumnModel().getColumn(3).setPreferredWidth(100);
-		getColumnModel().getColumn(4).setPreferredWidth(810);
+		getColumnModel().getColumn(4).setPreferredWidth(750);
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF) ;
 		
 		addMouseListener(new BackupItemMouseAdapter(this, Config.getOsActions(), tLog));
