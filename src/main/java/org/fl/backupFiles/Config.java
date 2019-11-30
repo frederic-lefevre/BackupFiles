@@ -29,7 +29,7 @@ public class Config {
 		int threadPoolSize 		 	  = backupProperty.getInt( "backupFiles.scan.threadPoolSize", 		   10) ;
 		scanExecutorService 	 	  = Executors.newFixedThreadPool(threadPoolSize) ;
 		
-		long fileSizeWarningThreshold = backupProperty.getLong("backupFiles.scan.refreshRate", Long.MAX_VALUE) ;
+		long fileSizeWarningThreshold = backupProperty.getLong("backupFiles.fileSize.warningThreshold", Long.MAX_VALUE) ;
 		BackUpItem.setFileSizeWarningThreshold(fileSizeWarningThreshold) ;
 		
 		osActions = new ArrayList<OsAction>() ;
