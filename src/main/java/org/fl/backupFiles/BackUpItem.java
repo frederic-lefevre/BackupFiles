@@ -29,8 +29,6 @@ public class BackUpItem {
 	private boolean		 		isAboveSizeLimit ;
 	private Logger		 		bLog ;
 	
-	private static long fileSizeWarningThreshold ;
-	
 	// A back up item is :
 	// * a source path (file or directory) to back up 
 	// * a destination path (file or directory) to back up
@@ -47,7 +45,7 @@ public class BackUpItem {
 	//		DONE	 	 : the back up has been done
 	//		FAILED	 	 : the back up has failed
 	
-	public BackUpItem(Path src, Path tgt, Path srcExisting, BackupAction bst, long sizeDiff, Logger l) {
+	public BackUpItem(Path src, Path tgt, Path srcExisting, BackupAction bst, boolean iat, Logger l) {
 		sourcePath 	 	 		  = src ;
 		sourceClosestExistingPath = srcExisting ;
 		targetPath 	 	 		  = tgt ;
@@ -55,7 +53,7 @@ public class BackUpItem {
 		backupStatus 	 		  = BackupStatus.DIFFERENT ;
 		diffByContent		  	  = false ;
 		bLog 		 	 		  = l ;
-		isAboveSizeLimit		  = sizeDiff > fileSizeWarningThreshold ;
+		isAboveSizeLimit		  = iat ;
 	}
 
 	public Path getSourcePath() {
@@ -207,10 +205,6 @@ public class BackUpItem {
 	public void setDiffByContent(boolean dbc) {
 		backupStatus  = BackupStatus.DIFF_BY_CONTENT ;
 		diffByContent = dbc;
-	}
-
-	public static void setFileSizeWarningThreshold(long fileSizeWarningThreshold) {
-		BackUpItem.fileSizeWarningThreshold = fileSizeWarningThreshold;
 	}
 
 	public boolean isAboveSizeThreshold() {

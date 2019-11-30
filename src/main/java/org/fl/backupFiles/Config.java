@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 
 import org.fl.backupFiles.gui.BackUpItemActionListener;
 import org.fl.backupFiles.gui.BackUpItemActionListener.CustomAction;
+import org.fl.backupFiles.scanner.BackUpScannerThread;
 
 import com.ibm.lge.fl.util.AdvancedProperties;
 
@@ -30,7 +31,7 @@ public class Config {
 		scanExecutorService 	 	  = Executors.newFixedThreadPool(threadPoolSize) ;
 		
 		long fileSizeWarningThreshold = backupProperty.getLong("backupFiles.fileSize.warningThreshold", Long.MAX_VALUE) ;
-		BackUpItem.setFileSizeWarningThreshold(fileSizeWarningThreshold) ;
+		BackUpScannerThread.setFileSizeWarningThreshold(fileSizeWarningThreshold) ;
 		
 		osActions = new ArrayList<OsAction>() ;
 		String osCmdPropBase = "backupFiles.command." ;
