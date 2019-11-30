@@ -31,6 +31,7 @@ public class BackUpJTable extends JTable {
 		setAutoCreateRowSorter(true) ;
 		getColumnModel().getColumn(BackUpTableModel.ACTION_COL_IDX).setCellRenderer(new BackUpActionCellRenderer()) ;
 		getColumnModel().getColumn(BackUpTableModel.STATUS_COL_IDX).setCellRenderer(new BackUpStatusCellRenderer()) ;
+		getColumnModel().getColumn(BackUpTableModel.SIZE_LIMT_COL_IDX).setCellRenderer(new BackUpSizeLimitCellRenderer());
 		getColumnModel().getColumn(BackUpTableModel.SOURCE_PATH_COL_IDX).setPreferredWidth(810);
 		getColumnModel().getColumn(BackUpTableModel.SIZE_LIMT_COL_IDX).setPreferredWidth(60);
 		getColumnModel().getColumn(BackUpTableModel.ACTION_COL_IDX).setPreferredWidth(120);
