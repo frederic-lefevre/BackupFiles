@@ -7,7 +7,12 @@ import org.fl.backupFiles.BackUpItemList;
 
 public class BackUpTableModel extends AbstractTableModel {
 
-
+	public static final int SOURCE_PATH_COL_IDX = 0 ;
+	public static final int SIZE_LIMT_COL_IDX 	= 1 ;
+	public static final int ACTION_COL_IDX 		= 2 ;
+	public static final int STATUS_COL_IDX 		= 3 ;
+	public static final int TARGET_PATH_COL_IDX = 4 ;
+	
 	private static final long serialVersionUID = 1L;
 	
 	public final static String[] entetes = {"Chemin source", "Size limit", "Action", "Status", "Chemin cible"};
@@ -42,15 +47,15 @@ public class BackUpTableModel extends AbstractTableModel {
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		switch(columnIndex){
-        case 0:
+        case SOURCE_PATH_COL_IDX:
             return backUpItems.get(rowIndex).getSourcePath();
-        case 1:
+        case SIZE_LIMT_COL_IDX:
         	return backUpItems.get(rowIndex).isAboveSizeThreshold() ;
-        case 2:
+        case ACTION_COL_IDX:
             return backUpItems.get(rowIndex).getBackupAction();
-        case 3:
+        case STATUS_COL_IDX:
             return backUpItems.get(rowIndex).getBackupStatus();
-        case 4:
+        case TARGET_PATH_COL_IDX:
             return backUpItems.get(rowIndex).getTargetPath();
         default:
             return null;

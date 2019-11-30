@@ -29,13 +29,13 @@ public class BackUpJTable extends JTable {
 		tLog = l ;
 		setFillsViewportHeight(true) ;
 		setAutoCreateRowSorter(true) ;
-		getColumnModel().getColumn(2).setCellRenderer(new BackUpActionCellRenderer()) ;
-		getColumnModel().getColumn(3).setCellRenderer(new BackUpStatusCellRenderer()) ;
-		getColumnModel().getColumn(0).setPreferredWidth(810);
-		getColumnModel().getColumn(1).setPreferredWidth(60);
-		getColumnModel().getColumn(2).setPreferredWidth(120);
-		getColumnModel().getColumn(3).setPreferredWidth(100);
-		getColumnModel().getColumn(4).setPreferredWidth(750);
+		getColumnModel().getColumn(BackUpTableModel.ACTION_COL_IDX).setCellRenderer(new BackUpActionCellRenderer()) ;
+		getColumnModel().getColumn(BackUpTableModel.STATUS_COL_IDX).setCellRenderer(new BackUpStatusCellRenderer()) ;
+		getColumnModel().getColumn(BackUpTableModel.SOURCE_PATH_COL_IDX).setPreferredWidth(810);
+		getColumnModel().getColumn(BackUpTableModel.SIZE_LIMT_COL_IDX).setPreferredWidth(60);
+		getColumnModel().getColumn(BackUpTableModel.ACTION_COL_IDX).setPreferredWidth(120);
+		getColumnModel().getColumn(BackUpTableModel.STATUS_COL_IDX).setPreferredWidth(100);
+		getColumnModel().getColumn(BackUpTableModel.TARGET_PATH_COL_IDX).setPreferredWidth(750);
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF) ;
 		
 		addMouseListener(new BackupItemMouseAdapter(this, Config.getOsActions(), tLog));
