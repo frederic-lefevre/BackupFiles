@@ -149,7 +149,7 @@ public class BackUpScannerThread {
 								action = BackupAction.DELETE ;
 								backUpCounters.deleteNb++ ;
 							}
-							backUpItemList.add(new BackUpItem(null, targetFile, sourceDirectory, action, pLog)) ;
+							backUpItemList.add(new BackUpItem(null, targetFile, sourceDirectory, action, 0, pLog)) ;
 
 						} else {
 							pairFiles.setTargetPath(targetFile);
@@ -168,13 +168,13 @@ public class BackUpScannerThread {
 				// source is a directory but target is not : delete target and copy source tree
 					
 					pLog.warning("Source " + sourceDirectory + " is a directory\n" + "but target is not " + targetDirectory);
-					backUpItemList.add(new BackUpItem(null, targetDirectory, sourceDirectory, BackupAction.DELETE, pLog)) ;
+					backUpItemList.add(new BackUpItem(null, targetDirectory, sourceDirectory, BackupAction.DELETE, 0, pLog)) ;
 				} else {
 					// source is a directory but target does not exists : copy source tree				
 					pLog.warning("Source " + sourceDirectory + " is a directory\n" + "but target does not exists " + targetDirectory);
 				}
 				
-				backUpItemList.add(new BackUpItem(sourceDirectory, targetDirectory, sourceDirectory, BackupAction.COPY_TREE, pLog)) ;
+				backUpItemList.add(new BackUpItem(sourceDirectory, targetDirectory, sourceDirectory, BackupAction.COPY_TREE, 0, pLog)) ;
 				backUpCounters.nbSourceFilesProcessed++ ;
 			}
 		}
@@ -195,14 +195,13 @@ public class BackUpScannerThread {
 					if (sourceAttributes.isDirectory()) {
 						// source is a directory
 						
-						backUpItemList.add(new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_TREE, pLog)) ;
+						backUpItemList.add(new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_TREE, 0, pLog)) ;
 						backUpCounters.copyTreeNb++ ;
 						
 					} else {
 						// source is a file
 						
-						BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, pLog) ;
-						copyNewItem.setSourceAttributes(sourceAttributes) ;
+						BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, sourceAttributes.size(), pLog) ;
 						backUpItemList.add(copyNewItem) ;						
 						backUpCounters.copyNewNb++ ;
 					}
@@ -230,9 +229,8 @@ public class BackUpScannerThread {
 						if (targetAttributes.isDirectory()) {
 							// source is a file but target is a directory : delete target dir, copy source file 
 							pLog.warning("Source " + srcPath + " is a file\n" + "but target is a directory " + tgtPath);
-							backUpItemList.add(new BackUpItem(null, tgtPath, sourceDirectory, BackupAction.DELETE_DIR, pLog)) ;
-							BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, pLog) ;
-							copyNewItem.setSourceAttributes(sourceAttributes) ;
+							backUpItemList.add(new BackUpItem(null, tgtPath, sourceDirectory, BackupAction.DELETE_DIR, 0, pLog)) ;
+							BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, sourceAttributes.size(), pLog) ;
 							backUpItemList.add(copyNewItem) ;
 						} else {
 							compareFile(srcPath, tgtPath, sourceAttributes, targetAttributes) ;	
@@ -258,10 +256,9 @@ public class BackUpScannerThread {
 						backUpCounters.nbTargetFilesFailed++ ; 
 					} else {
 						// content are not the same
-						BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, pLog) ;
+						long diffSize = sourceAttributes.size() - targetAttributes.size() ;
+						BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, diffSize, pLog) ;
 						backUpItem.setDiffByContent(true) ;
-						backUpItem.setSourceAttributes(sourceAttributes) ;
-						backUpItem.setTargetAttributes(targetAttributes) ;
 						backUpItemList.add(backUpItem) ;
 						backUpCounters.copyReplaceNb++ ;
 						backUpCounters.contentDifferentNb++ ;
@@ -284,22 +281,18 @@ public class BackUpScannerThread {
 					long f2s = targetAttributes.size() ;
 					if (f1s != f2s) {
 						// different size
-						BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, pLog) ;
-						backUpItem.setSourceAttributes(sourceAttributes) ;
-						backUpItem.setTargetAttributes(targetAttributes) ;
+						BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, f1s-f2s, pLog) ;
 						backUpItemList.add(backUpItem) ;
 						backUpCounters.copyReplaceNb++ ;
 					}
 				} else if (compareFile > 0) {
-					BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, pLog) ;
-					backUpItem.setSourceAttributes(sourceAttributes) ;
-					backUpItem.setTargetAttributes(targetAttributes) ;
+					long diffSize = sourceAttributes.size() - targetAttributes.size() ;
+					BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, diffSize, pLog) ;
 					backUpItemList.add(backUpItem) ;
 					backUpCounters.copyReplaceNb++ ;
 				} else if (compareFile < 0) {
-					BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.AMBIGUOUS, pLog) ;
-					backUpItem.setSourceAttributes(sourceAttributes) ;
-					backUpItem.setTargetAttributes(targetAttributes) ;
+					long diffSize = sourceAttributes.size() - targetAttributes.size() ;
+					BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.AMBIGUOUS, diffSize, pLog) ;
 					backUpItemList.add(backUpItem) ;
 					backUpCounters.ambiguousNb++ ;
 				} 
@@ -326,9 +319,8 @@ public class BackUpScannerThread {
 			if (targetAttributes.isDirectory()) {
 				// source is a file but target is a directory : delete target dir, copy source file 
 				pLog.warning("Source " + srcPath + " is a file\n" + "but target is a directory " + tgtPath);
-				backUpItemList.add(new BackUpItem(null, tgtPath, srcPath, BackupAction.DELETE_DIR, pLog)) ;
-				BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, pLog) ;
-				copyNewItem.setSourceAttributes(sourceAttributes) ;
+				backUpItemList.add(new BackUpItem(null, tgtPath, srcPath, BackupAction.DELETE_DIR, 0, pLog)) ;
+				BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, sourceAttributes.size(), pLog) ;
 				backUpItemList.add(copyNewItem) ;
 			}  else {
 				compareFile(srcPath, tgtPath, sourceAttributes, targetAttributes) ;

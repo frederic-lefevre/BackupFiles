@@ -26,10 +26,8 @@ public class BackUpItem {
 	private final BackupAction 	backupAction ;
 	private BackupStatus 		backupStatus ;
 	private boolean		 		diffByContent ;
+	private boolean		 		isAboveSizeLimit ;
 	private Logger		 		bLog ;
-	
-	private BasicFileAttributes sourceAttributes ;
-	private BasicFileAttributes targetAttributes ;
 	
 	private static long fileSizeWarningThreshold ;
 	
@@ -49,7 +47,7 @@ public class BackUpItem {
 	//		DONE	 	 : the back up has been done
 	//		FAILED	 	 : the back up has failed
 	
-	public BackUpItem(Path src, Path tgt, Path srcExisting, BackupAction bst, Logger l) {
+	public BackUpItem(Path src, Path tgt, Path srcExisting, BackupAction bst, long sizeDiff, Logger l) {
 		sourcePath 	 	 		  = src ;
 		sourceClosestExistingPath = srcExisting ;
 		targetPath 	 	 		  = tgt ;
@@ -57,8 +55,7 @@ public class BackUpItem {
 		backupStatus 	 		  = BackupStatus.DIFFERENT ;
 		diffByContent		  	  = false ;
 		bLog 		 	 		  = l ;
-		sourceAttributes		  = null ;
-		targetAttributes		  = null ;
+		isAboveSizeLimit		  = sizeDiff > fileSizeWarningThreshold ;
 	}
 
 	public Path getSourcePath() {
@@ -217,25 +214,6 @@ public class BackUpItem {
 	}
 
 	public boolean isAboveSizeThreshold() {
-	
-		boolean result = false ;		
-		if (sourceAttributes != null) {
-			long sourceSize = sourceAttributes.size() ;
-			if (targetAttributes != null) {
-				result = sourceSize - targetAttributes.size() > fileSizeWarningThreshold ;
-			} else {
-				result = sourceSize > fileSizeWarningThreshold ;
-			}
-		}
-		return result ;
-	}
-	
-	public void setSourceAttributes(BasicFileAttributes sourceAttributes) {
-		this.sourceAttributes = sourceAttributes;
-	}
-
-	public void setTargetAttributes(BasicFileAttributes targetAttributes) {
-		this.targetAttributes = targetAttributes;
-	}
-	
+		return isAboveSizeLimit ;
+	}	
 }
