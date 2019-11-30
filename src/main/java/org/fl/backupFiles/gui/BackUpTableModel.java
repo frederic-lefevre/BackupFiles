@@ -10,7 +10,7 @@ public class BackUpTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
 	
-	public final static String[] entetes = {"Chemin source", "Action", "Status", "Chemin cible"};
+	public final static String[] entetes = {"Chemin source", "Size\nlimit", "Action", "Status", "Chemin cible"};
 	
 	// Underlying data
 	private BackUpItemList backUpItems ;
@@ -45,10 +45,12 @@ public class BackUpTableModel extends AbstractTableModel {
         case 0:
             return backUpItems.get(rowIndex).getSourcePath();
         case 1:
-            return backUpItems.get(rowIndex).getBackupAction();
+        	return backUpItems.get(rowIndex).isAboveSizeThreshold() ;
         case 2:
-            return backUpItems.get(rowIndex).getBackupStatus();
+            return backUpItems.get(rowIndex).getBackupAction();
         case 3:
+            return backUpItems.get(rowIndex).getBackupStatus();
+        case 4:
             return backUpItems.get(rowIndex).getTargetPath();
         default:
             return null;

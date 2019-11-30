@@ -31,6 +31,8 @@ public class BackUpItem {
 	private BasicFileAttributes sourceAttributes ;
 	private BasicFileAttributes targetAttributes ;
 	
+	private static long fileSizeWarningThreshold ;
+	
 	// A back up item is :
 	// * a source path (file or directory) to back up 
 	// * a destination path (file or directory) to back up
@@ -195,8 +197,7 @@ public class BackUpItem {
 					 infos.append("\nThe contents of source and target files are different\n") ;
 				 }
 			}
-			
-			
+						
 		} catch (Exception e) {
 			bLog.log(Level.SEVERE, "Exception when getting information on backup item.\nSource Path=" + sourcePath + "\nTargetpath=" + targetPath, e);
 		}
@@ -211,6 +212,24 @@ public class BackUpItem {
 		diffByContent = dbc;
 	}
 
+	public static void setFileSizeWarningThreshold(long fileSizeWarningThreshold) {
+		BackUpItem.fileSizeWarningThreshold = fileSizeWarningThreshold;
+	}
+
+	public boolean isAboveSizeThreshold() {
+	
+		boolean result = false ;		
+		if (sourceAttributes != null) {
+			long sourceSize = sourceAttributes.size() ;
+			if (targetAttributes != null) {
+				result = sourceSize - targetAttributes.size() > fileSizeWarningThreshold ;
+			} else {
+				result = sourceSize > fileSizeWarningThreshold ;
+			}
+		}
+		return result ;
+	}
+	
 	public void setSourceAttributes(BasicFileAttributes sourceAttributes) {
 		this.sourceAttributes = sourceAttributes;
 	}

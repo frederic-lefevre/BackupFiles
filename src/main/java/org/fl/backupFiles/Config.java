@@ -21,13 +21,16 @@ public class Config {
 
 	public static void initConfig(AdvancedProperties backupProperty) {
 		
-		scanRefreshRate   		 = backupProperty.getLong(	 "backupFiles.scan.refreshRate", 		  2000) ;
-		backUpMaxRefreshInterval = backupProperty.getLong(	 "backupFiles.backUp.maxRefreshInterval", 3000) ;
-		backUpRefreshRate 		 = backupProperty.getInt( 	 "backupFiles.backUp.refreshRate",  		 1) ;
-		maxDepth 		  		 = backupProperty.getInt( 	 "backupFiles.scan.maxDepth",     		   200) ;
+		scanRefreshRate   		 	  = backupProperty.getLong("backupFiles.scan.refreshRate", 		     2000) ;
+		backUpMaxRefreshInterval	  = backupProperty.getLong("backupFiles.backUp.maxRefreshInterval",  3000) ;
+		backUpRefreshRate 		 	  = backupProperty.getInt( "backupFiles.backUp.refreshRate",  		    1) ;
+		maxDepth 		  		 	  = backupProperty.getInt( "backupFiles.scan.maxDepth",     		  200) ;
 
-		int threadPoolSize 		 = backupProperty.getInt(	 "backupFiles.scan.threadPoolSize", 		10) ;
-		scanExecutorService 	 = Executors.newFixedThreadPool(threadPoolSize) ;
+		int threadPoolSize 		 	  = backupProperty.getInt( "backupFiles.scan.threadPoolSize", 		   10) ;
+		scanExecutorService 	 	  = Executors.newFixedThreadPool(threadPoolSize) ;
+		
+		long fileSizeWarningThreshold = backupProperty.getLong("backupFiles.scan.refreshRate", Long.MAX_VALUE) ;
+		BackUpItem.setFileSizeWarningThreshold(fileSizeWarningThreshold) ;
 		
 		osActions = new ArrayList<OsAction>() ;
 		String osCmdPropBase = "backupFiles.command." ;
