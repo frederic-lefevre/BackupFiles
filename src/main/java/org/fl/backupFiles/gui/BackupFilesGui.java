@@ -76,10 +76,12 @@ public class BackupFilesGui  extends JFrame {
 			ApplicationTabbedPane bkpTablesPanel = new ApplicationTabbedPane(runningContext) ;
 				
 			ArrayList<BackUpPane> backUpPanes = new ArrayList<BackUpPane>() ;
+			int tabIndex = 0 ;
 			for (JobTaskType jtt : JobTaskType.values()) {
 				BackUpPane taskTypePane = new BackUpPane(jtt, jobInformationTable, bLog) ;
 				backUpPanes.add(taskTypePane) ;
-				bkpTablesPanel.add(jtt.toString(), taskTypePane) ;
+				bkpTablesPanel.add(taskTypePane, jtt.toString(), tabIndex) ;
+				tabIndex++ ;
 			}
 						
 			//  Tabbed Panel to choose back up configuration
