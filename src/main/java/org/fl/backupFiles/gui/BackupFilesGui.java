@@ -12,17 +12,13 @@ import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
-import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.BackUpJob.JobTaskType;
 
 import com.ibm.lge.fl.util.AdvancedProperties;
 import com.ibm.lge.fl.util.RunningContext;
-import com.ibm.lge.fl.util.swing.ApplicationInfoPane;
-import com.ibm.lge.fl.util.swing.LogsDisplayPane;
+import com.ibm.lge.fl.util.swing.ApplicationTabbedPane;
 
 // Main class for the back up files application
 public class BackupFilesGui  extends JFrame {
@@ -45,10 +41,6 @@ public class BackupFilesGui  extends JFrame {
 	}
 	
 	private Logger bLog ;
-	
-	private JTabbedPane bkpTablesPanel ;
-	
-	private ApplicationInfoPane appInfoPane ;
 	
 	public BackupFilesGui(String propertiesUri) {
 
@@ -81,7 +73,7 @@ public class BackupFilesGui  extends JFrame {
 					
 			BackUpJobInfoTableModel jobInformationTable = new BackUpJobInfoTableModel() ;
 			// Tabbed Panel for configuration, tables and controls, and history
-			bkpTablesPanel = new JTabbedPane() ;
+			ApplicationTabbedPane bkpTablesPanel = new ApplicationTabbedPane(runningContext) ;
 				
 			ArrayList<BackUpPane> backUpPanes = new ArrayList<BackUpPane>() ;
 			for (JobTaskType jtt : JobTaskType.values()) {
@@ -89,42 +81,20 @@ public class BackupFilesGui  extends JFrame {
 				backUpPanes.add(taskTypePane) ;
 				bkpTablesPanel.add(jtt.toString(), taskTypePane) ;
 			}
-			
-			BackUpConfigChoicePane configChoicePane = new BackUpConfigChoicePane(configFileDir, backUpPanes, bLog) ;	
-			
+						
 			//  Tabbed Panel to choose back up configuration
+			BackUpConfigChoicePane configChoicePane = new BackUpConfigChoicePane(configFileDir, backUpPanes, bLog) ;
 			bkpTablesPanel.add(configChoicePane, "Configuration", 0) ;
 	
-			// Tabbed Panel to display a summary of oprations done
+			// Tabbed Panel to display a summary of operations done
 			BackUpJobInfoPanel historiqueTab = new BackUpJobInfoPanel(jobInformationTable) ;
 			bkpTablesPanel.add("Historique", historiqueTab);
 			
-			// Tabbed Panel for application information
-			appInfoPane = new ApplicationInfoPane(runningContext) ;
-			bkpTablesPanel.add("Informations", appInfoPane) ;
-			
-			// Tabbed Panel for logs display
-			LogsDisplayPane lPane = new LogsDisplayPane(bLog) ;
-			bkpTablesPanel.addTab("Logs display", lPane) ;
-			
 			bkpTablesPanel.setSelectedIndex(0) ;
-			
-			bkpTablesPanel.addChangeListener(new BackUpTabChangeListener());
 			
 			getContentPane().add(bkpTablesPanel) ;
 			
 			addWindowListener(new ShutdownAppli()) ;
-		}
-	}
-	
-	private class BackUpTabChangeListener implements ChangeListener {
-
-		@Override
-		public void stateChanged(ChangeEvent arg0) {
-			
-			if (bkpTablesPanel.getSelectedComponent().equals(appInfoPane)) {
-				appInfoPane.setInfos();
-			}			
 		}
 	}
 	
