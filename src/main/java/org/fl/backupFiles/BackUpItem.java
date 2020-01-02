@@ -24,9 +24,9 @@ public class BackUpItem {
 	private final Path 		 	sourceClosestExistingPath ;
 	private final Path 		 	targetPath ;
 	private final BackupAction 	backupAction ;
+	private final boolean		isAboveSizeLimit ;
 	private BackupStatus 		backupStatus ;
 	private boolean		 		diffByContent ;
-	private boolean		 		isAboveSizeLimit ;
 	private Logger		 		bLog ;
 	
 	// A back up item is :
