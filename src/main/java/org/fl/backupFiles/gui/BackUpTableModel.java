@@ -53,7 +53,7 @@ public class BackUpTableModel extends AbstractTableModel {
         case SIZE_LIMT_COL_IDX:
         	return backUpItems.get(rowIndex).isAboveSizeThreshold() ;
         case PERMANENCE_COL_IDX:
-        	return backUpItems.get(rowIndex).getPermanenceLevel().getName() ;
+        	return backUpItems.get(rowIndex).getPermanenceLevel() ;
         case ACTION_COL_IDX:
             return backUpItems.get(rowIndex).getBackupAction();
         case STATUS_COL_IDX:

@@ -8,5 +8,6 @@ public enum DirectoryPermanenceLevel {
 		name  = n ;
 		level = l ;
 	}
-	public String getName() { return name ; }
+	@Override
+    public String toString()  { return name ; }
 }
