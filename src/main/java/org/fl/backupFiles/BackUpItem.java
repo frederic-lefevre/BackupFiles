@@ -10,6 +10,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.directoryPermanence.DirectoryPermanence;
+import org.fl.backupFiles.directoryPermanence.DirectoryPermanenceLevel;
+
 import com.ibm.lge.fl.util.file.FileComparator;
 import com.ibm.lge.fl.util.file.FilesSecurityUtils;
 import com.ibm.lge.fl.util.file.FilesUtils;
@@ -20,14 +23,15 @@ public class BackUpItem {
 	
 	public enum BackupStatus { DIFFERENT, DIFF_BY_CONTENT, DONE, FAILED } ;
 
-	private final Path	 		sourcePath ;
-	private final Path 		 	sourceClosestExistingPath ;
-	private final Path 		 	targetPath ;
-	private final BackupAction 	backupAction ;
-	private final boolean		isAboveSizeLimit ;
-	private BackupStatus 		backupStatus ;
-	private boolean		 		diffByContent ;
-	private Logger		 		bLog ;
+	private final Path	 				   sourcePath ;
+	private final Path 		 			   sourceClosestExistingPath ;
+	private final Path 		 			   targetPath ;
+	private final BackupAction 			   backupAction ;
+	private final boolean				   isAboveSizeLimit ;
+	private BackupStatus 				   backupStatus ;
+	private boolean		 				   diffByContent ;
+	private final DirectoryPermanenceLevel permanenceLevel ;
+	private final Logger				   bLog ;
 	
 	// A back up item is :
 	// * a source path (file or directory) to back up 
@@ -54,6 +58,13 @@ public class BackUpItem {
 		diffByContent		  	  = false ;
 		bLog 		 	 		  = l ;
 		isAboveSizeLimit		  = iat ;
+		if (src != null) {
+			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(src) ;
+		} else if (srcExisting != null) {
+			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(srcExisting) ;
+		} else {
+			permanenceLevel		  = DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL ;
+		}
 	}
 
 	public Path getSourcePath() {
@@ -86,6 +97,10 @@ public class BackUpItem {
 
 	public BackupStatus getBackupStatus() {
 		return backupStatus;
+	}
+
+	public DirectoryPermanenceLevel getPermanenceLevel() {
+		return permanenceLevel;
 	}
 
 	public void execute(BackUpCounters backUpCounters) {

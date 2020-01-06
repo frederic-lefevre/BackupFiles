@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.fl.backupFiles.directoryPermanence.DirectoryPermanence;
+import org.fl.backupFiles.directoryPermanence.SimpleDirectoryPermanence;
 import org.fl.backupFiles.gui.BackUpItemActionListener;
 import org.fl.backupFiles.gui.BackUpItemActionListener.CustomAction;
 import org.fl.backupFiles.scanner.BackUpScannerThread;
@@ -18,7 +20,8 @@ public class Config {
 	private static int  		   		backUpRefreshRate ;
 	private static int  		   		maxDepth ;
 	private static ExecutorService 		scanExecutorService ;
-	private static  ArrayList<OsAction> osActions ;
+	private static ArrayList<OsAction>  osActions ;
+	private static DirectoryPermanence  directoryPermanence ;
 
 	public static void initConfig(AdvancedProperties backupProperty) {
 		
@@ -51,6 +54,8 @@ public class Config {
 			}
 		}
 		BackUpItemActionListener.setCustomActionCommands(customActionMap) ;
+		
+		directoryPermanence = new SimpleDirectoryPermanence() ;
 	}
 
 	public static long getScanRefreshRate() {
@@ -75,6 +80,10 @@ public class Config {
 
 	public static ArrayList<OsAction> getOsActions() {
 		return osActions;
+	}
+
+	public static DirectoryPermanence getDirectoryPermanence() {
+		return directoryPermanence;
 	}
 
 }
