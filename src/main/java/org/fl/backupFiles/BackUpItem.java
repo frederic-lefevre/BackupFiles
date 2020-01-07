@@ -67,16 +67,18 @@ public class BackUpItem {
 		}
 		
 		// Update counters
-		if (backupAction.equals(BackupAction.COPY_NEW)) {
-			backUpCounters.copyNewNb++ ;
-		} else if (backupAction.equals(BackupAction.COPY_REPLACE)) {
+		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
 			backUpCounters.copyReplaceNb++ ;
-		} else if (backupAction.equals(BackupAction.COPY_TREE)) {
-			backUpCounters.copyTreeNb++ ;
+		} else if (backupAction.equals(BackupAction.COPY_NEW)) {
+			backUpCounters.copyNewNb++ ;
 		} else if (backupAction.equals(BackupAction.DELETE)) {
 			backUpCounters.deleteNb++ ;
+		} else if (backupAction.equals(BackupAction.COPY_TREE)) {
+			backUpCounters.copyTreeNb++ ;
 		} else if (backupAction.equals(BackupAction.DELETE_DIR)) {
 			backUpCounters.deleteDirNb++ ;
+		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
+			backUpCounters.ambiguousNb++ ;
 		}
 		if (isAboveSizeLimit) backUpCounters.backupWithSizeAboveThreshold++ ;
 		if (permanenceLevel.equals(DirectoryPermanenceLevel.HIGH)) {

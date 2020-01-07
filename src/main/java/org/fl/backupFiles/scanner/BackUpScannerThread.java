@@ -296,7 +296,6 @@ public class BackUpScannerThread {
 					boolean aboveThreshold = sourceAttributes.size() - targetAttributes.size() > fileSizeWarningThreshold ;
 					BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.AMBIGUOUS, aboveThreshold, backUpCounters, pLog) ;
 					backUpItemList.add(backUpItem) ;
-					backUpCounters.ambiguousNb++ ;
 				} 
 			}
 		} catch (Exception e) {
