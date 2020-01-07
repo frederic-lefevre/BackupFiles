@@ -78,15 +78,22 @@ public class BackUpItemTest {
 		assertEquals(1, counters.nbSourceFilesProcessed) ;
 		assertEquals(2, getTotalCounters(counters)) ;
 		
+		counters.reset();
 		backUpItem = new BackUpItem(null, tgt, src.getParent(), BackupAction.DELETE, false, counters, log) ;
+		assertEquals(0, counters.copyNewNb) ;
+		assertEquals(0, counters.nbSourceFilesProcessed) ;
+		assertEquals(1, counters.deleteNb) ;
+		assertEquals(0, counters.nbTargetFilesProcessed) ;
+		assertEquals(1, getTotalCounters(counters)) ;
+		
+		counters.reset();
 		backUpItem.execute(counters);
 		
 		assertFalse(Files.exists(tgt)) ;
-		assertEquals(1, counters.copyNewNb) ;
-		assertEquals(1, counters.nbSourceFilesProcessed) ;
+		assertEquals(0, counters.nbSourceFilesProcessed) ;
 		assertEquals(1, counters.deleteNb) ;
 		assertEquals(1, counters.nbTargetFilesProcessed) ;
-		assertEquals(4, getTotalCounters(counters)) ;
+		assertEquals(2, getTotalCounters(counters)) ;
 		
 	}
 	

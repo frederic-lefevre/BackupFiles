@@ -150,10 +150,8 @@ public class BackUpScannerThread {
 							BackupAction action ;
 							if (Files.isDirectory(targetFile)) {
 								action = BackupAction.DELETE_DIR ;
-								backUpCounters.deleteDirNb++ ;
 							} else {
 								action = BackupAction.DELETE ;
-								backUpCounters.deleteNb++ ;
 							}
 							backUpItemList.add(new BackUpItem(null, targetFile, sourceDirectory, action, false, backUpCounters, pLog)) ;
 
