@@ -179,7 +179,6 @@ public class BackUpScannerThread {
 				}
 				
 				backUpItemList.add(new BackUpItem(sourceDirectory, targetDirectory, sourceDirectory, BackupAction.COPY_TREE, false, backUpCounters, pLog)) ;
-				backUpCounters.nbSourceFilesProcessed++ ;
 			}
 		}
 		
