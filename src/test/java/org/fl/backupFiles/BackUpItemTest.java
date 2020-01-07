@@ -21,7 +21,8 @@ public class BackUpItemTest {
 		Path tgt 		 = Paths.get("") ;
 		Path srcExisting = Paths.get("") ;
 		
-		BackUpItem backUpItem = new BackUpItem(src, tgt, srcExisting, BackupAction.COPY_REPLACE, false, Logger.getGlobal()) ;
+		BackUpCounters counters = new BackUpCounters() ;
+		BackUpItem backUpItem = new BackUpItem(src, tgt, srcExisting, BackupAction.COPY_REPLACE, false, counters, Logger.getGlobal()) ;
 		
 		BackupAction action = backUpItem.getBackupAction() ;
 		
@@ -39,9 +40,9 @@ public class BackUpItemTest {
 		Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
 		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 		
-		BackUpItem backUpItem = new BackUpItem(src, tgt, src, BackupAction.COPY_NEW, false, log) ;
-		
 		BackUpCounters counters = new BackUpCounters() ;
+		BackUpItem backUpItem = new BackUpItem(src, tgt, src, BackupAction.COPY_NEW, false, counters, log) ;
+		
 		assertEquals(0, getTotalCounters(counters)) ;
 		backUpItem.execute(counters);
 		
@@ -53,7 +54,7 @@ public class BackUpItemTest {
 		assertEquals(1, counters.nbSourceFilesProcessed) ;
 		assertEquals(2, getTotalCounters(counters)) ;
 		
-		backUpItem = new BackUpItem(null, tgt, src.getParent(), BackupAction.DELETE, false, log) ;
+		backUpItem = new BackUpItem(null, tgt, src.getParent(), BackupAction.DELETE, false, counters, log) ;
 		backUpItem.execute(counters);
 		
 		assertFalse(Files.exists(tgt)) ;

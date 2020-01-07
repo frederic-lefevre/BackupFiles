@@ -49,7 +49,7 @@ public class BackUpItem {
 	//		DONE	 	 : the back up has been done
 	//		FAILED	 	 : the back up has failed
 	
-	public BackUpItem(Path src, Path tgt, Path srcExisting, BackupAction bst, boolean iat, Logger l) {
+	public BackUpItem(Path src, Path tgt, Path srcExisting, BackupAction bst, boolean iat, BackUpCounters backUpCounters, Logger l) {
 		sourcePath 	 	 		  = src ;
 		sourceClosestExistingPath = srcExisting ;
 		targetPath 	 	 		  = tgt ;
@@ -64,6 +64,11 @@ public class BackUpItem {
 			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(srcExisting) ;
 		} else {
 			permanenceLevel		  = DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL ;
+		}
+		if (permanenceLevel.equals(DirectoryPermanenceLevel.HIGH)) {
+			backUpCounters.nbHighPermanencePath++ ;
+		} else if (permanenceLevel.equals(DirectoryPermanenceLevel.MEDIUM)) {
+			backUpCounters.nbMediumPermanencePath++ ;
 		}
 	}
 
