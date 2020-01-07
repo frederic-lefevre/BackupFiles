@@ -65,6 +65,14 @@ public class BackUpItem {
 		} else {
 			permanenceLevel		  = DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL ;
 		}
+		
+		// Update counters
+		if (backupAction.equals(BackupAction.COPY_NEW)) {
+			backUpCounters.copyNewNb++ ;
+		} else if (backupAction.equals(BackupAction.COPY_REPLACE)) {
+			backUpCounters.copyReplaceNb++ ;
+		}
+		if (isAboveSizeLimit) backUpCounters.backupWithSizeAboveThreshold++ ;
 		if (permanenceLevel.equals(DirectoryPermanenceLevel.HIGH)) {
 			backUpCounters.nbHighPermanencePath++ ;
 		} else if (permanenceLevel.equals(DirectoryPermanenceLevel.MEDIUM)) {

@@ -208,10 +208,8 @@ public class BackUpScannerThread {
 						// source is a file
 						
 						boolean aboveThreshold = sourceAttributes.size() > fileSizeWarningThreshold ;
-						if (aboveThreshold) backUpCounters.backupWithSizeAboveThreshold++ ;
 						BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, aboveThreshold, backUpCounters, pLog) ;
 						backUpItemList.add(copyNewItem) ;						
-						backUpCounters.copyNewNb++ ;
 					}
 				} else {
 					
@@ -239,7 +237,6 @@ public class BackUpScannerThread {
 							pLog.warning("Source " + srcPath + " is a file\n" + "but target is a directory " + tgtPath);
 							backUpItemList.add(new BackUpItem(null, tgtPath, sourceDirectory, BackupAction.DELETE_DIR, false, backUpCounters, pLog)) ;
 							boolean aboveThreshold = sourceAttributes.size() > fileSizeWarningThreshold ;
-							if (aboveThreshold) backUpCounters.backupWithSizeAboveThreshold++ ;
 							BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, aboveThreshold, backUpCounters, pLog) ;
 							backUpItemList.add(copyNewItem) ;
 						} else {
@@ -267,11 +264,9 @@ public class BackUpScannerThread {
 					} else {
 						// content are not the same
 						boolean aboveThreshold = sourceAttributes.size() - targetAttributes.size() > fileSizeWarningThreshold ;
-						if (aboveThreshold) backUpCounters.backupWithSizeAboveThreshold++ ;
 						BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, aboveThreshold, backUpCounters, pLog) ;
 						backUpItem.setDiffByContent(true) ;
 						backUpItemList.add(backUpItem) ;
-						backUpCounters.copyReplaceNb++ ;
 						backUpCounters.contentDifferentNb++ ;
 					}
 				}
@@ -293,20 +288,15 @@ public class BackUpScannerThread {
 					if (f1s != f2s) {
 						// different size
 						boolean aboveThreshold = f1s - f2s > fileSizeWarningThreshold ;
-						if (aboveThreshold) backUpCounters.backupWithSizeAboveThreshold++ ;
 						BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, aboveThreshold, backUpCounters, pLog) ;
 						backUpItemList.add(backUpItem) ;
-						backUpCounters.copyReplaceNb++ ;
 					}
 				} else if (compareFile > 0) {
 					boolean aboveThreshold = sourceAttributes.size() - targetAttributes.size() > fileSizeWarningThreshold ;
-					if (aboveThreshold) backUpCounters.backupWithSizeAboveThreshold++ ;
 					BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, aboveThreshold, backUpCounters, pLog) ;
 					backUpItemList.add(backUpItem) ;
-					backUpCounters.copyReplaceNb++ ;
 				} else if (compareFile < 0) {
 					boolean aboveThreshold = sourceAttributes.size() - targetAttributes.size() > fileSizeWarningThreshold ;
-					if (aboveThreshold) backUpCounters.backupWithSizeAboveThreshold++ ;
 					BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.AMBIGUOUS, aboveThreshold, backUpCounters, pLog) ;
 					backUpItemList.add(backUpItem) ;
 					backUpCounters.ambiguousNb++ ;
@@ -336,7 +326,6 @@ public class BackUpScannerThread {
 				pLog.warning("Source " + srcPath + " is a file\n" + "but target is a directory " + tgtPath);
 				backUpItemList.add(new BackUpItem(null, tgtPath, srcPath, BackupAction.DELETE_DIR, false, backUpCounters, pLog)) ;
 				boolean aboveThreshold = sourceAttributes.size() > fileSizeWarningThreshold ;
-				if (aboveThreshold) backUpCounters.backupWithSizeAboveThreshold++ ;
 				BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, aboveThreshold, backUpCounters, pLog) ;
 				backUpItemList.add(copyNewItem) ;
 			}  else {
