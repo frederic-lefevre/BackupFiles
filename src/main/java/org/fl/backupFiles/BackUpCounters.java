@@ -15,6 +15,8 @@ public class BackUpCounters {
 	public long nbSourceFilesFailed ;
 	public long nbTargetFilesFailed ;
 	public long backupWithSizeAboveThreshold ;
+	public long nbHighPermanencePath ;
+	public long nbMediumPermanencePath ;
 	
 	private final static String COPY_NEW_LABEL 		= "  Copier nouveau:     " ;
 	private final static String COPY_REPLACE_LABEL  = "  Remplacer:          " ;
@@ -30,6 +32,8 @@ public class BackUpCounters {
 	
 	private final static String CONTENT_DIFFERENT_LABEL 	= "  Fichiers avec contenu différent:  " ;
 	private final static String SIZE_ABOVE_LIMIT_LABEL		= "  Fichiers avec tailles importantes: " ;
+	private final static String HIGH_PERMANENCE_LABEL		= "  Fichiers à haute permanence: " ;
+	private final static String MEDIUM_PERMANENCE_LABEL		= "  Fichiers à moyenne permanence: " ;
 	
 	public BackUpCounters() {
 		reset() ;
@@ -48,6 +52,8 @@ public class BackUpCounters {
 		nbSourceFilesFailed 		 = 0 ;
 		nbTargetFilesFailed 		 = 0 ;
 		backupWithSizeAboveThreshold = 0 ;
+		nbHighPermanencePath		 = 0 ;
+		nbMediumPermanencePath		 = 0 ;
 	}
 	
 	public String toString() {
@@ -62,6 +68,7 @@ public class BackUpCounters {
 		res.append(TARGET_FILE_PROCESSED_LABEL).append(nbTargetFilesProcessed).append(TARGET_FILE_FAILED_LABEL).append(nbTargetFilesFailed).append("\n") ;
 		
 		res.append(SIZE_ABOVE_LIMIT_LABEL).append(backupWithSizeAboveThreshold).append("\n") ;
+		res.append(HIGH_PERMANENCE_LABEL).append(nbHighPermanencePath).append(MEDIUM_PERMANENCE_LABEL).append(nbMediumPermanencePath).append("\n") ;
 		
 		if (contentDifferentNb != 0) {
 			res.append(CONTENT_DIFFERENT_LABEL).append(contentDifferentNb) ;
@@ -80,6 +87,8 @@ public class BackUpCounters {
 		res.append("<tr><td>").append(TARGET_FILE_PROCESSED_LABEL).append("</td><td>").append(nbTargetFilesProcessed).append("</td><td>").append(TARGET_FILE_FAILED_LABEL).append("</td><td>").append(nbTargetFilesFailed).append("</td></tr>") ;
 		
 		res.append("<tr><td>").append(SIZE_ABOVE_LIMIT_LABEL).append("</td><td>").append(backupWithSizeAboveThreshold).append("</td><td></td><td></td></tr>") ;
+		res.append("<tr><td>").append(HIGH_PERMANENCE_LABEL).append("</td><td>").append(nbHighPermanencePath).append("</td><td>").append(MEDIUM_PERMANENCE_LABEL).append("</td><td>").append(nbMediumPermanencePath).append("</td></tr>") ;
+
 		if (contentDifferentNb != 0) {
 			res.append("<tr><td>").append(CONTENT_DIFFERENT_LABEL).append("</td><td>").append(contentDifferentNb).append("</td><td></td><td></td></tr></table>") ;
 		} else {
@@ -102,5 +111,7 @@ public class BackUpCounters {
 		nbSourceFilesFailed 		 = nbSourceFilesFailed 	 		+ counters.nbSourceFilesFailed ;
 		nbTargetFilesFailed 		 = nbTargetFilesFailed 	 		+ counters.nbTargetFilesFailed ;
 		backupWithSizeAboveThreshold = backupWithSizeAboveThreshold + counters.backupWithSizeAboveThreshold ;
+		nbHighPermanencePath		 = nbHighPermanencePath			+ counters.nbHighPermanencePath ;
+		nbMediumPermanencePath		 = nbMediumPermanencePath		+ counters.nbMediumPermanencePath ;
 	}
 }
