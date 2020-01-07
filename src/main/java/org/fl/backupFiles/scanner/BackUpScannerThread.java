@@ -202,7 +202,6 @@ public class BackUpScannerThread {
 						// source is a directory
 						
 						backUpItemList.add(new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_TREE, false, backUpCounters, pLog)) ;
-						backUpCounters.copyTreeNb++ ;
 						
 					} else {
 						// source is a file

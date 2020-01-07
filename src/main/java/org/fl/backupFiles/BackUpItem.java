@@ -71,6 +71,8 @@ public class BackUpItem {
 			backUpCounters.copyNewNb++ ;
 		} else if (backupAction.equals(BackupAction.COPY_REPLACE)) {
 			backUpCounters.copyReplaceNb++ ;
+		} else if (backupAction.equals(BackupAction.COPY_TREE)) {
+			backUpCounters.copyTreeNb++ ;
 		}
 		if (isAboveSizeLimit) backUpCounters.backupWithSizeAboveThreshold++ ;
 		if (permanenceLevel.equals(DirectoryPermanenceLevel.HIGH)) {
