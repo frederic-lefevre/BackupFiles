@@ -9,7 +9,7 @@ public class DirectoryPermanenceMap implements DirectoryPermanence {
 	private final TreeMap<Path,DirectoryPermanenceLevel> permanenceMap ;
 	private final Set<Path> pathKeys ;
 	
-	public DirectoryPermanenceMap() {
+	public DirectoryPermanenceMap(String config) {
 		super();
 		permanenceMap = new TreeMap<Path,DirectoryPermanenceLevel>(new PermanencePathComparator()) ;
 		pathKeys = permanenceMap.keySet() ;

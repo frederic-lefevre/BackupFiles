@@ -1,5 +1,6 @@
 package org.fl.backupFiles;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
@@ -55,7 +56,8 @@ public class Config {
 		}
 		BackUpItemActionListener.setCustomActionCommands(customActionMap) ;
 		
-		directoryPermanence = new DirectoryPermanenceMap() ;
+		String permanenceConf = backupProperty.getFileContentFromURI("backupFiles.dirPermanenceFile", StandardCharsets.UTF_8) ;
+		directoryPermanence = new DirectoryPermanenceMap(permanenceConf) ;
 	}
 
 	public static long getScanRefreshRate() {
