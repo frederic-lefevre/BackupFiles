@@ -2,10 +2,10 @@ package org.fl.backupFiles.directoryPermanence;
 
 import java.nio.file.Path;
 
-public class SimpleDirectoryPermanence implements DirectoryPermanence {
+public class DummyDirectoryPermanence implements DirectoryPermanence {
 
 	
-	public SimpleDirectoryPermanence() {
+	public DummyDirectoryPermanence() {
 		super();
 	}
 
