@@ -47,7 +47,7 @@ class FilesBackUpScannerTest {
 			log = runningContext.getpLog() ;
 
 			AdvancedProperties backupProperty = runningContext.getProps() ;
-			Config.initConfig(runningContext.getProps());
+			Config.initConfig(runningContext.getProps(), log);
 
 			// Get the different config path
 			configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir") ;

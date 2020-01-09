@@ -28,9 +28,8 @@ public class BackUpItemTest {
 		
 		try {
 			RunningContext runningContext = new RunningContext("BackupFilesTest", null, new URI(DEFAULT_PROP_FILE));
-			Config.initConfig(runningContext.getProps());
-
 			log = runningContext.getpLog() ;
+			Config.initConfig(runningContext.getProps(), log);
 			
 		} catch (URISyntaxException e) {
 			log.log(Level.SEVERE, "URI exception writing test data", e);

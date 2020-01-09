@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryPermanence.DirectoryPermanence;
 import org.fl.backupFiles.directoryPermanence.DirectoryPermanenceMap;
@@ -24,7 +25,7 @@ public class Config {
 	private static ArrayList<OsAction>  osActions ;
 	private static DirectoryPermanence  directoryPermanence ;
 
-	public static void initConfig(AdvancedProperties backupProperty) {
+	public static void initConfig(AdvancedProperties backupProperty, Logger cLog) {
 		
 		scanRefreshRate   		 	  = backupProperty.getLong("backupFiles.scan.refreshRate", 		     2000) ;
 		backUpMaxRefreshInterval	  = backupProperty.getLong("backupFiles.backUp.maxRefreshInterval",  3000) ;
@@ -57,7 +58,7 @@ public class Config {
 		BackUpItemActionListener.setCustomActionCommands(customActionMap) ;
 		
 		String permanenceConf = backupProperty.getFileContentFromURI("backupFiles.dirPermanenceFile", StandardCharsets.UTF_8) ;
-		directoryPermanence = new DirectoryPermanenceMap(permanenceConf) ;
+		directoryPermanence = new DirectoryPermanenceMap(permanenceConf, cLog) ;
 	}
 
 	public static long getScanRefreshRate() {
