@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.fl.backupFiles.directoryPermanence.DirectoryPermanence;
-import org.fl.backupFiles.directoryPermanence.DummyDirectoryPermanence;
+import org.fl.backupFiles.directoryPermanence.DirectoryPermanenceMap;
 import org.fl.backupFiles.gui.BackUpItemActionListener;
 import org.fl.backupFiles.gui.BackUpItemActionListener.CustomAction;
 import org.fl.backupFiles.scanner.BackUpScannerThread;
@@ -55,7 +55,7 @@ public class Config {
 		}
 		BackUpItemActionListener.setCustomActionCommands(customActionMap) ;
 		
-		directoryPermanence = new DummyDirectoryPermanence() ;
+		directoryPermanence = new DirectoryPermanenceMap() ;
 	}
 
 	public static long getScanRefreshRate() {
