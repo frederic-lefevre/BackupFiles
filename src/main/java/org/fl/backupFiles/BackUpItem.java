@@ -58,7 +58,9 @@ public class BackUpItem {
 		diffByContent		  	  = false ;
 		bLog 		 	 		  = l ;
 		isAboveSizeLimit		  = iat ;
-		if (src != null) {
+		if (targetPath != null) {
+			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(targetPath) ;
+		} else if (src != null) {
 			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(src) ;
 		} else if (srcExisting != null) {
 			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(srcExisting) ;
