@@ -30,4 +30,12 @@ class PermanencePathComparatorTest {
 				pathKeys.toString());
 	}
 
+	@Test
+	void test2() {
+		
+		PermanencePathComparator permComp = new PermanencePathComparator() ;
+		
+		int comp = permComp.compare(Paths.get("/toto/titi/tata"), Paths.get("/toto/titi/tata")) ;
+		assertEquals(0, comp) ;
+	}
 }
