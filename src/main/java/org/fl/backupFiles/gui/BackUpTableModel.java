@@ -9,13 +9,14 @@ public class BackUpTableModel extends AbstractTableModel {
 
 	public static final int SOURCE_PATH_COL_IDX = 0 ;
 	public static final int SIZE_LIMT_COL_IDX 	= 1 ;
-	public static final int ACTION_COL_IDX 		= 2 ;
-	public static final int STATUS_COL_IDX 		= 3 ;
-	public static final int TARGET_PATH_COL_IDX = 4 ;
+	public static final int PERMANENCE_COL_IDX 	= 2 ;
+	public static final int ACTION_COL_IDX 		= 3 ;
+	public static final int STATUS_COL_IDX 		= 4 ;
+	public static final int TARGET_PATH_COL_IDX = 5 ;
 	
 	private static final long serialVersionUID = 1L;
 	
-	public final static String[] entetes = {"Chemin source", "Size limit", "Action", "Status", "Chemin cible"};
+	public final static String[] entetes = {"Chemin source", "Size limit", "Permanence", "Action", "Status", "Chemin cible"};
 	
 	// Underlying data
 	private BackUpItemList backUpItems ;
@@ -51,6 +52,8 @@ public class BackUpTableModel extends AbstractTableModel {
             return backUpItems.get(rowIndex).getSourcePath();
         case SIZE_LIMT_COL_IDX:
         	return backUpItems.get(rowIndex).isAboveSizeThreshold() ;
+        case PERMANENCE_COL_IDX:
+        	return backUpItems.get(rowIndex).getPermanenceLevel() ;
         case ACTION_COL_IDX:
             return backUpItems.get(rowIndex).getBackupAction();
         case STATUS_COL_IDX:

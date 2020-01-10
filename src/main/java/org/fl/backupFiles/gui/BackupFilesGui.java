@@ -56,7 +56,7 @@ public class BackupFilesGui  extends JFrame {
 			configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir") ;
 			
 			// Init config
-			Config.initConfig(backupProperty) ;
+			Config.initConfig(backupProperty, bLog) ;
 			
 		} catch (Exception e) {
 			System.out.println("Exception caught in Main (see default prop file processing)") ;

@@ -49,9 +49,8 @@ class BackUpScannerProcessorTest {
 		
 		try {
 			RunningContext runningContext = new RunningContext("BackupFilesTest", null, new URI(DEFAULT_PROP_FILE));
-			Config.initConfig(runningContext.getProps());
-
 			log = runningContext.getpLog() ;
+			Config.initConfig(runningContext.getProps(), log);
 
 			// Copy test data
 			Path srcPath1 = Paths.get(new URI(SOURCE_DATA_DIR1));

@@ -10,6 +10,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.directoryPermanence.DirectoryPermanence;
+import org.fl.backupFiles.directoryPermanence.DirectoryPermanenceLevel;
+
 import com.ibm.lge.fl.util.file.FileComparator;
 import com.ibm.lge.fl.util.file.FilesSecurityUtils;
 import com.ibm.lge.fl.util.file.FilesUtils;
@@ -20,14 +23,15 @@ public class BackUpItem {
 	
 	public enum BackupStatus { DIFFERENT, DIFF_BY_CONTENT, DONE, FAILED } ;
 
-	private final Path	 		sourcePath ;
-	private final Path 		 	sourceClosestExistingPath ;
-	private final Path 		 	targetPath ;
-	private final BackupAction 	backupAction ;
-	private BackupStatus 		backupStatus ;
-	private boolean		 		diffByContent ;
-	private boolean		 		isAboveSizeLimit ;
-	private Logger		 		bLog ;
+	private final Path	 				   sourcePath ;
+	private final Path 		 			   sourceClosestExistingPath ;
+	private final Path 		 			   targetPath ;
+	private final BackupAction 			   backupAction ;
+	private final boolean				   isAboveSizeLimit ;
+	private BackupStatus 				   backupStatus ;
+	private boolean		 				   diffByContent ;
+	private final DirectoryPermanenceLevel permanenceLevel ;
+	private final Logger				   bLog ;
 	
 	// A back up item is :
 	// * a source path (file or directory) to back up 
@@ -45,7 +49,7 @@ public class BackUpItem {
 	//		DONE	 	 : the back up has been done
 	//		FAILED	 	 : the back up has failed
 	
-	public BackUpItem(Path src, Path tgt, Path srcExisting, BackupAction bst, boolean iat, Logger l) {
+	public BackUpItem(Path src, Path tgt, Path srcExisting, BackupAction bst, boolean iat, BackUpCounters backUpCounters, Logger l) {
 		sourcePath 	 	 		  = src ;
 		sourceClosestExistingPath = srcExisting ;
 		targetPath 	 	 		  = tgt ;
@@ -54,6 +58,36 @@ public class BackUpItem {
 		diffByContent		  	  = false ;
 		bLog 		 	 		  = l ;
 		isAboveSizeLimit		  = iat ;
+		if (targetPath != null) {
+			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(targetPath) ;
+		} else if (src != null) {
+			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(src) ;
+		} else if (srcExisting != null) {
+			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(srcExisting) ;
+		} else {
+			permanenceLevel		  = DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL ;
+		}
+		
+		// Update counters
+		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
+			backUpCounters.copyReplaceNb++ ;
+		} else if (backupAction.equals(BackupAction.COPY_NEW)) {
+			backUpCounters.copyNewNb++ ;
+		} else if (backupAction.equals(BackupAction.DELETE)) {
+			backUpCounters.deleteNb++ ;
+		} else if (backupAction.equals(BackupAction.COPY_TREE)) {
+			backUpCounters.copyTreeNb++ ;
+		} else if (backupAction.equals(BackupAction.DELETE_DIR)) {
+			backUpCounters.deleteDirNb++ ;
+		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
+			backUpCounters.ambiguousNb++ ;
+		}
+		if (isAboveSizeLimit) backUpCounters.backupWithSizeAboveThreshold++ ;
+		if (permanenceLevel.equals(DirectoryPermanenceLevel.HIGH)) {
+			backUpCounters.nbHighPermanencePath++ ;
+		} else if (permanenceLevel.equals(DirectoryPermanenceLevel.MEDIUM)) {
+			backUpCounters.nbMediumPermanencePath++ ;
+		}
 	}
 
 	public Path getSourcePath() {
@@ -86,6 +120,10 @@ public class BackUpItem {
 
 	public BackupStatus getBackupStatus() {
 		return backupStatus;
+	}
+
+	public DirectoryPermanenceLevel getPermanenceLevel() {
+		return permanenceLevel;
 	}
 
 	public void execute(BackUpCounters backUpCounters) {
