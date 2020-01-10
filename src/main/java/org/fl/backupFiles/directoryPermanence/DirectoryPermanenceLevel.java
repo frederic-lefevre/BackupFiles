@@ -1,12 +1,10 @@
 package org.fl.backupFiles.directoryPermanence;
 
 public enum DirectoryPermanenceLevel {
-	HIGH ("Haut", 100), MEDIUM("Moyen", 50), LOW("Faible", 10) ;
-	private int level ;
+	HIGH ("Haut"), MEDIUM("Moyen"), LOW("Faible") ;
 	private String name ;
-	private DirectoryPermanenceLevel(String n, int l) {
+	private DirectoryPermanenceLevel(String n) {
 		name  = n ;
-		level = l ;
 	}
 	@Override
     public String toString()  { return name ; }
