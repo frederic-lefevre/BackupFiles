@@ -128,9 +128,7 @@ public class UiControl extends JPanel {
 	}
 
 	private JPanel getEmptyPane() {
-		JPanel emptyPane = new JPanel() ;
-		emptyPane.setPreferredSize(new Dimension(10, 10));
-		return emptyPane ;
+		return new JPanel() ;
 	}
 	
 	private class ControlAction implements ActionListener {
