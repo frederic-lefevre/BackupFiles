@@ -82,6 +82,10 @@ public class BackUpItem {
 		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
 			backUpCounters.ambiguousNb++ ;
 		}
+		updateLimtsCounters(backUpCounters) ;
+	}
+
+	private void updateLimtsCounters(BackUpCounters backUpCounters) {
 		if (isAboveSizeLimit) backUpCounters.backupWithSizeAboveThreshold++ ;
 		if (permanenceLevel.equals(DirectoryPermanenceLevel.HIGH)) {
 			backUpCounters.nbHighPermanencePath++ ;
@@ -89,7 +93,7 @@ public class BackUpItem {
 			backUpCounters.nbMediumPermanencePath++ ;
 		}
 	}
-
+	
 	public Path getSourcePath() {
 		return sourcePath;
 	}
@@ -131,6 +135,7 @@ public class BackUpItem {
 		try {
 			if (executeAction(backUpCounters)) {
 				backupStatus = BackupStatus.DONE ;
+				updateLimtsCounters(backUpCounters) ;
 			} else {
 				backupStatus = BackupStatus.FAILED ;
 			}
