@@ -86,25 +86,9 @@ public class BackUpCounters {
 		appendRow(res, SOURCE_OK_LABEL, nbSourceFilesProcessed, SOURCE_KO_LABEL, nbSourceFilesFailed, null, null) ;
 		appendRow(res, TARGET_OK_LABEL, nbTargetFilesProcessed, TARGET_KO_LABEL, nbTargetFilesFailed, null, null) ;
 		
-		String color1, color2 ;
-		if (backupWithSizeAboveThreshold > 0) {
-			color1 = "red" ;
-		} else {
-			color1 = null ;
-		}
-		appendRow(res, SIZE_ABOVE_LIMIT_LABEL, backupWithSizeAboveThreshold, "", 0, color1, null) ;
-				
-		if (nbHighPermanencePath > 0) {
-			color1 = "red" ;
-		} else {
-			color1 = null ;
-		}		
-		if (nbMediumPermanencePath > 0) {
-			color2 = "#ff8f00" ;
-		} else {
-			color2 = null ;
-		}	
-		appendRow(res, HIGH_PERMANENCE_LABEL, nbHighPermanencePath, MEDIUM_PERMANENCE_LABEL, nbMediumPermanencePath, color1, color2) ;
+		appendRow(res, SIZE_ABOVE_LIMIT_LABEL, backupWithSizeAboveThreshold, "", 0, "red", null) ;
+					
+		appendRow(res, HIGH_PERMANENCE_LABEL, nbHighPermanencePath, MEDIUM_PERMANENCE_LABEL, nbMediumPermanencePath, "red", "#ff8f00") ;
 		
 		if (contentDifferentNb != 0) {
 			appendRow(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, "", 0, null, null) ;
@@ -115,8 +99,8 @@ public class BackUpCounters {
 	
 	private void appendRow(StringBuilder res, String label1, long value1, String label2, long value2, String color1, String color2) {
 		
-		boolean color1present = (color1 != null) && (! color1.isEmpty()) ;
-		boolean color2present = (color2 != null) && (! color2.isEmpty()) ;
+		boolean color1present = (color1 != null) && (! color1.isEmpty()) && (value1 > 0) ;
+		boolean color2present = (color2 != null) && (! color2.isEmpty()) && (value2 > 0) ;
 		
 		res.append("<tr><td") ;
 		if (color1present) res.append(" bgcolor=").append(color1) ;
