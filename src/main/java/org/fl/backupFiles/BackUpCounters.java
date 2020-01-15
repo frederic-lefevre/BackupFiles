@@ -87,9 +87,33 @@ public class BackUpCounters {
 		res.append("<tr><td>").append(SOURCE_FILE_PROCESSED_LABEL).append("</td><td>").append(nbSourceFilesProcessed).append("</td><td>").append(SOURCE_FILE_FAILED_LABEL).append("</td><td>").append(nbSourceFilesFailed).append("</td></tr>") ;
 		res.append("<tr><td>").append(TARGET_FILE_PROCESSED_LABEL).append("</td><td>").append(nbTargetFilesProcessed).append("</td><td>").append(TARGET_FILE_FAILED_LABEL).append("</td><td>").append(nbTargetFilesFailed).append("</td></tr>") ;
 		
-		res.append("<tr><td>").append(SIZE_ABOVE_LIMIT_LABEL).append("</td><td>").append(backupWithSizeAboveThreshold).append("</td><td></td><td></td></tr>") ;
-		res.append("<tr><td>").append(HIGH_PERMANENCE_LABEL).append("</td><td>").append(nbHighPermanencePath).append("</td><td>").append(MEDIUM_PERMANENCE_LABEL).append("</td><td>").append(nbMediumPermanencePath).append("</td></tr>") ;
-
+		String rowStart ;
+		String cellStart ;
+		if (backupWithSizeAboveThreshold > 0) {
+			rowStart = "<tr><td bgcolor=red>" ;
+			cellStart = "</td><td bgcolor=red>" ;
+		} else {
+			rowStart = "<tr><td>" ;
+			cellStart = "</td><td>" ;
+		}
+		res.append(rowStart).append(SIZE_ABOVE_LIMIT_LABEL).append(cellStart).append(backupWithSizeAboveThreshold).append("</td><td></td><td></td></tr>") ;
+				
+		if (nbHighPermanencePath > 0) {
+			rowStart = "<tr><td bgcolor=red>" ;
+			cellStart = "</td><td bgcolor=red>" ;
+		} else {
+			rowStart = "<tr><td>" ;
+			cellStart = "</td><td>" ;
+		}
+		res.append(rowStart).append(HIGH_PERMANENCE_LABEL).append(cellStart).append(nbHighPermanencePath) ;
+		
+		if (nbMediumPermanencePath > 0) {
+			cellStart = "</td><td bgcolor=#ff8f00>" ;
+		} else {
+			cellStart = "</td><td>" ;
+		}
+		res.append(cellStart).append(MEDIUM_PERMANENCE_LABEL).append(cellStart).append(nbMediumPermanencePath).append("</td></tr>") ;		
+		
 		if (contentDifferentNb != 0) {
 			res.append("<tr><td>").append(CONTENT_DIFFERENT_LABEL).append("</td><td>").append(contentDifferentNb).append("</td><td></td><td></td></tr></table>") ;
 		} else {
