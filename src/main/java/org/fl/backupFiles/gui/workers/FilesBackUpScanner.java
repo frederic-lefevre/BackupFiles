@@ -117,7 +117,7 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 							nbActiveTasks-- ;								
 							oneResult.setResultRecorded(true) ;						
 						} 
-						jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus(uiControl.isStopAsked())).append("\n") ;
+						jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus(uiControl.isStopAsked())).append("<br/>") ;
 					}
 					
 					// Refresh progress information
@@ -146,10 +146,10 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 					pLog.severe("Erreur, nombre de résultats de scan recalculé =" + sumOfRes + " différent du nombre stocké =" + backUpItemList.size());
 				}
 				
-				publish(new BackupFilesInformation("Comparaison de fichiers terminée (" + jobTaskType.toString() + " - " + jobsChoice.getTitleAsString() + ")", backUpCounters.toString(), backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed)) ;
+				publish(new BackupFilesInformation("Comparaison de fichiers terminée (" + jobTaskType.toString() + " - " + jobsChoice.getTitleAsString() + ")", backUpCounters.toHtmlString(), backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed)) ;
 			} else {
 				pLog.warning("back up tasks is null") ;
-				publish(new BackupFilesInformation("Aucune taches à effectuer", backUpCounters.toString(), backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed)) ;
+				publish(new BackupFilesInformation("Aucune taches à effectuer", backUpCounters.toHtmlString(), backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed)) ;
 			}
 					
 		} catch (Exception e) {

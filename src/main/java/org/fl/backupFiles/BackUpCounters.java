@@ -96,6 +96,12 @@ public class BackUpCounters {
 		res.append("</table>") ;				
 	}
 	
+	public String toHtmlString() {
+		StringBuilder res = new StringBuilder() ;
+		appendHtmlFragment(res) ;
+		return res.toString() ;
+	}
+	
 	private void appendRow(StringBuilder res, String label1, long value1, String label2, long value2, String color1, String color2) {
 		
 		boolean color1present = (color1 != null) && (! color1.isEmpty()) && (value1 > 0) ;

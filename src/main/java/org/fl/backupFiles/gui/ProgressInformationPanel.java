@@ -12,14 +12,12 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.text.DefaultCaret;
 
 public class ProgressInformationPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
-	private JTextArea lblStepInfo;
+	private JLabel lblStepInfo;
 	private JScrollPane stepInfoScroll ;
 	private JLabel lblStatus;
 	private JLabel lblNum;
@@ -62,15 +60,11 @@ public class ProgressInformationPanel extends JPanel {
 		
 		// Progression
 		JLabel lblStep = new JLabel("Progression: ");
-		lblStepInfo = new JTextArea(6,500);
+		lblStepInfo = new JLabel();
 		lblStep.setAlignmentX(Component.LEFT_ALIGNMENT) ;
 		lblStep.setFont(progressTitleFont) ;
 		lblStepInfo.setFont(progressInfoFont) ;
 		lblStepInfo.setBackground(Color.WHITE) ;
-		
-		// to always be on the top of the scrollPane
-		DefaultCaret caret = (DefaultCaret) lblStepInfo.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 		
 		lblStep.setBackground(Color.WHITE) ;
 		infoStep.add(lblStep) ;
@@ -93,8 +87,11 @@ public class ProgressInformationPanel extends JPanel {
 		add(infoStep) ;
 	}
 
+	private static final String HTML_BEGIN = "<html><body>" ;
+	private static final String HTML_END   = "</body></html>" ;
+	
 	public void setStepInfos(String info, long num) {
-		 lblStepInfo.setText(info + "\n");
+		 lblStepInfo.setText(HTML_BEGIN + info + HTML_END);
 		 lblNum.setText(Long.toString(num));
 	}
 	

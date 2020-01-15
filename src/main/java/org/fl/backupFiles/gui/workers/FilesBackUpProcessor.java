@@ -76,14 +76,15 @@ public class FilesBackUpProcessor extends SwingWorker<String,BackupFilesInformat
 			if (((idx % refreshRate) == 0) || (System.currentTimeMillis() - lastRefreshTime > maxRefreshInterval)) {
 				status.setLength(0) ;
 				status.append(NB_ELEM).append(backUpItemList.size() - idx) ;
-				status.append(PROCESSED_ELEM).append( backUpCounters.toString()) ;
+				status.append(PROCESSED_ELEM) ;
+				backUpCounters.appendHtmlFragment(status);
 				publish(new BackupFilesInformation(SAUVEGARDE_EN_COURS,status.toString(), idx)) ;
 				lastRefreshTime = System.currentTimeMillis() ;
 			}
 			backUpItemList.get(idx).execute(backUpCounters);			
 			idx++ ;
 		} 
-		publish(new BackupFilesInformation("Sauvegarde de fichiers terminée (" + jobTaskType.toString() + " - " + jobsChoice.getTitleAsString() + ")", backUpCounters.toString(), backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed)) ;
+		publish(new BackupFilesInformation("Sauvegarde de fichiers terminée (" + jobTaskType.toString() + " - " + jobsChoice.getTitleAsString() + ")", backUpCounters.toHtmlString(), backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed)) ;
 		
 		long endTime = System.currentTimeMillis() ;
 		long duration = endTime - startTime ;
