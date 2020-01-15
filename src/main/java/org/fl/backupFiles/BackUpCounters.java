@@ -83,8 +83,8 @@ public class BackUpCounters {
 		appendRow(res, COPY_NEW_LABEL, copyNewNb, DELETE_LABEL, deleteNb, null, null) ;
 		appendRow(res, COPY_REPLACE_LABEL, copyReplaceNb, DELETE_DIR_LABEL, deleteDirNb, null, null) ;
 		appendRow(res, COPY_TREE_LABEL, copyTreeNb, AMBIGUOUS_LABEL, ambiguousNb, null, null) ;
-		appendRow(res, SOURCE_OK_LABEL, nbSourceFilesProcessed, SOURCE_KO_LABEL, nbSourceFilesFailed, null, null) ;
-		appendRow(res, TARGET_OK_LABEL, nbTargetFilesProcessed, TARGET_KO_LABEL, nbTargetFilesFailed, null, null) ;
+		appendRow(res, SOURCE_OK_LABEL, nbSourceFilesProcessed, SOURCE_KO_LABEL, nbSourceFilesFailed, null, "red") ;
+		appendRow(res, TARGET_OK_LABEL, nbTargetFilesProcessed, TARGET_KO_LABEL, nbTargetFilesFailed, null, "red") ;
 		
 		appendRow(res, SIZE_ABOVE_LIMIT_LABEL, backupWithSizeAboveThreshold, "", 0, "red", null) ;
 					
