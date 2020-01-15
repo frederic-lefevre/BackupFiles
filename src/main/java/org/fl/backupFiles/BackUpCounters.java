@@ -25,10 +25,10 @@ public class BackUpCounters {
 	private final static String DELETE_DIR_LABEL 	= "  Effacer arbre:      " ;
 	private final static String AMBIGUOUS_LABEL 	= "  Ambigu:             " ;
 	
-	public final static String SOURCE_FILE_PROCESSED_LABEL 	= "  Eléments source traités:   " ;
-	public final static String SOURCE_FILE_FAILED_LABEL 	= "  Eléments source en erreur: " ;
-	public final static String TARGET_FILE_PROCESSED_LABEL 	= "  Eléments target traités:   " ;
-	public final static String TARGET_FILE_FAILED_LABEL 	= "  Eléments target en erreur: " ;
+	public final static String SOURCE_OK_LABEL 	= "  Eléments source traités:   " ;
+	public final static String SOURCE_KO_LABEL 	= "  Eléments source en erreur: " ;
+	public final static String TARGET_OK_LABEL 	= "  Eléments target traités:   " ;
+	public final static String TARGET_KO_LABEL 	= "  Eléments target en erreur: " ;
 	
 	private final static String CONTENT_DIFFERENT_LABEL 	= "  Fichiers avec contenu différent:  " ;
 	private final static String SIZE_ABOVE_LIMIT_LABEL		= "  Fichiers avec tailles importantes: " ;
@@ -65,8 +65,8 @@ public class BackUpCounters {
 		res.append(COPY_REPLACE_LABEL).append(copyReplaceNb).append(DELETE_DIR_LABEL).append(deleteDirNb).append("\n") ;
 		res.append(COPY_TREE_LABEL	 ).append(copyTreeNb   ).append(AMBIGUOUS_LABEL	).append(ambiguousNb).append("\n") ;
 		
-		res.append(SOURCE_FILE_PROCESSED_LABEL).append(nbSourceFilesProcessed).append(SOURCE_FILE_FAILED_LABEL).append(nbSourceFilesFailed).append("\n") ;
-		res.append(TARGET_FILE_PROCESSED_LABEL).append(nbTargetFilesProcessed).append(TARGET_FILE_FAILED_LABEL).append(nbTargetFilesFailed).append("\n") ;
+		res.append(SOURCE_OK_LABEL).append(nbSourceFilesProcessed).append(SOURCE_KO_LABEL).append(nbSourceFilesFailed).append("\n") ;
+		res.append(TARGET_OK_LABEL).append(nbTargetFilesProcessed).append(TARGET_KO_LABEL).append(nbTargetFilesFailed).append("\n") ;
 		
 		res.append(SIZE_ABOVE_LIMIT_LABEL).append(backupWithSizeAboveThreshold).append("\n") ;
 		res.append(HIGH_PERMANENCE_LABEL).append(nbHighPermanencePath).append(MEDIUM_PERMANENCE_LABEL).append(nbMediumPermanencePath).append("\n") ;
@@ -79,46 +79,58 @@ public class BackUpCounters {
 	
 	public void appendHtmlFragment(StringBuilder res) {
 		
-		res.append("<table><tr><td>") ;
-		res.append(COPY_NEW_LABEL).append("</td><td>").append(copyNewNb).append("</td><td>").append(DELETE_LABEL).append("</td><td>").append(deleteNb).append("</td></tr>") ;
-		res.append("<tr><td>").append(COPY_REPLACE_LABEL).append("</td><td>").append(copyReplaceNb).append("</td><td>").append(DELETE_DIR_LABEL).append("</td><td>").append(deleteDirNb).append("</td></tr>") ;
-		res.append("<tr><td>").append(COPY_TREE_LABEL).append("</td><td>").append(copyTreeNb).append("</td><td>").append(AMBIGUOUS_LABEL).append("</td><td>").append(ambiguousNb).append("</td></tr>") ;
+		res.append("<table>") ;
+		appendRow(res, COPY_NEW_LABEL, copyNewNb, DELETE_LABEL, deleteNb, null, null) ;
+		appendRow(res, COPY_REPLACE_LABEL, copyReplaceNb, DELETE_DIR_LABEL, deleteDirNb, null, null) ;
+		appendRow(res, COPY_TREE_LABEL, copyTreeNb, AMBIGUOUS_LABEL, ambiguousNb, null, null) ;
+		appendRow(res, SOURCE_OK_LABEL, nbSourceFilesProcessed, SOURCE_KO_LABEL, nbSourceFilesFailed, null, null) ;
+		appendRow(res, TARGET_OK_LABEL, nbTargetFilesProcessed, TARGET_KO_LABEL, nbTargetFilesFailed, null, null) ;
 		
-		res.append("<tr><td>").append(SOURCE_FILE_PROCESSED_LABEL).append("</td><td>").append(nbSourceFilesProcessed).append("</td><td>").append(SOURCE_FILE_FAILED_LABEL).append("</td><td>").append(nbSourceFilesFailed).append("</td></tr>") ;
-		res.append("<tr><td>").append(TARGET_FILE_PROCESSED_LABEL).append("</td><td>").append(nbTargetFilesProcessed).append("</td><td>").append(TARGET_FILE_FAILED_LABEL).append("</td><td>").append(nbTargetFilesFailed).append("</td></tr>") ;
-		
-		String rowStart ;
-		String cellStart ;
+		String color1, color2 ;
 		if (backupWithSizeAboveThreshold > 0) {
-			rowStart = "<tr><td bgcolor=red>" ;
-			cellStart = "</td><td bgcolor=red>" ;
+			color1 = "red" ;
 		} else {
-			rowStart = "<tr><td>" ;
-			cellStart = "</td><td>" ;
+			color1 = null ;
 		}
-		res.append(rowStart).append(SIZE_ABOVE_LIMIT_LABEL).append(cellStart).append(backupWithSizeAboveThreshold).append("</td><td></td><td></td></tr>") ;
+		appendRow(res, SIZE_ABOVE_LIMIT_LABEL, backupWithSizeAboveThreshold, "", 0, color1, null) ;
 				
 		if (nbHighPermanencePath > 0) {
-			rowStart = "<tr><td bgcolor=red>" ;
-			cellStart = "</td><td bgcolor=red>" ;
+			color1 = "red" ;
 		} else {
-			rowStart = "<tr><td>" ;
-			cellStart = "</td><td>" ;
-		}
-		res.append(rowStart).append(HIGH_PERMANENCE_LABEL).append(cellStart).append(nbHighPermanencePath) ;
-		
+			color1 = null ;
+		}		
 		if (nbMediumPermanencePath > 0) {
-			cellStart = "</td><td bgcolor=#ff8f00>" ;
+			color2 = "#ff8f00" ;
 		} else {
-			cellStart = "</td><td>" ;
-		}
-		res.append(cellStart).append(MEDIUM_PERMANENCE_LABEL).append(cellStart).append(nbMediumPermanencePath).append("</td></tr>") ;		
+			color2 = null ;
+		}	
+		appendRow(res, HIGH_PERMANENCE_LABEL, nbHighPermanencePath, MEDIUM_PERMANENCE_LABEL, nbMediumPermanencePath, color1, color2) ;
 		
 		if (contentDifferentNb != 0) {
+			appendRow(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, "", 0, null, null) ;
 			res.append("<tr><td>").append(CONTENT_DIFFERENT_LABEL).append("</td><td>").append(contentDifferentNb).append("</td><td></td><td></td></tr></table>") ;
-		} else {
-			res.append("</table>") ;
-		}
+		} 
+		res.append("</table>") ;				
+	}
+	
+	private void appendRow(StringBuilder res, String label1, long value1, String label2, long value2, String color1, String color2) {
+		
+		boolean color1present = (color1 != null) && (! color1.isEmpty()) ;
+		boolean color2present = (color2 != null) && (! color2.isEmpty()) ;
+		
+		res.append("<tr><td") ;
+		if (color1present) res.append(" bgcolor=").append(color1) ;
+		res.append(">").append(label1).append("</td><td") ;
+		if (color1present) res.append(" bgcolor=").append(color1) ;
+		res.append(">").append(value1).append("</td><td") ;
+		if (color2present) res.append(" bgcolor=").append(color2) ;
+		res.append(">") ;
+		if (label2 != null) res.append(label2) ;
+		res.append("</td><td") ;
+		if (color2present) res.append(" bgcolor=").append(color2) ;
+		res.append(">") ;
+		if (label2 != null) res.append(value2) ;
+		res.append("</td></tr>") ;
 		
 	}
 	
