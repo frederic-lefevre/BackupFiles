@@ -82,26 +82,15 @@ public class UiControl extends JPanel {
 		GridBagLayout gLayout = new GridBagLayout() ;
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
-		c.insets = new Insets(20,20,20,20) ;
+		c.insets = new Insets(2,20,20,2) ;
 		setLayout(gLayout);
 		
 		// Compare content check box
 		compareContentSelect = new JCheckBox("Compare files content") ;
 		c.gridx = 0;
 		c.gridy = 0;
-		add(getEmptyPane(), c) ;
-		c.gridx = 1;
+		c.weighty = 0.3 ;
 		add(compareContentSelect, c) ;
-		c.gridx = 2;
-		add(getEmptyPane(), c) ;
-		c.gridx = 3;
-		add(getEmptyPane(), c) ;
-		c.gridx = 4;
-		add(getEmptyPane(), c) ;
-		c.gridx = 5;
-		add(getEmptyPane(), c) ;
-		c.gridx = 6;
-		add(getEmptyPane(), c) ;
 		
 		// Scan and Back up button
 		bckpUpButton = new JButton("Sauvegarde") ;
@@ -125,19 +114,20 @@ public class UiControl extends JPanel {
 		
 		c.gridx = 0;
 		c.gridy = 1;
-		add(getEmptyPane(), c) ;
-		c.gridx = 1;
+		c.ipadx = 200;
+//		c.ipady = 40;
+		c.weighty = 1.0 ;
 		add(scanButton, c) ;
-		c.gridx = 2;
-		add(getEmptyPane(), c) ;
-		c.gridx = 3;
+		c.gridx = 1;
+		c.ipadx = 200;
+//		c.ipady = 40;
+//		c.weighty = 1.0 ;
 		add(stopButton, c) ;
-		c.gridx = 4;
-		add(getEmptyPane(), c) ;
-		c.gridx = 5;
+		c.gridx = 3;
+		c.ipadx = 200;
+//		c.ipady = 40;
+//		c.weighty = 1.0 ;
 		add(bckpUpButton, c) ;
-		c.gridx = 6;
-		add(getEmptyPane(), c) ;
 
 	}
 
