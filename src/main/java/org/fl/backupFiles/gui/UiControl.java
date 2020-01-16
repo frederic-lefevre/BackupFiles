@@ -2,7 +2,9 @@ package org.fl.backupFiles.gui;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
@@ -77,20 +79,31 @@ public class UiControl extends JPanel {
 		
 		backUpJobInfoTableModel = bj ;
 		
-		GridLayout gLayout = new GridLayout(2, 7) ;
+		GridBagLayout gLayout = new GridBagLayout() ;
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.insets = new Insets(20,20,20,20) ;
 		setLayout(gLayout);
 		
 		// Compare content check box
-		compareContentSelect = new JCheckBox("Compare files content") ;	
-		add(getEmptyPane()) ;
-		add(compareContentSelect) ;
-		add(getEmptyPane()) ;
-		add(getEmptyPane()) ;
-		add(getEmptyPane()) ;
-		add(getEmptyPane()) ;
-		add(getEmptyPane()) ;
+		compareContentSelect = new JCheckBox("Compare files content") ;
+		c.gridx = 0;
+		c.gridy = 0;
+		add(getEmptyPane(), c) ;
+		c.gridx = 1;
+		add(compareContentSelect, c) ;
+		c.gridx = 2;
+		add(getEmptyPane(), c) ;
+		c.gridx = 3;
+		add(getEmptyPane(), c) ;
+		c.gridx = 4;
+		add(getEmptyPane(), c) ;
+		c.gridx = 5;
+		add(getEmptyPane(), c) ;
+		c.gridx = 6;
+		add(getEmptyPane(), c) ;
 		
-		// Scan and Back up button		
+		// Scan and Back up button
 		bckpUpButton = new JButton("Sauvegarde") ;
 		scanButton   = new JButton("Comparaison") ;
 		stopButton	 = new JButton("Stop") ;
@@ -110,14 +123,22 @@ public class UiControl extends JPanel {
 		scanButton.addActionListener(controlAction);
 		stopButton.addActionListener(controlAction);
 		
-		add(getEmptyPane()) ;
-		add(scanButton) ;
-		add(getEmptyPane()) ;
-		add(stopButton) ;
-		add(getEmptyPane()) ;
-		add(bckpUpButton) ;
-		add(getEmptyPane()) ;
-		
+		c.gridx = 0;
+		c.gridy = 1;
+		add(getEmptyPane(), c) ;
+		c.gridx = 1;
+		add(scanButton, c) ;
+		c.gridx = 2;
+		add(getEmptyPane(), c) ;
+		c.gridx = 3;
+		add(stopButton, c) ;
+		c.gridx = 4;
+		add(getEmptyPane(), c) ;
+		c.gridx = 5;
+		add(bckpUpButton, c) ;
+		c.gridx = 6;
+		add(getEmptyPane(), c) ;
+
 	}
 
 	public void setJobChoice(JobsChoice jc) {
