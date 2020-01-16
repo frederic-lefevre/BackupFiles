@@ -55,7 +55,6 @@ public class BackUpPane extends JPanel {
 		
 		// Scan and Back up buttons
 		backUpControl = new UiControl(jobTaskType, backUpTableModel, pip, backUpJobInfoTableModel, bLog) ;
-		backUpControl.setPreferredSize(new Dimension(1700, 100));
 		backUpControl.setMaximumSize(new Dimension(1700, 100));
 		add(backUpControl) ;
 		

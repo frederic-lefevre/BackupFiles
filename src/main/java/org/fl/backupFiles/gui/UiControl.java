@@ -81,22 +81,20 @@ public class UiControl extends JPanel {
 		
 		GridBagLayout gLayout = new GridBagLayout() ;
 		GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.insets = new Insets(2,20,20,2) ;
+		c.insets = new Insets(0,100,0,100) ;
 		setLayout(gLayout);
 		
 		// Compare content check box
 		compareContentSelect = new JCheckBox("Compare files content") ;
 		c.gridx = 0;
 		c.gridy = 0;
-		c.weighty = 0.3 ;
 		add(compareContentSelect, c) ;
 		
 		// Scan and Back up button
 		bckpUpButton = new JButton("Sauvegarde") ;
 		scanButton   = new JButton("Comparaison") ;
 		stopButton	 = new JButton("Stop") ;
-		Font buttonFont = new Font("Verdana", Font.BOLD, 18);
+		Font buttonFont = new Font("Verdana", Font.BOLD, 24);
 		bckpUpButton.setFont(buttonFont) ;
 		bckpUpButton.setBackground(Color.GREEN) ;
 		bckpUpButton.setEnabled(false) ;
@@ -115,20 +113,13 @@ public class UiControl extends JPanel {
 		c.gridx = 0;
 		c.gridy = 1;
 		c.ipadx = 200;
-//		c.ipady = 40;
-		c.weighty = 1.0 ;
 		add(scanButton, c) ;
 		c.gridx = 1;
 		c.ipadx = 200;
-//		c.ipady = 40;
-//		c.weighty = 1.0 ;
 		add(stopButton, c) ;
 		c.gridx = 3;
 		c.ipadx = 200;
-//		c.ipady = 40;
-//		c.weighty = 1.0 ;
 		add(bckpUpButton, c) ;
-
 	}
 
 	public void setJobChoice(JobsChoice jc) {
@@ -137,10 +128,6 @@ public class UiControl extends JPanel {
 		backUpTableModel.getBackUpItems().clear() ;
 	}
 
-	private JPanel getEmptyPane() {
-		return new JPanel() ;
-	}
-	
 	private class ControlAction implements ActionListener {
 
 		private UiControl uiControl ;
