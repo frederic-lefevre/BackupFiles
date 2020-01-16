@@ -1,6 +1,7 @@
 package org.fl.backupFiles.gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -9,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -78,6 +80,10 @@ public class UiControl extends JPanel {
 		backUpTableModel  = b ;
 		
 		backUpJobInfoTableModel = bj ;
+		
+		int width = BackupFilesGui.WINDOW_WIDTH - 20 ;
+		setMaximumSize(new Dimension(width, 100)) ;
+		setBorder(BorderFactory.createMatteBorder(10,10,10,10,Color.WHITE)) ;
 		
 		GridBagLayout gLayout = new GridBagLayout() ;
 		GridBagConstraints c = new GridBagConstraints();

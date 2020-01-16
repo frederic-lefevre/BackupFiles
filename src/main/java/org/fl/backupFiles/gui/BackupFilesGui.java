@@ -27,6 +27,9 @@ public class BackupFilesGui  extends JFrame {
 
 	private static final long serialVersionUID = -2691160306708075667L;
 
+	public static final int WINDOW_WIDTH  = 1880 ;
+	public static final int WINDOW_HEIGHT = 1000 ;
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -66,7 +69,7 @@ public class BackupFilesGui  extends JFrame {
 		if ((runningContext != null) && (configFileDir != null)) {
 		// Display GUI
 			
-			setBounds(10, 10, 1880, 1000);
+			setBounds(10, 10, WINDOW_WIDTH, WINDOW_HEIGHT);
 			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			setTitle("Sauvegarde de fichiers") ;
 			getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));		

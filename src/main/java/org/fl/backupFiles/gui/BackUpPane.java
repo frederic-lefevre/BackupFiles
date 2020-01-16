@@ -1,8 +1,6 @@
 package org.fl.backupFiles.gui;
 
-
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.util.logging.Logger;
 
@@ -55,7 +53,6 @@ public class BackUpPane extends JPanel {
 		
 		// Scan and Back up buttons
 		backUpControl = new UiControl(jobTaskType, backUpTableModel, pip, backUpJobInfoTableModel, bLog) ;
-		backUpControl.setMaximumSize(new Dimension(1700, 100));
 		add(backUpControl) ;
 		
 		// Table headers
