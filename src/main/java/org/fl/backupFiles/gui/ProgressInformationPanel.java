@@ -2,7 +2,6 @@ package org.fl.backupFiles.gui;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -69,7 +68,6 @@ public class ProgressInformationPanel extends JPanel {
 		lblStep.setBackground(Color.WHITE) ;
 		infoStep.add(lblStep) ;
 		stepInfoScroll = new JScrollPane(lblStepInfo) ;
-		stepInfoScroll.setMinimumSize(new Dimension(1700, 150)) ;
 		infoStep.add(stepInfoScroll) ;
 		infoStep.setAlignmentX(Component.LEFT_ALIGNMENT) ;
 		infoStep.setBackground(Color.WHITE) ;
