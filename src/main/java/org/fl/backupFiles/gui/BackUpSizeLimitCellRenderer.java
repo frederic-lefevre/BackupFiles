@@ -21,8 +21,10 @@ public class BackUpSizeLimitCellRenderer extends DefaultTableCellRenderer {
         
         if (aboveSizeLimit) {
         	setBackground(ABOVE_LIMIT_COLOR) ;
+        	setText("Elevée") ;
         } else {
         	setBackground(BELOW_LIMIT_COLOR) ;
+        	setText("Normale") ;
         }
         setHorizontalAlignment(SwingConstants.CENTER) ;
         return this ;

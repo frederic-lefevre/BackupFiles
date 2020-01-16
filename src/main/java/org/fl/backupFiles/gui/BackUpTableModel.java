@@ -16,7 +16,7 @@ public class BackUpTableModel extends AbstractTableModel {
 	
 	private static final long serialVersionUID = 1L;
 	
-	public final static String[] entetes = {"Chemin source", "Size limit", "Permanence", "Action", "Status", "Chemin cible"};
+	public final static String[] entetes = {"Chemin source", "Taille", "Permanence", "Action", "Status", "Chemin cible"};
 	
 	// Underlying data
 	private BackUpItemList backUpItems ;

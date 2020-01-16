@@ -51,6 +51,7 @@ public class BackUpConfigChoicePane extends JPanel {
 		BackUpJobList backUpJobs = new BackUpJobList(configFileDir, bLog) ;
 		
 		JLabel choiceLbl = new JLabel("Choix de la configuration de sauvegarde") ;
+		choiceLbl.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		bkpChoicePanel.add(choiceLbl);
 		backUpJobChoice = new JList<BackUpJob>(backUpJobs) ;
 		backUpJobChoice.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
