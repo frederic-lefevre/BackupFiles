@@ -108,6 +108,7 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 				while (nbActiveTasks > 0) {
 										
 					jobProgress.setLength(0) ;
+					jobProgress.append(HTML_BEGIN) ;
 					for (BackUpScannerTask oneResult : results) {
 						
 						if ( (! oneResult.isResultRecorded()) &&
@@ -119,9 +120,10 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 						} 
 						jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus(uiControl.isStopAsked())).append("<br/>") ;
 					}
+					jobProgress.append(HTML_END) ;
 					
 					// Refresh progress information
-					publish(new BackupFilesInformation("Comparaison de fichiers en cours", jobProgress.toString(), backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed)) ;
+					publish(new BackupFilesInformation(null, jobProgress.toString(), backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed)) ;
 
 					if (nbActiveTasks > 0) {
 						try {
@@ -202,10 +204,13 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 		 backUpJobInfoTableModel.fireTableDataChanged() ;
 	 }
 	  
+	private static final String HTML_BEGIN = "<html><body>" ;
+	private static final String HTML_END   = "</body></html>" ;
+
 	 private String getScanInfoHtml(long duration) {
 		 
 		 StringBuilder scanInfo = new StringBuilder(1024) ;
-		 scanInfo.append("<html><body>") ;
+		 scanInfo.append(HTML_BEGIN) ;
 		 backUpCounters.appendHtmlFragment(scanInfo) ;
 		 scanInfo.append("<p>Durée scan (ms)= ").append(duration) ;
 		 if ((filesVisitFailed != null) && (! filesVisitFailed.isEmpty())) {
@@ -214,7 +219,7 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 				 scanInfo.append("<br>").append(fileOnError) ;
 			 }
 		 }
-		 scanInfo.append("</body></html>") ;
+		 scanInfo.append(HTML_END) ;
 		 return scanInfo.toString() ;
 	 }
 	 

@@ -36,10 +36,9 @@ public class FilesBackUpProcessor extends SwingWorker<String,BackupFilesInformat
 	
 	private BackUpCounters backUpCounters ;
 	
-	private final static String SAUVEGARDE_EN_COURS = "Sauvegarde de fichiers en cours" ;
 	private final static String NB_ELEM 			= "Nombre d'éléments restant à traiter: "  ;
 	private final static String PROCESSED_ELEM 		= "\nEléments déjà traités : \n"  ;
-	
+		
 	public FilesBackUpProcessor(UiControl u,  JobTaskType jtt, JobsChoice jc, BackUpTableModel b, ProgressInformationPanel pip, BackUpJobInfoTableModel bj, Logger l) {
 
 		super();
@@ -71,20 +70,28 @@ public class FilesBackUpProcessor extends SwingWorker<String,BackupFilesInformat
 		backUpCounters.reset() ;
 		int idx = 0 ;
 		long lastRefreshTime = System.currentTimeMillis() ;
-		StringBuilder status = new StringBuilder(1024) ;
+		StringBuilder infos = new StringBuilder(1024) ;
 		while ((idx < backUpItemList.size() ) && (! uiControl.isStopAsked())) {
 			if (((idx % refreshRate) == 0) || (System.currentTimeMillis() - lastRefreshTime > maxRefreshInterval)) {
-				status.setLength(0) ;
-				status.append(NB_ELEM).append(backUpItemList.size() - idx) ;
-				status.append(PROCESSED_ELEM) ;
-				backUpCounters.appendHtmlFragment(status);
-				publish(new BackupFilesInformation(SAUVEGARDE_EN_COURS,status.toString(), idx)) ;
+				infos.setLength(0) ;
+				infos.append(HTML_BEGIN) ;
+				infos.append(NB_ELEM).append(backUpItemList.size() - idx) ;
+				infos.append(PROCESSED_ELEM) ;
+				backUpCounters.appendHtmlFragment(infos) ;
+				infos.append(HTML_END) ;
+				publish(new BackupFilesInformation(null, infos.toString(), idx)) ;
 				lastRefreshTime = System.currentTimeMillis() ;
 			}
 			backUpItemList.get(idx).execute(backUpCounters);			
 			idx++ ;
-		} 
-		publish(new BackupFilesInformation("Sauvegarde de fichiers terminée (" + jobTaskType.toString() + " - " + jobsChoice.getTitleAsString() + ")", backUpCounters.toHtmlString(), backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed)) ;
+		}
+		StringBuilder finalStatus = new StringBuilder(256) ;
+		finalStatus.append("Sauvegarde de fichiers terminée (") ;
+		finalStatus.append(jobTaskType.toString()) ;
+		finalStatus.append(" - ") ;
+		finalStatus.append(jobsChoice.getTitleAsString()) ;
+		finalStatus.append(")") ;
+		publish(new BackupFilesInformation(finalStatus.toString(), backUpCounters.toHtmlString(), backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed)) ;
 		
 		long endTime = System.currentTimeMillis() ;
 		long duration = endTime - startTime ;
@@ -121,14 +128,17 @@ public class FilesBackUpProcessor extends SwingWorker<String,BackupFilesInformat
 		 backUpJobInfoTableModel.fireTableDataChanged() ;
 	 }
 	 
+	private static final String HTML_BEGIN = "<html><body>" ;
+	private static final String HTML_END   = "</body></html>" ;
+
 	 private String getProcessorInfoHtml(long duration) {
 		 
 		 StringBuilder procInfo = new StringBuilder(1024) ;
-		 procInfo.append("<html><body>") ;
+		 procInfo.append(HTML_BEGIN) ;
 		 backUpCounters.appendHtmlFragment(procInfo) ;
 		 procInfo.append("<p>Durée sauvegarde (ms)= ").append(duration) ;
 		 procInfo.append(jobsChoice.getTargetRemainigSpace(true)) ;
-		 procInfo.append("</body></html>") ;
+		 procInfo.append(HTML_END) ;
 		 return procInfo.toString() ;
 	 }
 	 

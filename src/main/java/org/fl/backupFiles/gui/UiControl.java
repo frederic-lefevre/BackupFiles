@@ -142,6 +142,9 @@ public class UiControl extends JPanel {
 			uiControl = u ;
 		}
 		
+		private final static String COMPARAISON_EN_COURS = "Comparaison de fichiers en cours" ;
+		private final static String SAUVEGARDE_EN_COURS  = "Sauvegarde de fichiers en cours" ;
+		
 		@Override
 		public void actionPerformed(ActionEvent ae) {
 			
@@ -150,6 +153,7 @@ public class UiControl extends JPanel {
 				uiControl.setIsRunning(true);
 				
 				FilesBackUpProcessor fProcess = new FilesBackUpProcessor(uiControl, jobTaskType, jobsChoice, backUpTableModel, progressPanel, backUpJobInfoTableModel, bLog) ;
+				progressPanel.setProcessStatus(SAUVEGARDE_EN_COURS) ;
 				fProcess.execute() ;
 				
 			} else if (ae.getSource() == scanButton) {				
@@ -159,6 +163,7 @@ public class UiControl extends JPanel {
 				jobsChoice.setCompareContent(jobTaskType, compareContentSelect.isSelected()) ;
 				
 				FilesBackUpScanner   fScan 	 = new FilesBackUpScanner(uiControl, jobTaskType, jobsChoice, backUpTableModel, progressPanel, backUpJobInfoTableModel, bLog) ;				
+				progressPanel.setProcessStatus(COMPARAISON_EN_COURS);
 				fScan.execute() ;
 			}  else if (ae.getSource() == stopButton) {	
 			 	stopAsked = true   ;

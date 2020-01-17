@@ -16,12 +16,14 @@ public class ProgressInformationPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
-	private JLabel lblStepInfo;
-	private JScrollPane stepInfoScroll ;
-	private JLabel lblStatus;
-	private JLabel lblNum;
-	private static String dateFrancePattern = " EEEE dd MMMM uuuu à HH:mm:ss" ;
-	private DateTimeFormatter dateFranceFormat;
+	private final JLabel 			lblStepInfo;
+	private final JScrollPane 		stepInfoScroll ;
+	private final JLabel 			lblStatus ;
+	private final JLabel 			lblStatusDate ;
+	private final JLabel 			lblNum ;
+	private final DateTimeFormatter dateFranceFormat;
+	
+	private final static String dateFrancePattern = " EEEE dd MMMM uuuu à HH:mm:ss" ;
 	
 	public ProgressInformationPanel() {
 		
@@ -48,8 +50,13 @@ public class ProgressInformationPanel extends JPanel {
 		lblStatus.setFont(statusFont) ;
 		lblStatus.setAlignmentX(Component.LEFT_ALIGNMENT) ;
 		lblStatus.setBackground(Color.WHITE) ;
+		lblStatusDate = new JLabel("") ;
+		lblStatusDate.setFont(statusFont) ;
+		lblStatusDate.setAlignmentX(Component.LEFT_ALIGNMENT) ;
+		lblStatusDate.setBackground(Color.WHITE) ;
 		statusPane.add(lblStatusTitle) ;
 		statusPane.add(lblStatus) ;
+		statusPane.add(lblStatusDate) ;
 		statusPane.setBackground(Color.WHITE) ;
 		statusPane.setAlignmentX(Component.LEFT_ALIGNMENT) ;
 		add(statusPane) ;
@@ -85,15 +92,15 @@ public class ProgressInformationPanel extends JPanel {
 		add(infoStep) ;
 	}
 
-	private static final String HTML_BEGIN = "<html><body>" ;
-	private static final String HTML_END   = "</body></html>" ;
-	
 	public void setStepInfos(String info, long num) {
-		 lblStepInfo.setText(HTML_BEGIN + info + HTML_END);
+		 lblStepInfo.setText(info);
 		 lblNum.setText(Long.toString(num));
 	}
 	
 	public void setProcessStatus(String st) {
-		 lblStatus.setText(st + dateFranceFormat.format(LocalDateTime.now()));
+		if (st != null) {
+			lblStatus.setText(st) ;
+		}
+		lblStatusDate.setText(dateFranceFormat.format(LocalDateTime.now()));
 	}
 }

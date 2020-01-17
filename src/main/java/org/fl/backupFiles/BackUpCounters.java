@@ -96,9 +96,14 @@ public class BackUpCounters {
 		res.append("</table>") ;				
 	}
 	
+	private static final String HTML_BEGIN = "<html><body>" ;
+	private static final String HTML_END   = "</body></html>" ;
+	
 	public String toHtmlString() {
 		StringBuilder res = new StringBuilder() ;
+		res.append(HTML_BEGIN) ;
 		appendHtmlFragment(res) ;
+		res.append(HTML_END) ;
 		return res.toString() ;
 	}
 	
@@ -119,8 +124,7 @@ public class BackUpCounters {
 		if (color2present) res.append(" bgcolor=").append(color2) ;
 		res.append(">") ;
 		if (label2 != null) res.append(value2) ;
-		res.append("</td></tr>") ;
-		
+		res.append("</td></tr>") ;	
 	}
 	
 	public void add(BackUpCounters counters)  {
