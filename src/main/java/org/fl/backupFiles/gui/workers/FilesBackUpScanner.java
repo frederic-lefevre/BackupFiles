@@ -118,7 +118,7 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 							nbActiveTasks-- ;								
 							oneResult.setResultRecorded(true) ;						
 						} 
-						jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus(uiControl.isStopAsked())).append("<br/>") ;
+						jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus(uiControl.isStopAsked())).append("<br/>\n") ;
 					}
 					jobProgress.append(HTML_END) ;
 					
@@ -204,8 +204,8 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 		 backUpJobInfoTableModel.fireTableDataChanged() ;
 	 }
 	  
-	private static final String HTML_BEGIN = "<html><body>" ;
-	private static final String HTML_END   = "</body></html>" ;
+	private static final String HTML_BEGIN = "<html><body>\n" ;
+	private static final String HTML_END   = "</body></html>\n" ;
 
 	 private String getScanInfoHtml(long duration) {
 		 
