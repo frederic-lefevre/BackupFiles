@@ -36,8 +36,8 @@ public class FilesBackUpProcessor extends SwingWorker<String,BackupFilesInformat
 	
 	private BackUpCounters backUpCounters ;
 	
-	private final static String NB_ELEM 			= "Nombre d'éléments restant à traiter: "  ;
-	private final static String PROCESSED_ELEM 		= "\nEléments déjà traités : \n"  ;
+	private final static String NB_ELEM 		= "Nombre d'éléments restant à traiter: "  ;
+	private final static String PROCESSED_ELEM 	= "<br/>Eléments déjà traités : "  ;
 		
 	public FilesBackUpProcessor(UiControl u,  JobTaskType jtt, JobsChoice jc, BackUpTableModel b, ProgressInformationPanel pip, BackUpJobInfoTableModel bj, Logger l) {
 
