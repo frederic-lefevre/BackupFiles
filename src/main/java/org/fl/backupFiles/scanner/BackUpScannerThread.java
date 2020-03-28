@@ -43,12 +43,6 @@ public class BackUpScannerThread {
 	private boolean done ;
 	private int 	maxDepth ;
 	private int		currDepth ;
-	
-	private static long fileSizeWarningThreshold ;
-	public static void setFileSizeWarningThreshold(long fileSizeWarningThreshold) {
-		BackUpScannerThread.fileSizeWarningThreshold = fileSizeWarningThreshold;
-	}
-
 
 	public BackUpScannerThread(BackUpTask but, Logger l) {
 		
@@ -157,7 +151,7 @@ public class BackUpScannerThread {
 								action = BackupAction.DELETE ;
 								sizeDiff = 0 - Files.size(targetFile) ;
 							}
-							backUpItemList.add(new BackUpItem(null, targetFile, sourceDirectory, action, sizeDiff, false, backUpCounters, pLog)) ;
+							backUpItemList.add(new BackUpItem(null, targetFile, sourceDirectory, action, sizeDiff, backUpCounters, pLog)) ;
 
 						} else {
 							pairFiles.setTargetPath(targetFile);
@@ -182,13 +176,13 @@ public class BackUpScannerThread {
 					} catch (IOException e) {
 						pLog.log(Level.SEVERE, "IOException when getting the size of " + targetDirectory, e);
 					}
-					backUpItemList.add(new BackUpItem(null, targetDirectory, sourceDirectory, BackupAction.DELETE, sizeDiff, false, backUpCounters, pLog)) ;
+					backUpItemList.add(new BackUpItem(null, targetDirectory, sourceDirectory, BackupAction.DELETE, sizeDiff, backUpCounters, pLog)) ;
 				} else {
 					// source is a directory but target does not exists : copy source tree				
 					pLog.warning("Source " + sourceDirectory + " is a directory\n" + "but target does not exists " + targetDirectory);
 				}
 				long sizeDiff = FilesUtils.folderSize(sourceDirectory, pLog) ;
-				backUpItemList.add(new BackUpItem(sourceDirectory, targetDirectory, sourceDirectory, BackupAction.COPY_TREE, sizeDiff, false, backUpCounters, pLog)) ;
+				backUpItemList.add(new BackUpItem(sourceDirectory, targetDirectory, sourceDirectory, BackupAction.COPY_TREE, sizeDiff, backUpCounters, pLog)) ;
 			}
 		}
 		
@@ -208,13 +202,12 @@ public class BackUpScannerThread {
 					if (sourceAttributes.isDirectory()) {
 						// source is a directory
 						long sizeDiff = FilesUtils.folderSize(sourceDirectory, pLog) ;
-						backUpItemList.add(new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_TREE, sizeDiff, false, backUpCounters, pLog)) ;
+						backUpItemList.add(new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_TREE, sizeDiff, backUpCounters, pLog)) ;
 						
 					} else {
 						// source is a file
 						
-						boolean aboveThreshold = sourceAttributes.size() > fileSizeWarningThreshold ;
-						BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, sourceAttributes.size(), aboveThreshold, backUpCounters, pLog) ;
+						BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, sourceAttributes.size(), backUpCounters, pLog) ;
 						backUpItemList.add(copyNewItem) ;						
 					}
 				} else {
@@ -242,9 +235,8 @@ public class BackUpScannerThread {
 							// source is a file but target is a directory : delete target dir, copy source file 
 							pLog.warning("Source " + srcPath + " is a file\n" + "but target is a directory " + tgtPath);
 							long sizeDiff = 0 - FilesUtils.folderSize(tgtPath, pLog) ;
-							backUpItemList.add(new BackUpItem(null, tgtPath, sourceDirectory, BackupAction.DELETE_DIR, sizeDiff, false, backUpCounters, pLog)) ;
-							boolean aboveThreshold = sourceAttributes.size() > fileSizeWarningThreshold ;
-							BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, sourceAttributes.size(), aboveThreshold, backUpCounters, pLog) ;
+							backUpItemList.add(new BackUpItem(null, tgtPath, sourceDirectory, BackupAction.DELETE_DIR, sizeDiff, backUpCounters, pLog)) ;
+							BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, sourceAttributes.size(), backUpCounters, pLog) ;
 							backUpItemList.add(copyNewItem) ;
 						} else {
 							compareFile(srcPath, tgtPath, sourceAttributes, targetAttributes) ;	
@@ -271,8 +263,7 @@ public class BackUpScannerThread {
 					} else {
 						// content are not the same
 						long sizeDiff = sourceAttributes.size() - targetAttributes.size() ;
-						boolean aboveThreshold = sourceAttributes.size() - targetAttributes.size() > fileSizeWarningThreshold ;
-						BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, sizeDiff, aboveThreshold, backUpCounters, pLog) ;
+						BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, sizeDiff, backUpCounters, pLog) ;
 						backUpItem.setDiffByContent(true) ;
 						backUpItemList.add(backUpItem) ;
 						backUpCounters.contentDifferentNb++ ;
@@ -296,19 +287,16 @@ public class BackUpScannerThread {
 					if (f1s != f2s) {
 						// different size
 						long sizeDiff = f1s - f2s ;
-						boolean aboveThreshold = sizeDiff > fileSizeWarningThreshold ;
-						BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, sizeDiff, aboveThreshold, backUpCounters, pLog) ;
+						BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, sizeDiff, backUpCounters, pLog) ;
 						backUpItemList.add(backUpItem) ;
 					}
 				} else if (compareFile > 0) {
 					long sizeDiff = sourceAttributes.size() - targetAttributes.size() ;
-					boolean aboveThreshold = sourceAttributes.size() - targetAttributes.size() > fileSizeWarningThreshold ;
-					BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, sizeDiff, aboveThreshold, backUpCounters, pLog) ;
+					BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_REPLACE, sizeDiff, backUpCounters, pLog) ;
 					backUpItemList.add(backUpItem) ;
 				} else if (compareFile < 0) {
 					long sizeDiff = sourceAttributes.size() - targetAttributes.size() ;
-					boolean aboveThreshold = sourceAttributes.size() - targetAttributes.size() > fileSizeWarningThreshold ;
-					BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.AMBIGUOUS, sizeDiff, aboveThreshold, backUpCounters, pLog) ;
+					BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.AMBIGUOUS, sizeDiff, backUpCounters, pLog) ;
 					backUpItemList.add(backUpItem) ;
 				} 
 			}
@@ -335,9 +323,8 @@ public class BackUpScannerThread {
 				// source is a file but target is a directory : delete target dir, copy source file 
 				pLog.warning("Source " + srcPath + " is a file\n" + "but target is a directory " + tgtPath);
 				long sizeDiff = FilesUtils.folderSize(tgtPath, pLog) ;
-				backUpItemList.add(new BackUpItem(null, tgtPath, srcPath, BackupAction.DELETE_DIR, sizeDiff, false, backUpCounters, pLog)) ;
-				boolean aboveThreshold = sourceAttributes.size() > fileSizeWarningThreshold ;
-				BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, sourceAttributes.size(), aboveThreshold, backUpCounters, pLog) ;
+				backUpItemList.add(new BackUpItem(null, tgtPath, srcPath, BackupAction.DELETE_DIR, sizeDiff, backUpCounters, pLog)) ;
+				BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, sourceAttributes.size(), backUpCounters, pLog) ;
 				backUpItemList.add(copyNewItem) ;
 			}  else {
 				compareFile(srcPath, tgtPath, sourceAttributes, targetAttributes) ;

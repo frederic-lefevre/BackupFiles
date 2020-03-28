@@ -8,7 +8,7 @@ import org.fl.backupFiles.BackUpItemList;
 public class BackUpTableModel extends AbstractTableModel {
 
 	public static final int SOURCE_PATH_COL_IDX = 0 ;
-	public static final int SIZE_LIMT_COL_IDX 	= 1 ;
+	public static final int SIZE_DIFF_COL_IDX 	= 1 ;
 	public static final int PERMANENCE_COL_IDX 	= 2 ;
 	public static final int ACTION_COL_IDX 		= 3 ;
 	public static final int STATUS_COL_IDX 		= 4 ;
@@ -45,13 +45,22 @@ public class BackUpTableModel extends AbstractTableModel {
 	    return entetes[col];
 	}
 	
+	 @Override
+     public Class<?> getColumnClass(int columnIndex) {
+		 if ((backUpItems == null) || (backUpItems.isEmpty())) {
+			 return String.class ;
+		 } else {
+			 return getValueAt(0, columnIndex).getClass() ;
+		 }	 
+     }
+	 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		switch(columnIndex){
         case SOURCE_PATH_COL_IDX:
             return backUpItems.get(rowIndex).getSourcePath();
-        case SIZE_LIMT_COL_IDX:
-        	return backUpItems.get(rowIndex).isAboveSizeThreshold() ;
+        case SIZE_DIFF_COL_IDX:
+        	return backUpItems.get(rowIndex).getSizeDifference() ;
         case PERMANENCE_COL_IDX:
         	return backUpItems.get(rowIndex).getPermanenceLevel() ;
         case ACTION_COL_IDX:

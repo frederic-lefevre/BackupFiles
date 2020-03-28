@@ -19,6 +19,11 @@ import com.ibm.lge.fl.util.file.FilesUtils;
 
 public class BackUpItem {
 
+	private static long fileSizeWarningThreshold ;
+	public static void setFileSizeWarningThreshold(long fileSizeWarningThreshold) {
+		BackUpItem.fileSizeWarningThreshold = fileSizeWarningThreshold;
+	}
+	
 	public enum BackupAction { COPY_NEW, COPY_REPLACE, COPY_TREE, DELETE, DELETE_DIR, AMBIGUOUS } ;
 	
 	public enum BackupStatus { DIFFERENT, DIFF_BY_CONTENT, DONE, FAILED } ;
@@ -28,7 +33,6 @@ public class BackUpItem {
 	private final Path 		 			   targetPath ;
 	private final BackupAction 			   backupAction ;
 	private final long					   sizeDifference ;
-	private final boolean				   isAboveSizeLimit ;
 	private BackupStatus 				   backupStatus ;
 	private boolean		 				   diffByContent ;
 	private final DirectoryPermanenceLevel permanenceLevel ;
@@ -50,7 +54,7 @@ public class BackUpItem {
 	//		DONE	 	 : the back up has been done
 	//		FAILED	 	 : the back up has failed
 	
-	public BackUpItem(Path src, Path tgt, Path srcExisting, BackupAction bst, long sd, boolean iat, BackUpCounters backUpCounters, Logger l) {
+	public BackUpItem(Path src, Path tgt, Path srcExisting, BackupAction bst, long sd, BackUpCounters backUpCounters, Logger l) {
 		sourcePath 	 	 		  = src ;
 		sourceClosestExistingPath = srcExisting ;
 		targetPath 	 	 		  = tgt ;
@@ -59,7 +63,6 @@ public class BackUpItem {
 		diffByContent		  	  = false ;
 		bLog 		 	 		  = l ;
 		sizeDifference			  = sd ;
-		isAboveSizeLimit		  = iat ;
 		if (targetPath != null) {
 			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(targetPath) ;
 		} else if (src != null) {
@@ -88,7 +91,7 @@ public class BackUpItem {
 	}
 
 	private void updateLimtsCounters(BackUpCounters backUpCounters) {
-		if (isAboveSizeLimit) backUpCounters.backupWithSizeAboveThreshold++ ;
+		if (sizeDifference > fileSizeWarningThreshold) backUpCounters.backupWithSizeAboveThreshold++ ;
 		if (permanenceLevel.equals(DirectoryPermanenceLevel.HIGH)) {
 			backUpCounters.nbHighPermanencePath++ ;
 		} else if (permanenceLevel.equals(DirectoryPermanenceLevel.MEDIUM)) {
@@ -256,7 +259,4 @@ public class BackUpItem {
 		diffByContent = dbc;
 	}
 
-	public boolean isAboveSizeThreshold() {
-		return isAboveSizeLimit ;
-	}	
 }

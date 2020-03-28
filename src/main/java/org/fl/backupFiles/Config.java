@@ -11,7 +11,7 @@ import org.fl.backupFiles.directoryPermanence.DirectoryPermanence;
 import org.fl.backupFiles.directoryPermanence.DirectoryPermanenceMap;
 import org.fl.backupFiles.gui.BackUpItemActionListener;
 import org.fl.backupFiles.gui.BackUpItemActionListener.CustomAction;
-import org.fl.backupFiles.scanner.BackUpScannerThread;
+import org.fl.backupFiles.gui.BackUpSizeDifferenceCellRenderer;
 
 import com.ibm.lge.fl.util.AdvancedProperties;
 
@@ -36,7 +36,8 @@ public class Config {
 		scanExecutorService 	 	  = Executors.newFixedThreadPool(threadPoolSize) ;
 		
 		long fileSizeWarningThreshold = backupProperty.getLong("backupFiles.fileSize.warningThreshold", Long.MAX_VALUE) ;
-		BackUpScannerThread.setFileSizeWarningThreshold(fileSizeWarningThreshold) ;
+		BackUpSizeDifferenceCellRenderer.setFileSizeWarningThreshold(fileSizeWarningThreshold) ;
+		BackUpItem.setFileSizeWarningThreshold(fileSizeWarningThreshold) ;
 		
 		osActions = new ArrayList<OsAction>() ;
 		String osCmdPropBase = "backupFiles.command." ;
