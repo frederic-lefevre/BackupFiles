@@ -201,7 +201,7 @@ public class BackUpScannerThread {
 					
 					if (sourceAttributes.isDirectory()) {
 						// source is a directory
-						long sizeDiff = FilesUtils.folderSize(sourceDirectory, pLog) ;
+						long sizeDiff = FilesUtils.folderSize(srcPath, pLog) ;
 						backUpItemList.add(new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_TREE, sizeDiff, backUpCounters, pLog)) ;
 						
 					} else {
