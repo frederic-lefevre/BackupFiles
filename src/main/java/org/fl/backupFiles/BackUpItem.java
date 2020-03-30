@@ -87,6 +87,7 @@ public class BackUpItem {
 		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
 			backUpCounters.ambiguousNb++ ;
 		}
+		backUpCounters.totalSizeDifference = backUpCounters.totalSizeDifference + sizeDifference ;
 		updateLimtsCounters(backUpCounters) ;
 	}
 

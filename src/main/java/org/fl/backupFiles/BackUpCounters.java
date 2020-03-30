@@ -17,6 +17,7 @@ public class BackUpCounters {
 	public long backupWithSizeAboveThreshold ;
 	public long nbHighPermanencePath ;
 	public long nbMediumPermanencePath ;
+	public long totalSizeDifference ;
 	
 	private final static String COPY_NEW_LABEL 		= "  Copier nouveau:     " ;
 	private final static String COPY_REPLACE_LABEL  = "  Remplacer:          " ;
@@ -54,6 +55,7 @@ public class BackUpCounters {
 		backupWithSizeAboveThreshold = 0 ;
 		nbHighPermanencePath		 = 0 ;
 		nbMediumPermanencePath		 = 0 ;
+		totalSizeDifference			 = 0 ;
 	}
 	
 	@Override
@@ -143,5 +145,6 @@ public class BackUpCounters {
 		backupWithSizeAboveThreshold = backupWithSizeAboveThreshold + counters.backupWithSizeAboveThreshold ;
 		nbHighPermanencePath		 = nbHighPermanencePath			+ counters.nbHighPermanencePath ;
 		nbMediumPermanencePath		 = nbMediumPermanencePath		+ counters.nbMediumPermanencePath ;
+		totalSizeDifference			 = totalSizeDifference			+ counters.totalSizeDifference ;
 	}
 }
