@@ -108,21 +108,7 @@ public class BackUpCounters {
 			appendCellCouple(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, null) ;
 		}
 		res.append("</tr></table>") ;
-		
-//		appendRow(res, COPY_NEW_LABEL, 	   copyNewNb, 	  		   DELETE_LABEL, 	 deleteNb, 	  		  null, null) ;
-//		appendRow(res, COPY_REPLACE_LABEL, copyReplaceNb, 		   DELETE_DIR_LABEL, deleteDirNb, 		  null, null) ;
-//		appendRow(res, COPY_TREE_LABEL,    copyTreeNb, 	  		   AMBIGUOUS_LABEL,  ambiguousNb, 		  null, null) ;
-//		appendRow(res, SOURCE_OK_LABEL,    nbSourceFilesProcessed, SOURCE_KO_LABEL,  nbSourceFilesFailed, null, "red") ;
-//		appendRow(res, TARGET_OK_LABEL,    nbTargetFilesProcessed, TARGET_KO_LABEL,  nbTargetFilesFailed, null, "red") ;
-		
-//		appendRow(res, SIZE_ABOVE_LIMIT_LABEL, backupWithSizeAboveThreshold, null, 0, "red", null) ;
-					
-//		appendRow(res, HIGH_PERMANENCE_LABEL, nbHighPermanencePath, MEDIUM_PERMANENCE_LABEL, nbMediumPermanencePath, "red", "#ff8f00") ;
-		
-//		if (contentDifferentNb != 0) {
-//			appendRow(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, "", 0, null, null) ;
-//		} 
-//		res.append("</table>") ;				
+				
 	}
 	
 	private static final String HTML_BEGIN = "<html><body>" ;
@@ -134,26 +120,6 @@ public class BackUpCounters {
 		appendHtmlFragment(res) ;
 		res.append(HTML_END) ;
 		return res.toString() ;
-	}
-	
-	private void appendRow(StringBuilder res, String label1, long value1, String label2, long value2, String color1, String color2) {
-		
-		boolean color1present = (color1 != null) && (! color1.isEmpty()) && (value1 > 0) ;
-		boolean color2present = (color2 != null) && (! color2.isEmpty()) && (value2 > 0) ;
-		
-		res.append("<tr><td") ;
-		if (color1present) res.append(" bgcolor=").append(color1) ;
-		res.append(">").append(label1).append("</td><td") ;
-		if (color1present) res.append(" bgcolor=").append(color1) ;
-		res.append(">").append(value1).append("</td><td") ;
-		if (color2present) res.append(" bgcolor=").append(color2) ;
-		res.append(">") ;
-		if (label2 != null) res.append(label2) ;
-		res.append("</td><td") ;
-		if (color2present) res.append(" bgcolor=").append(color2) ;
-		res.append(">") ;
-		if (label2 != null) res.append(value2) ;
-		res.append("</td></tr>") ;	
 	}
 	
 	private void appendCellCouple(StringBuilder res, String label, long value, String color) {
