@@ -84,33 +84,40 @@ public class BackUpCounters {
 	public void appendHtmlFragment(StringBuilder res) {
 		
 		res.append("<table><tr>") ;
-		appendCellCouple(res, COPY_NEW_LABEL, copyNewNb, null) ;
-		appendCellCouple(res, DELETE_LABEL, deleteNb, null) ;
-		res.append("</tr><tr>") ;
-		appendCellCouple(res, COPY_REPLACE_LABEL, copyReplaceNb, null) ;
-		appendCellCouple(res, DELETE_DIR_LABEL, deleteDirNb, null) ;
-		res.append("</tr><tr>") ;
 		appendCellCouple(res, COPY_TREE_LABEL, copyTreeNb, null) ;
+		appendCellCouple(res, COPY_NEW_LABEL, copyNewNb, null) ;
+		appendCellCouple(res, COPY_REPLACE_LABEL, copyReplaceNb, null) ;
+		
+		res.append(NEW_ROW) ;
+		appendCellCouple(res, DELETE_LABEL, deleteNb, null) ;
+		appendCellCouple(res, DELETE_DIR_LABEL, deleteDirNb, null) ;
 		appendCellCouple(res, AMBIGUOUS_LABEL, ambiguousNb, "red") ;
-		res.append("</tr><tr>") ;
+		
+		res.append(NEW_ROW) ;		
 		appendCellCouple(res, SOURCE_OK_LABEL, nbSourceFilesProcessed, null) ;
 		appendCellCouple(res, SOURCE_KO_LABEL, nbSourceFilesFailed,  "red") ;
-		res.append("</tr><tr>") ;
+		
+		res.append(NEW_ROW) ;
 		appendCellCouple(res, TARGET_OK_LABEL, nbTargetFilesProcessed, null) ;
 		appendCellCouple(res, TARGET_KO_LABEL, nbTargetFilesFailed,  "red") ;
-		res.append("</tr><tr>") ;
+		
+		res.append(NEW_ROW) ;
+		appendCellCouple(res, TOTAL_SIZE_DIFF_LABEL, totalSizeDifference, null) ;
 		appendCellCouple(res, SIZE_ABOVE_LIMIT_LABEL, backupWithSizeAboveThreshold, "red") ;
-		res.append("<td></td></tr><tr>") ;
+		
+		res.append(NEW_ROW) ;
 		appendCellCouple(res, HIGH_PERMANENCE_LABEL, nbHighPermanencePath, "red") ;
 		appendCellCouple(res, MEDIUM_PERMANENCE_LABEL, nbMediumPermanencePath,  "#ff8f00") ;
+		
 		if (contentDifferentNb != 0) {
-			res.append("</tr><tr>") ;
+			res.append(NEW_ROW) ;
 			appendCellCouple(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, null) ;
 		}
 		res.append("</tr></table>") ;
 				
 	}
 	
+	private static final String NEW_ROW    = "</tr><tr>" ;
 	private static final String HTML_BEGIN = "<html><body>" ;
 	private static final String HTML_END   = "</body></html>" ;
 	
