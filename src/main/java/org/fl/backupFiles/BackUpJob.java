@@ -38,8 +38,8 @@ public class BackUpJob {
 	
 	// A back up jobs is defined by a Json object (passed in parameter of this constructor)
 	// It is basically 2 lists of back up tasks :
-	//  - a list of back up task from source diectories to buffer directories
-	//  - a list of back up task from buffer diectories to target directories
+	//  - a list of back up task from source directories to buffer directories
+	//  - a list of back up task from buffer directories to target directories
 	// A back up task is a source directory to back up and a destination diectory to back up
 	public BackUpJob(String jsonConfig, Logger l) {
 		
@@ -47,7 +47,7 @@ public class BackUpJob {
 		if (jsonConfig != null) {
 			
 			try {
-				JsonElement jElemConf = new JsonParser().parse(jsonConfig) ;
+				JsonElement jElemConf = JsonParser.parseString(jsonConfig) ;
 				
 				if (jElemConf != null) {
 					

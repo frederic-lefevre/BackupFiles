@@ -28,7 +28,7 @@ public class DirectoryPermanenceMap implements DirectoryPermanence {
 		if (jsonConfig != null) {
 			
 			try {
-				JsonArray jPaths = new JsonParser().parse(jsonConfig).getAsJsonArray() ;
+				JsonArray jPaths = JsonParser.parseString(jsonConfig).getAsJsonArray() ;
 				for (JsonElement jElem : jPaths) {
 					JsonObject jPathPermanence = jElem.getAsJsonObject() ;
 					
