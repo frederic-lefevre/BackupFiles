@@ -83,7 +83,7 @@ public class BackUpCounters {
 	
 	public void appendHtmlFragment(StringBuilder res) {
 		
-		res.append("<table><tr>") ;
+		res.append(TABLE_BEGIN) ;
 		appendCellCouple(res, COPY_TREE_LABEL, copyTreeNb, null) ;
 		appendCellCouple(res, COPY_NEW_LABEL, copyNewNb, null) ;
 		appendCellCouple(res, COPY_REPLACE_LABEL, copyReplaceNb, null) ;
@@ -113,13 +113,22 @@ public class BackUpCounters {
 			res.append(NEW_ROW) ;
 			appendCellCouple(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, null) ;
 		}
-		res.append("</tr></table>") ;
+		res.append(TABLE_END) ;
 				
 	}
 	
-	private static final String NEW_ROW    = "</tr><tr>" ;
-	private static final String HTML_BEGIN = "<html><body>" ;
-	private static final String HTML_END   = "</body></html>" ;
+	private static final String NEW_ROW    			  = "</tr><tr>" ;
+	private static final String HTML_BEGIN 			  = "<html><body>" ;
+	private static final String HTML_END   			  = "</body></html>" ;
+	private static final String TABLE_BEGIN 		  = "<table><tr>" ;
+	private static final String TABLE_END   		  = "</tr></table>" ;
+	private static final String TWO_EMPTY_CELLS 	  = "<td></td><td></td>" ;
+	private static final String CELL_BEGIN 			  = "<td>" ;
+	private static final String CELL_END 			  = "</td>" ;
+	private static final String CELL_BREAK 			  = "</td><td>" ;
+	private static final String TAG_END 			  = ">" ;
+	private static final String CELL_WITH_COLOR_BEGIN = "<td bgcolor=" ;
+	private static final String CELL_WITH_COLOR_BREAK = "</td><td bgcolor=" ;
 	
 	public String toHtmlString() {
 		StringBuilder res = new StringBuilder() ;
@@ -133,23 +142,23 @@ public class BackUpCounters {
 		
 		boolean colorPresent = (color != null) && (! color.isEmpty()) && (value > 0) ;
 		if (label == null) {
-			res.append("<td></td><td></td>") ;
+			res.append(TWO_EMPTY_CELLS) ;
 		} else if (colorPresent) {
-			res.append("<td bgcolor=")
+			res.append(CELL_WITH_COLOR_BEGIN)
 				.append(color)
-				.append(">")
+				.append(TAG_END)
 				.append(label)
-				.append("</td><td bgcolor=")
+				.append(CELL_WITH_COLOR_BREAK)
 				.append(color)
-				.append(">")
+				.append(TAG_END)
 				.append(value)
-				.append("</td>");
+				.append(CELL_END);
 		} else {
-			res.append("<td>")
+			res.append(CELL_BEGIN)
 				.append(label)
-				.append("</td><td>")
+				.append(CELL_BREAK)
 				.append(value)
-				.append("</td>");
+				.append(CELL_END);
 		}
 	}
 	
