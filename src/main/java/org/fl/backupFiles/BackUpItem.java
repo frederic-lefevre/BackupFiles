@@ -87,11 +87,11 @@ public class BackUpItem {
 		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
 			backUpCounters.ambiguousNb++ ;
 		}
-		backUpCounters.totalSizeDifference = backUpCounters.totalSizeDifference + sizeDifference ;
 		updateLimtsCounters(backUpCounters) ;
 	}
 
 	private void updateLimtsCounters(BackUpCounters backUpCounters) {
+		backUpCounters.totalSizeDifference = backUpCounters.totalSizeDifference + sizeDifference ;
 		if (sizeDifference > fileSizeWarningThreshold) backUpCounters.backupWithSizeAboveThreshold++ ;
 		if (permanenceLevel.equals(DirectoryPermanenceLevel.HIGH)) {
 			backUpCounters.nbHighPermanencePath++ ;
