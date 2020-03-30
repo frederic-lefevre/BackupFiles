@@ -35,6 +35,7 @@ public class BackUpCounters {
 	private final static String SIZE_ABOVE_LIMIT_LABEL		= "  Fichiers avec tailles importantes: " ;
 	private final static String HIGH_PERMANENCE_LABEL		= "  Fichiers à haute permanence: " ;
 	private final static String MEDIUM_PERMANENCE_LABEL		= "  Fichiers à moyenne permanence: " ;
+	private final static String TOTAL_SIZE_DIFF_LABEL		= "  Différence totale de taille: " ;
 	
 	public BackUpCounters() {
 		reset() ;
@@ -76,26 +77,52 @@ public class BackUpCounters {
 		if (contentDifferentNb != 0) {
 			res.append(CONTENT_DIFFERENT_LABEL).append(contentDifferentNb) ;
 		}
+		res.append(TOTAL_SIZE_DIFF_LABEL).append(totalSizeDifference).append("\n") ;
 		return res.toString() ;
 	}
 	
 	public void appendHtmlFragment(StringBuilder res) {
 		
-		res.append("<table>") ;
-		appendRow(res, COPY_NEW_LABEL, 	   copyNewNb, 	  		   DELETE_LABEL, 	 deleteNb, 	  		  null, null) ;
-		appendRow(res, COPY_REPLACE_LABEL, copyReplaceNb, 		   DELETE_DIR_LABEL, deleteDirNb, 		  null, null) ;
-		appendRow(res, COPY_TREE_LABEL,    copyTreeNb, 	  		   AMBIGUOUS_LABEL,  ambiguousNb, 		  null, null) ;
-		appendRow(res, SOURCE_OK_LABEL,    nbSourceFilesProcessed, SOURCE_KO_LABEL,  nbSourceFilesFailed, null, "red") ;
-		appendRow(res, TARGET_OK_LABEL,    nbTargetFilesProcessed, TARGET_KO_LABEL,  nbTargetFilesFailed, null, "red") ;
-		
-		appendRow(res, SIZE_ABOVE_LIMIT_LABEL, backupWithSizeAboveThreshold, "", 0, "red", null) ;
-					
-		appendRow(res, HIGH_PERMANENCE_LABEL, nbHighPermanencePath, MEDIUM_PERMANENCE_LABEL, nbMediumPermanencePath, "red", "#ff8f00") ;
-		
+		res.append("<table><tr>") ;
+		appendCellCouple(res, COPY_NEW_LABEL, copyNewNb, null) ;
+		appendCellCouple(res, DELETE_LABEL, deleteNb, null) ;
+		res.append("</tr><tr>") ;
+		appendCellCouple(res, COPY_REPLACE_LABEL, copyReplaceNb, null) ;
+		appendCellCouple(res, DELETE_DIR_LABEL, deleteDirNb, null) ;
+		res.append("</tr><tr>") ;
+		appendCellCouple(res, COPY_TREE_LABEL, copyTreeNb, null) ;
+		appendCellCouple(res, AMBIGUOUS_LABEL, ambiguousNb, "red") ;
+		res.append("</tr><tr>") ;
+		appendCellCouple(res, SOURCE_OK_LABEL, nbSourceFilesProcessed, null) ;
+		appendCellCouple(res, SOURCE_KO_LABEL, nbSourceFilesFailed,  "red") ;
+		res.append("</tr><tr>") ;
+		appendCellCouple(res, TARGET_OK_LABEL, nbTargetFilesProcessed, null) ;
+		appendCellCouple(res, TARGET_KO_LABEL, nbTargetFilesFailed,  "red") ;
+		res.append("</tr><tr>") ;
+		appendCellCouple(res, SIZE_ABOVE_LIMIT_LABEL, backupWithSizeAboveThreshold, "red") ;
+		res.append("<td></td></tr><tr>") ;
+		appendCellCouple(res, HIGH_PERMANENCE_LABEL, nbHighPermanencePath, "red") ;
+		appendCellCouple(res, MEDIUM_PERMANENCE_LABEL, nbMediumPermanencePath,  "#ff8f00") ;
 		if (contentDifferentNb != 0) {
-			appendRow(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, "", 0, null, null) ;
-		} 
-		res.append("</table>") ;				
+			res.append("</tr><tr>") ;
+			appendCellCouple(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, null) ;
+		}
+		res.append("</tr></table>") ;
+		
+//		appendRow(res, COPY_NEW_LABEL, 	   copyNewNb, 	  		   DELETE_LABEL, 	 deleteNb, 	  		  null, null) ;
+//		appendRow(res, COPY_REPLACE_LABEL, copyReplaceNb, 		   DELETE_DIR_LABEL, deleteDirNb, 		  null, null) ;
+//		appendRow(res, COPY_TREE_LABEL,    copyTreeNb, 	  		   AMBIGUOUS_LABEL,  ambiguousNb, 		  null, null) ;
+//		appendRow(res, SOURCE_OK_LABEL,    nbSourceFilesProcessed, SOURCE_KO_LABEL,  nbSourceFilesFailed, null, "red") ;
+//		appendRow(res, TARGET_OK_LABEL,    nbTargetFilesProcessed, TARGET_KO_LABEL,  nbTargetFilesFailed, null, "red") ;
+		
+//		appendRow(res, SIZE_ABOVE_LIMIT_LABEL, backupWithSizeAboveThreshold, null, 0, "red", null) ;
+					
+//		appendRow(res, HIGH_PERMANENCE_LABEL, nbHighPermanencePath, MEDIUM_PERMANENCE_LABEL, nbMediumPermanencePath, "red", "#ff8f00") ;
+		
+//		if (contentDifferentNb != 0) {
+//			appendRow(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, "", 0, null, null) ;
+//		} 
+//		res.append("</table>") ;				
 	}
 	
 	private static final String HTML_BEGIN = "<html><body>" ;
@@ -127,6 +154,30 @@ public class BackUpCounters {
 		res.append(">") ;
 		if (label2 != null) res.append(value2) ;
 		res.append("</td></tr>") ;	
+	}
+	
+	private void appendCellCouple(StringBuilder res, String label, long value, String color) {
+		
+		boolean colorPresent = (color != null) && (! color.isEmpty()) && (value > 0) ;
+		if (label == null) {
+			res.append("<td></td><td></td>") ;
+		} else if (colorPresent) {
+			res.append("<td bgcolor=")
+				.append(color)
+				.append(">")
+				.append(label)
+				.append("</td><td bgcolor=")
+				.append(color)
+				.append(">")
+				.append(value)
+				.append("</td>");
+		} else {
+			res.append("<td>")
+				.append(label)
+				.append("</td><td>")
+				.append(value)
+				.append("</td>");
+		}
 	}
 	
 	public void add(BackUpCounters counters)  {
