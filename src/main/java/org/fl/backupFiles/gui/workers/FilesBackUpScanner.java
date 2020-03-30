@@ -77,14 +77,14 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 		Path 				  sourcePath  = null ;
 		ArrayList<BackUpTask> backUpTasks = jobsChoice.getTasks(jobTaskType) ;
 		StringBuilder 		  jobProgress = new StringBuilder(1024) ;
-		
+	
+		ArrayList<BackUpScannerTask> results = new ArrayList<BackUpScannerTask>() ;
+
 		try {
 			if (backUpTasks != null) {
 				
 				ExecutorService scannerExecutor = Config.getScanExecutorService() ;
-				
-				ArrayList<BackUpScannerTask> results = new ArrayList<BackUpScannerTask>() ;
-				
+								
 				// Launch one thread per backUpTask
 				for (BackUpTask backUpTask : backUpTasks) {
 
@@ -118,7 +118,7 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 							nbActiveTasks-- ;								
 							oneResult.setResultRecorded(true) ;						
 						} 
-						jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus(uiControl.isStopAsked())).append("<br/>\n") ;
+						jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus(uiControl.isStopAsked())).append("<br/>") ;
 					}
 					jobProgress.append(HTML_END) ;
 					
@@ -161,6 +161,10 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 		long endTime = System.currentTimeMillis() ;
 		long duration = endTime - startTime ;
 		
+		jobProgress.setLength(0);
+		for (BackUpScannerTask oneResult : results) {
+			jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus(uiControl.isStopAsked())).append("\n") ;
+		}
 		pLog.info(getScanInfoText(jobProgress, duration)) ;
 		
 		String scanResult = getScanInfoHtml(duration) ;
