@@ -125,10 +125,10 @@ public class BackUpCounters {
 	private static final String TWO_EMPTY_CELLS 	  = "<td></td><td></td>" ;
 	private static final String CELL_BEGIN 			  = "<td>" ;
 	private static final String CELL_END 			  = "</td>" ;
-	private static final String CELL_BREAK 			  = "</td><td>" ;
+	private static final String CELL_BREAK 			  = "</td><td style=\"text-align:right\">" ;
 	private static final String TAG_END 			  = ">" ;
 	private static final String CELL_WITH_COLOR_BEGIN = "<td bgcolor=" ;
-	private static final String CELL_WITH_COLOR_BREAK = "</td><td bgcolor=" ;
+	private static final String CELL_WITH_COLOR_BREAK = "</td><td style=\"text-align:right\" bgcolor=" ;
 	
 	public String toHtmlString() {
 		StringBuilder res = new StringBuilder() ;
