@@ -176,8 +176,6 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 		BackUpJobInformation jobInfo = new BackUpJobInformation( jobsChoice.getTitleAsHtml(), endTime, scanResult, compareType, jobTaskType.toString()) ;
 		backUpJobInfoTableModel.add(jobInfo) ;
 		
-		uiControl.setIsRunning(false) ;
-		uiControl.setStopAsked(false) ;
 		return null;
 	}
 	
@@ -189,25 +187,27 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 		return scannerResp ;
 	}
 	
-	 @Override
-     protected void process(java.util.List<BackupFilesInformation> chunks) {
-		 
-        // Get the latest result from the list
-		 BackupFilesInformation latestResult = chunks.get(chunks.size() - 1);
-		 
-		 backUpTableModel.fireTableDataChanged();
-		 		 
-        progressPanel.setStepInfos(latestResult.getInformation(), latestResult.getNbFilesProcessed());
-	    progressPanel.setProcessStatus(latestResult.getStatus());
-       
-     }
+	@Override
+	protected void process(java.util.List<BackupFilesInformation> chunks) {
+
+		// Get the latest result from the list
+		BackupFilesInformation latestResult = chunks.get(chunks.size() - 1);
+
+		backUpTableModel.fireTableDataChanged();
+
+		progressPanel.setStepInfos(latestResult.getInformation(), latestResult.getNbFilesProcessed());
+		progressPanel.setProcessStatus(latestResult.getStatus());
+	}
 	
-	 @Override
-	 protected void done() {
-		 
-		 backUpTableModel.fireTableDataChanged() ;
-		 backUpJobInfoTableModel.fireTableDataChanged() ;
-	 }
+	@Override
+	protected void done() {
+
+		backUpTableModel.fireTableDataChanged() ;
+		backUpJobInfoTableModel.fireTableDataChanged() ;
+		
+		uiControl.setStopAsked(false) ;
+		uiControl.setIsRunning(false) ;
+	}
 	  
 	private static final String HTML_BEGIN = "<html><body>\n" ;
 	private static final String HTML_END   = "</body></html>\n" ;
