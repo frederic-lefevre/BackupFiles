@@ -18,15 +18,15 @@ import org.fl.backupFiles.gui.UiControl;
 
 public class FilesBackUpProcessor extends SwingWorker<String,BackupFilesInformation>  {
 
-	private Logger pLog ;
+	private final Logger pLog ;
 	
 	private final UiControl uiControl ;
 	
-	private final BackUpTableModel backUpTableModel ;
-	private BackUpItemList 	 backUpItemList ;
-	private BackUpJobInfoTableModel backUpJobInfoTableModel ;
+	private final BackUpTableModel 		  backUpTableModel ;
+	private final BackUpItemList 	 	  backUpItemList ;
+	private final BackUpJobInfoTableModel backUpJobInfoTableModel ;
 	
-	private ProgressInformationPanel progressPanel;
+	private final ProgressInformationPanel progressPanel;
 	
 	private final JobsChoice  jobsChoice ;
 	private final JobTaskType jobTaskType ;
@@ -34,7 +34,7 @@ public class FilesBackUpProcessor extends SwingWorker<String,BackupFilesInformat
 	private final int  refreshRate ;
 	private final long maxRefreshInterval ;
 	
-	private BackUpCounters backUpCounters ;
+	private final BackUpCounters backUpCounters ;
 	
 	private final static String NB_ELEM 		= "Nombre d'éléments restant à traiter: "  ;
 	private final static String PROCESSED_ELEM 	= "<br/>Eléments déjà traités : "  ;
