@@ -29,21 +29,22 @@ import org.fl.backupFiles.JobsChoice;
 
 public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformation> {
 
-	private Logger pLog ;
+	private final Logger pLog ;
 	
-	private UiControl uiControl ;
+	private final UiControl uiControl ;
 	
-	private BackUpTableModel 		 backUpTableModel ;
-	private BackUpItemList 			 backUpItemList ;
-	private BackUpJobInfoTableModel  backUpJobInfoTableModel ;	
-	private ProgressInformationPanel progressPanel;
+	private final BackUpTableModel 		   backUpTableModel ;
+	private final BackUpItemList 		   backUpItemList ;
+	private final BackUpJobInfoTableModel  backUpJobInfoTableModel ;	
+	private final ProgressInformationPanel progressPanel;
 	
-	private JobsChoice		jobsChoice ;
-	private JobTaskType 	jobTaskType ;
+	private final JobsChoice	jobsChoice ;
+	private final JobTaskType 	jobTaskType ;
+	
 	private ArrayList<Path> filesVisitFailed ;
 	
-	private long 	refreshRate ;
-	private BackUpCounters backUpCounters ;
+	private final long 	refreshRate ;
+	private final BackUpCounters backUpCounters ;
 	
 	public FilesBackUpScanner(UiControl u, JobTaskType jtt, JobsChoice jc, BackUpTableModel b, ProgressInformationPanel pip, BackUpJobInfoTableModel bj, Logger l)  {
 		super();
