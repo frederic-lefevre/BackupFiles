@@ -118,8 +118,9 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 								
 							nbActiveTasks-- ;								
 							oneResult.setResultRecorded(true) ;						
-						} 
-						jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus(uiControl.isStopAsked())).append("<br/>") ;
+						}
+						oneResult.getBackUpScannerThread().stopAsked(uiControl.isStopAsked());
+						jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus()).append("<br/>") ;
 					}
 					jobProgress.append(HTML_END) ;
 					
@@ -164,7 +165,7 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 		
 		jobProgress.setLength(0);
 		for (BackUpScannerTask oneResult : results) {
-			jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus(uiControl.isStopAsked())).append("\n") ;
+			jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus()).append("\n") ;
 		}
 		pLog.info(getScanInfoText(jobProgress, duration)) ;
 		

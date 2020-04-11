@@ -57,9 +57,12 @@ public class BackUpScannerThread {
 		status = backUpTask.toString() + " " ;
 	}
 
-	public String getCurrentStatus(boolean b) {
-		
+	public void stopAsked(boolean b) {
 		stopAsked = b ;
+	}
+	
+	public String getCurrentStatus() {
+		
 		if (done) {
 			return status ;
 		} else {
