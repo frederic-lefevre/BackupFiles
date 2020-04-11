@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.BackUpCounters;
 import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpJob;
 import org.fl.backupFiles.BackUpJob.JobTaskType;
@@ -19,6 +20,7 @@ import org.fl.backupFiles.gui.BackUpJobInfoTableModel;
 import org.fl.backupFiles.gui.BackUpTableModel;
 import org.fl.backupFiles.gui.ProgressInformationPanel;
 import org.fl.backupFiles.gui.UiControl;
+import org.fl.backupFiles.scanner.BackUpScannerTask;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -81,13 +83,13 @@ class FilesBackUpScannerTest {
 			BackUpJob backUpJob = backUpJobs.firstElement() ;
 			JobsChoice jobsChoice = new JobsChoice(Arrays.asList(backUpJob), log) ;
 
-			BackUpJobInfoTableModel  bujitm 	 = new BackUpJobInfoTableModel() ;
-			ProgressInformationPanel pip    	 = new ProgressInformationPanel() ;
-			BackUpItemList 			 backUpItems = new BackUpItemList() ;
-			BackUpTableModel         btm    	 = new BackUpTableModel(backUpItems) ;
-			UiControl				 uicS2B		 = new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm, log) ;
-			UiControl				 uicB2T		 = new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm, log) ;
-
+			BackUpJobInfoTableModel  bujitm 	 	= new BackUpJobInfoTableModel() ;
+			ProgressInformationPanel pip    	 	= new ProgressInformationPanel() ;
+			BackUpItemList 			 backUpItems 	= new BackUpItemList() ;
+			BackUpTableModel         btm    	 	= new BackUpTableModel(backUpItems) ;
+			UiControl				 uicS2B		 	= new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm, log) ;
+			UiControl				 uicB2T		 	= new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm, log) ;
+			BackUpCounters           backUpCounters = new BackUpCounters() ;
 			// SOURCE_TO_BUFFER			
 			FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm, log) ;
 			assertEquals(0, backUpItems.size()) ;
@@ -95,22 +97,39 @@ class FilesBackUpScannerTest {
 			filesBackUpScanner.execute();
 
 			// Wait for filesBackUpScanner end
-			filesBackUpScanner.get() ;
-
+			BackUpScannerResult results = filesBackUpScanner.get() ;
+			for (BackUpScannerTask oneResult : results.getTaskResults()) {
+				backUpCounters.add(oneResult.getFutureResponse().get().getBackUpCounters());
+			}
+			
 			// buffer is supposed to be the same as source
-			assertEquals(0, backUpItems.size()) ;
+			assertEquals(0, backUpCounters.ambiguousNb) ;
+			assertEquals(0, backUpCounters.copyNewNb) ;
+			assertEquals(0, backUpCounters.copyReplaceNb) ;
+			assertEquals(0, backUpCounters.copyTreeNb) ;
+			assertEquals(0, backUpCounters.deleteDirNb) ;
+			assertEquals(0, backUpCounters.deleteNb) ;
 
 			// BUFFER_TO_TARGET
+			backUpCounters.reset();
 			filesBackUpScanner = new FilesBackUpScanner(uicB2T, JobTaskType.BUFFER_TO_TARGET, jobsChoice, btm, pip, bujitm, log) ;
 			assertEquals(0, backUpItems.size()) ;
 
 			filesBackUpScanner.execute();
 
 			// Wait for filesBackUpScanner end
-			filesBackUpScanner.get() ;
+			BackUpScannerResult results2 = filesBackUpScanner.get() ;
+			for (BackUpScannerTask oneResult : results2.getTaskResults()) {
+				backUpCounters.add(oneResult.getFutureResponse().get().getBackUpCounters());
+			}
 
 			// target is supposed to be empty
-			assertEquals(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION, backUpItems.size()) ;
+			assertEquals(0, backUpCounters.ambiguousNb) ;
+			assertEquals(0, backUpCounters.copyNewNb) ;
+			assertEquals(0, backUpCounters.copyReplaceNb) ;
+			assertEquals(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION, backUpCounters.copyTreeNb) ;
+			assertEquals(0, backUpCounters.deleteDirNb) ;
+			assertEquals(0, backUpCounters.deleteNb) ;
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
