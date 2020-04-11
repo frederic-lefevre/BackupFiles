@@ -7,7 +7,6 @@ import javax.swing.SwingWorker;
 import org.fl.backupFiles.BackUpCounters;
 import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpJobInformation;
-import org.fl.backupFiles.BackupFilesInformation;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.JobsChoice;
 import org.fl.backupFiles.BackUpJob.JobTaskType;

@@ -1,4 +1,4 @@
-package org.fl.backupFiles;
+package org.fl.backupFiles.gui.workers;
 
 public class BackupFilesInformation {
 
