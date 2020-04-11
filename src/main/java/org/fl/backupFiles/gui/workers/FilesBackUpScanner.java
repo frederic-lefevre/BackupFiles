@@ -65,6 +65,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 	@Override
 	protected BackUpScannerResult doInBackground() throws Exception {
+		// The worker itself is multi-threaded
 		
 		pLog.info("Scan triggered for " + jobsChoice.getTitleAsString()) ;
 		backUpItemList.clear() ;
@@ -116,6 +117,8 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 								
 							nbActiveTasks-- ;								
 							oneResult.setResultRecorded(true) ;
+							
+							// publish task result
 							publish(new BackupScannerInformation(null, jobProgress.toString(), oneResult.getFutureResponse().get())) ;
 
 						}
@@ -134,8 +137,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 						}
 					}
 				}
-			}
-					
+			}					
 		} catch (Exception e) {
 			pLog.log(Level.SEVERE, "IOException when walking file tree " + sourcePath, e) ;
 		}
@@ -181,7 +183,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				progressPanel.setProcessStatus("Aucune taches à effectuer");
 			} else {
 				
-				// Check
+				// Check number of backup items
 				int sumOfRes = taskResults.stream()
 					.mapToInt(backRes -> {
 						try {
@@ -196,18 +198,21 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 					pLog.severe("Erreur, nombre de résultats de scan recalculé =" + sumOfRes + " différent du nombre stocké =" + backUpItemList.size());
 				}
 				
+				// Update progress info panel
 				long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed ;
 				progressPanel.setStepInfos(backUpCounters.toHtmlString(), nbFilesProcessed);
 				progressPanel.setProcessStatus("Comparaison de fichiers terminée (" + jobTaskType.toString() + " - " + jobsChoice.getTitleAsString() + ")");
 				
 				long duration = results.getDuration() ;
-				StringBuilder infoScanner = new StringBuilder() ;
 				
+				// Log info
+				StringBuilder infoScanner = new StringBuilder() ;				
 				for (BackUpScannerTask oneResult : taskResults) {
 					infoScanner.append(oneResult.getBackUpScannerThread().getCurrentStatus()).append("\n") ;
 				}
 				pLog.info(getScanInfoText(infoScanner, duration)) ;
 				
+				// Update history tab
 				String scanResult = getScanInfoHtml(duration) ;
 				String compareType = "Comparaison" ;
 				if (jobsChoice.compareContent()) {
