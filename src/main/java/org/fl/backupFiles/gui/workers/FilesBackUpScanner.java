@@ -3,11 +3,13 @@ package org.fl.backupFiles.gui.workers;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.SwingWorker;
 
@@ -152,11 +154,11 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		for (BackupScannerInformation scannerInfo : chunks) {
 			
 			ScannerThreadResponse scannerResp = scannerInfo.getScannerThreadResponse() ;
-			if (scannerResp != null) {
+			if ((scannerResp != null) && (scannerResp.hasNotBeenProcessed())) {
 				// One scanner thread has ended
-				backUpCounters.add(scannerResp.getBackUpCounters());
-				filesVisitFailed.addAll(scannerResp.getFilesVisitFailed()) ;
-				backUpItemList.addAll(scannerResp.getBackUpItemList()) ;
+				// It is necessary to test if the result has not been processed
+				// because done() may have been called before
+				processScannerThreadResponse(scannerResp) ;
 			}
 		}
 		
@@ -182,16 +184,26 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				progressPanel.setProcessStatus("Aucune taches à effectuer");
 			} else {
 				
-				// Check number of backup items
-				int sumOfRes = taskResults.stream()
-					.mapToInt(backRes -> {
+				// Get scanner results
+				List<ScannerThreadResponse> scannerResults = taskResults.stream()
+					.map(taskResult -> {
 						try {
-							return backRes.getFutureResponse().get().getBackUpItemList().size();
+							return taskResult.getFutureResponse().get();
 						} catch (InterruptedException | ExecutionException e) {
-							pLog.log(Level.SEVERE, "Echec de la vérification du nombre d'élément de backup", e) ;
-							return 0 ;
+							pLog.log(Level.SEVERE, "Echec du processing des résultats de scanner", e) ;
+							return null;
 						}
 					})
+					.collect(Collectors.toList()) ;
+				
+				// Process the response that may have not been processed
+				scannerResults.stream()
+						.filter(scannerResp -> { return scannerResp.hasNotBeenProcessed();	})
+						.forEach(scannerResp -> { processScannerThreadResponse(scannerResp) ; });
+									
+				// Check number of backup items
+				int sumOfRes = scannerResults.stream()
+					.mapToInt(backRes -> { return backRes.getBackUpItemList().size(); })
 					.sum() ;
 				if (sumOfRes != backUpItemList.size()) {
 					pLog.severe("Erreur, nombre de résultats de scan recalculé =" + sumOfRes + " différent du nombre stocké =" + backUpItemList.size());
@@ -239,6 +251,14 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		uiControl.setIsRunning(false) ;
 	}
 	  
+	private void processScannerThreadResponse(ScannerThreadResponse scannerResp) {
+		backUpCounters.add(scannerResp.getBackUpCounters());
+		filesVisitFailed.addAll(scannerResp.getFilesVisitFailed()) ;
+		backUpItemList.addAll(scannerResp.getBackUpItemList()) ;
+		
+		scannerResp.setHasNotBeenProcessed(false) ;
+	}
+	
 	private static final String HTML_BEGIN = "<html><body>\n" ;
 	private static final String HTML_END   = "</body></html>\n" ;
 

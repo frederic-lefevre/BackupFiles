@@ -15,27 +15,25 @@ public class ScannerThreadResponse {
 	private final BackUpItemList backUpItemList ;	
 	private final BackUpCounters backUpCounters ;
 	
+	private boolean hasNotBeenProcessed ;
+	
 	public ScannerThreadResponse(BackUpTask but, BackUpItemList bil, BackUpCounters buc, ArrayList<Path> fvf) {
 		
 		backUpTask 		 = but ;
 		backUpItemList 	 = bil ;
 		backUpCounters 	 = buc ;
 		filesVisitFailed = fvf ;
+		
+		hasNotBeenProcessed = true ;
 	}
 
-	public BackUpTask getBackUpTask() {
-		return backUpTask;
-	}
-
-	public ArrayList<Path> getFilesVisitFailed() {
-		return filesVisitFailed;
-	}
-
-	public BackUpItemList getBackUpItemList() {
-		return backUpItemList;
-	}
-
-	public BackUpCounters getBackUpCounters() {
-		return backUpCounters;
+	public BackUpTask 	   getBackUpTask() 		 { return backUpTask ; 			}
+	public ArrayList<Path> getFilesVisitFailed() { return filesVisitFailed ; 	}
+	public BackUpItemList  getBackUpItemList() 	 { return backUpItemList ; 	 	}
+	public BackUpCounters  getBackUpCounters() 	 { return backUpCounters ;	    }
+	public boolean 		   hasNotBeenProcessed() { return hasNotBeenProcessed ; }
+	
+	public void setHasNotBeenProcessed(boolean hasNotBeenProcessed) {	
+		this.hasNotBeenProcessed = hasNotBeenProcessed ;	
 	}
 }
