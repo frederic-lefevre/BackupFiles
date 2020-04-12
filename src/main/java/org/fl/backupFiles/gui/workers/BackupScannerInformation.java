@@ -4,20 +4,17 @@ import org.fl.backupFiles.scanner.ScannerThreadResponse;
 
 public class BackupScannerInformation {
 
-	// Stocke le status du process
-	// status , information , et résultat si il est terminé
+	// Stocke une information sur la progression du scanner
+	// et le résultat si il est terminé
 		
-	private final String status ;
 	private final String information ;	
 	private final ScannerThreadResponse scannerThreadResponse;
 	
-	public BackupScannerInformation(String st, String info, ScannerThreadResponse str) {
-		status 			 = st ;
+	public BackupScannerInformation(String info, ScannerThreadResponse str) {
 		information 	 = info ;
 		scannerThreadResponse = str ;
 	}
 	
-	public String 				 getStatus() 	 	    	{ return status ;	        	}
 	public String 				 getInformation() 	    	{ return information ; 	    	}
 	public ScannerThreadResponse getScannerThreadResponse() { return scannerThreadResponse; }
 }

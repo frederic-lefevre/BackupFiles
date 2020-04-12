@@ -119,7 +119,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 							oneResult.setResultRecorded(true) ;
 							
 							// publish task result
-							publish(new BackupScannerInformation(null, jobProgress.toString(), oneResult.getFutureResponse().get())) ;
+							publish(new BackupScannerInformation(jobProgress.toString(), oneResult.getFutureResponse().get())) ;
 
 						}
 						oneResult.getBackUpScannerThread().stopAsked(uiControl.isStopAsked());
@@ -128,7 +128,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 					jobProgress.append(HTML_END) ;
 					
 					// Refresh progress information
-					publish(new BackupScannerInformation(null, jobProgress.toString(), null)) ;
+					publish(new BackupScannerInformation(jobProgress.toString(), null)) ;
 
 					if (nbActiveTasks > 0) {
 						try {
@@ -153,6 +153,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 			
 			ScannerThreadResponse scannerResp = scannerInfo.getScannerThreadResponse() ;
 			if (scannerResp != null) {
+				// One scanner thread has ended
 				backUpCounters.add(scannerResp.getBackUpCounters());
 				filesVisitFailed.addAll(scannerResp.getFilesVisitFailed()) ;
 				backUpItemList.addAll(scannerResp.getBackUpItemList()) ;
@@ -166,7 +167,6 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 		long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed ;
 		progressPanel.setStepInfos(latestResult.getInformation(), nbFilesProcessed);
-		progressPanel.setProcessStatus(latestResult.getStatus());
 	}
 	
 	@Override
