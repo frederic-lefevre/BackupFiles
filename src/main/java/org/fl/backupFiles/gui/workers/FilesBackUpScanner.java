@@ -199,8 +199,14 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				
 				// Update progress info panel
 				long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed ;
+				StringBuilder finalStatus = new StringBuilder(1024) ;
+				finalStatus.append("Comparaison de fichiers terminée (") ;				
+				finalStatus.append(jobTaskType.toString()) ;
+				finalStatus.append(" - ") ;
+				finalStatus.append(jobsChoice.getTitleAsString()) ;
+				finalStatus.append(")") ;
 				progressPanel.setStepInfos(backUpCounters.toHtmlString(), nbFilesProcessed);
-				progressPanel.setProcessStatus("Comparaison de fichiers terminée (" + jobTaskType.toString() + " - " + jobsChoice.getTitleAsString() + ")");
+				progressPanel.setProcessStatus(finalStatus.toString());
 				
 				long duration = results.getDuration() ;
 				
@@ -213,12 +219,13 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				pLog.info(getScanInfoText(infoScanner, duration)) ;
 				
 				// Update history tab
-				String scanResult = getScanInfoHtml(duration) ;
+				StringBuilder scanInfo = new StringBuilder(1024) ;
+				getScanInfoHtml(scanInfo, duration) ;
 				String compareType = "Comparaison" ;
 				if (jobsChoice.compareContent()) {
 					compareType = compareType + " avec comparaison du contenu" ;
 				}
-				BackUpJobInformation jobInfo = new BackUpJobInformation( jobsChoice.getTitleAsHtml(), System.currentTimeMillis(), scanResult, compareType, jobTaskType.toString()) ;
+				BackUpJobInformation jobInfo = new BackUpJobInformation( jobsChoice.getTitleAsHtml(), System.currentTimeMillis(), scanInfo.toString(), compareType, jobTaskType.toString()) ;
 				backUpJobInfoTableModel.add(jobInfo) ;
 			}
 		} catch (InterruptedException | ExecutionException e) {
@@ -235,9 +242,8 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 	private static final String HTML_BEGIN = "<html><body>\n" ;
 	private static final String HTML_END   = "</body></html>\n" ;
 
-	 private String getScanInfoHtml(long duration) {
-		 
-		 StringBuilder scanInfo = new StringBuilder(1024) ;
+	 private void getScanInfoHtml(StringBuilder scanInfo, long duration) {
+		 		
 		 scanInfo.append(HTML_BEGIN) ;
 		 backUpCounters.appendHtmlFragment(scanInfo) ;
 		 scanInfo.append("<p>Durée scan (ms)= ").append(duration) ;
@@ -248,7 +254,6 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 			 }
 		 }
 		 scanInfo.append(HTML_END) ;
-		 return scanInfo.toString() ;
 	 }
 	 
 	 private String getScanInfoText(StringBuilder scanInfo, long duration) {

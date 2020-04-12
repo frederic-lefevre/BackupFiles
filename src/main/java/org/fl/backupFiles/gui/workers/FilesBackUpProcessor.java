@@ -161,7 +161,7 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 	 
 	 private String getProcessorInfoText(long duration) {
 		 
-		 StringBuilder procInfo = new StringBuilder() ;
+		 StringBuilder procInfo = new StringBuilder(1024) ;
 		 procInfo.append(jobsChoice.getTitleAsString()).append(jobTaskType.toString()).append("\n") ;
 		 procInfo.append(backUpCounters.toString()).append("\nProcess duration (ms)= ").append(duration).append("\n") ;
 		 procInfo.append(jobsChoice.getTargetRemainigSpace(false)) ;
