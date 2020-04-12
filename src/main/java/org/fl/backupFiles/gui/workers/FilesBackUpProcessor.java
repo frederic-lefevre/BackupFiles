@@ -89,7 +89,7 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Back
 		}
 		
 		long duration = System.currentTimeMillis() - startTime ;				
-		return new BackUpProcessorResult(duration);
+		return new BackUpProcessorResult(backupSuccess, duration);
 	}
 	
 	 @Override
@@ -111,7 +111,11 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Back
 		
 			// Update progress info panel
 			StringBuilder finalStatus = new StringBuilder(256) ;
-			finalStatus.append("Sauvegarde de fichiers terminée (") ;
+			if (result.isSuccessfull()) {
+				finalStatus.append("Sauvegarde de fichiers terminée (") ;
+			} else {
+				finalStatus.append("Sauvegarde de fichiers en erreur (") ;
+			}
 			finalStatus.append(jobTaskType.toString()) ;
 			finalStatus.append(" - ") ;
 			finalStatus.append(jobsChoice.getTitleAsString()) ;

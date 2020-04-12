@@ -2,12 +2,15 @@ package org.fl.backupFiles.gui.workers;
 
 public class BackUpProcessorResult {
 
-	private final long 	duration ;
+	private final long 	  duration ;
+	private final boolean success ;
 
-	public BackUpProcessorResult(long d) {
+	public BackUpProcessorResult(boolean s, long d) {
 		super();
-		duration = d;
+		success  = s ;
+		duration = d ;
 	}
 
-	public long getDuration() { return duration; }
+	public boolean isSuccessfull() { return success;  } 
+	public long    getDuration()   { return duration; }
 }
