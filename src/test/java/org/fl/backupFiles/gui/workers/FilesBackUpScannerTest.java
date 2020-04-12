@@ -20,7 +20,6 @@ import org.fl.backupFiles.gui.BackUpJobInfoTableModel;
 import org.fl.backupFiles.gui.BackUpTableModel;
 import org.fl.backupFiles.gui.ProgressInformationPanel;
 import org.fl.backupFiles.gui.UiControl;
-import org.fl.backupFiles.scanner.BackUpScannerTask;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -89,7 +88,7 @@ class FilesBackUpScannerTest {
 			BackUpTableModel         btm    	 	= new BackUpTableModel(backUpItems) ;
 			UiControl				 uicS2B		 	= new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm, log) ;
 			UiControl				 uicB2T		 	= new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm, log) ;
-			BackUpCounters           backUpCounters = new BackUpCounters() ;
+			BackUpCounters           backUpCounters ;
 			// SOURCE_TO_BUFFER			
 			FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm, log) ;
 			assertEquals(0, backUpItems.size()) ;
@@ -98,9 +97,9 @@ class FilesBackUpScannerTest {
 
 			// Wait for filesBackUpScanner end
 			BackUpScannerResult results = filesBackUpScanner.get() ;
-			for (BackUpScannerTask oneResult : results.getTaskResults()) {
-				backUpCounters.add(oneResult.getFutureResponse().get().getBackUpCounters());
-			}
+			
+			filesBackUpScanner.done();
+			backUpCounters = filesBackUpScanner.getBackUpCounters() ;
 			
 			// buffer is supposed to be the same as source
 			assertEquals(0, backUpCounters.ambiguousNb) ;
@@ -110,8 +109,9 @@ class FilesBackUpScannerTest {
 			assertEquals(0, backUpCounters.deleteDirNb) ;
 			assertEquals(0, backUpCounters.deleteNb) ;
 
+			assertEquals(0, backUpItems.size()) ;
+			
 			// BUFFER_TO_TARGET
-			backUpCounters.reset();
 			filesBackUpScanner = new FilesBackUpScanner(uicB2T, JobTaskType.BUFFER_TO_TARGET, jobsChoice, btm, pip, bujitm, log) ;
 			assertEquals(0, backUpItems.size()) ;
 
@@ -119,9 +119,8 @@ class FilesBackUpScannerTest {
 
 			// Wait for filesBackUpScanner end
 			BackUpScannerResult results2 = filesBackUpScanner.get() ;
-			for (BackUpScannerTask oneResult : results2.getTaskResults()) {
-				backUpCounters.add(oneResult.getFutureResponse().get().getBackUpCounters());
-			}
+			filesBackUpScanner.done();
+			backUpCounters = filesBackUpScanner.getBackUpCounters() ;
 
 			// target is supposed to be empty
 			assertEquals(0, backUpCounters.ambiguousNb) ;
@@ -131,6 +130,8 @@ class FilesBackUpScannerTest {
 			assertEquals(0, backUpCounters.deleteDirNb) ;
 			assertEquals(0, backUpCounters.deleteNb) ;
 
+			assertEquals(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION, backUpItems.size()) ;
+			
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
 			fail("Exception");

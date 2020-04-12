@@ -286,5 +286,13 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 			 }
 		 }
 		 return scanInfo.toString() ;
-	 }	 
+	 }
+
+	protected BackUpItemList getBackUpItemList() {
+		return backUpItemList;
+	}
+
+	protected BackUpCounters getBackUpCounters() {
+		return backUpCounters;
+	}	 
 }
