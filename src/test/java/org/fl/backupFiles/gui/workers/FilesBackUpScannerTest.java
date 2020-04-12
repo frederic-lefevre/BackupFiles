@@ -96,7 +96,7 @@ class FilesBackUpScannerTest {
 			filesBackUpScanner.execute();
 
 			// Wait for filesBackUpScanner end
-			BackUpScannerResult results = filesBackUpScanner.get() ;
+			filesBackUpScanner.get() ;
 			
 			filesBackUpScanner.done();
 			backUpCounters = filesBackUpScanner.getBackUpCounters() ;
@@ -108,6 +108,15 @@ class FilesBackUpScannerTest {
 			assertEquals(0, backUpCounters.copyTreeNb) ;
 			assertEquals(0, backUpCounters.deleteDirNb) ;
 			assertEquals(0, backUpCounters.deleteNb) ;
+			assertEquals(0, backUpCounters.backupWithSizeAboveThreshold) ;
+			assertEquals(0, backUpCounters.contentDifferentNb) ;
+			assertEquals(0, backUpCounters.nbHighPermanencePath) ;
+			assertEquals(0, backUpCounters.nbMediumPermanencePath) ;
+			assertEquals(0, backUpCounters.nbSourceFilesFailed) ;
+			assertEquals(19800, backUpCounters.nbSourceFilesProcessed) ;
+			assertEquals(19700, backUpCounters.nbTargetFilesProcessed) ;
+			assertEquals(0, backUpCounters.nbTargetFilesFailed) ;
+			assertEquals(0, backUpCounters.totalSizeDifference) ;
 
 			assertEquals(0, backUpItems.size()) ;
 			
@@ -118,7 +127,7 @@ class FilesBackUpScannerTest {
 			filesBackUpScanner.execute();
 
 			// Wait for filesBackUpScanner end
-			BackUpScannerResult results2 = filesBackUpScanner.get() ;
+			filesBackUpScanner.get() ;
 			filesBackUpScanner.done();
 			backUpCounters = filesBackUpScanner.getBackUpCounters() ;
 
@@ -129,6 +138,15 @@ class FilesBackUpScannerTest {
 			assertEquals(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION, backUpCounters.copyTreeNb) ;
 			assertEquals(0, backUpCounters.deleteDirNb) ;
 			assertEquals(0, backUpCounters.deleteNb) ;
+			assertEquals(0, backUpCounters.backupWithSizeAboveThreshold) ;
+			assertEquals(0, backUpCounters.contentDifferentNb) ;
+			assertEquals(0, backUpCounters.nbHighPermanencePath) ;
+			assertEquals(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION, backUpCounters.nbMediumPermanencePath) ;
+			assertEquals(0, backUpCounters.nbSourceFilesFailed) ;
+			assertEquals(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION, backUpCounters.nbSourceFilesProcessed) ;
+			assertEquals(0, backUpCounters.nbTargetFilesProcessed) ;
+			assertEquals(0, backUpCounters.nbTargetFilesFailed) ;
+			assertEquals(4997400, backUpCounters.totalSizeDifference) ;
 
 			assertEquals(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION, backUpItems.size()) ;
 			
