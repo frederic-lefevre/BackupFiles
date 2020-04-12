@@ -121,7 +121,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 							oneResult.setResultRecorded(true) ;
 							
 							// publish task result
-							publish(new BackupScannerInformation(jobProgress.toString(), oneResult.getFutureResponse().get())) ;
+							publish(new BackupScannerInformation(null, oneResult.getFutureResponse().get())) ;
 
 						}
 						oneResult.getBackUpScannerThread().stopAsked(uiControl.isStopAsked());
@@ -166,9 +166,11 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		BackupScannerInformation latestResult = chunks.get(chunks.size() - 1);
 
 		backUpTableModel.fireTableDataChanged();
-
-		long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed ;
-		progressPanel.setStepInfos(latestResult.getInformation(), nbFilesProcessed);
+		String lastInfo = latestResult.getInformation();
+		if ((lastInfo != null) && (!lastInfo.isEmpty())) {
+			long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed ;
+			progressPanel.setStepInfos(lastInfo, nbFilesProcessed);
+		}
 	}
 	
 	@Override
