@@ -72,16 +72,10 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Back
 		backUpCounters.reset() ;
 		int idx = 0 ;
 		long lastRefreshTime = System.currentTimeMillis() ;
-		StringBuilder infos = new StringBuilder(1024) ;
+		
 		while ((idx < backUpItemList.size() ) && (! uiControl.isStopAsked())) {
-			if (((idx % refreshRate) == 0) || (System.currentTimeMillis() - lastRefreshTime > maxRefreshInterval)) {
-				infos.setLength(0) ;
-				infos.append(HTML_BEGIN) ;
-				infos.append(NB_ELEM).append(backUpItemList.size() - idx) ;
-				infos.append(PROCESSED_ELEM) ;
-				backUpCounters.appendHtmlFragment(infos) ;
-				infos.append(HTML_END) ;
-				publish(new BackupFilesInformation( infos.toString(), idx)) ;
+			if (((idx % refreshRate) == 0) || (System.currentTimeMillis() - lastRefreshTime > maxRefreshInterval)) {				
+				publish(new BackupFilesInformation(idx)) ;
 				lastRefreshTime = System.currentTimeMillis() ;
 			}
 			backupSuccess &= backUpItemList.get(idx).execute(backUpCounters) ;			
@@ -92,16 +86,22 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Back
 		return new BackUpProcessorResult(backupSuccess, duration);
 	}
 	
-	 @Override
-     protected void process(java.util.List<BackupFilesInformation> chunks) {
-		 
-		 // Get the latest result from the list
-		 BackupFilesInformation latestResult = chunks.get(chunks.size() - 1);
+	@Override
+	protected void process(java.util.List<BackupFilesInformation> chunks) {
 
-		 backUpTableModel.fireTableDataChanged() ;
+		// Get the latest result from the list
+		BackupFilesInformation latestResult = chunks.get(chunks.size() - 1);
 
-		 progressPanel.setStepInfos(latestResult.getInformation(), latestResult.getNbFilesProcessed());       
-     }
+		backUpTableModel.fireTableDataChanged() ;
+
+		StringBuilder infos = new StringBuilder(1024) ;
+		infos.append(HTML_BEGIN) ;
+		infos.append(NB_ELEM).append(backUpItemList.size() - latestResult.getNbFilesProcessed()) ;
+		infos.append(PROCESSED_ELEM) ;
+		backUpCounters.appendHtmlFragment(infos) ;
+		infos.append(HTML_END) ;
+		progressPanel.setStepInfos(infos.toString(), latestResult.getNbFilesProcessed());       
+	}
 	 
 	@Override
 	protected void done() {
