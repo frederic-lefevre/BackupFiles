@@ -140,7 +140,7 @@ public class BackUpItem {
 		return sizeDifference;
 	}
 
-	public void execute(BackUpCounters backUpCounters) {
+	public boolean execute(BackUpCounters backUpCounters) {
 		
 		try {
 			if (executeAction(backUpCounters)) {
@@ -179,6 +179,7 @@ public class BackUpItem {
 				backUpCounters.nbSourceFilesFailed++ ;
 			}
 		}
+		return backupStatus == BackupStatus.DONE;
 	}
 	
 	private boolean executeAction(BackUpCounters backUpCounters) throws Exception {

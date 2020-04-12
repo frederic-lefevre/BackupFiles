@@ -1,5 +1,7 @@
 package org.fl.backupFiles.gui.workers;
 
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.SwingWorker;
@@ -15,7 +17,7 @@ import org.fl.backupFiles.gui.BackUpTableModel;
 import org.fl.backupFiles.gui.ProgressInformationPanel;
 import org.fl.backupFiles.gui.UiControl;
 
-public class FilesBackUpProcessor extends SwingWorker<String,BackupFilesInformation>  {
+public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,BackupFilesInformation>  {
 
 	private final Logger pLog ;
 	
@@ -60,11 +62,12 @@ public class FilesBackUpProcessor extends SwingWorker<String,BackupFilesInformat
 	}
 
 	@Override
-	protected String doInBackground() throws Exception {
+	protected BackUpProcessorResult doInBackground() throws Exception {
 		
 		long startTime = System.currentTimeMillis() ;
 		pLog.info("Back up triggered for " + jobsChoice.getTitleAsString()) ;
 
+		boolean backupSuccess = true;
 		jobsChoice.initTargetFileStores(jobTaskType) ;
 		backUpCounters.reset() ;
 		int idx = 0 ;
@@ -78,30 +81,15 @@ public class FilesBackUpProcessor extends SwingWorker<String,BackupFilesInformat
 				infos.append(PROCESSED_ELEM) ;
 				backUpCounters.appendHtmlFragment(infos) ;
 				infos.append(HTML_END) ;
-				publish(new BackupFilesInformation(null, infos.toString(), idx)) ;
+				publish(new BackupFilesInformation( infos.toString(), idx)) ;
 				lastRefreshTime = System.currentTimeMillis() ;
 			}
-			backUpItemList.get(idx).execute(backUpCounters);			
+			backupSuccess &= backUpItemList.get(idx).execute(backUpCounters) ;			
 			idx++ ;
 		}
-		StringBuilder finalStatus = new StringBuilder(256) ;
-		finalStatus.append("Sauvegarde de fichiers terminée (") ;
-		finalStatus.append(jobTaskType.toString()) ;
-		finalStatus.append(" - ") ;
-		finalStatus.append(jobsChoice.getTitleAsString()) ;
-		finalStatus.append(")") ;
-		publish(new BackupFilesInformation(finalStatus.toString(), backUpCounters.toHtmlString(), backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed)) ;
 		
-		long endTime = System.currentTimeMillis() ;
-		long duration = endTime - startTime ;
-		
-		pLog.info(getProcessorInfoText(duration)) ;
-		
-		String scanResult = getProcessorInfoHtml(duration) ;
-		BackUpJobInformation jobInfo = new BackUpJobInformation( jobsChoice.getTitleAsHtml(), endTime, scanResult, "Sauvegarde", jobTaskType.toString()) ;
-		backUpJobInfoTableModel.add(jobInfo) ;
-		
-		return null;
+		long duration = System.currentTimeMillis() - startTime ;				
+		return new BackUpProcessorResult(duration);
 	}
 	
 	 @Override
@@ -112,21 +100,46 @@ public class FilesBackUpProcessor extends SwingWorker<String,BackupFilesInformat
 
 		 backUpTableModel.fireTableDataChanged() ;
 
-		 progressPanel.setStepInfos(latestResult.getInformation(), latestResult.getNbFilesProcessed());
-		 progressPanel.setProcessStatus(latestResult.getStatus());
-       
+		 progressPanel.setStepInfos(latestResult.getInformation(), latestResult.getNbFilesProcessed());       
      }
 	 
-	 @Override
-	 protected void done() {
-		 	 
-		 backUpItemList.removeItemsDone() ;
-		 backUpTableModel.fireTableDataChanged() ;
-		 backUpJobInfoTableModel.fireTableDataChanged() ;
-		 
-		uiControl.setIsRunning(false) ;
-		uiControl.setStopAsked(false) ;
-	 }
+	@Override
+	protected void done() {
+
+		try {
+			BackUpProcessorResult result = get();
+		
+			// Update progress info panel
+			StringBuilder finalStatus = new StringBuilder(256) ;
+			finalStatus.append("Sauvegarde de fichiers terminée (") ;
+			finalStatus.append(jobTaskType.toString()) ;
+			finalStatus.append(" - ") ;
+			finalStatus.append(jobsChoice.getTitleAsString()) ;
+			finalStatus.append(")") ;
+			long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed ;
+			progressPanel.setStepInfos(backUpCounters.toHtmlString(), nbFilesProcessed);
+			progressPanel.setProcessStatus(finalStatus.toString());
+
+			// Log info
+			pLog.info(getProcessorInfoText(result.getDuration())) ;
+		
+			// Update history tab
+			String scanResult = getProcessorInfoHtml(result.getDuration()) ;
+			BackUpJobInformation jobInfo = new BackUpJobInformation( jobsChoice.getTitleAsHtml(), System.currentTimeMillis(), scanResult, "Sauvegarde", jobTaskType.toString()) ;
+			backUpJobInfoTableModel.add(jobInfo) ;
+			
+			backUpItemList.removeItemsDone();
+			
+		} catch (InterruptedException | ExecutionException e) {
+			pLog.log(Level.SEVERE, "Exception when getting FileBackupProcessor result", e) ;
+		}
+		
+		backUpTableModel.fireTableDataChanged();
+		backUpJobInfoTableModel.fireTableDataChanged();
+
+		uiControl.setIsRunning(false);
+		uiControl.setStopAsked(false);
+	}
 	 
 	private static final String HTML_BEGIN = "<html><body>" ;
 	private static final String HTML_END   = "</body></html>" ;
