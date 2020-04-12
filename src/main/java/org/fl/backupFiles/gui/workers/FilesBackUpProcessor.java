@@ -17,7 +17,7 @@ import org.fl.backupFiles.gui.BackUpTableModel;
 import org.fl.backupFiles.gui.ProgressInformationPanel;
 import org.fl.backupFiles.gui.UiControl;
 
-public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,BackupFilesInformation>  {
+public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Integer>  {
 
 	private final Logger pLog ;
 	
@@ -75,7 +75,7 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Back
 		
 		while ((idx < backUpItemList.size() ) && (! uiControl.isStopAsked())) {
 			if (((idx % refreshRate) == 0) || (System.currentTimeMillis() - lastRefreshTime > maxRefreshInterval)) {				
-				publish(new BackupFilesInformation(idx)) ;
+				publish(idx) ;
 				lastRefreshTime = System.currentTimeMillis() ;
 			}
 			backupSuccess &= backUpItemList.get(idx).execute(backUpCounters) ;			
@@ -87,20 +87,20 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Back
 	}
 	
 	@Override
-	protected void process(java.util.List<BackupFilesInformation> chunks) {
+	protected void process(java.util.List<Integer> chunks) {
 
 		// Get the latest result from the list
-		BackupFilesInformation latestResult = chunks.get(chunks.size() - 1);
+		int latestResult = chunks.get(chunks.size() - 1);
 
 		backUpTableModel.fireTableDataChanged() ;
 
 		StringBuilder infos = new StringBuilder(1024) ;
 		infos.append(HTML_BEGIN) ;
-		infos.append(NB_ELEM).append(backUpItemList.size() - latestResult.getNbFilesProcessed()) ;
+		infos.append(NB_ELEM).append(backUpItemList.size() - latestResult) ;
 		infos.append(PROCESSED_ELEM) ;
 		backUpCounters.appendHtmlFragment(infos) ;
 		infos.append(HTML_END) ;
-		progressPanel.setStepInfos(infos.toString(), latestResult.getNbFilesProcessed());       
+		progressPanel.setStepInfos(infos.toString(), latestResult);       
 	}
 	 
 	@Override
