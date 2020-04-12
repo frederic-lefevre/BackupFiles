@@ -4,11 +4,11 @@ public class BackupFilesInformation {
 
 	// Stocke le status du backup processor
 	// nombre de fichiers traités
-	private long   nbFilesProcessed ;
+	private int nbFilesProcessed ;
 	
-	public BackupFilesInformation(long nb) {
+	public BackupFilesInformation(int nb) {
 		nbFilesProcessed = nb ;
 	}
 
-	public long   getNbFilesProcessed() { return nbFilesProcessed ; }
+	public int getNbFilesProcessed() { return nbFilesProcessed ; }
 }
