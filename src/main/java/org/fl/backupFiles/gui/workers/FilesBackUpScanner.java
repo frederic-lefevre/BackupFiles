@@ -172,9 +172,8 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 	@Override
 	protected void done() {
 
-		BackUpScannerResult results;
 		try {
-			results = get();
+			BackUpScannerResult results = get();
 			ArrayList<BackUpScannerTask> taskResults = results.getTaskResults() ;
 			
 			if ((taskResults == null) || (taskResults.isEmpty())) {
@@ -221,11 +220,9 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				BackUpJobInformation jobInfo = new BackUpJobInformation( jobsChoice.getTitleAsHtml(), System.currentTimeMillis(), scanResult, compareType, jobTaskType.toString()) ;
 				backUpJobInfoTableModel.add(jobInfo) ;
 			}
-		} catch (InterruptedException e) {
-			pLog.log(Level.SEVERE, "InterruptedException when getting FileBackupScanner result", e) ;
-		} catch (ExecutionException e) {
-			pLog.log(Level.SEVERE, "ExecutionException when getting FileBackupScanner result", e) ;
-		}
+		} catch (InterruptedException | ExecutionException e) {
+			pLog.log(Level.SEVERE, "Exception when getting FileBackupScanner result", e) ;
+		} 
 
 		backUpTableModel.fireTableDataChanged() ;
 		backUpJobInfoTableModel.fireTableDataChanged() ;
