@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.BackUpCounters;
 import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpJob;
 import org.fl.backupFiles.BackUpJob.JobTaskType;
@@ -81,13 +82,13 @@ class FilesBackUpScannerTest {
 			BackUpJob backUpJob = backUpJobs.firstElement() ;
 			JobsChoice jobsChoice = new JobsChoice(Arrays.asList(backUpJob), log) ;
 
-			BackUpJobInfoTableModel  bujitm 	 = new BackUpJobInfoTableModel() ;
-			ProgressInformationPanel pip    	 = new ProgressInformationPanel() ;
-			BackUpItemList 			 backUpItems = new BackUpItemList() ;
-			BackUpTableModel         btm    	 = new BackUpTableModel(backUpItems) ;
-			UiControl				 uicS2B		 = new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm, log) ;
-			UiControl				 uicB2T		 = new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm, log) ;
-
+			BackUpJobInfoTableModel  bujitm 	 	= new BackUpJobInfoTableModel() ;
+			ProgressInformationPanel pip    	 	= new ProgressInformationPanel() ;
+			BackUpItemList 			 backUpItems 	= new BackUpItemList() ;
+			BackUpTableModel         btm    	 	= new BackUpTableModel(backUpItems) ;
+			UiControl				 uicS2B		 	= new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm, log) ;
+			UiControl				 uicB2T		 	= new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm, log) ;
+			BackUpCounters           backUpCounters ;
 			// SOURCE_TO_BUFFER			
 			FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm, log) ;
 			assertEquals(0, backUpItems.size()) ;
@@ -96,10 +97,29 @@ class FilesBackUpScannerTest {
 
 			// Wait for filesBackUpScanner end
 			filesBackUpScanner.get() ;
-
+			
+			filesBackUpScanner.done();
+			backUpCounters = filesBackUpScanner.getBackUpCounters() ;
+			
 			// buffer is supposed to be the same as source
-			assertEquals(0, backUpItems.size()) ;
+			assertEquals(0, backUpCounters.ambiguousNb) ;
+			assertEquals(0, backUpCounters.copyNewNb) ;
+			assertEquals(0, backUpCounters.copyReplaceNb) ;
+			assertEquals(0, backUpCounters.copyTreeNb) ;
+			assertEquals(0, backUpCounters.deleteDirNb) ;
+			assertEquals(0, backUpCounters.deleteNb) ;
+			assertEquals(0, backUpCounters.backupWithSizeAboveThreshold) ;
+			assertEquals(0, backUpCounters.contentDifferentNb) ;
+			assertEquals(0, backUpCounters.nbHighPermanencePath) ;
+			assertEquals(0, backUpCounters.nbMediumPermanencePath) ;
+			assertEquals(0, backUpCounters.nbSourceFilesFailed) ;
+			assertEquals(19800, backUpCounters.nbSourceFilesProcessed) ;
+			assertEquals(19700, backUpCounters.nbTargetFilesProcessed) ;
+			assertEquals(0, backUpCounters.nbTargetFilesFailed) ;
+			assertEquals(0, backUpCounters.totalSizeDifference) ;
 
+			assertEquals(0, backUpItems.size()) ;
+			
 			// BUFFER_TO_TARGET
 			filesBackUpScanner = new FilesBackUpScanner(uicB2T, JobTaskType.BUFFER_TO_TARGET, jobsChoice, btm, pip, bujitm, log) ;
 			assertEquals(0, backUpItems.size()) ;
@@ -108,10 +128,28 @@ class FilesBackUpScannerTest {
 
 			// Wait for filesBackUpScanner end
 			filesBackUpScanner.get() ;
+			filesBackUpScanner.done();
+			backUpCounters = filesBackUpScanner.getBackUpCounters() ;
 
 			// target is supposed to be empty
-			assertEquals(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION, backUpItems.size()) ;
+			assertEquals(0, backUpCounters.ambiguousNb) ;
+			assertEquals(0, backUpCounters.copyNewNb) ;
+			assertEquals(0, backUpCounters.copyReplaceNb) ;
+			assertEquals(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION, backUpCounters.copyTreeNb) ;
+			assertEquals(0, backUpCounters.deleteDirNb) ;
+			assertEquals(0, backUpCounters.deleteNb) ;
+			assertEquals(0, backUpCounters.backupWithSizeAboveThreshold) ;
+			assertEquals(0, backUpCounters.contentDifferentNb) ;
+			assertEquals(0, backUpCounters.nbHighPermanencePath) ;
+			assertEquals(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION, backUpCounters.nbMediumPermanencePath) ;
+			assertEquals(0, backUpCounters.nbSourceFilesFailed) ;
+			assertEquals(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION, backUpCounters.nbSourceFilesProcessed) ;
+			assertEquals(0, backUpCounters.nbTargetFilesProcessed) ;
+			assertEquals(0, backUpCounters.nbTargetFilesFailed) ;
+			assertEquals(4997400, backUpCounters.totalSizeDifference) ;
 
+			assertEquals(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION, backUpItems.size()) ;
+			
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
 			fail("Exception");

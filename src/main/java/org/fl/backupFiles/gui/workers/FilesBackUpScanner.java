@@ -3,11 +3,13 @@ package org.fl.backupFiles.gui.workers;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.swing.SwingWorker;
 
@@ -23,11 +25,10 @@ import org.fl.backupFiles.scanner.ScannerThreadResponse;
 import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpJobInformation;
 import org.fl.backupFiles.BackUpTask;
-import org.fl.backupFiles.BackupFilesInformation;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.JobsChoice;
 
-public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformation> {
+public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupScannerInformation> {
 
 	private final Logger pLog ;
 	
@@ -65,7 +66,8 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 	}
 
 	@Override
-	protected String doInBackground() throws Exception {
+	protected BackUpScannerResult doInBackground() throws Exception {
+		// The worker itself is multi-threaded
 		
 		pLog.info("Scan triggered for " + jobsChoice.getTitleAsString()) ;
 		backUpItemList.clear() ;
@@ -94,8 +96,7 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 						
 						BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, pLog) ;
 						CompletableFuture<ScannerThreadResponse> backUpRes  = 
-							CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor)
-											.thenApply(this::processScanResult);
+							CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
 						
 						results.add(new BackUpScannerTask(backUpScannerThread, backUpRes)) ;
 												
@@ -117,7 +118,11 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 							// one backUpTask has finished
 								
 							nbActiveTasks-- ;								
-							oneResult.setResultRecorded(true) ;						
+							oneResult.setResultRecorded(true) ;
+							
+							// publish task result
+							publish(new BackupScannerInformation(null, oneResult.getFutureResponse().get())) ;
+
 						}
 						oneResult.getBackUpScannerThread().stopAsked(uiControl.isStopAsked());
 						jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus()).append("<br/>") ;
@@ -125,7 +130,7 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 					jobProgress.append(HTML_END) ;
 					
 					// Refresh progress information
-					publish(new BackupFilesInformation(null, jobProgress.toString(), backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed)) ;
+					publish(new BackupScannerInformation(jobProgress.toString(), null)) ;
 
 					if (nbActiveTasks > 0) {
 						try {
@@ -134,74 +139,112 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 						}
 					}
 				}
+			}					
+		} catch (Exception e) {
+			pLog.log(Level.SEVERE, "IOException when walking file tree " + sourcePath, e) ;
+		}
+		long duration = System.currentTimeMillis() - startTime ;
 				
-				// Check
-				int sumOfRes = results.stream()
-					.mapToInt(backRes -> {
+		return new BackUpScannerResult(results, duration);
+	}
+	
+	@Override
+	protected void process(java.util.List<BackupScannerInformation> chunks) {
+
+		for (BackupScannerInformation scannerInfo : chunks) {
+			
+			ScannerThreadResponse scannerResp = scannerInfo.getScannerThreadResponse() ;
+			if ((scannerResp != null) && (scannerResp.hasNotBeenProcessed())) {
+				// One scanner thread has ended
+				// It is necessary to test if the result has not been processed
+				// because done() may have been called before
+				processScannerThreadResponse(scannerResp) ;
+			}
+		}
+		
+		// Get the latest result from the list
+		BackupScannerInformation latestResult = chunks.get(chunks.size() - 1);
+
+		backUpTableModel.fireTableDataChanged();
+		String lastInfo = latestResult.getInformation();
+		if ((lastInfo != null) && (!lastInfo.isEmpty())) {
+			long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed ;
+			progressPanel.setStepInfos(lastInfo, nbFilesProcessed);
+		}
+	}
+	
+	@Override
+	protected void done() {
+
+		try {
+			BackUpScannerResult results = get();
+			ArrayList<BackUpScannerTask> taskResults = results.getTaskResults() ;
+			
+			if ((taskResults == null) || (taskResults.isEmpty())) {
+				pLog.warning("back up tasks is null") ;							
+				progressPanel.setStepInfos(backUpCounters.toHtmlString(), 0);
+				progressPanel.setProcessStatus("Aucune taches à effectuer");
+			} else {
+				
+				// Get scanner results
+				List<ScannerThreadResponse> scannerResults = taskResults.stream()
+					.map(taskResult -> {
 						try {
-							return backRes.getFutureResponse().get().getBackUpItemList().size();
+							return taskResult.getFutureResponse().get();
 						} catch (InterruptedException | ExecutionException e) {
-							pLog.log(Level.SEVERE, "Echec de la vérification du nombre d'élément de backup", e) ;
-							return 0 ;
+							pLog.log(Level.SEVERE, "Echec du processing des résultats de scanner", e) ;
+							return null;
 						}
 					})
+					.collect(Collectors.toList()) ;
+				
+				// Process the response that may have not been processed
+				scannerResults.stream()
+						.filter(scannerResp -> { return scannerResp.hasNotBeenProcessed();	})
+						.forEach(scannerResp -> { processScannerThreadResponse(scannerResp) ; });
+									
+				// Check number of backup items
+				int sumOfRes = scannerResults.stream()
+					.mapToInt(backRes -> { return backRes.getBackUpItemList().size(); })
 					.sum() ;
 				if (sumOfRes != backUpItemList.size()) {
 					pLog.severe("Erreur, nombre de résultats de scan recalculé =" + sumOfRes + " différent du nombre stocké =" + backUpItemList.size());
 				}
 				
-				publish(new BackupFilesInformation("Comparaison de fichiers terminée (" + jobTaskType.toString() + " - " + jobsChoice.getTitleAsString() + ")", backUpCounters.toHtmlString(), backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed)) ;
-			} else {
-				pLog.warning("back up tasks is null") ;
-				publish(new BackupFilesInformation("Aucune taches à effectuer", backUpCounters.toHtmlString(), backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed)) ;
+				// Update progress info panel
+				long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed ;
+				StringBuilder finalStatus = new StringBuilder(1024) ;
+				finalStatus.append("Comparaison de fichiers terminée (") ;				
+				finalStatus.append(jobTaskType.toString()) ;
+				finalStatus.append(" - ") ;
+				finalStatus.append(jobsChoice.getTitleAsString()) ;
+				finalStatus.append(")") ;
+				progressPanel.setStepInfos(backUpCounters.toHtmlString(), nbFilesProcessed);
+				progressPanel.setProcessStatus(finalStatus.toString());
+				
+				long duration = results.getDuration() ;
+				
+				// Log info
+				StringBuilder infoScanner = new StringBuilder(1024) ;		
+				infoScanner.append(jobsChoice.getTitleAsString()).append("\n") ;
+				for (BackUpScannerTask oneResult : taskResults) {
+					infoScanner.append(oneResult.getBackUpScannerThread().getCurrentStatus()).append("\n") ;
+				}
+				pLog.info(getScanInfoText(infoScanner, duration)) ;
+				
+				// Update history tab
+				StringBuilder scanInfo = new StringBuilder(1024) ;
+				getScanInfoHtml(scanInfo, duration) ;
+				String compareType = "Comparaison" ;
+				if (jobsChoice.compareContent()) {
+					compareType = compareType + " avec comparaison du contenu" ;
+				}
+				BackUpJobInformation jobInfo = new BackUpJobInformation( jobsChoice.getTitleAsHtml(), System.currentTimeMillis(), scanInfo.toString(), compareType, jobTaskType.toString()) ;
+				backUpJobInfoTableModel.add(jobInfo) ;
 			}
-					
-		} catch (Exception e) {
-			pLog.log(Level.SEVERE, "IOException when walking file tree " + sourcePath, e) ;
-		}
-		
-		long endTime = System.currentTimeMillis() ;
-		long duration = endTime - startTime ;
-		
-		jobProgress.setLength(0);
-		for (BackUpScannerTask oneResult : results) {
-			jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus()).append("\n") ;
-		}
-		pLog.info(getScanInfoText(jobProgress, duration)) ;
-		
-		String scanResult = getScanInfoHtml(duration) ;
-		String compareType = "Comparaison" ;
-		if (jobsChoice.compareContent()) {
-			compareType = compareType + " avec comparaison du contenu" ;
-		}
-		BackUpJobInformation jobInfo = new BackUpJobInformation( jobsChoice.getTitleAsHtml(), endTime, scanResult, compareType, jobTaskType.toString()) ;
-		backUpJobInfoTableModel.add(jobInfo) ;
-		
-		return null;
-	}
-	
-	private synchronized ScannerThreadResponse processScanResult(ScannerThreadResponse scannerResp) {
-		
-		backUpCounters.add(scannerResp.getBackUpCounters());
-		filesVisitFailed.addAll(scannerResp.getFilesVisitFailed()) ;
-		backUpItemList.addAll(scannerResp.getBackUpItemList()) ;		
-		return scannerResp ;
-	}
-	
-	@Override
-	protected void process(java.util.List<BackupFilesInformation> chunks) {
-
-		// Get the latest result from the list
-		BackupFilesInformation latestResult = chunks.get(chunks.size() - 1);
-
-		backUpTableModel.fireTableDataChanged();
-
-		progressPanel.setStepInfos(latestResult.getInformation(), latestResult.getNbFilesProcessed());
-		progressPanel.setProcessStatus(latestResult.getStatus());
-	}
-	
-	@Override
-	protected void done() {
+		} catch (InterruptedException | ExecutionException e) {
+			pLog.log(Level.SEVERE, "Exception when getting FileBackupScanner result", e) ;
+		} 
 
 		backUpTableModel.fireTableDataChanged() ;
 		backUpJobInfoTableModel.fireTableDataChanged() ;
@@ -210,12 +253,19 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 		uiControl.setIsRunning(false) ;
 	}
 	  
+	private void processScannerThreadResponse(ScannerThreadResponse scannerResp) {
+		backUpCounters.add(scannerResp.getBackUpCounters());
+		filesVisitFailed.addAll(scannerResp.getFilesVisitFailed()) ;
+		backUpItemList.addAll(scannerResp.getBackUpItemList()) ;
+		
+		scannerResp.setHasNotBeenProcessed(false) ;
+	}
+	
 	private static final String HTML_BEGIN = "<html><body>\n" ;
 	private static final String HTML_END   = "</body></html>\n" ;
 
-	 private String getScanInfoHtml(long duration) {
-		 
-		 StringBuilder scanInfo = new StringBuilder(1024) ;
+	 private void getScanInfoHtml(StringBuilder scanInfo, long duration) {
+		 		
 		 scanInfo.append(HTML_BEGIN) ;
 		 backUpCounters.appendHtmlFragment(scanInfo) ;
 		 scanInfo.append("<p>Durée scan (ms)= ").append(duration) ;
@@ -226,7 +276,6 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 			 }
 		 }
 		 scanInfo.append(HTML_END) ;
-		 return scanInfo.toString() ;
 	 }
 	 
 	 private String getScanInfoText(StringBuilder scanInfo, long duration) {
@@ -238,6 +287,14 @@ public class FilesBackUpScanner extends SwingWorker<String,BackupFilesInformatio
 				 scanInfo.append("\n").append(fileOnError) ;
 			 }
 		 }
-		 return jobsChoice.getTitleAsString() + "\n" + scanInfo.toString() ;
-	 }	 
+		 return scanInfo.toString() ;
+	 }
+
+	protected BackUpItemList getBackUpItemList() {
+		return backUpItemList;
+	}
+
+	protected BackUpCounters getBackUpCounters() {
+		return backUpCounters;
+	}	 
 }
