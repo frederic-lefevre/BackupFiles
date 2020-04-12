@@ -110,7 +110,7 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 			BackUpProcessorResult result = get();
 		
 			// Update progress info panel
-			StringBuilder finalStatus = new StringBuilder(256) ;
+			StringBuilder finalStatus = new StringBuilder(1024) ;
 			if (result.isSuccessfull()) {
 				finalStatus.append("Sauvegarde de fichiers terminée (") ;
 			} else {

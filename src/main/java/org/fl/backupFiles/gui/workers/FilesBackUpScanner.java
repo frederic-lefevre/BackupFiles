@@ -205,7 +205,8 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				long duration = results.getDuration() ;
 				
 				// Log info
-				StringBuilder infoScanner = new StringBuilder() ;				
+				StringBuilder infoScanner = new StringBuilder(1024) ;		
+				infoScanner.append(jobsChoice.getTitleAsString()).append("\n") ;
 				for (BackUpScannerTask oneResult : taskResults) {
 					infoScanner.append(oneResult.getBackUpScannerThread().getCurrentStatus()).append("\n") ;
 				}
@@ -259,6 +260,6 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				 scanInfo.append("\n").append(fileOnError) ;
 			 }
 		 }
-		 return jobsChoice.getTitleAsString() + "\n" + scanInfo.toString() ;
+		 return scanInfo.toString() ;
 	 }	 
 }
