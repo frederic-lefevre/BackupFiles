@@ -101,8 +101,6 @@ public class FilesBackUpProcessor extends SwingWorker<String,BackupFilesInformat
 		BackUpJobInformation jobInfo = new BackUpJobInformation( jobsChoice.getTitleAsHtml(), endTime, scanResult, "Sauvegarde", jobTaskType.toString()) ;
 		backUpJobInfoTableModel.add(jobInfo) ;
 		
-		uiControl.setIsRunning(false) ;
-		uiControl.setStopAsked(false) ;
 		return null;
 	}
 	
@@ -121,10 +119,13 @@ public class FilesBackUpProcessor extends SwingWorker<String,BackupFilesInformat
 	 
 	 @Override
 	 protected void done() {
-		 
+		 	 
 		 backUpItemList.removeItemsDone() ;
 		 backUpTableModel.fireTableDataChanged() ;
 		 backUpJobInfoTableModel.fireTableDataChanged() ;
+		 
+		uiControl.setIsRunning(false) ;
+		uiControl.setStopAsked(false) ;
 	 }
 	 
 	private static final String HTML_BEGIN = "<html><body>" ;
