@@ -98,9 +98,7 @@ public class ProgressInformationPanel extends JPanel {
 	}
 	
 	public void setProcessStatus(String st) {
-		if (st != null) {
-			lblStatus.setText(st) ;
-		}
+		lblStatus.setText(st) ;
 		lblStatusDate.setText(dateFranceFormat.format(LocalDateTime.now()));
 	}
 }
