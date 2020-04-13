@@ -45,14 +45,23 @@ public class BackUpTableModel extends AbstractTableModel {
 	    return entetes[col];
 	}
 	
-	 @Override
-     public Class<?> getColumnClass(int columnIndex) {
-		 if ((backUpItems == null) || (backUpItems.isEmpty())) {
-			 return String.class ;
-		 } else {
-			 return getValueAt(0, columnIndex).getClass() ;
-		 }	 
-     }
+	// AbstractTableModel.getColumnClass is overridden because it interprets numbers as string
+	// So they are not sorted in number natural order, in case of negative numbers
+	@Override
+	public Class<?> getColumnClass(int columnIndex) {
+
+		if ((backUpItems == null) || (backUpItems.isEmpty())) {
+			return super.getColumnClass(columnIndex);
+		} else {
+			Object val = getValueAt(0, columnIndex);
+			if (val == null) {
+				// Source or target path maybe null
+				return super.getColumnClass(columnIndex);
+			} else {
+				return getValueAt(0, columnIndex).getClass();
+			}
+		}
+	}
 	 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
