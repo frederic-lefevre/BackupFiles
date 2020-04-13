@@ -14,7 +14,7 @@ public class TargetFileStore {
 
 	private final FileStore fileStore ;
 	private final Path mountPoint ;
-	private Logger tLog ;
+	private final Logger tLog ;
 	private long initialRemainingSpace ;
 	
 	public TargetFileStore(Path path, Logger l) {

@@ -11,7 +11,7 @@ public class BackUpTask {
 	
 	private boolean compareContent ;
 	
-	private Logger bLog ;
+	private final Logger bLog ;
 	
 	private final static String warning1  = "  Attention : les chemins source et cible n'existent pas" ;
 	private final static String warning2  = "  Attention : le chemin source n'existe pas" ;

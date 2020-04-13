@@ -34,7 +34,7 @@ public class BackUpScannerThread {
 	
 	private final BackUpTask backUpTask ;
 	
-	private Logger pLog ;
+	private final Logger pLog ;
 	
 	private FileComparator fileComparator ;
 	

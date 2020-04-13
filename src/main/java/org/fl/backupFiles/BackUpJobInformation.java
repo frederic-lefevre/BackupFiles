@@ -7,17 +7,17 @@ import java.time.format.DateTimeFormatter;
 
 public class BackUpJobInformation {
 
-	private String jobTitle ;
-	private String jobEnd ;
-	private String jobResult ;
+	private final String jobTitle ;
+	private final String jobEnd ;
+	private final String jobResult ;
 	
 	// Comparaison ou Sauvegarde
-	private String jobOperation ;
+	private final String jobOperation ;
 	
 	// To buffer or to target
-	private String jobDirection ;
+	private final String jobDirection ;
 	
-	private static String dateFrancePattern = " EEEE dd MMMM uuuu à HH:mm:ss" ;
+	private static final String dateFrancePattern = " EEEE dd MMMM uuuu à HH:mm:ss" ;
 	
 	public BackUpJobInformation(String jt, long je, String jr, String jo, String jd) {
 		super();
@@ -30,24 +30,9 @@ public class BackUpJobInformation {
 		jobTitle 	 = jt ;
 	}
 
-	public String getJobTitle() {
-		return jobTitle;
-	}
-
-	public String getJobEnd() {
-		return jobEnd;
-	}
-
-	public String getJobResult() {
-		return jobResult;
-	}
-
-	public String getJobOperation() {
-		return jobOperation;
-	}
-
-	public String getJobDirection() {
-		return jobDirection;
-	}
-
+	public String getJobTitle() 	{ return jobTitle;		}
+	public String getJobEnd() 		{ return jobEnd;		}
+	public String getJobResult() 	{ return jobResult;		}
+	public String getJobOperation() { return jobOperation;	}
+	public String getJobDirection() { return jobDirection;	}
 }

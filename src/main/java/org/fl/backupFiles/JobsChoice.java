@@ -20,7 +20,7 @@ public class JobsChoice {
 	
 	private boolean			compareContent ;
 	
-	private Logger jLog ;
+	private final Logger jLog ;
 	
 	private final static String jobSeparator  	 = "\n__________________________\n" ;
 	private final static String taskJobSeparator = "\n\n" ;

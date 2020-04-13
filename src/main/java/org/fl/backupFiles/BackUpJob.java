@@ -18,7 +18,7 @@ import com.google.gson.JsonSyntaxException;
 public class BackUpJob {
 
 	private String title ;
-	private Logger bLog ;
+	private final Logger bLog ;
 	
 	public enum JobTaskType { 
 		SOURCE_TO_BUFFER("Source vers buffer"), BUFFER_TO_TARGET("Buffer vers target") ;

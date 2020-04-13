@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 public class BackUpJobList extends Vector<BackUpJob> {
 
 	private static final long serialVersionUID = 1L;
-	private Logger bLog ;
+	private final Logger bLog ;
 	
 	// Class to hold all the back up job
 	// Each back up job is defined by a Json configuration
