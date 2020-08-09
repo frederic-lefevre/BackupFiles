@@ -202,6 +202,44 @@ class BackUpScannerProcessorTest {
 		}	
 	}
 	
+	@Test
+	void testSingleFileUnexistingSourceAndTarget() {
+		
+		try {
+			
+			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
+			
+			final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Buffer/doesNotExists" ;
+			final String TGT_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Target/doesNotExists" ;
+			
+			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
+			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
+
+			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
+			
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
+			
+			while (! backUpRes.isDone()) {
+				try {
+					Thread.sleep(300);
+				} catch (InterruptedException e) {
+					log.log(Level.SEVERE, "Interruption exception in BackUpScannerThread test", e);
+					fail("Interrupted Exception");
+				}
+			}
+		
+			ScannerThreadResponse scannerResp = backUpRes.get() ;
+			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
+			assertNotNull(backUpItemList) ;
+			assertEquals(0, backUpItemList.size());
+
+		} catch (Exception e) {
+			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
+			fail("Exception " + e.getMessage());
+		}	
+	}
+	
 	@AfterAll
 	static void deleteTestData() {
 		

@@ -91,7 +91,11 @@ public class BackUpScannerThread {
 
 		backUpItemList = new BackUpItemList();
 		
-		if (Files.isDirectory(sourcePath)) {
+		if (! Files.exists(sourcePath)) {
+			String warning = "Source path does not exist: " + sourcePath ;
+			status = status + "| " + warning ;
+			pLog.warning(warning) ;
+		} else if (Files.isDirectory(sourcePath)) {
 			currDepth = 0 ;
 			directoryCompare(sourcePath, targetPath, compareContent) ;
 		} else {

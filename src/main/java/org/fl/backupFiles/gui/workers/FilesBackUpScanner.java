@@ -1,6 +1,5 @@
 package org.fl.backupFiles.gui.workers;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,18 +90,11 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				// Launch one thread per backUpTask
 				for (BackUpTask backUpTask : backUpTasks) {
 
-					sourcePath = backUpTask.getSource() ;					
-					if (Files.exists(sourcePath)) {
-						
 						BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, pLog) ;
 						CompletableFuture<ScannerThreadResponse> backUpRes  = 
 							CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
 						
 						results.add(new BackUpScannerTask(backUpScannerThread, backUpRes)) ;
-												
-					} else {
-						pLog.warning("Source path does not exist: " + sourcePath) ;
-					}
 				}
 				
 				// Get results from backUpTask threads as they completes
