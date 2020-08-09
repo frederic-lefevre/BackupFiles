@@ -92,21 +92,21 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 					.collect(Collectors.toList());
 				
 				// Get results from backUpTask threads as they completes
-				int nbActiveTasks = results.size() ;
-				while (nbActiveTasks > 0) {
-										
+				boolean scanningNotTerminated = true ;
+				while (scanningNotTerminated) {
+								
+					scanningNotTerminated = false ;
 					jobProgress.setLength(0) ;
 					jobProgress.append(HTML_BEGIN) ;
 					for (BackUpScannerTask oneResult : results) {
 						
-						if ( (! oneResult.isResultRecorded()) &&
-							 (oneResult.getFutureResponse().isDone())) {
+						if (! oneResult.getFutureResponse().isDone()) {
+							scanningNotTerminated = true ;
+						} else if (! oneResult.isResultRecorded()) {
 							// one backUpTask has finished
-								
-							nbActiveTasks-- ;								
-							oneResult.setResultRecorded(true) ;
-							
+																					
 							// publish task result
+							oneResult.setResultRecorded(true) ;
 							publish(new BackupScannerInformation(null, oneResult.getFutureResponse().get())) ;
 
 						}
@@ -118,7 +118,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 					// Refresh progress information
 					publish(new BackupScannerInformation(jobProgress.toString(), null)) ;
 
-					if (nbActiveTasks > 0) {
+					if (scanningNotTerminated) {
 						try {
 							Thread.sleep(refreshRate) ;
 						} catch (InterruptedException e) {
