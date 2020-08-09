@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -79,54 +82,30 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		long 				  startTime   = System.currentTimeMillis() ;
 		Path 				  sourcePath  = null ;
 		ArrayList<BackUpTask> backUpTasks = jobsChoice.getTasks(jobTaskType) ;
-		StringBuilder 		  jobProgress = new StringBuilder(1024) ;
 	
 		List<BackUpScannerTask> results = null;
 		try {
 			if (backUpTasks != null) {
 				
 				ExecutorService scannerExecutor = Config.getScanExecutorService() ;
-								
+	
+				// Launch scanner tasks
 				results = backUpTasks.stream()
 					.map(backupTask ->  new BackUpScannerThread(backupTask, pLog))
 					.map(backUpScannerThread -> new BackUpScannerTask(backUpScannerThread, CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor)))
 					.collect(Collectors.toList());
-				
-				// Get results from backUpTask threads as they completes
-				boolean scanningNotTerminated = true ;
-				while (scanningNotTerminated) {
-								
-					scanningNotTerminated = false ;
-					jobProgress.setLength(0) ;
-					jobProgress.append(HTML_BEGIN) ;
-					for (BackUpScannerTask oneResult : results) {
-						
-						if (! oneResult.getFutureResponse().isDone()) {
-							scanningNotTerminated = true ;
-						} else if (! oneResult.isResultRecorded()) {
-							// one backUpTask has finished
-																					
-							// publish task result
-							oneResult.setResultRecorded(true) ;
-							publish(new BackupScannerInformation(null, oneResult.getFutureResponse().get())) ;
 
-						}
-						oneResult.getBackUpScannerThread().stopAsked(uiControl.isStopAsked());
-						jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus()).append("<br/>") ;
-					}
-					jobProgress.append(HTML_END) ;
-					
-					// Refresh progress information
-					publish(new BackupScannerInformation(jobProgress.toString(), null)) ;
+				// Report scanner task progress
+				ScannerProgress scannerProgress = new ScannerProgress(results) ;
+				ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+				ScheduledFuture<?> progressRecordTask = scheduler.scheduleAtFixedRate(scannerProgress, 0, refreshRate, TimeUnit.MILLISECONDS);
 
-					if (scanningNotTerminated) {
-						try {
-							TimeUnit.MILLISECONDS.sleep(refreshRate) ;
-						} catch (InterruptedException e) {
-							Thread.currentThread().interrupt();
-						}
-					}
-				}
+				// Wait scanner tasks completion
+				results.stream().map(r -> r.getFutureResponse()).map(CompletableFuture::join).collect(Collectors.toList());
+
+				// Stop progress reporting
+				progressRecordTask.cancel(true);
+				scheduler.shutdown() ;
 			} 
 		} catch (Exception e) {
 			pLog.log(Level.SEVERE, "IOException when walking file tree " + sourcePath, e) ;
@@ -134,6 +113,44 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		long duration = System.currentTimeMillis() - startTime ;
 				
 		return new BackUpScannerResult(results, duration);
+	}
+	
+	private class ScannerProgress implements Runnable {
+	
+		private StringBuilder jobProgress ;
+		private List<BackUpScannerTask> results ;	
+		
+		public ScannerProgress(List<BackUpScannerTask> results) {
+			super();
+			this.results = results;
+			jobProgress = new StringBuilder(1024) ;
+		}
+
+		@Override
+		public void run() {
+
+			jobProgress.setLength(0) ;
+			jobProgress.append(HTML_BEGIN) ;
+			for (BackUpScannerTask oneResult : results) {
+				
+				if ((oneResult.getFutureResponse().isDone()) && (! oneResult.isResultRecorded())) {
+					// one backUpTask has finished																			
+					// publish task result
+					try {
+						publish(new BackupScannerInformation(null, oneResult.getFutureResponse().get())) ;
+						oneResult.setResultRecorded(true) ;
+					} catch (InterruptedException | ExecutionException e) {
+						pLog.log(Level.SEVERE, "Exception getting task results", e) ;
+					}
+				}
+				oneResult.getBackUpScannerThread().stopAsked(uiControl.isStopAsked());
+				jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus()).append("<br/>") ;
+			}
+			jobProgress.append(HTML_END) ;
+			
+			// Refresh progress information
+			publish(new BackupScannerInformation(jobProgress.toString(), null)) ;
+		}
 	}
 	
 	@Override
