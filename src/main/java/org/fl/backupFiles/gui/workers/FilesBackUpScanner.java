@@ -80,7 +80,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		ArrayList<BackUpTask> backUpTasks = jobsChoice.getTasks(jobTaskType) ;
 		StringBuilder 		  jobProgress = new StringBuilder(1024) ;
 	
-		List<BackUpScannerTask> results ;
+		List<BackUpScannerTask> results = null;
 		try {
 			if (backUpTasks != null) {
 				
@@ -125,11 +125,8 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 						}
 					}
 				}
-			} else {
-				results = new ArrayList<>() ;
-			}
+			} 
 		} catch (Exception e) {
-			results = new ArrayList<>() ;
 			pLog.log(Level.SEVERE, "IOException when walking file tree " + sourcePath, e) ;
 		}
 		long duration = System.currentTimeMillis() - startTime ;
