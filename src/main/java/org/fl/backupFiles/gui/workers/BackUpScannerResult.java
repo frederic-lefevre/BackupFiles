@@ -2,21 +2,20 @@ package org.fl.backupFiles.gui.workers;
 
 import java.util.List;
 
-import org.fl.backupFiles.scanner.BackUpScannerTask;
+import org.fl.backupFiles.scanner.ScannerThreadResponse;
 
 public class BackUpScannerResult {
 
-	private final List<BackUpScannerTask> taskResults ;
-	private final long 					  duration ;
+	private final List<ScannerThreadResponse> taskResults ;
+	private final long 					  	  duration ;
 	
-	public BackUpScannerResult(List<BackUpScannerTask> tr, long d) {
-		
+	public BackUpScannerResult(List<ScannerThreadResponse> tr, long d) {	
 		super();
 		taskResults = tr;
 		duration = d;
 	}
 
-	public List<BackUpScannerTask> getTaskResults() {
+	public List<ScannerThreadResponse> getTaskResults() {
 		return taskResults;
 	}
 

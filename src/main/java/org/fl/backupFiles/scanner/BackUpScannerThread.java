@@ -110,7 +110,7 @@ public class BackUpScannerThread {
 			status = status + "with content compare " ;
 		}
 		status = status + "| Number of files processed: " + nbFilesProcessed ;
-		ScannerThreadResponse resp = new ScannerThreadResponse(backUpTask, backUpItemList, backUpCounters, filesVisitFailed) ;
+		ScannerThreadResponse resp = new ScannerThreadResponse(backUpTask, backUpItemList, backUpCounters, filesVisitFailed, status) ;
 		return resp ;
 	}
 		

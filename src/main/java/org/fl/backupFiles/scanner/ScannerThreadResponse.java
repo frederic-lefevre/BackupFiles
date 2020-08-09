@@ -14,15 +14,17 @@ public class ScannerThreadResponse {
 
 	private final BackUpItemList backUpItemList ;	
 	private final BackUpCounters backUpCounters ;
+	private final String 		 status ;
 	
 	private boolean hasNotBeenProcessed ;
 	
-	public ScannerThreadResponse(BackUpTask but, BackUpItemList bil, BackUpCounters buc, ArrayList<Path> fvf) {
+	public ScannerThreadResponse(BackUpTask but, BackUpItemList bil, BackUpCounters buc, ArrayList<Path> fvf, String st) {
 		
 		backUpTask 		 = but ;
 		backUpItemList 	 = bil ;
 		backUpCounters 	 = buc ;
 		filesVisitFailed = fvf ;
+		status			 = st  ;
 		
 		hasNotBeenProcessed = true ;
 	}
@@ -31,6 +33,8 @@ public class ScannerThreadResponse {
 	public ArrayList<Path> getFilesVisitFailed() { return filesVisitFailed ; 	}
 	public BackUpItemList  getBackUpItemList() 	 { return backUpItemList ; 	 	}
 	public BackUpCounters  getBackUpCounters() 	 { return backUpCounters ;	    }
+	public String 		   getStatus() 			 { return status ;				}
+
 	public boolean 		   hasNotBeenProcessed() { return hasNotBeenProcessed ; }
 	
 	public void setHasNotBeenProcessed(boolean hasNotBeenProcessed) {	

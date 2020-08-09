@@ -83,7 +83,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		Path 				  sourcePath  = null ;
 		ArrayList<BackUpTask> backUpTasks = jobsChoice.getTasks(jobTaskType) ;
 	
-		List<BackUpScannerTask> results = null;
+		List<ScannerThreadResponse> scannerThreadResponse = null; 
 		try {
 			if (backUpTasks != null) {
 				
@@ -91,7 +91,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				ScheduledExecutorService scheduler 		 = Config.getScheduler();
 	
 				// Launch scanner tasks
-				results = backUpTasks.stream()
+				List<BackUpScannerTask> results = backUpTasks.stream()
 					.map(backupTask ->  new BackUpScannerThread(backupTask, pLog))
 					.map(backUpScannerThread -> new BackUpScannerTask(backUpScannerThread, CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor)))
 					.collect(Collectors.toList());
@@ -101,7 +101,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				ScheduledFuture<?> progressRecordTask = scheduler.scheduleAtFixedRate(scannerProgress::getProgress, 0, refreshRate, TimeUnit.MILLISECONDS);
 
 				// Wait scanner tasks completion
-				results.stream().map(r -> r.getFutureResponse()).map(CompletableFuture::join).collect(Collectors.toList());
+				scannerThreadResponse = results.stream().map(r -> r.getFutureResponse()).map(CompletableFuture::join).collect(Collectors.toList());
 
 				// Stop progress reporting
 				progressRecordTask.cancel(true);
@@ -111,7 +111,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		}
 		long duration = System.currentTimeMillis() - startTime ;
 				
-		return new BackUpScannerResult(results, duration);
+		return new BackUpScannerResult(scannerThreadResponse, duration);
 	}
 	
 	private class ScannerProgress {
@@ -181,7 +181,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 		try {
 			BackUpScannerResult results = get();
-			List<BackUpScannerTask> taskResults = results.getTaskResults() ;
+			List<ScannerThreadResponse> taskResults = results.getTaskResults() ;
 			
 			if ((taskResults == null) || (taskResults.isEmpty())) {
 				pLog.warning("back up tasks is null") ;							
@@ -190,15 +190,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 			} else {
 								
 				int sumOfRes = taskResults.stream()
-					.map(taskResult -> {
-						try {
-							// Get scanner results
-							return taskResult.getFutureResponse().get();
-						} catch (InterruptedException | ExecutionException e) {
-							pLog.log(Level.SEVERE, "Echec du processing des résultats de scanner", e) ;
-							return null;
-						}
-					}).mapToInt(backRes -> {
+					.mapToInt(backRes -> {
 						// count number of backup items
 						if (backRes.hasNotBeenProcessed()) {
 							// Process the response that may have not been processed
@@ -228,8 +220,8 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				// Log info
 				StringBuilder infoScanner = new StringBuilder(1024) ;		
 				infoScanner.append(jobsChoice.getTitleAsString()).append("\n") ;
-				for (BackUpScannerTask oneResult : taskResults) {
-					infoScanner.append(oneResult.getBackUpScannerThread().getCurrentStatus()).append("\n") ;
+				for (ScannerThreadResponse oneResult : taskResults) {
+					infoScanner.append(oneResult.getStatus()).append("\n") ;
 				}
 				pLog.info(getScanInfoText(infoScanner, duration)) ;
 				
