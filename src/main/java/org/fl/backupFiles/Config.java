@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryPermanence.DirectoryPermanence;
@@ -17,13 +18,14 @@ import com.ibm.lge.fl.util.AdvancedProperties;
 
 public class Config {
 
-	private static long 		   		scanRefreshRate ;
-	private static long 		   		backUpMaxRefreshInterval ;
-	private static int  		   		backUpRefreshRate ;
-	private static int  		   		maxDepth ;
-	private static ExecutorService 		scanExecutorService ;
-	private static ArrayList<OsAction>  osActions ;
-	private static DirectoryPermanence  directoryPermanence ;
+	private static long 		   			scanRefreshRate ;
+	private static long 		   			backUpMaxRefreshInterval ;
+	private static int  		   			backUpRefreshRate ;
+	private static int  		   			maxDepth ;
+	private static ExecutorService 			scanExecutorService ;
+	private static ScheduledExecutorService scheduler ;
+	private static ArrayList<OsAction>  	osActions ;
+	private static DirectoryPermanence  	directoryPermanence ;
 
 	public static void initConfig(AdvancedProperties backupProperty, Logger cLog) {
 		
@@ -33,7 +35,9 @@ public class Config {
 		maxDepth 		  		 	  = backupProperty.getInt( "backupFiles.scan.maxDepth",     		  200) ;
 
 		int threadPoolSize 		 	  = backupProperty.getInt( "backupFiles.scan.threadPoolSize", 		   10) ;
+		int schedulerPoolSize 		  = backupProperty.getInt( "backupFiles.scan.schedulerPoolSize", 		1) ;
 		scanExecutorService 	 	  = Executors.newFixedThreadPool(threadPoolSize) ;
+		scheduler					  = Executors.newScheduledThreadPool(schedulerPoolSize);
 		
 		long fileSizeWarningThreshold = backupProperty.getLong("backupFiles.fileSize.warningThreshold", Long.MAX_VALUE) ;
 		BackUpSizeDifferenceCellRenderer.setFileSizeWarningThreshold(fileSizeWarningThreshold) ;
@@ -80,6 +84,10 @@ public class Config {
 
 	public static ExecutorService getScanExecutorService() {
 		return scanExecutorService;
+	}
+
+	public static ScheduledExecutorService getScheduler() {
+		return scheduler;
 	}
 
 	public static ArrayList<OsAction> getOsActions() {

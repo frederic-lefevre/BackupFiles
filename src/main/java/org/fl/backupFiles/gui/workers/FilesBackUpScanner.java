@@ -87,7 +87,8 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		try {
 			if (backUpTasks != null) {
 				
-				ExecutorService scannerExecutor = Config.getScanExecutorService() ;
+				ExecutorService 		 scannerExecutor = Config.getScanExecutorService() ;
+				ScheduledExecutorService scheduler 		 = Config.getScheduler();
 	
 				// Launch scanner tasks
 				results = backUpTasks.stream()
@@ -97,7 +98,6 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 				// Report scanner task progress
 				ScannerProgress scannerProgress = new ScannerProgress(results) ;
-				ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 				ScheduledFuture<?> progressRecordTask = scheduler.scheduleAtFixedRate(scannerProgress, 0, refreshRate, TimeUnit.MILLISECONDS);
 
 				// Wait scanner tasks completion
@@ -105,7 +105,6 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 				// Stop progress reporting
 				progressRecordTask.cancel(true);
-				scheduler.shutdown() ;
 			} 
 		} catch (Exception e) {
 			pLog.log(Level.SEVERE, "IOException when walking file tree " + sourcePath, e) ;
