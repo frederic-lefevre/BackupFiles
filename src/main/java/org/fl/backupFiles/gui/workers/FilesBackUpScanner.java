@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -120,8 +121,9 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 					if (scanningNotTerminated) {
 						try {
-							Thread.sleep(refreshRate) ;
+							TimeUnit.MILLISECONDS.sleep(refreshRate) ;
 						} catch (InterruptedException e) {
+							Thread.currentThread().interrupt();
 						}
 					}
 				}
