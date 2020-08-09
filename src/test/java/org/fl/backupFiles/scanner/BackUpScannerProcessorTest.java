@@ -88,17 +88,7 @@ class BackUpScannerProcessorTest {
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
 			
-			while (! backUpRes.isDone()) {
-				try {
-					Thread.sleep(300);
-				} catch (InterruptedException e) {
-					log.log(Level.SEVERE, "Interruption exception in BackUpScannerThread test", e);
-					fail("Interrupted Exception");
-				}
-			}
-		
 			ScannerThreadResponse scannerResp = backUpRes.get() ;
-						
 			BackUpCounters backUpCounters = scannerResp.getBackUpCounters() ;			
 			assertEquals(0, backUpCounters.ambiguousNb) ;
 			assertEquals(0, backUpCounters.contentDifferentNb) ;
@@ -115,7 +105,7 @@ class BackUpScannerProcessorTest {
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
 			assertNotNull(backUpItemList) ;
 			assertEquals(2, backUpItemList.size()) ;
-			
+
 			// Execute backup
 			backUpCounters.reset() ;
 			for (BackUpItem backUpItem : backUpItemList) {
@@ -137,15 +127,6 @@ class BackUpScannerProcessorTest {
 			backUpTask.setCompareContent(true) ;
 			backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
 			backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
-			
-			while (! backUpRes.isDone()) {
-				try {
-					Thread.sleep(300);
-				} catch (InterruptedException e) {
-					log.log(Level.SEVERE, "Interruption exception in BackUpScannerThread test", e);
-					fail("Interrupted Exception");
-				}
-			}
 			
 			scannerResp = backUpRes.get() ;
 			backUpItemList = scannerResp.getBackUpItemList() ;
@@ -182,15 +163,6 @@ class BackUpScannerProcessorTest {
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
-			
-			while (! backUpRes.isDone()) {
-				try {
-					Thread.sleep(300);
-				} catch (InterruptedException e) {
-					log.log(Level.SEVERE, "Interruption exception in BackUpScannerThread test", e);
-					fail("Interrupted Exception");
-				}
-			}
 		
 			ScannerThreadResponse scannerResp = backUpRes.get() ;
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
@@ -220,15 +192,6 @@ class BackUpScannerProcessorTest {
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
 			
-			while (! backUpRes.isDone()) {
-				try {
-					Thread.sleep(300);
-				} catch (InterruptedException e) {
-					log.log(Level.SEVERE, "Interruption exception in BackUpScannerThread test", e);
-					fail("Interrupted Exception");
-				}
-			}
-		
 			ScannerThreadResponse scannerResp = backUpRes.get() ;
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
 			assertNotNull(backUpItemList) ;
