@@ -1,12 +1,12 @@
 package org.fl.backupFiles.gui.workers;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -81,46 +81,33 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		ArrayList<BackUpTask> backUpTasks = jobsChoice.getTasks(jobTaskType) ;
 		StringBuilder 		  jobProgress = new StringBuilder(1024) ;
 	
-		ArrayList<BackUpScannerTask> results = new ArrayList<BackUpScannerTask>() ;
-
+		List<BackUpScannerTask> results = null;
 		try {
 			if (backUpTasks != null) {
 				
 				ExecutorService scannerExecutor = Config.getScanExecutorService() ;
 								
-				// Launch one thread per backUpTask
-				for (BackUpTask backUpTask : backUpTasks) {
-
-					sourcePath = backUpTask.getSource() ;					
-					if (Files.exists(sourcePath)) {
-						
-						BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, pLog) ;
-						CompletableFuture<ScannerThreadResponse> backUpRes  = 
-							CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
-						
-						results.add(new BackUpScannerTask(backUpScannerThread, backUpRes)) ;
-												
-					} else {
-						pLog.warning("Source path does not exist: " + sourcePath) ;
-					}
-				}
+				results = backUpTasks.stream()
+					.map(backupTask ->  new BackUpScannerThread(backupTask, pLog))
+					.map(backUpScannerThread -> new BackUpScannerTask(backUpScannerThread, CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor)))
+					.collect(Collectors.toList());
 				
 				// Get results from backUpTask threads as they completes
-				int nbActiveTasks = results.size() ;
-				while (nbActiveTasks > 0) {
-										
+				boolean scanningNotTerminated = true ;
+				while (scanningNotTerminated) {
+								
+					scanningNotTerminated = false ;
 					jobProgress.setLength(0) ;
 					jobProgress.append(HTML_BEGIN) ;
 					for (BackUpScannerTask oneResult : results) {
 						
-						if ( (! oneResult.isResultRecorded()) &&
-							 (oneResult.getFutureResponse().isDone())) {
+						if (! oneResult.getFutureResponse().isDone()) {
+							scanningNotTerminated = true ;
+						} else if (! oneResult.isResultRecorded()) {
 							// one backUpTask has finished
-								
-							nbActiveTasks-- ;								
-							oneResult.setResultRecorded(true) ;
-							
+																					
 							// publish task result
+							oneResult.setResultRecorded(true) ;
 							publish(new BackupScannerInformation(null, oneResult.getFutureResponse().get())) ;
 
 						}
@@ -132,14 +119,15 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 					// Refresh progress information
 					publish(new BackupScannerInformation(jobProgress.toString(), null)) ;
 
-					if (nbActiveTasks > 0) {
+					if (scanningNotTerminated) {
 						try {
-							Thread.sleep(refreshRate) ;
+							TimeUnit.MILLISECONDS.sleep(refreshRate) ;
 						} catch (InterruptedException e) {
+							Thread.currentThread().interrupt();
 						}
 					}
 				}
-			}					
+			} 
 		} catch (Exception e) {
 			pLog.log(Level.SEVERE, "IOException when walking file tree " + sourcePath, e) ;
 		}
@@ -178,35 +166,33 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 		try {
 			BackUpScannerResult results = get();
-			ArrayList<BackUpScannerTask> taskResults = results.getTaskResults() ;
+			List<BackUpScannerTask> taskResults = results.getTaskResults() ;
 			
 			if ((taskResults == null) || (taskResults.isEmpty())) {
 				pLog.warning("back up tasks is null") ;							
 				progressPanel.setStepInfos(backUpCounters.toHtmlString(), 0);
 				progressPanel.setProcessStatus("Aucune taches à effectuer");
 			} else {
-				
-				// Get scanner results
-				List<ScannerThreadResponse> scannerResults = taskResults.stream()
+								
+				int sumOfRes = taskResults.stream()
 					.map(taskResult -> {
 						try {
+							// Get scanner results
 							return taskResult.getFutureResponse().get();
 						} catch (InterruptedException | ExecutionException e) {
 							pLog.log(Level.SEVERE, "Echec du processing des résultats de scanner", e) ;
 							return null;
 						}
-					})
-					.collect(Collectors.toList()) ;
-				
-				// Process the response that may have not been processed
-				scannerResults.stream()
-						.filter(scannerResp -> { return scannerResp.hasNotBeenProcessed();	})
-						.forEach(scannerResp -> { processScannerThreadResponse(scannerResp) ; });
-									
-				// Check number of backup items
-				int sumOfRes = scannerResults.stream()
-					.mapToInt(backRes -> { return backRes.getBackUpItemList().size(); })
+					}).mapToInt(backRes -> {
+						// count number of backup items
+						if (backRes.hasNotBeenProcessed()) {
+							// Process the response that may have not been processed
+							processScannerThreadResponse(backRes) ;
+						}
+						return backRes.getBackUpItemList().size(); })
 					.sum() ;
+																	
+				// Check number of backup items
 				if (sumOfRes != backUpItemList.size()) {
 					pLog.severe("Erreur, nombre de résultats de scan recalculé =" + sumOfRes + " différent du nombre stocké =" + backUpItemList.size());
 				}
