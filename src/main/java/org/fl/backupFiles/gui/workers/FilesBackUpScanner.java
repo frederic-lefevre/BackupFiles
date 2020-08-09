@@ -80,22 +80,16 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		ArrayList<BackUpTask> backUpTasks = jobsChoice.getTasks(jobTaskType) ;
 		StringBuilder 		  jobProgress = new StringBuilder(1024) ;
 	
-		ArrayList<BackUpScannerTask> results = new ArrayList<BackUpScannerTask>() ;
-
+		List<BackUpScannerTask> results ;
 		try {
 			if (backUpTasks != null) {
 				
 				ExecutorService scannerExecutor = Config.getScanExecutorService() ;
 								
-				// Launch one thread per backUpTask
-				for (BackUpTask backUpTask : backUpTasks) {
-
-						BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, pLog) ;
-						CompletableFuture<ScannerThreadResponse> backUpRes  = 
-							CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
-						
-						results.add(new BackUpScannerTask(backUpScannerThread, backUpRes)) ;
-				}
+				results = backUpTasks.stream()
+					.map(backupTask ->  new BackUpScannerThread(backupTask, pLog))
+					.map(backUpScannerThread -> new BackUpScannerTask(backUpScannerThread, CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor)))
+					.collect(Collectors.toList());
 				
 				// Get results from backUpTask threads as they completes
 				int nbActiveTasks = results.size() ;
@@ -131,8 +125,11 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 						}
 					}
 				}
-			}					
+			} else {
+				results = new ArrayList<>() ;
+			}
 		} catch (Exception e) {
+			results = new ArrayList<>() ;
 			pLog.log(Level.SEVERE, "IOException when walking file tree " + sourcePath, e) ;
 		}
 		long duration = System.currentTimeMillis() - startTime ;
@@ -170,7 +167,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 		try {
 			BackUpScannerResult results = get();
-			ArrayList<BackUpScannerTask> taskResults = results.getTaskResults() ;
+			List<BackUpScannerTask> taskResults = results.getTaskResults() ;
 			
 			if ((taskResults == null) || (taskResults.isEmpty())) {
 				pLog.warning("back up tasks is null") ;							
