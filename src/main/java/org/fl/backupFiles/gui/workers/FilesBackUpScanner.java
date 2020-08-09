@@ -98,7 +98,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 				// Report scanner task progress
 				ScannerProgress scannerProgress = new ScannerProgress(results) ;
-				ScheduledFuture<?> progressRecordTask = scheduler.scheduleAtFixedRate(scannerProgress, 0, refreshRate, TimeUnit.MILLISECONDS);
+				ScheduledFuture<?> progressRecordTask = scheduler.scheduleAtFixedRate(scannerProgress::getProgress, 0, refreshRate, TimeUnit.MILLISECONDS);
 
 				// Wait scanner tasks completion
 				results.stream().map(r -> r.getFutureResponse()).map(CompletableFuture::join).collect(Collectors.toList());
@@ -114,7 +114,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		return new BackUpScannerResult(results, duration);
 	}
 	
-	private class ScannerProgress implements Runnable {
+	private class ScannerProgress {
 	
 		private StringBuilder jobProgress ;
 		private List<BackUpScannerTask> results ;	
@@ -125,8 +125,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 			jobProgress = new StringBuilder(1024) ;
 		}
 
-		@Override
-		public void run() {
+		public void getProgress() {
 
 			jobProgress.setLength(0) ;
 			jobProgress.append(HTML_BEGIN) ;
