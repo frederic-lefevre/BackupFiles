@@ -174,28 +174,26 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				progressPanel.setStepInfos(backUpCounters.toHtmlString(), 0);
 				progressPanel.setProcessStatus("Aucune taches à effectuer");
 			} else {
-				
-				// Get scanner results
-				List<ScannerThreadResponse> scannerResults = taskResults.stream()
+								
+				int sumOfRes = taskResults.stream()
 					.map(taskResult -> {
 						try {
+							// Get scanner results
 							return taskResult.getFutureResponse().get();
 						} catch (InterruptedException | ExecutionException e) {
 							pLog.log(Level.SEVERE, "Echec du processing des résultats de scanner", e) ;
 							return null;
 						}
-					})
-					.collect(Collectors.toList()) ;
-				
-				// Process the response that may have not been processed
-				scannerResults.stream()
-						.filter(scannerResp -> { return scannerResp.hasNotBeenProcessed();	})
-						.forEach(scannerResp -> { processScannerThreadResponse(scannerResp) ; });
-									
-				// Check number of backup items
-				int sumOfRes = scannerResults.stream()
-					.mapToInt(backRes -> { return backRes.getBackUpItemList().size(); })
+					}).mapToInt(backRes -> {
+						// count number of backup items
+						if (backRes.hasNotBeenProcessed()) {
+							// Process the response that may have not been processed
+							processScannerThreadResponse(backRes) ;
+						}
+						return backRes.getBackUpItemList().size(); })
 					.sum() ;
+																	
+				// Check number of backup items
 				if (sumOfRes != backUpItemList.size()) {
 					pLog.severe("Erreur, nombre de résultats de scan recalculé =" + sumOfRes + " différent du nombre stocké =" + backUpItemList.size());
 				}
