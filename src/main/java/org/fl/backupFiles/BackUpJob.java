@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,7 +30,7 @@ public class BackUpJob {
         public String toString() { return jobName ; } 
 	} ;
 	
-	private HashMap<JobTaskType, ArrayList<BackUpTask>> backUpTasks ;
+	private Map<JobTaskType, List<BackUpTask>> backUpTasks ;
 	
 	private final static String TITLE  = "titre"  ;
 	private final static String ITEMS  = "items"  ;
@@ -79,7 +81,7 @@ public class BackUpJob {
 
 	private void getBackUpTasks(JsonArray jItems) {
 		
-		backUpTasks = new HashMap<JobTaskType, ArrayList<BackUpTask>>() ;
+		backUpTasks = new HashMap<JobTaskType, List<BackUpTask>>() ;
 		for (JobTaskType jtt : JobTaskType.values()) {
 			ArrayList<BackUpTask> tasksForJtt = new ArrayList<BackUpTask>() ;
 			backUpTasks.put(jtt, tasksForJtt) ;
@@ -113,7 +115,7 @@ public class BackUpJob {
 		return title ;
 	}
 
-	public ArrayList<BackUpTask> getTasks(JobTaskType jobTaskType) {
+	public List<BackUpTask> getTasks(JobTaskType jobTaskType) {
 		
 		return backUpTasks.get(jobTaskType) ;
 	}

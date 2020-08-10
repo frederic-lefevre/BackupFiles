@@ -89,7 +89,7 @@ public class JobsChoice {
 		}
 	}
 	
-	private void addAllTasks(ArrayList<BackUpTask> tasks, ArrayList<BackUpTask> tasksToAdd) {
+	private void addAllTasks(ArrayList<BackUpTask> tasks, List<BackUpTask> tasksToAdd) {
 		for (BackUpTask taskToAdd : tasksToAdd) {
 			if (! tasks.contains(taskToAdd)) {
 				tasks.add(taskToAdd) ;
