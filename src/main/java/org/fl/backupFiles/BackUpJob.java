@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,12 +47,13 @@ public class BackUpJob {
 	public BackUpJob(String jsonConfig, Logger l) {
 		
 		bLog = l ;
+		backUpTasks = new HashMap<JobTaskType, List<BackUpTask>>() ;
 		if (jsonConfig != null) {
 			
 			try {
 				JsonElement jElemConf = JsonParser.parseString(jsonConfig) ;
 				
-				if (jElemConf != null) {
+				if ((jElemConf != null) && (jElemConf.isJsonObject())) {
 					
 					JsonObject jsonObjectConf = jElemConf.getAsJsonObject() ;
 					
@@ -81,7 +83,6 @@ public class BackUpJob {
 
 	private void getBackUpTasks(JsonArray jItems) {
 		
-		backUpTasks = new HashMap<JobTaskType, List<BackUpTask>>() ;
 		for (JobTaskType jtt : JobTaskType.values()) {
 			ArrayList<BackUpTask> tasksForJtt = new ArrayList<BackUpTask>() ;
 			backUpTasks.put(jtt, tasksForJtt) ;
@@ -117,7 +118,11 @@ public class BackUpJob {
 
 	public List<BackUpTask> getTasks(JobTaskType jobTaskType) {
 		
-		return backUpTasks.get(jobTaskType) ;
+		if (backUpTasks.get(jobTaskType) == null) {
+			return null ;
+		} else {
+			return Collections.unmodifiableList(backUpTasks.get(jobTaskType)) ;
+		}
 	}
 	
 	private Path getPathElement(JsonObject jObjItem, String prop) {
