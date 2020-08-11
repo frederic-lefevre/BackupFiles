@@ -2,6 +2,7 @@ package org.fl.backupFiles.directoryPermanence;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -18,7 +19,7 @@ public class DirectoryPermanenceMap implements DirectoryPermanence {
 	private static final String PATH 	   = "path" ;
 	private static final String PERMANENCE = "permanence" ;
 	
-	private final TreeMap<Path,DirectoryPermanenceLevel> permanenceMap ;
+	private final Map<Path,DirectoryPermanenceLevel> permanenceMap ;
 	private final Set<Path> pathKeys ;
 	
 	public DirectoryPermanenceMap(String jsonConfig, Logger bLog) {
