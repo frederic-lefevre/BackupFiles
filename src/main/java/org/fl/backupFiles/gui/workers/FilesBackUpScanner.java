@@ -78,9 +78,9 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		
 		filesVisitFailed = new ArrayList<Path>() ;	
 
-		long 				  startTime   = System.currentTimeMillis() ;
-		Path 				  sourcePath  = null ;
-		ArrayList<BackUpTask> backUpTasks = jobsChoice.getTasks(jobTaskType) ;
+		long 			 startTime   = System.currentTimeMillis() ;
+		Path 			 sourcePath  = null ;
+		List<BackUpTask> backUpTasks = jobsChoice.getTasks(jobTaskType) ;
 	
 		List<ScannerThreadResponse> scannerThreadResponse = null; 
 		try {

@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.fl.backupFiles.BackUpJob.JobTaskType;
@@ -26,9 +27,9 @@ public class JobsChoice {
 	private final static String taskJobSeparator = "\n\n" ;
 	private final static String taskSeparator 	 = "\n" ;
 	
-	private final HashMap<JobTaskType, ArrayList<BackUpTask>> backUpTasks ;
+	private final Map<JobTaskType, ArrayList<BackUpTask>> backUpTasks ;
 	
-	private HashMap<FileStore,TargetFileStore> targetFileStores ;
+	private Map<FileStore,TargetFileStore> targetFileStores ;
 	
 	public JobsChoice(List<BackUpJob> bj, Logger l) {
 		
@@ -75,7 +76,7 @@ public class JobsChoice {
 		return jobsDetail ;
 	}
 	
-	public ArrayList<BackUpTask> getTasks(JobTaskType jobTaskType) {
+	public List<BackUpTask> getTasks(JobTaskType jobTaskType) {
 				
 		return backUpTasks.get(jobTaskType) ;
 	}
@@ -83,13 +84,13 @@ public class JobsChoice {
 	public void setCompareContent(JobTaskType jobTaskType, boolean cc) {
 		
 		compareContent = cc ;
-		ArrayList<BackUpTask> bupTasks = getTasks(jobTaskType) ;
+		List<BackUpTask> bupTasks = getTasks(jobTaskType) ;
 		for (BackUpTask backUpTask : bupTasks) {
 			backUpTask.setCompareContent(cc);
 		}
 	}
 	
-	private void addAllTasks(ArrayList<BackUpTask> tasks, List<BackUpTask> tasksToAdd) {
+	private void addAllTasks(List<BackUpTask> tasks, List<BackUpTask> tasksToAdd) {
 		for (BackUpTask taskToAdd : tasksToAdd) {
 			if (! tasks.contains(taskToAdd)) {
 				tasks.add(taskToAdd) ;
@@ -99,8 +100,7 @@ public class JobsChoice {
 	}
 	
 	public void initTargetFileStores(JobTaskType jobTaskType) {
-		ArrayList<BackUpTask> bupTasks = getTasks(jobTaskType) ;
-		for (BackUpTask backUpTask : bupTasks) {
+		for (BackUpTask backUpTask : getTasks(jobTaskType)) {
 			Path targetPath = backUpTask.getTarget() ;
 			if ((targetPath != null) && (Files.exists(targetPath))) {
 				TargetFileStore targetFileStore = new TargetFileStore(targetPath, jLog) ;
