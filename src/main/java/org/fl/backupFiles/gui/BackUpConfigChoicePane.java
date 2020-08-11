@@ -1,9 +1,9 @@
 package org.fl.backupFiles.gui;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -29,11 +29,11 @@ public class BackUpConfigChoicePane extends JPanel {
 	
 	private JList<BackUpJob> backUpJobChoice ;
 	
-	private ArrayList<BackUpPane> backUpPanes ;
+	private List<BackUpPane> backUpPanes ;
 	
-	private HashMap<JobTaskType, JobConfigTableModel> jobConfigTablesModel ;
+	private Map<JobTaskType, JobConfigTableModel> jobConfigTablesModel ;
 	
-	public BackUpConfigChoicePane(Path configFileDir, ArrayList<BackUpPane> bps, Logger l) {
+	public BackUpConfigChoicePane(Path configFileDir, List<BackUpPane> bps, Logger l) {
 		super();
 		
 		backUpPanes = bps ;
