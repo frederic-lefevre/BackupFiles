@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JMenuItem;
@@ -22,12 +23,12 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 	private BackUpJTable backUpJTable ;
 	
 	// Menu items
-	private ArrayList<JMenuItem> sourceMenuItems ;
-	private ArrayList<JMenuItem> targetMenuItems ;
-	private ArrayList<JMenuItem> bothMenuItems ;
-	private ArrayList<JMenuItem> anyMenuItems ;
+	private List<JMenuItem> sourceMenuItems ;
+	private List<JMenuItem> targetMenuItems ;
+	private List<JMenuItem> bothMenuItems ;
+	private List<JMenuItem> anyMenuItems ;
 	
-	public BackupItemMouseAdapter(BackUpJTable bkt, ArrayList<OsAction> osActions, Logger bLog) {
+	public BackupItemMouseAdapter(BackUpJTable bkt, List<OsAction> osActions, Logger bLog) {
 		super() ;
 		backUpJTable 	= bkt ;
 		localJPopupMenu = new JPopupMenu();
@@ -107,7 +108,7 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 	
 	private void enableMenuItems() {
 		
-		ArrayList<BackUpItem> selectedEntries = backUpJTable.getSelectedBackUpItems() ;
+		List<BackUpItem> selectedEntries = backUpJTable.getSelectedBackUpItems() ;
 		
 		boolean sourcePresent = false ;
 		boolean targetPresent = false ;

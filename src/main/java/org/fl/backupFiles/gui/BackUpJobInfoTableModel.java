@@ -1,6 +1,7 @@
 package org.fl.backupFiles.gui;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -13,7 +14,7 @@ public class BackUpJobInfoTableModel extends AbstractTableModel {
 	
 	private final static String[] entetes = {"Configuration", "Date", "Résultat", "Opération", "Type"};
 
-	private ArrayList<BackUpJobInformation> jobInfosList ;
+	private List<BackUpJobInformation> jobInfosList ;
 	
 	public BackUpJobInfoTableModel() {
 		super() ;

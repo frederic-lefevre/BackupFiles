@@ -1,6 +1,7 @@
 package org.fl.backupFiles.gui;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JTable;
@@ -46,10 +47,10 @@ public class BackUpJTable extends JTable {
 	}
 	
 	// Get the list of selected BackUpItem
-	public ArrayList<BackUpItem> getSelectedBackUpItems() {
+	public List<BackUpItem> getSelectedBackUpItems() {
 		
 		int[] rowIdxs = getSelectedRows() ;
-		ArrayList<BackUpItem> res = new ArrayList<BackUpItem>() ;
+		List<BackUpItem> res = new ArrayList<BackUpItem>() ;
 		for (int idx : rowIdxs) {
 			res.add(((BackUpTableModel)getModel()).getBackUpItemAt(convertRowIndexToModel(idx))) ;
 		}

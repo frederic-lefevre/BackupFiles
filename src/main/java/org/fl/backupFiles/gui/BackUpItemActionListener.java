@@ -6,8 +6,9 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
@@ -25,7 +26,7 @@ public class BackUpItemActionListener implements java.awt.event.ActionListener {
 	
 	public enum CustomAction { Compare, ShowParentDir } ;
 	
-	private static HashMap<CustomAction, String> customActionCommands ;
+	private static Map<CustomAction, String> customActionCommands ;
 	
 	private BackUpJTable   backUpJTable ;
 	private Desktop.Action action ;
@@ -64,7 +65,7 @@ public class BackUpItemActionListener implements java.awt.event.ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 		
-		ArrayList<BackUpItem> selectedEntries = backUpJTable.getSelectedBackUpItems() ;
+		List<BackUpItem> selectedEntries = backUpJTable.getSelectedBackUpItems() ;
 		
 		if (action != null) {
 			// OS command (Java Desktop class OS action on File object: Edit, Open, Print)
