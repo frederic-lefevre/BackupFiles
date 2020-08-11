@@ -44,7 +44,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 	private final JobsChoice	jobsChoice ;
 	private final JobTaskType 	jobTaskType ;
 	
-	private ArrayList<Path> filesVisitFailed ;
+	private List<Path> filesVisitFailed ;
 	
 	private final long 	refreshRate ;
 	private final BackUpCounters backUpCounters ;

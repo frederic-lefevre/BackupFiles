@@ -8,6 +8,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +27,7 @@ public class BackUpScannerThread {
 
 	private boolean stopAsked ;
 
-	private ArrayList<Path> filesVisitFailed ;
+	private List<Path> filesVisitFailed ;
 	
 	private BackUpItemList 	backUpItemList ;
 	
