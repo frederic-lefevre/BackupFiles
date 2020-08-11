@@ -24,22 +24,23 @@ public class UiControl extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
-	private JButton scanButton ;
-	private JButton bckpUpButton ;
-	private JButton stopButton ;
+	private final Logger  bLog ;
+	private final JButton scanButton ;
+	private final JButton bckpUpButton ;
+	private final JButton stopButton ;
 
-	private JCheckBox compareContentSelect ;
+	private final JCheckBox compareContentSelect ;
 	
 	private boolean isRunning ;
 	private boolean stopAsked ;
-	private Logger 	bLog ;
 	
-	private ProgressInformationPanel progressPanel;
-	private JobsChoice				 jobsChoice ;
-	private JobTaskType 			 jobTaskType ;
+	private final ProgressInformationPanel progressPanel;
+	private final JobTaskType 			   jobTaskType ;
 	
-	private BackUpTableModel backUpTableModel  ;
-	private BackUpJobInfoTableModel backUpJobInfoTableModel ;
+	private JobsChoice				 	   jobsChoice ;
+	
+	private final BackUpTableModel 		  backUpTableModel  ;
+	private final BackUpJobInfoTableModel backUpJobInfoTableModel ;
 	
 	public boolean isRunning() {
 		return isRunning;
