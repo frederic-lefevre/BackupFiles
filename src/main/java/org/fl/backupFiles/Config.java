@@ -3,6 +3,7 @@ package org.fl.backupFiles;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -24,7 +25,7 @@ public class Config {
 	private static int  		   			maxDepth ;
 	private static ExecutorService 			scanExecutorService ;
 	private static ScheduledExecutorService scheduler ;
-	private static ArrayList<OsAction>  	osActions ;
+	private static List<OsAction>  			osActions ;
 	private static DirectoryPermanence  	directoryPermanence ;
 
 	public static void initConfig(AdvancedProperties backupProperty, Logger cLog) {
@@ -45,7 +46,7 @@ public class Config {
 		
 		osActions = new ArrayList<OsAction>() ;
 		String osCmdPropBase = "backupFiles.command." ;
-		ArrayList<String> osActionProperties = backupProperty.getKeysElements("backupFiles.command.") ;
+		List<String> osActionProperties = backupProperty.getKeysElements("backupFiles.command.") ;
 		for (String prop : osActionProperties) {
 			String title = backupProperty.getProperty(osCmdPropBase + prop + ".title") ;
 			String cmd	 = backupProperty.getProperty(osCmdPropBase + prop + ".cmd") ;
@@ -90,7 +91,7 @@ public class Config {
 		return scheduler;
 	}
 
-	public static ArrayList<OsAction> getOsActions() {
+	public static List<OsAction> getOsActions() {
 		return osActions;
 	}
 

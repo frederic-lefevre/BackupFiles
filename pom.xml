@@ -4,14 +4,14 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.fl.backupFiles</groupId>
 	<artifactId>BackupFiles</artifactId>
-	<version>1.21.3</version>
+	<version>1.21.4</version>
 	<name>BackupFiles</name>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.fl.FlUtils</groupId>
 			<artifactId>FlUtils</artifactId>
-			<version>1.9.0</version>
+			<version>1.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
