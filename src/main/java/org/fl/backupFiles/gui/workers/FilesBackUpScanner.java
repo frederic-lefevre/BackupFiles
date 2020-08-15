@@ -130,7 +130,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 			jobProgress.append(HTML_BEGIN) ;
 			for (BackUpScannerTask oneResult : results) {
 				
-				if ((oneResult.getFutureResponse().isDone()) && (! oneResult.isResultRecorded())) {
+				if ((! oneResult.isResultRecorded()) && (oneResult.getFutureResponse().isDone())) {
 					// one backUpTask has finished																			
 					// publish task result
 					try {
