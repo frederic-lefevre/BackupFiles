@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -86,18 +84,15 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		try {
 			if (backUpTasks != null) {
 				
-				ExecutorService 		 scannerExecutor = Config.getScanExecutorService() ;
-				ScheduledExecutorService scheduler 		 = Config.getScheduler();
-	
 				// Launch scanner tasks
 				List<BackUpScannerTask> results = backUpTasks.stream()
 					.map(backupTask ->  new BackUpScannerThread(backupTask, pLog))
-					.map(backUpScannerThread -> new BackUpScannerTask(backUpScannerThread, CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor)))
+					.map(backUpScannerThread -> new BackUpScannerTask(backUpScannerThread, CompletableFuture.supplyAsync(backUpScannerThread::scan, Config.getScanExecutorService())))
 					.collect(Collectors.toList());
 
 				// Report scanner task progress
 				ScannerProgress scannerProgress = new ScannerProgress(results) ;
-				ScheduledFuture<?> progressRecordTask = scheduler.scheduleAtFixedRate(scannerProgress::getProgress, 0, refreshRate, TimeUnit.MILLISECONDS);
+				ScheduledFuture<?> progressRecordTask = Config.getScheduler().scheduleAtFixedRate(scannerProgress::getProgress, 0, refreshRate, TimeUnit.MILLISECONDS);
 
 				// Wait scanner tasks completion
 				scannerThreadResponse = results.stream().map(r -> r.getFutureResponse()).map(CompletableFuture::join).collect(Collectors.toList());
