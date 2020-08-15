@@ -1,6 +1,7 @@
 package org.fl.backupFiles;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import com.ibm.lge.fl.util.AdvancedProperties;
 
 public class Config {
 
+	private static Path 		   			configFileDir;
 	private static long 		   			scanRefreshRate ;
 	private static long 		   			backUpMaxRefreshInterval ;
 	private static int  		   			backUpRefreshRate ;
@@ -30,6 +32,7 @@ public class Config {
 
 	public static void initConfig(AdvancedProperties backupProperty, Logger cLog) {
 		
+		configFileDir 				  = backupProperty.getPathFromURI("backupFiles.configFileDir") ;
 		scanRefreshRate   		 	  = backupProperty.getLong("backupFiles.scan.refreshRate", 		     2000) ;
 		backUpMaxRefreshInterval	  = backupProperty.getLong("backupFiles.backUp.maxRefreshInterval",  3000) ;
 		backUpRefreshRate 		 	  = backupProperty.getInt( "backupFiles.backUp.refreshRate",  		    1) ;
@@ -67,36 +70,14 @@ public class Config {
 		directoryPermanence = new DirectoryPermanenceMap(permanenceConf, cLog) ;
 	}
 
-	public static long getScanRefreshRate() {
-		return scanRefreshRate;
-	}
-
-	public static long getBackUpMaxRefreshInterval() {
-		return backUpMaxRefreshInterval;
-	}
-
-	public static int getBackUpRefreshRate() {
-		return backUpRefreshRate;
-	}
-
-	public static int getMaxDepth() {
-		return maxDepth;
-	}
-
-	public static ExecutorService getScanExecutorService() {
-		return scanExecutorService;
-	}
-
-	public static ScheduledExecutorService getScheduler() {
-		return scheduler;
-	}
-
-	public static List<OsAction> getOsActions() {
-		return osActions;
-	}
-
-	public static DirectoryPermanence getDirectoryPermanence() {
-		return directoryPermanence;
-	}
+	public static Path 					   getConfigFileDir() 			 { return configFileDir;			}
+	public static long 					   getScanRefreshRate() 		 { return scanRefreshRate;			}
+	public static long 					   getBackUpMaxRefreshInterval() { return backUpMaxRefreshInterval;	}
+	public static int 					   getBackUpRefreshRate() 		 { return backUpRefreshRate;		}
+	public static int 					   getMaxDepth() 				 { return maxDepth;					}
+	public static ExecutorService 		   getScanExecutorService() 	 { return scanExecutorService;		}
+	public static ScheduledExecutorService getScheduler()				 { return scheduler;		   		}
+	public static List<OsAction> 	  	   getOsActions() 		   		 { return osActions;		   		}
+	public static DirectoryPermanence 	   getDirectoryPermanence() 	 { return directoryPermanence; 		}
 
 }

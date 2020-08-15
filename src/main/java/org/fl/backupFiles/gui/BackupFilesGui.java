@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
@@ -33,39 +34,37 @@ public class BackupFilesGui  extends JFrame {
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
+
 				try {
-					BackupFilesGui window = new BackupFilesGui(DEFAULT_PROP_FILE);
-					window.setVisible(true);
+					// Get context, properties, logger
+					RunningContext runningContext = new RunningContext("BackupFiles", null, new URI(DEFAULT_PROP_FILE));
+					Logger bLog = runningContext.getpLog() ;
+					AdvancedProperties backupProperty = runningContext.getProps() ;
+					
+					// Init config
+					Config.initConfig(backupProperty, bLog) ;
+					
+					try {
+						BackupFilesGui window = new BackupFilesGui(runningContext, bLog);
+						window.setVisible(true);
+					} catch (Exception e) {
+						bLog.log(Level.SEVERE, "Exception in main", e);
+					}
+					
 				} catch (Exception e) {
-					e.printStackTrace();
-				}
+					System.out.println("Exception caught in Main (see default prop file processing)") ;
+					e.printStackTrace() ;
+				}				
 			}
 		});
 	}
 	
 	private Logger bLog ;
 	
-	public BackupFilesGui(String propertiesUri) {
+	public BackupFilesGui(RunningContext runningContext, Logger l) {
 
-		RunningContext runningContext = null ;
-		Path 		   configFileDir  = null ;
-		try {
-			// Get context, properties, logger
-			runningContext = new RunningContext("BackupFiles", null, new URI(propertiesUri));
-			bLog = runningContext.getpLog() ;
-			AdvancedProperties backupProperty = runningContext.getProps() ;
-			
-			// Get the different config files
-			configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir") ;
-			
-			// Init config
-			Config.initConfig(backupProperty, bLog) ;
-			
-		} catch (Exception e) {
-			System.out.println("Exception caught in Main (see default prop file processing)") ;
-			e.printStackTrace() ;
-		}
-		
+		Path configFileDir = Config.getConfigFileDir() ;
+		bLog = l ;
 		if ((runningContext != null) && (configFileDir != null)) {
 		// Display GUI
 			
