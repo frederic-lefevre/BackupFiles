@@ -7,6 +7,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -108,29 +109,35 @@ public class BackupFilesGui  extends JFrame {
         @Override
         public void windowClosing(WindowEvent e)
         {
-        	ExecutorService backUpExecutor = Config.getScanExecutorService() ;
-        	
-        	backUpExecutor.shutdown();
-        	
-        	try {
+        	terminateExecutor(Config.getScanExecutorService(), "executor for scan") ;
+        	terminateExecutor(Config.getScheduler(), "scheduled executor for information refresh");
+        }
+        
+        private void terminateExecutor(ExecutorService execSvc, String executorType) {
+
+    		execSvc.shutdown();
+    		try {
     			// Wait a while for existing tasks to terminate
-        		
-        		if (! backUpExecutor.awaitTermination(5,TimeUnit.SECONDS)) {
+    			if (! execSvc.awaitTermination(10, TimeUnit.SECONDS)) {
     				// Cancel currently executing tasks
-        			backUpExecutor.shutdownNow() ;
-        		} else {
-        			bLog.fine("shutdown normal") ;
+    				execSvc.shutdownNow();
+    				bLog.fine("shutdown NOW " + executorType) ;
+    			} else {
+        			bLog.fine("shutdown normal " + executorType) ;
         		}
-        		if (! backUpExecutor.awaitTermination(5,TimeUnit.SECONDS)) {
-        			bLog.severe("ExecutorService not able to shutdown");
-        		}
+    			
+    			if (! execSvc.awaitTermination(5, TimeUnit.SECONDS)) {
+    				bLog.severe(executorType + " not terminated " + execSvc.isTerminated());
+    			} else {
+    				bLog.fine("shutdown ok " + executorType) ;
+    			}
     		} catch (InterruptedException ie) {
     			// (Re-)Cancel if current thread also interrupted
-    			backUpExecutor.shutdownNow();
-
+    			bLog.warning("Interrupted exception during threads shutdown " + executorType) ;
+    			execSvc.shutdownNow();
     			// Preserve interrupt status
     			Thread.currentThread().interrupt();
     		}
-        }
+    	}
 	}
 }
