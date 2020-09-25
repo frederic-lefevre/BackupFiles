@@ -121,27 +121,35 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 		public void getProgress() {
 
-			jobProgress.setLength(0) ;
-			jobProgress.append(HTML_BEGIN) ;
-			for (BackUpScannerTask oneResult : results) {
-				
-				if ((! oneResult.isResultRecorded()) && (oneResult.getFutureResponse().isDone())) {
-					// one backUpTask has finished																			
-					// publish task result
-					try {
-						publish(new BackupScannerInformation(null, oneResult.getFutureResponse().get())) ;
-						oneResult.setResultRecorded(true) ;
-					} catch (InterruptedException | ExecutionException e) {
-						pLog.log(Level.SEVERE, "Exception getting task results", e) ;
+			if (results != null) {
+				jobProgress.setLength(0) ;
+				jobProgress.append(HTML_BEGIN) ;
+				for (BackUpScannerTask oneResult : results) {
+					
+					if ((oneResult != null) 					&&
+						(! oneResult.isResultRecorded()) 		&&
+						(oneResult.getFutureResponse() != null) &&
+						(oneResult.getFutureResponse().isDone())) {
+						// one backUpTask has finished																			
+						// publish task result
+						try {
+							publish(new BackupScannerInformation(null, oneResult.getFutureResponse().get())) ;
+							oneResult.setResultRecorded(true) ;
+						} catch (InterruptedException | ExecutionException e) {
+							pLog.log(Level.SEVERE, "Exception getting task results", e) ;
+						}
+					
+						if (oneResult.getBackUpScannerThread() != null) {
+							oneResult.getBackUpScannerThread().stopAsked(uiControl.isStopAsked());
+							jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus()).append("<br/>") ;
+						}
 					}
 				}
-				oneResult.getBackUpScannerThread().stopAsked(uiControl.isStopAsked());
-				jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus()).append("<br/>") ;
+				jobProgress.append(HTML_END) ;
+				
+				// Refresh progress information
+				publish(new BackupScannerInformation(jobProgress.toString(), null)) ;
 			}
-			jobProgress.append(HTML_END) ;
-			
-			// Refresh progress information
-			publish(new BackupScannerInformation(jobProgress.toString(), null)) ;
 		}
 	}
 	
