@@ -110,8 +110,8 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 	
 	private class ScannerProgress {
 	
-		private StringBuilder jobProgress ;
-		private List<BackUpScannerTask> results ;	
+		private final StringBuilder jobProgress ;
+		private final List<BackUpScannerTask> results ;	
 		
 		public ScannerProgress(List<BackUpScannerTask> results) {
 			super();
@@ -122,26 +122,31 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		public void getProgress() {
 
 			if (results != null) {
+				
 				jobProgress.setLength(0) ;
 				jobProgress.append(HTML_BEGIN) ;
 				for (BackUpScannerTask oneResult : results) {
 					
-					if ((oneResult != null) 					&&
-						(! oneResult.isResultRecorded()) 		&&
-						(oneResult.getFutureResponse() != null) &&
-						(oneResult.getFutureResponse().isDone())) {
+					if ((oneResult != null) && (! oneResult.isResultRecorded())) {
+						
+						CompletableFuture<ScannerThreadResponse> futureResponse = oneResult.getFutureResponse();
+						if ((futureResponse != null) && (futureResponse.isDone())) {
 						// one backUpTask has finished																			
 						// publish task result
-						try {
-							publish(new BackupScannerInformation(null, oneResult.getFutureResponse().get())) ;
-							oneResult.setResultRecorded(true) ;
-						} catch (InterruptedException | ExecutionException e) {
-							pLog.log(Level.SEVERE, "Exception getting task results", e) ;
+							try {
+								publish(new BackupScannerInformation(null, futureResponse.get())) ;
+								oneResult.setResultRecorded(true) ;
+							} catch (InterruptedException | ExecutionException e) {
+								pLog.log(Level.SEVERE, "Exception getting task results", e) ;
+							}	
 						}
-					
-						if (oneResult.getBackUpScannerThread() != null) {
-							oneResult.getBackUpScannerThread().stopAsked(uiControl.isStopAsked());
-							jobProgress.append(oneResult.getBackUpScannerThread().getCurrentStatus()).append("<br/>") ;
+						
+						BackUpScannerThread backupScannerThread = oneResult.getBackUpScannerThread() ;
+						if (backupScannerThread != null) {
+							backupScannerThread.stopAsked(uiControl.isStopAsked());
+							
+							// publish intermediate result of the scanner thread
+							jobProgress.append(backupScannerThread.getCurrentStatus()).append("<br/>") ;
 						}
 					}
 				}
