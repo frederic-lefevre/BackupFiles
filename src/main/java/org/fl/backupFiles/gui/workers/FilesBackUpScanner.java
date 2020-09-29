@@ -127,18 +127,20 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				jobProgress.append(HTML_BEGIN) ;
 				for (BackUpScannerTask oneResult : results) {
 					
-					if ((oneResult != null) && (! oneResult.isResultRecorded())) {
+					if (oneResult != null) {
 						
-						CompletableFuture<ScannerThreadResponse> futureResponse = oneResult.getFutureResponse();
-						if ((futureResponse != null) && (futureResponse.isDone())) {
-						// one backUpTask has finished																			
-						// publish task result
-							try {
-								publish(new BackupScannerInformation(null, futureResponse.get())) ;
-								oneResult.setResultRecorded(true) ;
-							} catch (InterruptedException | ExecutionException e) {
-								pLog.log(Level.SEVERE, "Exception getting task results", e) ;
-							}	
+						if (! oneResult.isResultRecorded()) {
+							CompletableFuture<ScannerThreadResponse> futureResponse = oneResult.getFutureResponse();
+							if ((futureResponse != null) && (futureResponse.isDone())) {
+							// one backUpTask has finished																			
+							// publish task result
+								try {
+									publish(new BackupScannerInformation(null, futureResponse.get())) ;
+									oneResult.setResultRecorded(true) ;
+								} catch (InterruptedException | ExecutionException e) {
+									pLog.log(Level.SEVERE, "Exception getting task results", e) ;
+								}	
+							}
 						}
 						
 						BackUpScannerThread backupScannerThread = oneResult.getBackUpScannerThread() ;
