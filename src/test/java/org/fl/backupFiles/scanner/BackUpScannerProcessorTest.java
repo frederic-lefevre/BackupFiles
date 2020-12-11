@@ -33,7 +33,7 @@ class BackUpScannerProcessorTest {
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles.properties";
 	
 	private final static String SOURCE_DATA_DIR1 = "file:///C:/FredericPersonnel/tmp" ;
-	private final static String SOURCE_DATA_DIR2 = "file:///C:/FredericPersonnel/sports" ;
+	private final static String SOURCE_DATA_DIR2 = "file:///C:/FredericPersonnel/Loisirs/sports" ;
 	
 	private final static String BUFFER_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer/" ;
 	private final static String BUFFER_DATA_DIR1 = BUFFER_DATA_DIR + "dir1/" ;
