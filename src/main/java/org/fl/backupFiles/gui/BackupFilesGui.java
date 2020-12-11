@@ -24,7 +24,7 @@ import com.ibm.lge.fl.util.swing.ApplicationTabbedPane;
 // Main class for the back up files application
 public class BackupFilesGui  extends JFrame {
 
-	private static final String DEFAULT_PROP_FILE = "file:///FredericPersonnel/PortableApps/BackUpFiles/backupFiles.properties";
+	private static final String DEFAULT_PROP_FILE = "file:///FredericPersonnel/Program/PortableApps/BackUpFiles/backupFiles.properties";
 
 	private static final long serialVersionUID = -2691160306708075667L;
 
