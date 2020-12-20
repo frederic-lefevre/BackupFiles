@@ -74,7 +74,7 @@ class BackUpScannerProcessorTest {
 	}
 	
 	@Test
-	void test() {
+	void nominalTest() {
 		
 		try {
 								
@@ -138,6 +138,48 @@ class BackUpScannerProcessorTest {
 			FilesUtils.deleteDirectoryTree(tgt, false, log) ;
 			Files.createDirectory(tgt) ;
 			
+		} catch (Exception e) {
+			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
+			fail("Exception " + e.getMessage());
+		}	
+	}
+	
+	@Test
+	void scanWithUnexistingTargetDir() {
+		
+		try {
+								
+			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
+			
+			Path src  = TestUtils.getPathFromUriString(BUFFER_DATA_DIR) ;
+			Path tgt  = TestUtils.getPathFromUriString(TARGET_DATA_DIR  + "doesNotExists/") ;
+			
+			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
+			
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
+			
+			ScannerThreadResponse scannerResp = backUpRes.get() ;
+			BackUpCounters backUpCounters = scannerResp.getBackUpCounters() ;			
+			assertEquals(0, backUpCounters.ambiguousNb) ;
+			assertEquals(0, backUpCounters.contentDifferentNb) ;
+			assertEquals(0, backUpCounters.copyNewNb) ;
+			assertEquals(0, backUpCounters.copyReplaceNb) ;
+			assertEquals(1, backUpCounters.copyTreeNb) ;
+			assertEquals(0, backUpCounters.deleteDirNb) ;
+			assertEquals(0, backUpCounters.deleteNb) ;
+			assertEquals(0, backUpCounters.nbSourceFilesFailed) ;
+			assertEquals(1, backUpCounters.nbSourceFilesProcessed) ;
+			assertEquals(0, backUpCounters.nbTargetFilesFailed) ;
+			assertEquals(0, backUpCounters.nbTargetFilesProcessed) ;
+			
+			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
+			assertNotNull(backUpItemList) ;
+			assertEquals(1, backUpItemList.size()) ;
+			BackUpItem backUpItem = backUpItemList.get(0) ;
+			assertNotNull(backUpItem) ;
+			assertEquals(BackUpItem.BackupAction.COPY_TREE, backUpItem.getBackupAction()) ;
+
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
 			fail("Exception " + e.getMessage());
@@ -257,7 +299,48 @@ class BackUpScannerProcessorTest {
 	}
 	
 	@Test
-	void testSingleFileUnexistingSourceAndTarget() {
+	void testTargetDirectoryAndUnexistingSource() {
+		
+		try {
+			
+			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
+			
+			final String SRC_FILE1 =  BUFFER_DATA_DIR + "doesNotExists" ;
+			final String TGT_FILE1 =  TARGET_DATA_DIR + "targetDir/" ;
+			
+			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
+			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
+
+			Files.createDirectory(tgt) ;
+			
+			assertFalse(Files.exists(src)) ;
+			assertTrue(Files.exists(tgt)) ;
+			assertTrue(Files.isDirectory(tgt)) ;
+			
+			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
+			
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
+		
+			ScannerThreadResponse scannerResp = backUpRes.get() ;
+			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
+			assertNotNull(backUpItemList) ;
+			assertEquals(1, backUpItemList.size()) ;
+			BackUpItem backUpItem = backUpItemList.get(0) ;
+			assertNotNull(backUpItem) ;
+			assertEquals(BackUpItem.BackupAction.DELETE_DIR, backUpItem.getBackupAction()) ;
+			
+			Files.delete(tgt) ;
+			assertFalse(Files.exists(tgt)) ;
+
+		} catch (Exception e) {
+			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
+			fail("Exception " + e.getMessage());
+		}	
+	}
+	
+	@Test
+	void testUnexistingSourceAndTarget() {
 		
 		try {
 			
