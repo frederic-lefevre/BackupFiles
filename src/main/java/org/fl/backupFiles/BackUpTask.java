@@ -18,7 +18,7 @@ public class BackUpTask {
 	private final static String warning3  = "  Attention : le chemin cible n'existe pas" ;
 	private final static String noWarning = "" ;
 	
-	// A back up task is a source directory to back up to a destination directory
+	// A back up task is a source directory or file to back up to a destination directory or file
 	public BackUpTask(Path src, Path tgt, Logger l) {
 		
 		source = src ;
