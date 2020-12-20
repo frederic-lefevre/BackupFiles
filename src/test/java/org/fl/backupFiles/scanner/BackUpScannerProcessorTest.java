@@ -151,8 +151,8 @@ class BackUpScannerProcessorTest {
 			
 			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
 			
-			final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Buffer/singleFile" ;
-			final String TGT_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Target/singleFile" ;
+			final String SRC_FILE1 =  BUFFER_DATA_DIR + "singleFile" ;
+			final String TGT_FILE1 =  TARGET_DATA_DIR + "singleFile" ;
 			
 			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
 			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
@@ -189,8 +189,8 @@ class BackUpScannerProcessorTest {
 			
 			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
 			
-			final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Buffer/singleFile" ;
-			final String TGT_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Target/doesNotExists" ;
+			final String SRC_FILE1 =  BUFFER_DATA_DIR + "singleFile" ;
+			final String TGT_FILE1 =  TARGET_DATA_DIR + "doesNotExists" ;
 			
 			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
 			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
@@ -220,14 +220,51 @@ class BackUpScannerProcessorTest {
 	}
 	
 	@Test
+	void testSingleFileUnexistingSource() {
+		
+		try {
+			
+			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
+			
+			final String SRC_FILE1 =  BUFFER_DATA_DIR + "doesNotExists" ;
+			final String TGT_FILE1 =  TARGET_DATA_DIR + "singleFile" ;
+			
+			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
+			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
+
+			Files.write(tgt, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne"))) ;
+			
+			assertFalse(Files.exists(src)) ;
+			assertTrue(Files.exists(tgt)) ;
+			
+			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
+			
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
+		
+			ScannerThreadResponse scannerResp = backUpRes.get() ;
+			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
+			assertNotNull(backUpItemList) ;
+			assertEquals(1, backUpItemList.size()) ;
+			BackUpItem backUpItem = backUpItemList.get(0) ;
+			assertNotNull(backUpItem) ;
+			assertEquals(BackUpItem.BackupAction.DELETE, backUpItem.getBackupAction()) ;
+
+		} catch (Exception e) {
+			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
+			fail("Exception " + e.getMessage());
+		}	
+	}
+	
+	@Test
 	void testSingleFileUnexistingSourceAndTarget() {
 		
 		try {
 			
 			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
 			
-			final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Buffer/doesNotExists" ;
-			final String TGT_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Target/doesNotExists" ;
+			final String SRC_FILE1 =  BUFFER_DATA_DIR + "doesNotExists" ;
+			final String TGT_FILE1 =  TARGET_DATA_DIR + "doesNotExists" ;
 			
 			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
 			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;

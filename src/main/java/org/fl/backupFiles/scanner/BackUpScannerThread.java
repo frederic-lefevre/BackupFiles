@@ -93,11 +93,7 @@ public class BackUpScannerThread {
 		backUpItemList = new BackUpItemList();
 		
 		try {
-			if (! Files.exists(sourcePath)) {
-				String warning = "Source path does not exist: " + sourcePath ;
-				status = status + "| " + warning ;
-				pLog.warning(warning) ;
-			} else if (Files.isDirectory(sourcePath)) {
+			if ((Files.exists(sourcePath)) && (Files.isDirectory(sourcePath))) {
 				currDepth = 0 ;
 				directoryCompare(sourcePath, targetPath, compareContent) ;
 			} else {
@@ -330,27 +326,44 @@ public class BackUpScannerThread {
 		}		
 	}
 	
-	// This method is only called if the top level source path is a file
+	// This method is only called if the top level source path is not a directory (so is a file or does not exists)
 	private void topLevelFileCompare(Path srcPath, Path tgtPath, boolean compareContent) {
 
 		try {
-			BasicFileAttributes sourceAttributes = Files.readAttributes(srcPath, BasicFileAttributes.class);
 			
-			if (Files.exists(tgtPath)) {
-				BasicFileAttributes targetAttributes = Files.readAttributes(tgtPath, BasicFileAttributes.class);
-				if (targetAttributes.isDirectory()) {
-					// source is a file but target is a directory : delete target dir, copy source file 
-					pLog.warning("Source " + srcPath + " is a file\n" + "but target is a directory " + tgtPath);
-					long sizeDiff = FilesUtils.folderSize(tgtPath, pLog) ;
-					backUpItemList.add(new BackUpItem(null, tgtPath, srcPath, BackupAction.DELETE_DIR, sizeDiff, backUpCounters, pLog)) ;
+			if (Files.exists(srcPath)) {
+				BasicFileAttributes sourceAttributes = Files.readAttributes(srcPath, BasicFileAttributes.class);
+				
+				if (Files.exists(tgtPath)) {
+					BasicFileAttributes targetAttributes = Files.readAttributes(tgtPath, BasicFileAttributes.class);
+					if (targetAttributes.isDirectory()) {
+						// source is a file but target is a directory : delete target dir, copy source file 
+						pLog.warning("Source " + srcPath + " is a file\n" + "but target is a directory " + tgtPath);
+						long sizeDiff = 0 - FilesUtils.folderSize(tgtPath, pLog) ;
+						backUpItemList.add(new BackUpItem(null, tgtPath, srcPath, BackupAction.DELETE_DIR, sizeDiff, backUpCounters, pLog)) ;
+						BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, sourceAttributes.size(), backUpCounters, pLog) ;
+						backUpItemList.add(copyNewItem) ;
+					}  else {
+						compareFile(srcPath, tgtPath, sourceAttributes, targetAttributes) ;
+					}
+				} else {
 					BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, sourceAttributes.size(), backUpCounters, pLog) ;
 					backUpItemList.add(copyNewItem) ;
-				}  else {
-					compareFile(srcPath, tgtPath, sourceAttributes, targetAttributes) ;
 				}
 			} else {
-				BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, sourceAttributes.size(), backUpCounters, pLog) ;
-				backUpItemList.add(copyNewItem) ;
+				// Source path does not exist : delete target
+				pLog.warning("Source path does not exist: " + srcPath) ;
+				if (Files.exists(tgtPath)) {
+					BasicFileAttributes targetAttributes = Files.readAttributes(tgtPath, BasicFileAttributes.class);
+					if (targetAttributes.isDirectory()) {
+						long sizeDiff = 0 - FilesUtils.folderSize(tgtPath, pLog) ;
+						backUpItemList.add(new BackUpItem(null, tgtPath, srcPath, BackupAction.DELETE_DIR, sizeDiff, backUpCounters, pLog)) ;
+					}  else {
+						long sizeDiff = 0 - targetAttributes.size() ;
+						BackUpItem deleteItem = new BackUpItem(null, tgtPath, srcPath, BackupAction.DELETE, sizeDiff, backUpCounters, pLog) ;
+						backUpItemList.add(deleteItem) ;
+					}
+				} 
 			}
 		} catch (Exception e) {
 			filesVisitFailed.add(tgtPath) ;
