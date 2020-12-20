@@ -1,6 +1,7 @@
 package org.fl.backupFiles;
 
 import java.net.URI;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.fl.backupFiles.scanner.PathPairBasicAttributes;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -99,19 +102,35 @@ public class BackUpJob {
 
 			boolean scanInParallel = getParallelScanElement(jObjItem, PARALLEL_SCAN) ;
 
-			if ((srcPath != null) && (bufPath != null)) {
-				if (Files.isRegularFile(srcPath)) {
-					Path bufFile = bufPath.resolve(srcPath.getFileName()) ;
-					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile, bLog)) ;
-				} else {
-					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath, bLog)) ;
-				}
+			addBackUpTask(srcPath, bufPath, tgtPath) ;
+		}
+	}
+	
+	private void addParallelBackUpTasks(Path srcPath, Path bufPath, Path tgtPath) {
+		
+		 try (DirectoryStream<Path> sourceFileStream = Files.newDirectoryStream(srcPath)) {
+			 
+			 for (Path sourceFile : sourceFileStream) {				 
+				 
+			 }
+		 } catch (Exception e) {
+			bLog.log(Level.SEVERE, "Exception when scanning directory to create parallel scan " + srcPath, e);
+		}
+	}
+	
+	private void addBackUpTask(Path srcPath, Path bufPath, Path tgtPath) {
+		if ((srcPath != null) && (bufPath != null)) {
+			if (Files.isRegularFile(srcPath)) {
+				Path bufFile = bufPath.resolve(srcPath.getFileName()) ;
+				backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile, bLog)) ;
 			} else {
-				bLog.warning("No source / buffer element definition for back up job " + title);
+				backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath, bLog)) ;
 			}
-			if ((tgtPath != null) && (bufPath != null)) {
-				backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath, bLog)) ;
-			}
+		} else {
+			bLog.warning("No source / buffer element definition for back up job " + title);
+		}
+		if ((tgtPath != null) && (bufPath != null)) {
+			backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath, bLog)) ;
 		}
 	}
 	
