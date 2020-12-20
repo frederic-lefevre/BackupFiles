@@ -336,20 +336,21 @@ public class BackUpScannerThread {
 		try {
 			BasicFileAttributes sourceAttributes = Files.readAttributes(srcPath, BasicFileAttributes.class);
 			
-			if (! Files.exists(tgtPath)) {
-				Files.createFile(tgtPath) ;
-			}
-			BasicFileAttributes targetAttributes = Files.readAttributes(tgtPath, BasicFileAttributes.class);
-			
-			if (targetAttributes.isDirectory()) {
-				// source is a file but target is a directory : delete target dir, copy source file 
-				pLog.warning("Source " + srcPath + " is a file\n" + "but target is a directory " + tgtPath);
-				long sizeDiff = FilesUtils.folderSize(tgtPath, pLog) ;
-				backUpItemList.add(new BackUpItem(null, tgtPath, srcPath, BackupAction.DELETE_DIR, sizeDiff, backUpCounters, pLog)) ;
+			if (Files.exists(tgtPath)) {
+				BasicFileAttributes targetAttributes = Files.readAttributes(tgtPath, BasicFileAttributes.class);
+				if (targetAttributes.isDirectory()) {
+					// source is a file but target is a directory : delete target dir, copy source file 
+					pLog.warning("Source " + srcPath + " is a file\n" + "but target is a directory " + tgtPath);
+					long sizeDiff = FilesUtils.folderSize(tgtPath, pLog) ;
+					backUpItemList.add(new BackUpItem(null, tgtPath, srcPath, BackupAction.DELETE_DIR, sizeDiff, backUpCounters, pLog)) ;
+					BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, sourceAttributes.size(), backUpCounters, pLog) ;
+					backUpItemList.add(copyNewItem) ;
+				}  else {
+					compareFile(srcPath, tgtPath, sourceAttributes, targetAttributes) ;
+				}
+			} else {
 				BackUpItem copyNewItem = new BackUpItem(srcPath, tgtPath, srcPath, BackupAction.COPY_NEW, sourceAttributes.size(), backUpCounters, pLog) ;
 				backUpItemList.add(copyNewItem) ;
-			}  else {
-				compareFile(srcPath, tgtPath, sourceAttributes, targetAttributes) ;
 			}
 		} catch (Exception e) {
 			filesVisitFailed.add(tgtPath) ;

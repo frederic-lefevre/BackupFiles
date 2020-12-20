@@ -145,6 +145,44 @@ class BackUpScannerProcessorTest {
 	}
 	
 	@Test
+	void testSingleFile() {
+		
+		try {
+			
+			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
+			
+			final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Buffer/singleFile" ;
+			final String TGT_FILE1 =  "file:///ForTests/BackUpFiles/FP_Test_Target/singleFile" ;
+			
+			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
+			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
+
+			Files.write(src, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne"))) ;
+			Files.write(tgt, new ArrayList<String>(Arrays.asList("autre chose sur une ligne"))) ;
+			
+			assertTrue(Files.exists(src)) ;
+			assertTrue(Files.exists(tgt)) ;
+			
+			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
+			
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
+		
+			ScannerThreadResponse scannerResp = backUpRes.get() ;
+			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
+			assertNotNull(backUpItemList) ;
+			assertEquals(1, backUpItemList.size()) ;
+			BackUpItem backUpItem = backUpItemList.get(0) ;
+			assertNotNull(backUpItem) ;
+			assertEquals(BackUpItem.BackupAction.COPY_REPLACE, backUpItem.getBackupAction()) ;
+
+		} catch (Exception e) {
+			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
+			fail("Exception " + e.getMessage());
+		}	
+	}
+	
+	@Test
 	void testSingleFileUnexistingTarget() {
 		
 		try {
@@ -159,6 +197,9 @@ class BackUpScannerProcessorTest {
 
 			Files.write(src, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne"))) ;
 			
+			assertTrue(Files.exists(src)) ;
+			assertFalse(Files.exists(tgt)) ;
+			
 			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
@@ -167,6 +208,10 @@ class BackUpScannerProcessorTest {
 			ScannerThreadResponse scannerResp = backUpRes.get() ;
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
 			assertNotNull(backUpItemList) ;
+			assertEquals(1, backUpItemList.size()) ;
+			BackUpItem backUpItem = backUpItemList.get(0) ;
+			assertNotNull(backUpItem) ;
+			assertEquals(BackUpItem.BackupAction.COPY_NEW, backUpItem.getBackupAction()) ;
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
