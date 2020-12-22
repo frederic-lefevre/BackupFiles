@@ -191,19 +191,18 @@ class BackUpScannerProcessorTest {
 		
 		try {
 			
+			final String TGT_FILE1 =  TARGET_DATA_DIR + "singleFile" ;
+			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
+			Files.write(tgt, new ArrayList<String>(Arrays.asList("autre chose sur une ligne"))) ;
+			assertTrue(Files.exists(tgt)) ;
+			
 			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
 			
 			final String SRC_FILE1 =  BUFFER_DATA_DIR + "singleFile" ;
-			final String TGT_FILE1 =  TARGET_DATA_DIR + "singleFile" ;
-			
 			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
-			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
-
 			Files.write(src, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne"))) ;
-			Files.write(tgt, new ArrayList<String>(Arrays.asList("autre chose sur une ligne"))) ;
-			
 			assertTrue(Files.exists(src)) ;
-			assertTrue(Files.exists(tgt)) ;
+			
 			
 			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
 			
