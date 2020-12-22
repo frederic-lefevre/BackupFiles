@@ -357,10 +357,10 @@ public class BackUpScannerThread {
 					BasicFileAttributes targetAttributes = Files.readAttributes(tgtPath, BasicFileAttributes.class);
 					if (targetAttributes.isDirectory()) {
 						long sizeDiff = 0 - FilesUtils.folderSize(tgtPath, pLog) ;
-						backUpItemList.add(new BackUpItem(null, tgtPath, srcPath, BackupAction.DELETE_DIR, sizeDiff, backUpCounters, pLog)) ;
+						backUpItemList.add(new BackUpItem(null, tgtPath, srcPath.getParent(), BackupAction.DELETE_DIR, sizeDiff, backUpCounters, pLog)) ;
 					}  else {
 						long sizeDiff = 0 - targetAttributes.size() ;
-						BackUpItem deleteItem = new BackUpItem(null, tgtPath, srcPath, BackupAction.DELETE, sizeDiff, backUpCounters, pLog) ;
+						BackUpItem deleteItem = new BackUpItem(null, tgtPath, srcPath.getParent(), BackupAction.DELETE, sizeDiff, backUpCounters, pLog) ;
 						backUpItemList.add(deleteItem) ;
 					}
 				} 

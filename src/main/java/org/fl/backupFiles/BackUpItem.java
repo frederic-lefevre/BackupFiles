@@ -73,6 +73,8 @@ public class BackUpItem {
 			permanenceLevel		  = DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL ;
 		}
 		
+		checkPath(srcExisting, "Existing source path parameter is null or the path does not exist") ;
+		
 		// Update counters
 		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
 			backUpCounters.copyReplaceNb++ ;
@@ -90,6 +92,12 @@ public class BackUpItem {
 		updateLimtsCounters(backUpCounters) ;
 	}
 
+	private void checkPath(Path path, String exceptionMessage) {
+		if ((path == null) || (! Files.exists(path))) {
+			throw new IllegalBackUpItemException(exceptionMessage) ;
+		}
+	}
+	
 	private void updateLimtsCounters(BackUpCounters backUpCounters) {
 		backUpCounters.totalSizeDifference = backUpCounters.totalSizeDifference + sizeDifference ;
 		if (sizeDifference > fileSizeWarningThreshold) backUpCounters.backupWithSizeAboveThreshold++ ;

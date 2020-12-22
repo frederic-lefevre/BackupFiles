@@ -96,6 +96,34 @@ public class BackUpItemTest {
 		
 	}
 	
+	@Test
+	void nullSrcExistingShouldThrowException() {
+		
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf" ;
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf" ;
+		
+		Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
+		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
+		
+		BackUpCounters counters = new BackUpCounters() ;
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, null, BackupAction.COPY_NEW, 0, counters, log)) ;
+	}
+			
+	@Test
+	void unexistantSrcExistingShouldThrowException() {
+		
+		final String SRC_FILE1 		= "file:///ForTests/BackUpFiles/TestDir1/File1.pdf" ;
+		final String TGT_FILE1 		= "file:///ForTests/BackUpFiles/TestDir2/File1.pdf" ;
+		final String SRC_UNEXISTANT = "file:///ForTests/BackUpFiles/doesNotExists" ;
+		
+		Path src  			= TestUtils.getPathFromUriString(SRC_FILE1) ;
+		Path tgt  			= TestUtils.getPathFromUriString(TGT_FILE1) ;
+		Path src_unexistant = TestUtils.getPathFromUriString(SRC_UNEXISTANT) ;
+		
+		BackUpCounters counters = new BackUpCounters() ;
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, src_unexistant, BackupAction.COPY_NEW, 0, counters, log)) ;
+	}
+	
 	private long getTotalCounters(BackUpCounters counters) {
 		
 		return	counters.ambiguousNb			+
