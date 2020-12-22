@@ -44,9 +44,9 @@ public class BackUpJobTest {
 				"				\"buffer\" : \"file:///C:/FP_BackUpBuffer/FredericPersonnel/\"\r\n" + 
 				"			},\r\n" + 
 				"			{\r\n" + 
-				"				\"source\" : \"file:///C:/FredericPersonnel2/\",\r\n" + 
-				"				\"target\" : \"file:///S:/FredericPersonnel2/\",\r\n" + 
-				"				\"buffer\" : \"file:///C:/FP_BackUpBuffer/FredericPersonnel2/\"\r\n" + 
+				"				\"source\" : \"file:///C:/ForTests/\",\r\n" + 
+				"				\"target\" : \"file:///S:/ForTests/\",\r\n" + 
+				"				\"buffer\" : \"file:///C:/FP_BackUpBuffer/ForTests/\"\r\n" + 
 				"			},\r\n" + 
 				"			{\r\n" + 
 				"				\"source\" : \"file:///C:/pApps/\",\r\n" + 
@@ -65,6 +65,42 @@ public class BackUpJobTest {
 		assertEquals("FredericPersonnel sur USB S:", bupj.toString()) ;
 		
 		assertEquals(3, bTt.size()) ;
+	}
+	
+	@Test
+	void testParallelJson() {
+		
+		String json = "	{\r\n" + 
+				"		\"titre\" : \"FredericPersonnel sur USB S:\" ,\r\n" + 
+				"		\"items\" : [\r\n" + 
+				"			{\r\n" + 
+				"				\"source\" : \"file:///C:/FredericPersonnel/\",\r\n" + 
+				"				\"target\" : \"file:///S:/FredericPersonnel/\",\r\n" + 
+				"				\"buffer\" : \"file:///C:/FP_BackUpBuffer/FredericPersonnel/\",\r\n" + 
+				"				\"parallelScan\" : true\r\n" +
+				"			},\r\n" + 
+				"			{\r\n" + 
+				"				\"source\" : \"file:///C:/ForTests/\",\r\n" + 
+				"				\"target\" : \"file:///S:/ForTests/\",\r\n" + 
+				"				\"buffer\" : \"file:///C:/FP_BackUpBuffer/ForTests/\"\r\n" + 
+				"			},\r\n" + 
+				"			{\r\n" + 
+				"				\"source\" : \"file:///C:/pApps/\",\r\n" + 
+				"				\"target\" : \"file:///S:/pApps/\",\r\n" + 
+				"				\"buffer\" : \"file:///C:/FP_BackUpBuffer/pApps/\"\r\n" + 
+				"			}\r\n" + 
+				"		]\r\n" + 
+				"	}" ;
+		
+		BackUpJob bupj = new BackUpJob(json, log) ;
+		
+		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
+		assertNotNull(bTt) ;
+		assertNotNull(bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER)) ;
+		assertNotNull(bupj.toString()) ;
+		assertEquals("FredericPersonnel sur USB S:", bupj.toString()) ;
+		
+		assertEquals(12, bTt.size()) ;
 	}
 	
 	@Test

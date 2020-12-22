@@ -13,8 +13,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.fl.backupFiles.scanner.PathPairBasicAttributes;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -102,7 +100,11 @@ public class BackUpJob {
 
 			boolean scanInParallel = getParallelScanElement(jObjItem, PARALLEL_SCAN) ;
 
-			addBackUpTask(srcPath, bufPath, tgtPath) ;
+			if (scanInParallel) {
+				addParallelBackUpTasks(srcPath, bufPath, tgtPath) ;
+			} else {
+				addBackUpTask(srcPath, bufPath, tgtPath) ;
+			}
 		}
 	}
 	
@@ -110,7 +112,11 @@ public class BackUpJob {
 		
 		 try (DirectoryStream<Path> sourceFileStream = Files.newDirectoryStream(srcPath)) {
 			 
-			 for (Path sourceFile : sourceFileStream) {				 
+			 for (Path sourceSubPath : sourceFileStream) {	
+				 
+				 Path bufSubPath = bufPath.resolve(srcPath.relativize(sourceSubPath)) ;
+				 Path tgtSubPath = tgtPath.resolve(srcPath.relativize(sourceSubPath)) ;
+				 addBackUpTask(sourceSubPath, bufSubPath, tgtSubPath) ;
 				 
 			 }
 		 } catch (Exception e) {
