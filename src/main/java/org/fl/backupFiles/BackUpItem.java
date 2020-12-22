@@ -73,27 +73,45 @@ public class BackUpItem {
 			permanenceLevel		  = DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL ;
 		}
 		
-		checkPath(srcExisting, "Existing source path parameter is null or the path does not exist") ;
+		checkPathExists(srcExisting, "Existing source path parameter is null or the path does not exist") ;
 		
 		// Update counters
 		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
+			checkPathExists(src, "Source path parameter is null or the path does not exist") ;
+			checkPathExists(tgt, "Target path parameter is null or the path does not exist") ;
 			backUpCounters.copyReplaceNb++ ;
 		} else if (backupAction.equals(BackupAction.COPY_NEW)) {
+			checkPathExists(src, "Source path parameter is null or the path does not exist") ;
+			checkPathDoesNotExist(tgt, "Target path parameter should not exist") ;
 			backUpCounters.copyNewNb++ ;
 		} else if (backupAction.equals(BackupAction.DELETE)) {
+			checkPathDoesNotExist(src, "Source path parameter should not exist") ;
+			checkPathExists(tgt, "Target path parameter is null or the path does not exist") ;
 			backUpCounters.deleteNb++ ;
 		} else if (backupAction.equals(BackupAction.COPY_TREE)) {
+			checkPathExists(src, "Source path parameter is null or the path does not exist") ;
+			checkPathDoesNotExist(tgt, "Target path parameter should not exist") ;
 			backUpCounters.copyTreeNb++ ;
 		} else if (backupAction.equals(BackupAction.DELETE_DIR)) {
+			checkPathDoesNotExist(src, "Source path parameter should not exist") ;
+			checkPathExists(tgt, "Target path parameter is null or the path does not exist") ;
 			backUpCounters.deleteDirNb++ ;
 		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
+			checkPathExists(src, "Source path parameter is null or the path does not exist") ;
+			checkPathExists(tgt, "Target path parameter is null or the path does not exist") ;
 			backUpCounters.ambiguousNb++ ;
 		}
 		updateLimtsCounters(backUpCounters) ;
 	}
 
-	private void checkPath(Path path, String exceptionMessage) {
+	private void checkPathExists(Path path, String exceptionMessage) {
 		if ((path == null) || (! Files.exists(path))) {
+			throw new IllegalBackUpItemException(exceptionMessage) ;
+		}
+	}
+	
+	private void checkPathDoesNotExist(Path path, String exceptionMessage) {
+		if ((path != null) && (Files.exists(path))) {
 			throw new IllegalBackUpItemException(exceptionMessage) ;
 		}
 	}
