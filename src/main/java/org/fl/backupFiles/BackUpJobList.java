@@ -32,6 +32,9 @@ public class BackUpJobList extends Vector<BackUpJob> {
 				}
 				addElement(new BackUpJob(jsonConfig, bLog));
 			}
+			if (size() == 0) {
+				bLog.warning("No back up job config file found in " + configFilesDir.toString());
+			}
 		} catch (Exception e) {
 			bLog.log(Level.SEVERE, "Exception when getting config files in " + configFilesDir, e) ;
 		}
