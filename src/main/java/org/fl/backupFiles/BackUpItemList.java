@@ -13,15 +13,7 @@ public class BackUpItemList extends LinkedList<BackUpItem> {
 	}
 	
 	public void removeItemsDone() {
-		
-		int idx = 0 ;
-		while (size() > idx) {
-			if (get(idx).getBackupStatus().equals(BackupStatus.DONE)) {
-				remove(idx) ;
-			} else {
-				idx++ ;
-			}			
-		}
+		removeIf(i -> i.getBackupStatus().equals(BackupStatus.DONE));
 	}
 	
 }
