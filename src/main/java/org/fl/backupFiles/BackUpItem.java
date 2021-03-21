@@ -19,6 +19,13 @@ import com.ibm.lge.fl.util.file.FilesUtils;
 
 public class BackUpItem {
 
+	private static final String SRC_NOT_EXISTS 		  = "Source path parameter is null or the path does not exist";
+	private static final String TGT_NOT_EXISTS 		  = "Target path parameter is null or the path does not exist";
+	private static final String SRC_SHOULD_NOT_EXISTS = "Source path parameter should not exist";
+	private static final String TGT_SHOULD_NOT_EXISTS = "Target path parameter should not exist";
+	private static final String EXIST_SRC_NOT_EXISTS  = "Existing source path parameter is null or the path does not exist";
+
+	
 	private static long fileSizeWarningThreshold ;
 	public static void setFileSizeWarningThreshold(long fileSizeWarningThreshold) {
 		BackUpItem.fileSizeWarningThreshold = fileSizeWarningThreshold;
@@ -77,28 +84,28 @@ public class BackUpItem {
 		
 		// Update counters
 		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
-			checkPathExists(src, "Source path parameter is null or the path does not exist") ;
-			checkPathExists(tgt, "Target path parameter is null or the path does not exist") ;
+			checkPathExists(src, SRC_NOT_EXISTS) ;
+			checkPathExists(tgt, TGT_NOT_EXISTS) ;
 			backUpCounters.copyReplaceNb++ ;
 		} else if (backupAction.equals(BackupAction.COPY_NEW)) {
-			checkPathExists(src, "Source path parameter is null or the path does not exist") ;
-			checkPathDoesNotExist(tgt, "Target path parameter should not exist") ;
+			checkPathExists(src, SRC_NOT_EXISTS) ;
+			checkPathDoesNotExist(tgt, TGT_SHOULD_NOT_EXISTS) ;
 			backUpCounters.copyNewNb++ ;
 		} else if (backupAction.equals(BackupAction.DELETE)) {
-			checkPathDoesNotExist(src, "Source path parameter should not exist") ;
-			checkPathExists(tgt, "Target path parameter is null or the path does not exist") ;
+			checkPathDoesNotExist(src, SRC_SHOULD_NOT_EXISTS) ;
+			checkPathExists(tgt, TGT_NOT_EXISTS) ;
 			backUpCounters.deleteNb++ ;
 		} else if (backupAction.equals(BackupAction.COPY_TREE)) {
-			checkPathExists(src, "Source path parameter is null or the path does not exist") ;
-			checkPathDoesNotExist(tgt, "Target path parameter should not exist") ;
+			checkPathExists(src, SRC_NOT_EXISTS) ;
+			checkPathDoesNotExist(tgt, TGT_SHOULD_NOT_EXISTS) ;
 			backUpCounters.copyTreeNb++ ;
 		} else if (backupAction.equals(BackupAction.DELETE_DIR)) {
-			checkPathDoesNotExist(src, "Source path parameter should not exist") ;
-			checkPathExists(tgt, "Target path parameter is null or the path does not exist") ;
+			checkPathDoesNotExist(src, SRC_SHOULD_NOT_EXISTS) ;
+			checkPathExists(tgt, TGT_NOT_EXISTS) ;
 			backUpCounters.deleteDirNb++ ;
 		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
-			checkPathExists(src, "Source path parameter is null or the path does not exist") ;
-			checkPathExists(tgt, "Target path parameter is null or the path does not exist") ;
+			checkPathExists(src, SRC_NOT_EXISTS) ;
+			checkPathExists(tgt, TGT_NOT_EXISTS) ;
 			backUpCounters.ambiguousNb++ ;
 		}
 		updateLimtsCounters(backUpCounters) ;
