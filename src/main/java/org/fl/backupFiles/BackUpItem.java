@@ -92,7 +92,7 @@ public class BackUpItem {
 			checkPathExists(tgt, TGT_NOT_EXISTS) ;
 			backUpCounters.ambiguousNb++ ;
 		} else {
-			throw new IllegalBackUpItemException("Illegal backup action (should not be a delete action)" + backupAction) ;
+			throw new IllegalBackupActionException("Illegal backup action (should not be a delete action)", backupAction) ;
 		}
 		updateLimtsCounters(backUpCounters) ;
 	}
@@ -124,7 +124,7 @@ public class BackUpItem {
 		} else if (backupAction.equals(BackupAction.DELETE_DIR)) {
 			backUpCounters.deleteDirNb++ ;
 		} else {
-			throw new IllegalBackUpItemException("Illegal backup action (should be a delete action)" + backupAction) ;
+			throw new IllegalBackupActionException("Illegal backup action (should be a delete action)", backupAction) ;
 		}
 		updateLimtsCounters(backUpCounters) ;
 	}

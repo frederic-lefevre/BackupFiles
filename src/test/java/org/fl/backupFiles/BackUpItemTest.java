@@ -113,16 +113,16 @@ public class BackUpItemTest {
 	void illegalCopyShouldThrowException() {
 		
 		final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/TestDir1" ;
-		final String TGT_FILE1 =  "file:///ForTests/BackUpFiles/TestDir2/File1.pdf" ;
+		final String TGT_FILE1 =  "file:///ForTests/BackUpFiles/TestDir1/File1.pdf" ;
 		
 		Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
 		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 		
 		BackUpCounters counters = new BackUpCounters() ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(tgt, BackupAction.COPY_NEW, src, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(tgt, BackupAction.COPY_REPLACE, src, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(tgt, BackupAction.COPY_TREE, src, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(tgt, BackupAction.AMBIGUOUS, src, 0, counters, log)) ;
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_NEW, src, 0, counters, log)) ;
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_REPLACE, src, 0, counters, log)) ;
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_TREE, src, 0, counters, log)) ;
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.AMBIGUOUS, src, 0, counters, log)) ;
 	}
 	
 	@Test
@@ -135,8 +135,8 @@ public class BackUpItemTest {
 		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 		
 		BackUpCounters counters = new BackUpCounters() ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.DELETE, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.DELETE_DIR, 0, counters, log)) ;
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(src, tgt, BackupAction.DELETE, 0, counters, log)) ;
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(src, tgt, BackupAction.DELETE_DIR, 0, counters, log)) ;
 	}
 	
 	@Test
