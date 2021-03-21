@@ -80,7 +80,7 @@ public class BackUpItem {
 			permanenceLevel		  = DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL ;
 		}
 		
-		checkPathExists(srcExisting, "Existing source path parameter is null or the path does not exist") ;
+		checkPathExists(srcExisting, EXIST_SRC_NOT_EXISTS) ;
 		
 		// Update counters
 		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
