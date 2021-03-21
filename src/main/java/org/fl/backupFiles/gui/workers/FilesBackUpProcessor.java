@@ -1,5 +1,6 @@
 package org.fl.backupFiles.gui.workers;
 
+import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -7,6 +8,7 @@ import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 
 import org.fl.backupFiles.BackUpCounters;
+import org.fl.backupFiles.BackUpItem;
 import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpJobInformation;
 import org.fl.backupFiles.Config;
@@ -70,16 +72,17 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 		boolean backupSuccess = true;
 		jobsChoice.initTargetFileStores(jobTaskType) ;
 		backUpCounters.reset() ;
-		int idx = 0 ;
+		int nbActionDone = 0 ;
+		Iterator<BackUpItem> backupItemIterator = backUpItemList.iterator();
 		long lastRefreshTime = System.currentTimeMillis() ;
 		
-		while ((idx < backUpItemList.size() ) && (! uiControl.isStopAsked())) {
-			if (((idx % refreshRate) == 0) || (System.currentTimeMillis() - lastRefreshTime > maxRefreshInterval)) {				
-				publish(idx) ;
+		while ((backupItemIterator.hasNext()) && (! uiControl.isStopAsked())) {
+			if (((nbActionDone % refreshRate) == 0) || (System.currentTimeMillis() - lastRefreshTime > maxRefreshInterval)) {				
+				publish(nbActionDone) ;
 				lastRefreshTime = System.currentTimeMillis() ;
 			}
-			backupSuccess &= backUpItemList.get(idx).execute(backUpCounters) ;			
-			idx++ ;
+			backupSuccess &= backupItemIterator.next().execute(backUpCounters) ;			
+			nbActionDone++ ;
 		}
 		
 		long duration = System.currentTimeMillis() - startTime ;				
