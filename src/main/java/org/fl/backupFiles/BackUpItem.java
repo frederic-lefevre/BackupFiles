@@ -21,7 +21,6 @@ public class BackUpItem {
 
 	private static final String SRC_NOT_EXISTS 		  = "Source path parameter is null or the path does not exist";
 	private static final String TGT_NOT_EXISTS 		  = "Target path parameter is null or the path does not exist";
-	private static final String SRC_SHOULD_NOT_EXISTS = "Source path parameter should not exist";
 	private static final String TGT_SHOULD_NOT_EXISTS = "Target path parameter should not exist";
 	private static final String EXIST_SRC_NOT_EXISTS  = "Existing source path parameter is null or the path does not exist";
 
@@ -61,9 +60,9 @@ public class BackUpItem {
 	//		DONE	 	 : the back up has been done
 	//		FAILED	 	 : the back up has failed
 	
-	public BackUpItem(Path src, Path tgt, Path srcExisting, BackupAction bst, long sd, BackUpCounters backUpCounters, Logger l) {
+	public BackUpItem(Path src, Path tgt, BackupAction bst, long sd, BackUpCounters backUpCounters, Logger l) {
 		sourcePath 	 	 		  = src ;
-		sourceClosestExistingPath = srcExisting ;
+		sourceClosestExistingPath = src ;
 		targetPath 	 	 		  = tgt ;
 		backupAction 	 		  = bst ;
 		backupStatus 	 		  = BackupStatus.DIFFERENT ;
@@ -74,6 +73,42 @@ public class BackUpItem {
 			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(targetPath) ;
 		} else if (src != null) {
 			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(src) ;
+		} else {
+			permanenceLevel		  = DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL ;
+		}
+		
+		// Update counters
+		checkPathExists(src, SRC_NOT_EXISTS) ;
+		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
+			checkPathExists(tgt, TGT_NOT_EXISTS) ;
+			backUpCounters.copyReplaceNb++ ;
+		} else if (backupAction.equals(BackupAction.COPY_NEW)) {
+			checkPathDoesNotExist(tgt, TGT_SHOULD_NOT_EXISTS) ;
+			backUpCounters.copyNewNb++ ;
+		} else if (backupAction.equals(BackupAction.COPY_TREE)) {
+			checkPathDoesNotExist(tgt, TGT_SHOULD_NOT_EXISTS) ;
+			backUpCounters.copyTreeNb++ ;
+		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
+			checkPathExists(tgt, TGT_NOT_EXISTS) ;
+			backUpCounters.ambiguousNb++ ;
+		} else {
+			throw new IllegalBackUpItemException("Illegal backup action (should not be a delete action)" + backupAction) ;
+		}
+		updateLimtsCounters(backUpCounters) ;
+	}
+
+	// For delete actions
+	public BackUpItem(Path tgt, BackupAction bst, Path srcExisting, long sd, BackUpCounters backUpCounters, Logger l) {
+		sourcePath 	 	 		  = null ;
+		sourceClosestExistingPath = srcExisting ;
+		targetPath 	 	 		  = tgt ;
+		backupAction 	 		  = bst ;
+		backupStatus 	 		  = BackupStatus.DIFFERENT ;
+		diffByContent		  	  = false ;
+		bLog 		 	 		  = l ;
+		sizeDifference			  = sd ;
+		if (targetPath != null) {
+			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(targetPath) ;
 		} else if (srcExisting != null) {
 			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(srcExisting) ;
 		} else {
@@ -81,36 +116,19 @@ public class BackUpItem {
 		}
 		
 		checkPathExists(srcExisting, EXIST_SRC_NOT_EXISTS) ;
+		checkPathExists(tgt, TGT_NOT_EXISTS) ;
 		
 		// Update counters
-		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
-			checkPathExists(src, SRC_NOT_EXISTS) ;
-			checkPathExists(tgt, TGT_NOT_EXISTS) ;
-			backUpCounters.copyReplaceNb++ ;
-		} else if (backupAction.equals(BackupAction.COPY_NEW)) {
-			checkPathExists(src, SRC_NOT_EXISTS) ;
-			checkPathDoesNotExist(tgt, TGT_SHOULD_NOT_EXISTS) ;
-			backUpCounters.copyNewNb++ ;
-		} else if (backupAction.equals(BackupAction.DELETE)) {
-			checkPathDoesNotExist(src, SRC_SHOULD_NOT_EXISTS) ;
-			checkPathExists(tgt, TGT_NOT_EXISTS) ;
+		if (backupAction.equals(BackupAction.DELETE)) {
 			backUpCounters.deleteNb++ ;
-		} else if (backupAction.equals(BackupAction.COPY_TREE)) {
-			checkPathExists(src, SRC_NOT_EXISTS) ;
-			checkPathDoesNotExist(tgt, TGT_SHOULD_NOT_EXISTS) ;
-			backUpCounters.copyTreeNb++ ;
 		} else if (backupAction.equals(BackupAction.DELETE_DIR)) {
-			checkPathDoesNotExist(src, SRC_SHOULD_NOT_EXISTS) ;
-			checkPathExists(tgt, TGT_NOT_EXISTS) ;
 			backUpCounters.deleteDirNb++ ;
-		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
-			checkPathExists(src, SRC_NOT_EXISTS) ;
-			checkPathExists(tgt, TGT_NOT_EXISTS) ;
-			backUpCounters.ambiguousNb++ ;
+		} else {
+			throw new IllegalBackUpItemException("Illegal backup action (should be a delete action)" + backupAction) ;
 		}
 		updateLimtsCounters(backUpCounters) ;
 	}
-
+	
 	private void checkPathExists(Path path, String exceptionMessage) {
 		if ((path == null) || (! Files.exists(path))) {
 			throw new IllegalBackUpItemException(exceptionMessage) ;
