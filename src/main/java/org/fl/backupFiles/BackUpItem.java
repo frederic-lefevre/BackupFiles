@@ -130,14 +130,14 @@ public class BackUpItem {
 	}
 	
 	private void checkPathExists(Path path, String exceptionMessage) {
-		if ((path == null) || (! Files.exists(path))) {
-			throw new IllegalBackUpItemException(exceptionMessage) ;
+		if ((path == null) || (Files.notExists(path))) {
+			throw new IllegalBackUpItemException(exceptionMessage, path) ;
 		}
 	}
 	
 	private void checkPathDoesNotExist(Path path, String exceptionMessage) {
 		if ((path != null) && (Files.exists(path))) {
-			throw new IllegalBackUpItemException(exceptionMessage) ;
+			throw new IllegalBackUpItemException(exceptionMessage, path) ;
 		}
 	}
 	
