@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.fl.backupFiles</groupId>
 	<artifactId>BackupFiles</artifactId>
-	<version>1.22.2</version>
+	<version>1.22.3</version>
 	<name>BackupFiles</name>
 
 	<dependencies>
