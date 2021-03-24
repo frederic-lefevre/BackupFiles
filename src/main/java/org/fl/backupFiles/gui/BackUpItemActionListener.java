@@ -132,9 +132,16 @@ public class BackUpItemActionListener implements java.awt.event.ActionListener {
 						filePath = localEntry.getTargetPath() ;
 					}
 				
-					if ((filePath != null) && Files.exists(filePath )) {
-						OScommand osCommand = new OScommand(showParentDirCmd + " " + filePath.getParent().toAbsolutePath(), false, bLog) ;
-						osCommand.run();
+					if (filePath != null) {
+						Path parentDir = filePath.getParent();
+						if (Files.exists(parentDir)) {
+							OScommand osCommand = new OScommand(showParentDirCmd + " " + parentDir.toAbsolutePath(), false, bLog) ;
+							osCommand.run();
+						} else {
+							bLog.warning("Showing parent directory: parent directory of " + filePath + " does not exists");
+						}
+					} else {
+						bLog.warning("Action to show parent directory with a null file path");
 					}
 				}
 			}
