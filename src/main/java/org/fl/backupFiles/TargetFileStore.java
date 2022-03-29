@@ -8,7 +8,7 @@ import java.text.NumberFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.ibm.lge.fl.util.file.FilesUtils;
+import org.fl.util.file.FilesUtils;
 
 public class TargetFileStore {
 

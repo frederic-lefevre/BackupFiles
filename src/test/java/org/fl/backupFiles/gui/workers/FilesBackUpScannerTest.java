@@ -20,12 +20,11 @@ import org.fl.backupFiles.gui.BackUpJobInfoTableModel;
 import org.fl.backupFiles.gui.BackUpTableModel;
 import org.fl.backupFiles.gui.ProgressInformationPanel;
 import org.fl.backupFiles.gui.UiControl;
+import org.fl.util.AdvancedProperties;
+import org.fl.util.RunningContext;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import com.ibm.lge.fl.util.AdvancedProperties;
-import com.ibm.lge.fl.util.RunningContext;
 
 class FilesBackUpScannerTest {
 

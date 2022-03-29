@@ -12,11 +12,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.fl.backupFiles.BackUpItem.BackupAction;
+import org.fl.util.RunningContext;
+import org.fl.util.file.FileComparator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import com.ibm.lge.fl.util.RunningContext;
-import com.ibm.lge.fl.util.file.FileComparator;
 
 public class BackUpItemTest {
 

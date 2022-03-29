@@ -16,9 +16,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import org.fl.backupFiles.BackUpItem;
-
-import com.ibm.lge.fl.util.os.OScommand;
-import com.ibm.lge.fl.util.swing.FileActions;
+import org.fl.util.os.OScommand;
+import org.fl.util.swing.FileActions;
 
 public class BackUpItemActionListener implements java.awt.event.ActionListener {
 

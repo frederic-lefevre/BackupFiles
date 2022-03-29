@@ -19,9 +19,8 @@ import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.BackUpItem.BackupAction;
-
-import com.ibm.lge.fl.util.file.FileComparator;
-import com.ibm.lge.fl.util.file.FilesUtils;
+import org.fl.util.file.FileComparator;
+import org.fl.util.file.FilesUtils;
 
 public class BackUpScannerThread {
 

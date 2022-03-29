@@ -12,10 +12,9 @@ import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryPermanence.DirectoryPermanence;
 import org.fl.backupFiles.directoryPermanence.DirectoryPermanenceLevel;
-
-import com.ibm.lge.fl.util.file.FileComparator;
-import com.ibm.lge.fl.util.file.FilesSecurityUtils;
-import com.ibm.lge.fl.util.file.FilesUtils;
+import org.fl.util.file.FileComparator;
+import org.fl.util.file.FilesSecurityUtils;
+import org.fl.util.file.FilesUtils;
 
 public class BackUpItem {
 

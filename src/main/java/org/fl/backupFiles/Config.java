@@ -14,9 +14,8 @@ import org.fl.backupFiles.directoryPermanence.DirectoryPermanence;
 import org.fl.backupFiles.directoryPermanence.DirectoryPermanenceMap;
 import org.fl.backupFiles.gui.BackUpItemActionListener;
 import org.fl.backupFiles.gui.BackUpItemActionListener.CustomAction;
+import org.fl.util.AdvancedProperties;
 import org.fl.backupFiles.gui.BackUpSizeDifferenceCellRenderer;
-
-import com.ibm.lge.fl.util.AdvancedProperties;
 
 public class Config {
 

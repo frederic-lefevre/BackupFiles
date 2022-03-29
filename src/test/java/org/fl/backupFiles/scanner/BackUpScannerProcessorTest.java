@@ -21,12 +21,11 @@ import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.TestUtils;
+import org.fl.util.RunningContext;
+import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import com.ibm.lge.fl.util.RunningContext;
-import com.ibm.lge.fl.util.file.FilesUtils;
 
 class BackUpScannerProcessorTest {
 
