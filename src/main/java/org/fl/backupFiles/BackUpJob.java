@@ -25,9 +25,16 @@ public class BackUpJob {
 	private final Logger bLog ;
 	
 	public enum JobTaskType { 
-		SOURCE_TO_BUFFER("Source vers buffer"), BUFFER_TO_TARGET("Buffer vers target") ;
+		SOURCE_TO_BUFFER("Source vers buffer"), 
+		BUFFER_TO_TARGET("Buffer vers target"),
+		SOURCE_TO_TARGET("Source vers target");
+		
 		private String jobName ;
-		private JobTaskType(String name) { jobName = name ; }
+		
+		private JobTaskType(String name) { 
+			jobName = name ; 
+		}
+		
 		@Override
         public String toString() { return jobName ; } 
 	} ;
@@ -41,11 +48,12 @@ public class BackUpJob {
 	private final static String BUFFER = "buffer" ;
 	private final static String PARALLEL_SCAN = "parallelScan";
 	
-	// A back up jobs is defined by a Json object (passed in parameter of this constructor)
-	// It is basically 2 lists of back up tasks :
+	// A back up jobs is defined by a JSON object (passed in parameter of this constructor)
+	// It is basically either 2 lists of back up tasks :
 	//  - a list of back up task from source directories to buffer directories
 	//  - a list of back up task from buffer directories to target directories
-	// A back up task is a source directory to back up and a destination diectory to back up
+	// or a single list of back up task from source directories to target directories
+	// A back up task is a source directory to back up and a destination directory to back up
 	public BackUpJob(String jsonConfig, Logger l) {
 		
 		bLog = l ;
@@ -125,19 +133,26 @@ public class BackUpJob {
 	}
 	
 	private void addBackUpTask(Path srcPath, Path bufPath, Path tgtPath) {
-		if ((srcPath != null) && (bufPath != null)) {
-			if (Files.isRegularFile(srcPath)) {
-				Path bufFile = bufPath.resolve(srcPath.getFileName()) ;
-				backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile, bLog)) ;
-			} else {
+		if ((srcPath != null)) {
+			if (bufPath != null) {
+				if (Files.isRegularFile(srcPath)) {
+					Path bufFile = bufPath.resolve(srcPath.getFileName()) ;
+					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile, bLog)) ;
+				} else {
 				backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath, bLog)) ;
+				}
+				if (tgtPath != null) {
+					backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath, bLog)) ;
+				}
+			} else if (tgtPath != null) {
+				backUpTasks.get(JobTaskType.SOURCE_TO_TARGET).add(new BackUpTask(srcPath, tgtPath, bLog)) ;
+			} else {
+				bLog.severe("No buffer and target element definition for back up job " + title);
 			}
 		} else {
-			bLog.warning("No source / buffer element definition for back up job " + title);
+			bLog.severe("No source element definition for back up job " + title);
 		}
-		if ((tgtPath != null) && (bufPath != null)) {
-			backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath, bLog)) ;
-		}
+	
 	}
 	
 	public String toString() {
