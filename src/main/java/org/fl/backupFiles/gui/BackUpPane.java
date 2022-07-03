@@ -2,6 +2,7 @@ package org.fl.backupFiles.gui;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -11,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.fl.backupFiles.BackUpItemList;
+import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.BackUpJob.JobTaskType;
 import org.fl.backupFiles.JobsChoice;
 
@@ -24,6 +26,7 @@ public class BackUpPane extends JPanel {
 	
 	private final static String NO_CONFIG = "Aucune" ;
 	private final static String SEPARATOR = " - Configuration actuellement sélectionnée: " ;
+	private final static String NO_TASKS = " aucune tâche à effectuer";
 	
 	public BackUpPane(JobTaskType jtt, BackUpJobInfoTableModel backUpJobInfoTableModel, Logger bLog) {
 		super() ;
@@ -65,7 +68,16 @@ public class BackUpPane extends JPanel {
 	}
 
 	public void setJobChoice(JobsChoice jobChoice) {
-		title.setText(jobTaskType.toString()  + SEPARATOR + jobChoice.getTitleAsString());
+		
+		StringBuffer buTitle = new StringBuffer(jobTaskType.toString());
+		buTitle
+			.append(SEPARATOR)
+			.append(jobChoice.getTitleAsString());
+		List<BackUpTask> backupTaks = jobChoice.getTasks(jobTaskType);
+		if ((backupTaks == null) || (backupTaks.isEmpty())) {
+			buTitle.append(", ").append(NO_TASKS);
+		}
+		title.setText(buTitle.toString());
 		backUpControl.setJobChoice(jobChoice) ;
 	}
 

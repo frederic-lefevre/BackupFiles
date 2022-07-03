@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -16,6 +17,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
 import org.fl.backupFiles.BackUpJob.JobTaskType;
+import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.JobsChoice;
 import org.fl.backupFiles.gui.workers.FilesBackUpProcessor;
 import org.fl.backupFiles.gui.workers.FilesBackUpScanner;
@@ -103,16 +105,11 @@ public class UiControl extends JPanel {
 		stopButton	 = new JButton("Stop") ;
 		Font buttonFont = new Font("Verdana", Font.BOLD, 24);
 		bckpUpButton.setFont(buttonFont) ;
-		bckpUpButton.setBackground(Color.GREEN) ;
-		bckpUpButton.setEnabled(false) ;
 		scanButton.setFont(buttonFont) ;
-		scanButton.setBackground(Color.GREEN) ;
-		scanButton.setEnabled(false) ;
 		stopButton.setFont(buttonFont) ;
-		stopButton.setBackground(Color.RED) ;
-		stopButton.setEnabled(false) ;
+		setButtonForEmpyTasks();
 		
-		ControlAction controlAction = new ControlAction(this) ;
+		ControlAction controlAction = new ControlAction(this);
 		bckpUpButton.addActionListener(controlAction);
 		scanButton.addActionListener(controlAction);
 		stopButton.addActionListener(controlAction);
@@ -120,21 +117,36 @@ public class UiControl extends JPanel {
 		c.gridx = 0;
 		c.gridy = 1;
 		c.ipadx = 200;
-		add(scanButton, c) ;
+		add(scanButton, c);
 		c.gridx = 1;
 		c.ipadx = 200;
-		add(stopButton, c) ;
+		add(stopButton, c);
 		c.gridx = 3;
 		c.ipadx = 200;
-		add(bckpUpButton, c) ;
+		add(bckpUpButton, c);
 	}
 
 	public void setJobChoice(JobsChoice jc) {
-		setIsRunning(false) ;
-		jobsChoice = jc ;
-		backUpTableModel.getBackUpItems().clear() ;
+		
+		List<BackUpTask> backupTaks = jc.getTasks(jobTaskType);
+		if ((backupTaks == null) || (backupTaks.isEmpty())) {
+			setButtonForEmpyTasks();
+		} else {
+			setIsRunning(false);
+		}
+		jobsChoice = jc;
+		backUpTableModel.getBackUpItems().clear();
 	}
 
+	private void setButtonForEmpyTasks() {
+		bckpUpButton.setBackground(Color.GREEN) ;
+		bckpUpButton.setEnabled(false) ;
+		scanButton.setBackground(Color.GREEN) ;
+		scanButton.setEnabled(false) ;
+		stopButton.setBackground(Color.RED) ;
+		stopButton.setEnabled(false) ;
+	}
+	
 	private class ControlAction implements ActionListener {
 
 		private UiControl uiControl ;
