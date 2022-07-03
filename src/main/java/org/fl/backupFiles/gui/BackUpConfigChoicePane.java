@@ -41,12 +41,12 @@ public class BackUpConfigChoicePane extends JPanel {
 		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)) ;
 		
-		// Choix de la configuration de sauvegarde
+		// Backup configuration choice
 		JPanel bkpChoicePanel = new JPanel() ;
 		bkpChoicePanel.setLayout(new BoxLayout(bkpChoicePanel, BoxLayout.X_AXIS));
 		
 		// List of all possible back up jobs
-		// The back up jobs are defined in Json files (one file per back up job)
+		// The back up jobs are defined in JSON files (one file per back up job)
 		// The first user action is to choose the back up job to execute
 		BackUpJobList backUpJobs = new BackUpJobList(configFileDir, bLog) ;
 		
@@ -84,8 +84,6 @@ public class BackUpConfigChoicePane extends JPanel {
 
 	// Each time back up jobs are chosen, the back up panes are informed
 	private class ChooseJobs  implements ListSelectionListener {
-
-	
 
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
