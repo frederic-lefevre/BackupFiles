@@ -18,6 +18,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.fl.backupFiles.BackUpJob;
 import org.fl.backupFiles.BackUpJobList;
+import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.JobsChoice;
 import org.fl.backupFiles.BackUpJob.JobTaskType;
 
@@ -78,7 +79,7 @@ public class BackUpConfigChoicePane extends JPanel {
 		
 		add(resultScrollPane) ;
 		
-		// Each time a back up job is choosen, the backUpTasks are updated accordingly
+		// Each time a back up job is chosen, the backUpTasks are updated accordingly
 		backUpJobChoice.addListSelectionListener(new ChooseJobs());
 	}
 
