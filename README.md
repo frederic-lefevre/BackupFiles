@@ -19,3 +19,6 @@ a single buffer backup (2 backup on 2 USB keys for instance).
 It has acceptable performances (something like 400K files scanning in 20 seconds in the buffer phase). The scanning is multi-threaded.
 
 It has a content comparison option (which slows down the process naturally).
+
+TODO:
+* Warning file size threshold : make it particular to each config file
