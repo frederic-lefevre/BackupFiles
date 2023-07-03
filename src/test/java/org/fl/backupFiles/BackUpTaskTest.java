@@ -24,7 +24,7 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 import java.nio.file.Path;
 import java.util.logging.Logger;
@@ -46,12 +46,12 @@ class BackUpTaskTest {
 		
 		BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
 		
-		assertFalse(backUpTask.compareContent());
-		assertTrue(backUpTask.compareContentOnAmbiguous());
+		assertThat(backUpTask.compareContent()).isFalse();
+		assertThat(backUpTask.compareContentOnAmbiguous()).isTrue();
 		
 		BackUpTask backUpTask2 = new BackUpTask(src, tgt, log) ;
 		
-		assertTrue(backUpTask.equals(backUpTask2)) ;
+		assertThat(backUpTask).isEqualTo(backUpTask2) ;
 	}
 
 }
