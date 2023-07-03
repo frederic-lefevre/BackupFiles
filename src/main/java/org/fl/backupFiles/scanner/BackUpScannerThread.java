@@ -289,6 +289,25 @@ public class BackUpScannerThread {
 		}
 	}
 	
+	private void compareFileContent(Path srcPath, Path tgtPath, BasicFileAttributes sourceAttributes, BasicFileAttributes targetAttributes, BackupAction backupAction) {
+		
+		if (! fileComparator.haveSameContent(srcPath, tgtPath)) {
+			// file content are not the same (or there has been an error)
+			if (fileComparator.isOnError()) {
+				filesVisitFailed.add(tgtPath);
+				backUpCounters.nbTargetFilesFailed++; 
+			} else {
+				// content are not the same
+				long sizeDiff = sourceAttributes.size() - targetAttributes.size();
+				BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, backupAction, sizeDiff, backUpCounters, pLog);
+				backUpItem.setDiffByContent(true);
+				backUpItemList.add(backUpItem);
+				backUpCounters.contentDifferentNb++;
+			}
+		}
+		
+	}
+	
 	private void compareFile(Path srcPath, Path tgtPath, BasicFileAttributes sourceAttributes, BasicFileAttributes targetAttributes) {
 
 		try {
@@ -296,25 +315,12 @@ public class BackUpScannerThread {
 			if (fileComparator != null) {
 				// Content comparison is asked to be sure
 
-				if (! fileComparator.haveSameContent(srcPath, tgtPath)) {
-					// file content are not the same (or there has been an error)
-					if (fileComparator.isOnError()) {
-						filesVisitFailed.add(tgtPath) ;
-						backUpCounters.nbTargetFilesFailed++ ; 
-					} else {
-						// content are not the same
-						long sizeDiff = sourceAttributes.size() - targetAttributes.size() ;
-						BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, BackupAction.COPY_REPLACE, sizeDiff, backUpCounters, pLog) ;
-						backUpItem.setDiffByContent(true) ;
-						backUpItemList.add(backUpItem) ;
-						backUpCounters.contentDifferentNb++ ;
-					}
-				}
+				compareFileContent(srcPath, tgtPath, sourceAttributes, targetAttributes, BackupAction.COPY_REPLACE);
 
 			} else {
 
 				// Check if files seems to be the same or no
-				// Compare last modfied time
+				// Compare last modified time
 				FileTime f1t = sourceAttributes.lastModifiedTime() ;
 				FileTime f2t = targetAttributes.lastModifiedTime() ;
 				int compareFile = f1t.compareTo(f2t) ;
