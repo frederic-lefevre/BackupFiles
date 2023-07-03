@@ -30,29 +30,31 @@ import java.util.logging.Logger;
 
 public class BackUpTask {
 
-	private final Path source ;
-	private final Path target ;
+	private final Path source;
+	private final Path target;
 	
-	private boolean compareContent ;
+	private boolean compareContent;
+	private boolean compareContentOnAmbiguous;
 	
-	private final Logger bLog ;
+	private final Logger bLog;
 	
-	private final static String warning1  = "  Attention : les chemins source et cible n'existent pas" ;
-	private final static String warning2  = "  Attention : le chemin source n'existe pas" ;
-	private final static String warning3  = "  Attention : le chemin cible n'existe pas" ;
+	private final static String warning1  = "  Attention : les chemins source et cible n'existent pas";
+	private final static String warning2  = "  Attention : le chemin source n'existe pas";
+	private final static String warning3  = "  Attention : le chemin cible n'existe pas";
 	private final static String noWarning = "" ;
 	
 	// A back up task is a source directory or file to back up to a destination directory or file
 	public BackUpTask(Path src, Path tgt, Logger l) {
 		
-		source = src ;
-		target = tgt ;
-		bLog   = l ;
+		source = src;
+		target = tgt;
+		bLog   = l;
 		
 		if (source == null) {
 			bLog.severe("source path null when creating back up task") ;
 		}		
 		compareContent  = false ;
+		compareContentOnAmbiguous = true;
 	}
 
 	public Path getSource() {
@@ -100,6 +102,14 @@ public class BackUpTask {
 		this.compareContent = compareContent;
 	}
 
+	public boolean compareContentOnAmbiguous() {
+		return compareContentOnAmbiguous;
+	}
+
+	public void setCompareContentOnAmbiguous(boolean compareContentOnAmbiguous) {
+		this.compareContentOnAmbiguous = compareContentOnAmbiguous;
+	}
+	
 	// Hashcode with lazy init
 	private int hashcode = 0 ;
 	

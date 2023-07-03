@@ -1,3 +1,27 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2023 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.backupFiles;
 
 import java.nio.file.FileStore;
@@ -19,7 +43,8 @@ public class JobsChoice {
 	private final String 		  jobsDetail ;
 	private final StringBuilder   details ;
 	
-	private boolean			compareContent ;
+	private boolean	compareContent;
+	private boolean	compareContentOnAmbiguous;
 	
 	private final Logger jLog ;
 	
@@ -36,7 +61,8 @@ public class JobsChoice {
 		backUpJobs = bj ;
 		jLog	   = l ;
 		
-		compareContent = false ;
+		compareContent = false;
+		compareContentOnAmbiguous = true;
 		
 		targetFileStores = new HashMap<FileStore,TargetFileStore>() ;
 		
@@ -84,10 +110,15 @@ public class JobsChoice {
 	public void setCompareContent(JobTaskType jobTaskType, boolean cc) {
 		
 		compareContent = cc ;
-		List<BackUpTask> bupTasks = getTasks(jobTaskType) ;
-		for (BackUpTask backUpTask : bupTasks) {
-			backUpTask.setCompareContent(cc);
-		}
+		getTasks(jobTaskType)
+			.forEach(backUpTask -> backUpTask.setCompareContent(cc));
+	}
+	
+	public void setCompareContentOnAmbiguous(JobTaskType jobTaskType, boolean cc) {
+		
+		compareContentOnAmbiguous = cc ;
+		getTasks(jobTaskType)
+			.forEach(backUpTask -> backUpTask.setCompareContentOnAmbiguous(cc));
 	}
 	
 	private void addAllTasks(List<BackUpTask> tasks, List<BackUpTask> tasksToAdd) {
@@ -151,5 +182,9 @@ public class JobsChoice {
 
 	public boolean compareContent() {
 		return compareContent;
+	}
+	
+	public boolean compareContentOnAmbiguous() {
+		return compareContentOnAmbiguous;
 	}
 }
