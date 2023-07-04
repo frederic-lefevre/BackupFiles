@@ -20,5 +20,3 @@ It has acceptable performances (something like 400K files scanning in 20 seconds
 
 It has a content comparison option (which slows down the process naturally).
 
-TODO:
-* Warning file size threshold : make it particular to each config file
