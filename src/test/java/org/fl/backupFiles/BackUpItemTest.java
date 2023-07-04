@@ -127,10 +127,11 @@ public class BackUpItemTest {
 		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 		
 		BackUpCounters counters = new BackUpCounters() ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.AMBIGUOUS, BackupStatus.SAME_CONTENT, 0, counters, log)) ;
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.AMBIGUOUS, BackupStatus.SAME_CONTENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_TARGET, BackupStatus.SAME_CONTENT, 0, counters, log));
 	}
 	@Test
 	
@@ -143,10 +144,11 @@ public class BackUpItemTest {
 		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 		
 		BackUpCounters counters = new BackUpCounters() ;
-		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_NEW, src, 0, counters, log)) ;
-		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_REPLACE, src, 0, counters, log)) ;
-		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_TREE, src, 0, counters, log)) ;
-		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.AMBIGUOUS, src, 0, counters, log)) ;
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_NEW, src, 0, counters, log));
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_REPLACE, src, 0, counters, log));
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_TREE, src, 0, counters, log));
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.AMBIGUOUS, src, 0, counters, log));
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_TARGET, src, 0, counters, log));
 	}
 	
 	@Test
@@ -173,10 +175,11 @@ public class BackUpItemTest {
 		Path tgt  			= TestUtils.getPathFromUriString(TGT_FILE1) ;
 		
 		BackUpCounters counters = new BackUpCounters() ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.AMBIGUOUS, BackupStatus.DIFFERENT, 0, counters, log)) ;
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.AMBIGUOUS, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_TARGET, BackupStatus.DIFFERENT, 0, counters, log));
 	}
 	
 	@Test

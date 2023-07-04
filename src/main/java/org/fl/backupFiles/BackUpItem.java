@@ -53,7 +53,7 @@ public class BackUpItem {
 		BackUpItem.fileSizeWarningThreshold = fileSizeWarningThreshold;
 	}
 	
-	public enum BackupAction { COPY_NEW, COPY_REPLACE, COPY_TREE, DELETE, DELETE_DIR, AMBIGUOUS } ;
+	public enum BackupAction { COPY_NEW, COPY_REPLACE, COPY_TREE, DELETE, DELETE_DIR, AMBIGUOUS, COPY_TARGET };
 	
 	public enum BackupStatus { DIFFERENT, DIFF_BY_CONTENT, SAME_CONTENT, DONE, FAILED } ;
 
@@ -114,8 +114,11 @@ public class BackUpItem {
 		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
 			checkPathExists(tgt, TGT_NOT_EXISTS) ;
 			backUpCounters.ambiguousNb++ ;
+		} else if (backupAction.equals(BackupAction.COPY_TARGET)) {
+			checkPathExists(tgt, TGT_NOT_EXISTS) ;
+			backUpCounters.copyTargetNb++ ;
 		} else {
-			throw new IllegalBackupActionException("Illegal backup action (should not be a delete action)", backupAction) ;
+			throw new IllegalBackupActionException("Illegal backup action", backupAction) ;
 		}
 		updateLimtsCounters(backUpCounters) ;
 	}
@@ -290,8 +293,12 @@ public class BackUpItem {
 			Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES, LinkOption.NOFOLLOW_LINKS) ;
 			backUpCounters.ambiguousNb++ ;
 			backUpCounters.nbSourceFilesProcessed++ ;
+		} else if (backupAction.equals(BackupAction.COPY_TARGET)) {
+			Files.copy(targetPath, sourcePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES, LinkOption.NOFOLLOW_LINKS);
+			backUpCounters.ambiguousNb++;
+			backUpCounters.nbSourceFilesProcessed++;
 		} else {
-			bLog.severe("Unknown backUpAction" + backupAction);
+			throw new IllegalBackupActionException("Invalid backup action: ", backupAction);
 		}
 		return success ;
 	}

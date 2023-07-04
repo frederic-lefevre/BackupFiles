@@ -355,7 +355,7 @@ public class BackUpScannerThread {
 					// target file is newer
 					
 					if (backUpTask.compareContentOnAmbiguous()) {
-						compareFileContent(srcPath, tgtPath, sourceAttributes, targetAttributes, BackupAction.COPY_REPLACE, BackupAction.COPY_REPLACE);
+						compareFileContent(srcPath, tgtPath, sourceAttributes, targetAttributes, BackupAction.COPY_REPLACE, BackupAction.COPY_TARGET);
 					} else {
 						long sizeDiff = sourceAttributes.size() - targetAttributes.size() ;
 						BackUpItem backUpItem = new BackUpItem(srcPath, tgtPath, BackupAction.AMBIGUOUS, BackupStatus.DIFFERENT, sizeDiff, backUpCounters, pLog) ;
