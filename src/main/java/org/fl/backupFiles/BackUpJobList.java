@@ -1,5 +1,6 @@
 package org.fl.backupFiles;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,7 +25,7 @@ public class BackUpJobList extends Vector<BackUpJob> {
 		try (DirectoryStream<Path> paths = Files.newDirectoryStream(configFilesDir, "*.json")) {
 			for (Path configFile : paths) {
 				bLog.fine(() -> "Find config file " + configFile.toString());
-				String jsonConfig =  new String(Files.readAllBytes(configFile)) ;
+				String jsonConfig =  new String(Files.readAllBytes(configFile), StandardCharsets.UTF_8) ;
 				bLog.finest(() -> "New configuration : " + jsonConfig);
 				addElement(new BackUpJob(jsonConfig, bLog));
 			}
