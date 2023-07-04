@@ -1,3 +1,27 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2023 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.backupFiles;
 
 import java.io.File;
@@ -29,9 +53,9 @@ public class BackUpItem {
 		BackUpItem.fileSizeWarningThreshold = fileSizeWarningThreshold;
 	}
 	
-	public enum BackupAction { COPY_NEW, COPY_REPLACE, COPY_TREE, DELETE, DELETE_DIR, AMBIGUOUS } ;
+	public enum BackupAction { COPY_NEW, COPY_REPLACE, COPY_TREE, DELETE, DELETE_DIR, AMBIGUOUS, COPY_TARGET };
 	
-	public enum BackupStatus { DIFFERENT, DIFF_BY_CONTENT, DONE, FAILED } ;
+	public enum BackupStatus { DIFFERENT, DIFF_BY_CONTENT, SAME_CONTENT, DONE, FAILED } ;
 
 	private final Path	 				   sourcePath ;
 	private final Path 		 			   sourceClosestExistingPath ;
@@ -39,7 +63,6 @@ public class BackUpItem {
 	private final BackupAction 			   backupAction ;
 	private final long					   sizeDifference ;
 	private BackupStatus 				   backupStatus ;
-	private boolean		 				   diffByContent ;
 	private final DirectoryPermanenceLevel permanenceLevel ;
 	private final Logger				   bLog ;
 	
@@ -55,17 +78,18 @@ public class BackUpItem {
 	//		DELETE_DIR   : if the source directory does not exists (and the target exists)
 	//		AMBIGUOUS    : Abnormal case - if the target is newer than the source
 	// * a back up status that may take the following values:
-	//		TO_BE_DONE	 : the back up is to be done
-	//		DONE	 	 : the back up has been done
-	//		FAILED	 	 : the back up has failed
+	//		DIFFERENT	 	: the source and target are different by attributes (size, dates...)
+	//		DIFF_BY_CONTENT : the source and target are different by content (this information is only available when a content comparison is done)
+	//		SAME_CONTENT 	: the source and target are different by attributes but have same content (and target is newer)
+	//		DONE	 	 	: the item has been backed-up
+	//		FAILED	 	 	: the back up has failed
 	
-	public BackUpItem(Path src, Path tgt, BackupAction bst, long sd, BackUpCounters backUpCounters, Logger l) {
+	public BackUpItem(Path src, Path tgt, BackupAction bst, BackupStatus bStatus, long sd, BackUpCounters backUpCounters, Logger l) {
 		sourcePath 	 	 		  = src ;
 		sourceClosestExistingPath = src ;
 		targetPath 	 	 		  = tgt ;
 		backupAction 	 		  = bst ;
-		backupStatus 	 		  = BackupStatus.DIFFERENT ;
-		diffByContent		  	  = false ;
+		backupStatus 	 		  = bStatus;
 		bLog 		 	 		  = l ;
 		sizeDifference			  = sd ;
 		if (targetPath != null) {
@@ -90,8 +114,11 @@ public class BackUpItem {
 		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
 			checkPathExists(tgt, TGT_NOT_EXISTS) ;
 			backUpCounters.ambiguousNb++ ;
+		} else if (backupAction.equals(BackupAction.COPY_TARGET)) {
+			checkPathExists(tgt, TGT_NOT_EXISTS) ;
+			backUpCounters.copyTargetNb++ ;
 		} else {
-			throw new IllegalBackupActionException("Illegal backup action (should not be a delete action)", backupAction) ;
+			throw new IllegalBackupActionException("Illegal backup action", backupAction) ;
 		}
 		updateLimtsCounters(backUpCounters) ;
 	}
@@ -103,7 +130,6 @@ public class BackUpItem {
 		targetPath 	 	 		  = tgt ;
 		backupAction 	 		  = bst ;
 		backupStatus 	 		  = BackupStatus.DIFFERENT ;
-		diffByContent		  	  = false ;
 		bLog 		 	 		  = l ;
 		sizeDifference			  = sd ;
 		if (targetPath != null) {
@@ -267,6 +293,12 @@ public class BackUpItem {
 			Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES, LinkOption.NOFOLLOW_LINKS) ;
 			backUpCounters.ambiguousNb++ ;
 			backUpCounters.nbSourceFilesProcessed++ ;
+		} else if (backupAction.equals(BackupAction.COPY_TARGET)) {
+			Files.copy(targetPath, sourcePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES, LinkOption.NOFOLLOW_LINKS);
+			backUpCounters.ambiguousNb++;
+			backUpCounters.nbSourceFilesProcessed++;
+		} else {
+			throw new IllegalBackupActionException("Invalid backup action: ", backupAction);
 		}
 		return success ;
 	}
@@ -300,15 +332,6 @@ public class BackUpItem {
 		} catch (Exception e) {
 			bLog.log(Level.SEVERE, "Exception when getting information on backup item.\nSource Path=" + sourcePath + "\nTargetpath=" + targetPath, e);
 		}
-	}
-
-	public boolean diffByContent() {
-		return diffByContent;
-	}
-
-	public void setDiffByContent(boolean dbc) {
-		backupStatus  = BackupStatus.DIFF_BY_CONTENT ;
-		diffByContent = dbc;
 	}
 
 }

@@ -1,14 +1,39 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2023 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.backupFiles;
 
 public class BackUpCounters {
 
-	public long copyNewNb ;
-	public long copyReplaceNb ;
-	public long copyTreeNb ;
-	public long deleteNb ;
-	public long deleteDirNb ;
-	public long ambiguousNb ;
-	public long contentDifferentNb ;
+	public long copyNewNb;
+	public long copyReplaceNb;
+	public long copyTreeNb;
+	public long deleteNb;
+	public long deleteDirNb;
+	public long ambiguousNb;
+	public long copyTargetNb;
+	public long contentDifferentNb;
 	
 	public long nbSourceFilesProcessed ;
 	public long nbTargetFilesProcessed ;
@@ -25,6 +50,7 @@ public class BackUpCounters {
 	private final static String DELETE_LABEL 		= "  Effacer:            " ;
 	private final static String DELETE_DIR_LABEL 	= "  Effacer arbre:      " ;
 	private final static String AMBIGUOUS_LABEL 	= "  Ambigu:             " ;
+	private final static String COPY_TARGET_LABEL 	= "  Copier target:      " ;
 	
 	private final static String SOURCE_OK_LABEL 	= "  Eléments source traités:   " ;
 	private final static String SOURCE_KO_LABEL 	= "  Eléments source en erreur: " ;
@@ -48,6 +74,7 @@ public class BackUpCounters {
 		deleteNb					 = 0 ;
 		deleteDirNb 				 = 0 ;
 		ambiguousNb 				 = 0 ; 
+		copyTargetNb				 = 0 ; 
 		contentDifferentNb			 = 0 ;
 		nbSourceFilesProcessed 		 = 0 ;
 		nbTargetFilesProcessed 		 = 0 ;
@@ -67,6 +94,7 @@ public class BackUpCounters {
 		res.append(COPY_NEW_LABEL	 ).append(copyNewNb	   ).append(DELETE_LABEL	).append(deleteNb	).append("\n") ;
 		res.append(COPY_REPLACE_LABEL).append(copyReplaceNb).append(DELETE_DIR_LABEL).append(deleteDirNb).append("\n") ;
 		res.append(COPY_TREE_LABEL	 ).append(copyTreeNb   ).append(AMBIGUOUS_LABEL	).append(ambiguousNb).append("\n") ;
+		res.append(COPY_TARGET_LABEL).append(copyTargetNb).append("\n");
 		
 		res.append(SOURCE_OK_LABEL).append(nbSourceFilesProcessed).append(SOURCE_KO_LABEL).append(nbSourceFilesFailed).append("\n") ;
 		res.append(TARGET_OK_LABEL).append(nbTargetFilesProcessed).append(TARGET_KO_LABEL).append(nbTargetFilesFailed).append("\n") ;
@@ -92,6 +120,7 @@ public class BackUpCounters {
 		appendCellCouple(res, DELETE_LABEL, deleteNb, null) ;
 		appendCellCouple(res, DELETE_DIR_LABEL, deleteDirNb, null) ;
 		appendCellCouple(res, AMBIGUOUS_LABEL, ambiguousNb, "red") ;
+		appendCellCouple(res, COPY_TARGET_LABEL, copyTargetNb, "red") ;
 		
 		res.append(NEW_ROW) ;		
 		appendCellCouple(res, SOURCE_OK_LABEL, nbSourceFilesProcessed, null) ;
@@ -170,6 +199,7 @@ public class BackUpCounters {
 		deleteNb					 = deleteNb 				 	+ counters.deleteNb ;
 		deleteDirNb 				 = deleteDirNb 			 		+ counters.deleteDirNb ;
 		ambiguousNb 				 = ambiguousNb 			 		+ counters.ambiguousNb ; 
+		copyTargetNb 				 = copyTargetNb 			 	+ counters.copyTargetNb ;
 		contentDifferentNb 			 = contentDifferentNb	 		+ counters.contentDifferentNb ; 
 		nbSourceFilesProcessed 		 = nbSourceFilesProcessed 		+ counters.nbSourceFilesProcessed ;
 		nbTargetFilesProcessed 		 = nbTargetFilesProcessed 		+ counters.nbTargetFilesProcessed ;

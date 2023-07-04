@@ -1,3 +1,27 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2023 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.backupFiles.gui;
 
 import java.awt.Color;
@@ -31,7 +55,8 @@ public class UiControl extends JPanel {
 	private final JButton bckpUpButton ;
 	private final JButton stopButton ;
 
-	private final JCheckBox compareContentSelect ;
+	private final JCheckBox compareContentSelect;
+	private final JCheckBox compareContentOnAmbiguousSelect;
 	
 	private boolean isRunning ;
 	private boolean stopAsked ;
@@ -97,7 +122,13 @@ public class UiControl extends JPanel {
 		compareContentSelect = new JCheckBox("Compare files content") ;
 		c.gridx = 0;
 		c.gridy = 0;
-		add(compareContentSelect, c) ;
+		add(compareContentSelect, c);
+		
+		// Compare content check box
+		compareContentOnAmbiguousSelect = new JCheckBox("Compare files content on ambiguous files", true) ;
+		c.gridx = 0;
+		c.gridy = 1;
+		add(compareContentOnAmbiguousSelect, c);
 		
 		// Scan and Back up button
 		bckpUpButton = new JButton("Sauvegarde") ;
@@ -115,7 +146,7 @@ public class UiControl extends JPanel {
 		stopButton.addActionListener(controlAction);
 		
 		c.gridx = 0;
-		c.gridy = 1;
+		c.gridy = 2;
 		c.ipadx = 200;
 		add(scanButton, c);
 		c.gridx = 1;
@@ -173,7 +204,8 @@ public class UiControl extends JPanel {
 				bLog.fine("Scan action launched");
 				uiControl.setIsRunning(true);
 				
-				jobsChoice.setCompareContent(jobTaskType, compareContentSelect.isSelected()) ;
+				jobsChoice.setCompareContent(jobTaskType, compareContentSelect.isSelected());
+				jobsChoice.setCompareContentOnAmbiguous(jobTaskType, compareContentOnAmbiguousSelect.isSelected());
 				
 				FilesBackUpScanner   fScan 	 = new FilesBackUpScanner(uiControl, jobTaskType, jobsChoice, backUpTableModel, progressPanel, backUpJobInfoTableModel, bLog) ;				
 				progressPanel.setProcessStatus(COMPARAISON_EN_COURS);

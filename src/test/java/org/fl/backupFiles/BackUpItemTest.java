@@ -1,3 +1,27 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2023 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.backupFiles;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,6 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.fl.backupFiles.BackUpItem.BackupAction;
+import org.fl.backupFiles.BackUpItem.BackupStatus;
 import org.fl.util.RunningContext;
 import org.fl.util.file.FileComparator;
 import org.junit.jupiter.api.BeforeAll;
@@ -44,7 +69,7 @@ public class BackUpItemTest {
 		Path tgt 		 = Paths.get("") ;
 		
 		BackUpCounters counters = new BackUpCounters() ;
-		BackUpItem backUpItem = new BackUpItem(src, tgt, BackupAction.COPY_REPLACE, 0, counters, log) ;
+		BackUpItem backUpItem = new BackUpItem(src, tgt, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters, log) ;
 		
 		BackupAction action = backUpItem.getBackupAction() ;
 		
@@ -61,7 +86,7 @@ public class BackUpItemTest {
 		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 		
 		BackUpCounters counters = new BackUpCounters() ;
-		BackUpItem backUpItem = new BackUpItem(src, tgt, BackupAction.COPY_NEW, 0, counters, log) ;
+		BackUpItem backUpItem = new BackUpItem(src, tgt, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log) ;
 		
 		assertEquals(1, getTotalCounters(counters)) ;
 		
@@ -102,10 +127,11 @@ public class BackUpItemTest {
 		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 		
 		BackUpCounters counters = new BackUpCounters() ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_NEW, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_REPLACE, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_TREE, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.AMBIGUOUS, 0, counters, log)) ;
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.AMBIGUOUS, BackupStatus.SAME_CONTENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_TARGET, BackupStatus.SAME_CONTENT, 0, counters, log));
 	}
 	@Test
 	
@@ -118,10 +144,11 @@ public class BackUpItemTest {
 		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 		
 		BackUpCounters counters = new BackUpCounters() ;
-		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_NEW, src, 0, counters, log)) ;
-		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_REPLACE, src, 0, counters, log)) ;
-		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_TREE, src, 0, counters, log)) ;
-		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.AMBIGUOUS, src, 0, counters, log)) ;
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_NEW, src, 0, counters, log));
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_REPLACE, src, 0, counters, log));
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_TREE, src, 0, counters, log));
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.AMBIGUOUS, src, 0, counters, log));
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_TARGET, src, 0, counters, log));
 	}
 	
 	@Test
@@ -134,8 +161,8 @@ public class BackUpItemTest {
 		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 		
 		BackUpCounters counters = new BackUpCounters() ;
-		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(src, tgt, BackupAction.DELETE, 0, counters, log)) ;
-		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(src, tgt, BackupAction.DELETE_DIR, 0, counters, log)) ;
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(src, tgt, BackupAction.DELETE, BackupStatus.DIFFERENT, 0, counters, log)) ;
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(src, tgt, BackupAction.DELETE_DIR, BackupStatus.DIFFERENT, 0, counters, log)) ;
 	}
 	
 	@Test
@@ -148,10 +175,11 @@ public class BackUpItemTest {
 		Path tgt  			= TestUtils.getPathFromUriString(TGT_FILE1) ;
 		
 		BackUpCounters counters = new BackUpCounters() ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_NEW, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_REPLACE, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_TREE, 0, counters, log)) ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.AMBIGUOUS, 0, counters, log)) ;
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.AMBIGUOUS, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_TARGET, BackupStatus.DIFFERENT, 0, counters, log));
 	}
 	
 	@Test
@@ -182,7 +210,7 @@ public class BackUpItemTest {
 		assertTrue(Files.exists(tgt)) ;
 		
 		BackUpCounters counters = new BackUpCounters() ;
-		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_NEW, 0, counters, log)) ;
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log)) ;
 		Files.delete(tgt) ;
 	}
 	
