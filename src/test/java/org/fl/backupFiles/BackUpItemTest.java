@@ -24,6 +24,8 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,30 +39,14 @@ import org.fl.backupFiles.BackUpItem.BackupAction;
 import org.fl.backupFiles.BackUpItem.BackupStatus;
 import org.fl.util.RunningContext;
 import org.fl.util.file.FileComparator;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import static org.assertj.core.api.Assertions.*;
 
 public class BackUpItemTest {
 
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles.properties";
 
-	private static Logger log;
-	
-	private static final String SRC_FOLDER = "file:///ForTests/BackUpFiles/TestDir1/";
-	private static final String SRC_FILE1 = SRC_FOLDER + "File1.pdf";
-	private static final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
-	private static final String UNEXISTANT_FILE = "file:///ForTests/BackUpFiles/TestDir1/doesNotExists.pdf";
-	
-	private static final Path EXISTANT_SOURCE_FOLDER  = TestUtils.getPathFromUriString(SRC_FOLDER);
-	private static final Path EXISTANT_SOURCE  = TestUtils.getPathFromUriString(SRC_FILE1);
-	private static final Path UNEXISTANT_TARGET  = TestUtils.getPathFromUriString(TGT_FILE1);
-	private static final Path UNEXISTANT_PATH = TestUtils.getPathFromUriString(UNEXISTANT_FILE);
-	
-	
-	private static final String UNEXISTANT_FOLDER = "file:///ForTests/BackUpFiles/doesNotExists" ;
-	private static final Path UNEXISTANT_FOLDER_PATH  = TestUtils.getPathFromUriString(UNEXISTANT_FOLDER) ;
+	private static Logger log ;
 	
 	@BeforeAll
 	static void initConfig() {
@@ -87,140 +73,145 @@ public class BackUpItemTest {
 		
 		BackupAction action = backUpItem.getBackupAction() ;
 		
-		assertThat(action).isEqualTo(BackupAction.COPY_REPLACE);
+		assertEquals(BackupAction.COPY_REPLACE, action) ;
 	}
 		
 	@Test
 	void test2() {
 		
-		BackUpCounters counters = new BackUpCounters() ;
-		BackUpItem backUpItem = new BackUpItem(EXISTANT_SOURCE, UNEXISTANT_TARGET, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log) ;
+		final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/TestDir1/File1.pdf" ;
+		final String TGT_FILE1 =  "file:///ForTests/BackUpFiles/TestDir2/File1.pdf" ;
 		
-		assertThat(getTotalCounters(counters)).isEqualTo(1);
+		Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
+		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
+		
+		BackUpCounters counters = new BackUpCounters() ;
+		BackUpItem backUpItem = new BackUpItem(src, tgt, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log) ;
+		
+		assertEquals(1, getTotalCounters(counters)) ;
 		
 		counters.reset();
 		backUpItem.execute(counters);
 		
 		FileComparator fileComparator = new FileComparator(log) ;
 		
-		assertThat(fileComparator.haveSameContent(EXISTANT_SOURCE, UNEXISTANT_TARGET)).isTrue();
-	
-		assertThat(counters.nbSourceFilesProcessed).isEqualTo(1);
-		assertThat(counters.copyNewNb).isEqualTo(1);
-		assertThat(getTotalCounters(counters)).isEqualTo(2);
+		boolean same = fileComparator.haveSameContent(src, tgt) ;
+		assertTrue(same) ;		
+		assertEquals(1, counters.copyNewNb) ;
+		assertEquals(1, counters.nbSourceFilesProcessed) ;
+		assertEquals(2, getTotalCounters(counters)) ;
 		
 		counters.reset();
-		backUpItem = new BackUpItem(UNEXISTANT_TARGET, BackupAction.DELETE, EXISTANT_SOURCE.getParent(), 0, counters, log) ;
-		
-		assertThat(counters.copyNewNb).isZero();
-		assertThat(counters.nbSourceFilesProcessed).isZero();
-		assertThat(counters.nbTargetFilesProcessed).isZero();
-		assertThat(counters.deleteNb).isEqualTo(1);
-		assertThat(getTotalCounters(counters)).isEqualTo(1);
+		backUpItem = new BackUpItem(tgt, BackupAction.DELETE, src.getParent(), 0, counters, log) ;
+		assertEquals(0, counters.copyNewNb) ;
+		assertEquals(0, counters.nbSourceFilesProcessed) ;
+		assertEquals(1, counters.deleteNb) ;
+		assertEquals(0, counters.nbTargetFilesProcessed) ;
+		assertEquals(1, getTotalCounters(counters)) ;
 		
 		counters.reset();
 		backUpItem.execute(counters);
 		
-		assertThat(Files.exists(UNEXISTANT_TARGET)).isFalse();
-		assertThat(counters.nbSourceFilesProcessed).isZero();
-		assertThat(counters.deleteNb).isEqualTo(1);
-		assertThat(counters.nbTargetFilesProcessed).isEqualTo(1);
-		assertThat(getTotalCounters(counters)).isEqualTo(2);
+		assertFalse(Files.exists(tgt)) ;
+		assertEquals(0, counters.nbSourceFilesProcessed) ;
+		assertEquals(1, counters.deleteNb) ;
+		assertEquals(1, counters.nbTargetFilesProcessed) ;
+		assertEquals(2, getTotalCounters(counters)) ;	
 	}
 	
 	@Test
 	void nullSrcShouldThrowException() {
 		
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf" ;
+		
+		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
+		
 		BackUpCounters counters = new BackUpCounters() ;
-
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(null, UNEXISTANT_TARGET, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(null, UNEXISTANT_TARGET, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters, log));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(null, UNEXISTANT_TARGET, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, 0, counters, log));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() ->
-			new BackUpItem(null, UNEXISTANT_TARGET, BackupAction.AMBIGUOUS, BackupStatus.SAME_CONTENT, 0, counters, log));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(null, UNEXISTANT_TARGET, BackupAction.COPY_TARGET, BackupStatus.SAME_CONTENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.AMBIGUOUS, BackupStatus.SAME_CONTENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(null, tgt, BackupAction.COPY_TARGET, BackupStatus.SAME_CONTENT, 0, counters, log));
 	}
 	@Test
 	
 	void illegalCopyShouldThrowException() {
 		
-		Path tgt  = EXISTANT_SOURCE;
+		final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/TestDir1" ;
+		final String TGT_FILE1 =  "file:///ForTests/BackUpFiles/TestDir1/File1.pdf" ;
+		
+		Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
+		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 		
 		BackUpCounters counters = new BackUpCounters() ;
-
-		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> 
-			new BackUpItem(tgt, BackupAction.COPY_NEW, EXISTANT_SOURCE_FOLDER, 0, counters, log));
-		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> 
-			new BackUpItem(tgt, BackupAction.COPY_REPLACE, EXISTANT_SOURCE_FOLDER, 0, counters, log));
-		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> 
-			new BackUpItem(tgt, BackupAction.COPY_TREE, EXISTANT_SOURCE_FOLDER, 0, counters, log));
-		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> 
-			new BackUpItem(tgt, BackupAction.AMBIGUOUS, EXISTANT_SOURCE_FOLDER, 0, counters, log));
-		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> 
-			new BackUpItem(tgt, BackupAction.COPY_TARGET, EXISTANT_SOURCE_FOLDER, 0, counters, log));
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_NEW, src, 0, counters, log));
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_REPLACE, src, 0, counters, log));
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_TREE, src, 0, counters, log));
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.AMBIGUOUS, src, 0, counters, log));
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(tgt, BackupAction.COPY_TARGET, src, 0, counters, log));
 	}
 	
 	@Test
 	void illegalDeleteShouldThrowException() {
 		
+		final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/TestDir1/File1.pdf" ;
+		final String TGT_FILE1 =  "file:///ForTests/BackUpFiles/TestDir2/File1.pdf" ;
+		
+		Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
+		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
+		
 		BackUpCounters counters = new BackUpCounters() ;
-
-		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> 
-			new BackUpItem(EXISTANT_SOURCE, UNEXISTANT_TARGET, BackupAction.DELETE, BackupStatus.DIFFERENT, 0, counters, log));
-		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> 
-			new BackUpItem(EXISTANT_SOURCE, UNEXISTANT_TARGET, BackupAction.DELETE_DIR, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(src, tgt, BackupAction.DELETE, BackupStatus.DIFFERENT, 0, counters, log)) ;
+		assertThrows(IllegalBackupActionException.class, () -> new BackUpItem(src, tgt, BackupAction.DELETE_DIR, BackupStatus.DIFFERENT, 0, counters, log)) ;
 	}
 	
 	@Test
 	void unexistantSrcShouldThrowException() {
 		
+		final String SRC_FILE1 		= "file:///ForTests/BackUpFiles/TestDir1/doesNotExists.pdf" ;
+		final String TGT_FILE1 		= "file:///ForTests/BackUpFiles/TestDir2/File1.pdf" ;
+		
+		Path src  			= TestUtils.getPathFromUriString(SRC_FILE1) ;
+		Path tgt  			= TestUtils.getPathFromUriString(TGT_FILE1) ;
+		
 		BackUpCounters counters = new BackUpCounters() ;
-
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(UNEXISTANT_PATH, UNEXISTANT_TARGET, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(UNEXISTANT_PATH, UNEXISTANT_TARGET, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters, log));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(UNEXISTANT_PATH, UNEXISTANT_TARGET, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, 0, counters, log));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(UNEXISTANT_PATH, UNEXISTANT_TARGET, BackupAction.AMBIGUOUS, BackupStatus.DIFFERENT, 0, counters, log));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(UNEXISTANT_PATH, UNEXISTANT_TARGET, BackupAction.COPY_TARGET, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.AMBIGUOUS, BackupStatus.DIFFERENT, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_TARGET, BackupStatus.DIFFERENT, 0, counters, log));
 	}
 	
 	@Test
 	void unexistantExistingSrcShouldThrowException() throws IOException {
 		
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/doesNotExists" ;
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf" ;
+		
+		Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
+		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
+		
 		BackUpCounters counters = new BackUpCounters() ;
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(UNEXISTANT_TARGET, BackupAction.DELETE, UNEXISTANT_FOLDER_PATH, 0, counters, log));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(UNEXISTANT_TARGET, BackupAction.DELETE_DIR, UNEXISTANT_FOLDER_PATH, 0, counters, log));
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(tgt, BackupAction.DELETE, src, 0, counters, log)) ;
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(tgt, BackupAction.DELETE_DIR, src, 0, counters, log)) ;
 	}
 	
 	@Test
 	void existantTgtShouldThrowException() throws IOException {
-			
-		Files.copy(EXISTANT_SOURCE, UNEXISTANT_TARGET);
-		assertThat(Files.exists(EXISTANT_SOURCE)).isTrue();
-		assertThat(Files.exists(UNEXISTANT_TARGET)).isTrue();
+		
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf" ;
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf" ;
+		
+		Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
+		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
+		
+		Files.copy(src, tgt) ;
+		assertTrue(Files.exists(src)) ;
+		assertTrue(Files.exists(tgt)) ;
 		
 		BackUpCounters counters = new BackUpCounters() ;
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(EXISTANT_SOURCE, UNEXISTANT_TARGET, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log));
-	}
-	
-	@AfterEach
-	void clean() throws IOException {
-		
-		if (Files.exists(UNEXISTANT_TARGET)) {
-			Files.delete(UNEXISTANT_TARGET);
-		}
-	
+		assertThrows(IllegalBackUpItemException.class, () -> new BackUpItem(src, tgt, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log)) ;
+		Files.delete(tgt) ;
 	}
 	
 	private long getTotalCounters(BackUpCounters counters) {
