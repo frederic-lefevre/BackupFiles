@@ -295,7 +295,7 @@ public class BackUpItem {
 			backUpCounters.nbSourceFilesProcessed++ ;
 		} else if (backupAction.equals(BackupAction.COPY_TARGET)) {
 			Files.copy(targetPath, sourcePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES, LinkOption.NOFOLLOW_LINKS);
-			backUpCounters.ambiguousNb++;
+			backUpCounters.copyTargetNb++;
 			backUpCounters.nbSourceFilesProcessed++;
 		} else {
 			throw new IllegalBackupActionException("Invalid backup action: ", backupAction);

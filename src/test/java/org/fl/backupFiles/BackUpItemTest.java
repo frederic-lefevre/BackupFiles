@@ -206,12 +206,36 @@ public class BackUpItemTest {
 	void existantTgtShouldThrowException() throws IOException {
 			
 		Files.copy(EXISTANT_SOURCE, UNEXISTANT_TARGET);
+		Path nowExists = UNEXISTANT_TARGET;
+		
 		assertThat(Files.exists(EXISTANT_SOURCE)).isTrue();
-		assertThat(Files.exists(UNEXISTANT_TARGET)).isTrue();
+		assertThat(Files.exists(nowExists)).isTrue();
 		
 		BackUpCounters counters = new BackUpCounters() ;
 		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(EXISTANT_SOURCE, UNEXISTANT_TARGET, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log));
+			new BackUpItem(EXISTANT_SOURCE, nowExists, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters, log));
+	}
+	
+	@Test
+	void shouldCopyTarget() throws IOException {
+			
+		Files.copy(EXISTANT_SOURCE, UNEXISTANT_TARGET);
+		
+		Path nowExists = UNEXISTANT_TARGET;
+		assertThat(Files.exists(EXISTANT_SOURCE)).isTrue();
+		assertThat(Files.exists(nowExists)).isTrue();
+		
+		BackUpCounters counters = new BackUpCounters() ;
+		
+		BackUpItem backUpItem = new BackUpItem(EXISTANT_SOURCE, nowExists, BackupAction.COPY_TARGET, BackupStatus.SAME_CONTENT, 0, counters, log) ;
+		
+		assertThat(counters.copyTargetNb).isEqualTo(1);
+		
+		counters.reset();
+		backUpItem.execute(counters);
+		
+		assertThat(counters.copyTargetNb).isEqualTo(1);
+		assertThat(getTotalCounters(counters)).isEqualTo(2);
 	}
 	
 	@AfterEach
@@ -232,6 +256,7 @@ public class BackUpItemTest {
 				counters.copyTreeNb				+
 				counters.deleteDirNb			+
 				counters.deleteNb				+
+				counters.copyTargetNb			+
 				counters.nbSourceFilesFailed	+
 				counters.nbSourceFilesProcessed	+
 				counters.nbTargetFilesFailed	+
