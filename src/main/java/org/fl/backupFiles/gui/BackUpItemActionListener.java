@@ -44,8 +44,6 @@ import org.fl.util.swing.FileActions;
 
 public class BackUpItemActionListener implements java.awt.event.ActionListener {
 
-	public enum FileElement { Source, Cible, Both } ;
-	
 	public enum CustomAction { Compare, ShowParentDir } ;
 	
 	private static Map<CustomAction, String> customActionCommands ;
@@ -53,7 +51,6 @@ public class BackUpItemActionListener implements java.awt.event.ActionListener {
 	private BackUpJTable   backUpJTable ;
 	private Desktop.Action action ;
 	private FileElement    fileElement ;
-	private String 		   command ;
 	private CustomAction   customAction ;
 	private Logger		   bLog ;
 	
@@ -61,24 +58,13 @@ public class BackUpItemActionListener implements java.awt.event.ActionListener {
 		backUpJTable = bkt ;
 		action 		 = act ;
 		fileElement  = elem ;
-		command		 = null ;
 		customAction = null ;
-		bLog		 = l ;
-	}
-
-	public BackUpItemActionListener(BackUpJTable bkt, String cmd, FileElement elem, Logger l) {
-		backUpJTable = bkt ;
-		action 		 = null ;
-		customAction = null ;
-		fileElement  = elem ;
-		command		 = cmd ;
 		bLog		 = l ;
 	}
 	
 	public BackUpItemActionListener(BackUpJTable bkt, CustomAction ca, FileElement elem, Logger l) {
 		backUpJTable = bkt ;
 		action 		 = null ;
-		command		 = null ;
 		fileElement  = elem ;
 		customAction = ca ;
 		bLog		 = l ;
@@ -102,26 +88,6 @@ public class BackUpItemActionListener implements java.awt.event.ActionListener {
 					FileActions.launchAction(file, action);
 				}
 		
-		} else if (command != null) {
-			// Command defined in the property file, passed for execution to the OS (maybe an external binary editor for instance)
-			StringBuilder fullCommand = new StringBuilder(command) ;
-
-				
-				String filePaths = null ;
-				
-				if (fileElement.equals(FileElement.Source)) {
-					filePaths = selectedEntry.getSourcePath().toAbsolutePath().toString() ;
-				} else if (fileElement.equals(FileElement.Cible)) {
-					filePaths = selectedEntry.getTargetPath().toAbsolutePath().toString() ;
-				} else if (fileElement.equals(FileElement.Both)) {
-					filePaths = selectedEntry.getSourcePath().toAbsolutePath().toString() + " " + selectedEntry.getTargetPath().toAbsolutePath().toString() ;
-				}
-				if (filePaths != null) {
-					fullCommand.append(" ").append(filePaths) ;
-				}
-			
-			OScommand osCommand = new OScommand(fullCommand.toString(), false, bLog) ;
-			osCommand.run();
 		} else if (customAction.equals(CustomAction.Compare)) {
 			// Display all possible informations on the source and target files 
 			// including the result of a binary compare 

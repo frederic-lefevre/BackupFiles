@@ -38,7 +38,6 @@ import javax.swing.JPopupMenu;
 import org.fl.backupFiles.BackUpItem;
 import org.fl.backupFiles.OsAction;
 import org.fl.backupFiles.gui.BackUpItemActionListener.CustomAction;
-import org.fl.backupFiles.gui.BackUpItemActionListener.FileElement;
 
 public class BackupItemMouseAdapter extends MouseAdapter {
 
@@ -85,13 +84,13 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 		for (OsAction osAction : osActions) {
 
 			if (osAction.paramSeparated()) {
-				BackUpItemActionListener actionSourceListener  = new BackUpItemActionListener(bkt, osAction.getActionCommand(),  FileElement.Source, bLog) ;
-				BackUpItemActionListener actionCibleListener   = new BackUpItemActionListener(bkt, osAction.getActionCommand(),  FileElement.Cible,  bLog) ;
+				ActionListener actionSourceListener  = new BackUpItemCommandListener(bkt, osAction.getActionCommand(),  FileElement.Source, bLog);
+				ActionListener actionCibleListener   = new BackUpItemCommandListener(bkt, osAction.getActionCommand(),  FileElement.Cible,  bLog);
 
-				sourceMenuItems.add(addMenuItem(osAction.getActionTitle() + " source",  actionSourceListener)) ;
-				targetMenuItems.add(addMenuItem(osAction.getActionTitle() + " cible",   actionCibleListener)) ;
+				sourceMenuItems.add(addMenuItem(osAction.getActionTitle() + " source",  actionSourceListener));
+				targetMenuItems.add(addMenuItem(osAction.getActionTitle() + " cible",   actionCibleListener));
 			} else {
-				BackUpItemActionListener actionBothListener   = new BackUpItemActionListener(bkt, osAction.getActionCommand(),  FileElement.Both,  bLog) ;
+				ActionListener actionBothListener   = new BackUpItemCommandListener(bkt, osAction.getActionCommand(),  FileElement.Both,  bLog);
 
 				bothMenuItems.add(addMenuItem(osAction.getActionTitle(),  actionBothListener)) ;
 			}
