@@ -25,118 +25,43 @@ SOFTWARE.
 package org.fl.backupFiles.gui;
 
 import java.awt.Desktop;
-import java.awt.Font;
+
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
-
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 import org.fl.backupFiles.BackUpItem;
-import org.fl.util.os.OScommand;
 import org.fl.util.swing.FileActions;
 
 public class BackUpItemActionListener implements java.awt.event.ActionListener {
-
-	public enum CustomAction { Compare, ShowParentDir } ;
 	
-	private static Map<CustomAction, String> customActionCommands ;
+	private BackUpJTable backUpJTable ;
+	private Desktop.Action action;
+	private FileElement fileElement;
 	
-	private BackUpJTable   backUpJTable ;
-	private Desktop.Action action ;
-	private FileElement    fileElement ;
-	private CustomAction   customAction ;
-	private Logger		   bLog ;
-	
-	public BackUpItemActionListener(BackUpJTable bkt, Desktop.Action act, FileElement elem, Logger l) {
-		backUpJTable = bkt ;
-		action 		 = act ;
-		fileElement  = elem ;
-		customAction = null ;
-		bLog		 = l ;
-	}
-	
-	public BackUpItemActionListener(BackUpJTable bkt, CustomAction ca, FileElement elem, Logger l) {
-		backUpJTable = bkt ;
-		action 		 = null ;
-		fileElement  = elem ;
-		customAction = ca ;
-		bLog		 = l ;
+	public BackUpItemActionListener(BackUpJTable bkt, Desktop.Action act, FileElement elem) {
+		backUpJTable = bkt;
+		action 		 = act;
+		fileElement  = elem;
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent evt) {
-		
+
 		BackUpItem selectedEntry = backUpJTable.getSelectedBackUpItem() ;
-		
-		if (action != null) {
+
+		if (selectedEntry != null) {
 			// OS command (Java Desktop class OS action on File object: Edit, Open, Print)
 
-				File file = null ;
-				if (fileElement.equals(FileElement.Source)) {
-					file = selectedEntry.getSourceFile() ;
-				} else if (fileElement.equals(FileElement.Cible)) {
-					file = selectedEntry.getTargetFile();
-				}
-				if (file != null) {
-					FileActions.launchAction(file, action);
-				}
-		
-		} else if (customAction.equals(CustomAction.Compare)) {
-			// Display all possible informations on the source and target files 
-			// including the result of a binary compare 
-			
-			StringBuilder compareInfos = new StringBuilder() ;
-
-				selectedEntry.getInformation(compareInfos) ;
-				compareInfos.append("- - - - - - - - - - - - - - -\n") ;
-			
-			
-			// Show informations in popup message
-			JTextArea infoFiles = new JTextArea(40, 200);	
-			infoFiles.setText(compareInfos.toString());
-			infoFiles.setFont(new Font("monospaced", Font.BOLD, 14));
-			JScrollPane infoFilesScroll = new JScrollPane(infoFiles) ;
-			JOptionPane.showMessageDialog(null, infoFilesScroll, "Informations", JOptionPane.INFORMATION_MESSAGE);
-			
-		}  else if (customAction.equals(CustomAction.ShowParentDir)) {
-			// Launch a file explorer on the parent directory
-			
-			String showParentDirCmd = customActionCommands.get(CustomAction.ShowParentDir) ;
-			
-			if ((showParentDirCmd != null) && (! showParentDirCmd.isEmpty())) {
-
-					
-					Path filePath ;
-					if (fileElement.equals(FileElement.Source)) {
-						filePath = selectedEntry.getSourcePath() ;
-					} else {
-						filePath = selectedEntry.getTargetPath() ;
-					}
-				
-					if (filePath != null) {
-						Path parentDir = filePath.getParent();
-						if (Files.exists(parentDir)) {
-							OScommand osCommand = new OScommand(showParentDirCmd + " " + parentDir.toAbsolutePath(), false, bLog) ;
-							osCommand.run();
-						} else {
-							bLog.warning("Showing parent directory: parent directory of " + filePath + " does not exists");
-						}
-					} else {
-						bLog.warning("Action to show parent directory with a null file path");
-					}
-			
+			File file = null ;
+			if (fileElement.equals(FileElement.Source)) {
+				file = selectedEntry.getSourceFile();
+			} else if (fileElement.equals(FileElement.Cible)) {
+				file = selectedEntry.getTargetFile();
 			}
-		}
+			if (file != null) {
+				FileActions.launchAction(file, action);
+			}
+		} 
 	}
 
-	public static void setCustomActionCommands(HashMap<CustomAction, String> cac) {
-		customActionCommands = cac ;
-	}
 }
