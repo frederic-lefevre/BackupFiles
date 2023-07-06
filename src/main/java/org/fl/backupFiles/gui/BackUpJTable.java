@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumnModel;
@@ -71,6 +72,11 @@ public class BackUpJTable extends JTable {
 		getColumnModel().getColumn(BackUpTableModel.STATUS_COL_IDX).setPreferredWidth(100);
 		getColumnModel().getColumn(BackUpTableModel.TARGET_PATH_COL_IDX).setPreferredWidth(745);
 
+		// Allow single row selection only
+		ListSelectionModel listSelectionModel = new DefaultListSelectionModel();
+		listSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		setSelectionModel(listSelectionModel);
+		
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF) ;
 		
 		addMouseListener(new BackupItemMouseAdapter(this, Config.getOsActions(), tLog));

@@ -31,11 +31,9 @@ import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
 
 import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpTask;
@@ -64,12 +62,7 @@ public class BackUpPane extends JPanel {
 		BackUpItemList backUpItemList = new BackUpItemList();
 		BackUpTableModel backUpTableModel = new BackUpTableModel(backUpItemList);
 		
-		// Allow single row selection only
-		ListSelectionModel listSelectionModel = new DefaultListSelectionModel();
-		listSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		
 		BackUpJTable backUpItemTable = new BackUpJTable(backUpTableModel, bLog);
-		backUpItemTable.setSelectionModel(listSelectionModel);
 
 		// Tables labels
 		title = new JLabel(jobTaskType.toString() + SEPARATOR + NO_CONFIG) ;
