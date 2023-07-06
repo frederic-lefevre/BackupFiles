@@ -64,6 +64,8 @@ public class BackUpItem {
 	private final long					   sizeDifference ;
 	private BackupStatus 				   backupStatus ;
 	private final DirectoryPermanenceLevel permanenceLevel ;
+	private final boolean				   sourcePresent;
+	private final boolean				   targetPresent;
 	private final Logger				   bLog ;
 	
 	// A back up item is :
@@ -85,6 +87,7 @@ public class BackUpItem {
 	//		FAILED	 	 	: the back up has failed
 	
 	public BackUpItem(Path src, Path tgt, BackupAction bst, BackupStatus bStatus, long sd, BackUpCounters backUpCounters, Logger l) {
+		
 		sourcePath 	 	 		  = src ;
 		sourceClosestExistingPath = src ;
 		targetPath 	 	 		  = tgt ;
@@ -101,21 +104,27 @@ public class BackUpItem {
 		}
 		
 		// Update counters
-		checkPathExists(src, SRC_NOT_EXISTS) ;
+		checkPathExists(src, SRC_NOT_EXISTS);
+		sourcePresent = true;
 		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
-			checkPathExists(tgt, TGT_NOT_EXISTS) ;
+			checkPathExists(tgt, TGT_NOT_EXISTS);
+			targetPresent = true;
 			backUpCounters.copyReplaceNb++ ;
 		} else if (backupAction.equals(BackupAction.COPY_NEW)) {
-			checkPathDoesNotExist(tgt, TGT_SHOULD_NOT_EXISTS) ;
+			checkPathDoesNotExist(tgt, TGT_SHOULD_NOT_EXISTS);
+			targetPresent = false;
 			backUpCounters.copyNewNb++ ;
 		} else if (backupAction.equals(BackupAction.COPY_TREE)) {
-			checkPathDoesNotExist(tgt, TGT_SHOULD_NOT_EXISTS) ;
+			checkPathDoesNotExist(tgt, TGT_SHOULD_NOT_EXISTS);
+			targetPresent = false;
 			backUpCounters.copyTreeNb++ ;
 		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
-			checkPathExists(tgt, TGT_NOT_EXISTS) ;
+			checkPathExists(tgt, TGT_NOT_EXISTS);
+			targetPresent = true;
 			backUpCounters.ambiguousNb++ ;
 		} else if (backupAction.equals(BackupAction.COPY_TARGET)) {
-			checkPathExists(tgt, TGT_NOT_EXISTS) ;
+			checkPathExists(tgt, TGT_NOT_EXISTS);
+			targetPresent = true;
 			backUpCounters.copyTargetNb++ ;
 		} else {
 			throw new IllegalBackupActionException("Illegal backup action", backupAction) ;
@@ -140,8 +149,10 @@ public class BackUpItem {
 			permanenceLevel		  = DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL ;
 		}
 		
-		checkPathExists(srcExisting, EXIST_SRC_NOT_EXISTS) ;
-		checkPathExists(tgt, TGT_NOT_EXISTS) ;
+		checkPathExists(srcExisting, EXIST_SRC_NOT_EXISTS);
+		checkPathExists(tgt, TGT_NOT_EXISTS);
+		sourcePresent = false;
+		targetPresent = true;
 		
 		// Update counters
 		if (backupAction.equals(BackupAction.DELETE)) {
@@ -214,6 +225,14 @@ public class BackUpItem {
 
 	public long getSizeDifference() {
 		return sizeDifference;
+	}
+
+	public boolean isSourcePresent() {
+		return sourcePresent;
+	}
+
+	public boolean isTargetPresent() {
+		return targetPresent;
 	}
 
 	public boolean execute(BackUpCounters backUpCounters) {

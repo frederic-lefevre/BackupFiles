@@ -36,9 +36,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.fl.backupFiles.BackUpItem;
-import org.fl.backupFiles.IllegalBackupActionException;
 import org.fl.backupFiles.OsAction;
-import org.fl.backupFiles.BackUpItem.BackupAction;
 import org.fl.backupFiles.gui.BackUpItemActionListener.CustomAction;
 import org.fl.backupFiles.gui.BackUpItemActionListener.FileElement;
 
@@ -133,41 +131,21 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 	
 	private void enableMenuItems() {
 		
-		List<BackUpItem> selectedEntries = backUpJTable.getSelectedBackUpItems() ;
+		BackUpItem selectedEntry = backUpJTable.getSelectedBackUpItem() ;
 		
-		boolean sourcePresent = false ;
-		boolean targetPresent = false ;
-		for (BackUpItem localEntry : selectedEntries) {
+		if (selectedEntry != null) {
+	
+			sourceMenuItems
+				.forEach(menuItem -> menuItem.setEnabled(selectedEntry.isSourcePresent()));
+
+			targetMenuItems
+				.forEach(menuItem -> menuItem.setEnabled(selectedEntry.isTargetPresent()));
+
+			bothMenuItems
+				.forEach(menuItem -> menuItem.setEnabled(selectedEntry.isSourcePresent() && selectedEntry.isTargetPresent()));
 			
-			BackupAction backupAction = localEntry.getBackupAction() ;
-			if ( backupAction.equals(BackupAction.COPY_REPLACE) ||
-				 backupAction.equals(BackupAction.AMBIGUOUS) || 
-				 backupAction.equals(BackupAction.COPY_TARGET)) {
-			
-				sourcePresent = true ;
-				targetPresent = true ;
-			} else if ( backupAction.equals(BackupAction.COPY_NEW) ||
-					 backupAction.equals(BackupAction.COPY_TREE)) {
-				sourcePresent = true ;
-			} else if ( backupAction.equals(BackupAction.DELETE) ||
-					 backupAction.equals(BackupAction.DELETE_DIR)) {
-				targetPresent = true ;
-			} else {
-				throw new IllegalBackupActionException("Invalid backup action: ", backupAction);
-			}
-		}
-		
-		for (JMenuItem menuItem : sourceMenuItems) {
-			menuItem.setEnabled(sourcePresent);
-		}
-		for (JMenuItem menuItem : targetMenuItems) {
-			menuItem.setEnabled(targetPresent);
-		}
-		for (JMenuItem menuItem : bothMenuItems) {
-			menuItem.setEnabled(sourcePresent && targetPresent);
-		}
-		for (JMenuItem menuItem : anyMenuItems) {
-			menuItem.setEnabled(sourcePresent || targetPresent);
+			anyMenuItems
+				.forEach(menuItem -> menuItem.setEnabled(selectedEntry.isSourcePresent() || selectedEntry.isTargetPresent()));
 		}
 	}
 	

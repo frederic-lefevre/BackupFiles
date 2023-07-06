@@ -24,8 +24,6 @@ SOFTWARE.
 
 package org.fl.backupFiles.gui;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultListSelectionModel;
@@ -83,15 +81,16 @@ public class BackUpJTable extends JTable {
 		setAutoCreateRowSorter(true);
 	}
 	
-	// Get the list of selected BackUpItem
-	public List<BackUpItem> getSelectedBackUpItems() {
+	// Get the selected BackUpItem
+	public BackUpItem getSelectedBackUpItem() {
 		
-		int[] rowIdxs = getSelectedRows() ;
-		List<BackUpItem> res = new ArrayList<BackUpItem>() ;
-		for (int idx : rowIdxs) {
-			res.add(((BackUpTableModel)getModel()).getBackUpItemAt(convertRowIndexToModel(idx))) ;
+		int[] rowIdxs = getSelectedRows();
+		if (rowIdxs.length == 0) {
+			return null;
+		} else if (rowIdxs.length > 1) {
+			tLog.severe("Found several selected rows for BackUpJTable. Number of selected rows: " + rowIdxs.length);
 		}
-		return res ;
+		return ((BackUpTableModel)getModel()).getBackUpItemAt(convertRowIndexToModel(rowIdxs[0]));
 	}
 
 }
