@@ -36,35 +36,35 @@ import org.fl.util.file.FilesUtils;
 
 public class TargetFileStore {
 
-	private final FileStore fileStore ;
-	private final Path mountPoint ;
-	private final Logger tLog ;
-	private long initialRemainingSpace ;
+	private static final Logger tLog = Config.getLogger();
 	
-	public TargetFileStore(Path path, Logger l) {
+	private final FileStore fileStore;
+	private final Path mountPoint;
+	private long initialRemainingSpace;
+	
+	public TargetFileStore(Path path) {
 		
-		tLog = l ;
-		FileStore fs = null ;
-		Path	  mp = null ;
+		FileStore fs = null;
+		Path mp = null;
 		if ((path != null) && (Files.exists(path))) {
 			try {
-				fs  			  	  = Files.getFileStore(path) ;
-				mp 			  		  = FilesUtils.getMountPoint(path, tLog) ;
-				initialRemainingSpace = fs.getUsableSpace() ;
+				fs = Files.getFileStore(path);
+				mp = FilesUtils.getMountPoint(path, tLog);
+				initialRemainingSpace = fs.getUsableSpace();
 			} catch (IOException e) {	
-				tLog.log(Level.SEVERE, "IOException when getting filestore and mount point for " + path, e) ;
+				tLog.log(Level.SEVERE, "IOException when getting filestore and mount point for " + path, e);
 			}
 		}
-		fileStore   = fs ;
-		mountPoint = mp ;
+		fileStore = fs;
+		mountPoint = mp;
 	}
 
 	public void memorizeInitialRemainingSpace() {
 		if (fileStore != null) {
 			try {
-				initialRemainingSpace = fileStore.getUsableSpace() ;
+				initialRemainingSpace = fileStore.getUsableSpace();
 			} catch (IOException e) {	
-				tLog.log(Level.SEVERE, "IOException when getting remaining space for " + mountPoint, e) ;
+				tLog.log(Level.SEVERE, "IOException when getting remaining space for " + mountPoint, e);
 			}
 		} else {
 			tLog.severe("Ste initial remaining space of a fileStore : Null filestore");

@@ -31,13 +31,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.fl.backupFiles.BackUpJob.JobTaskType;
 
 public class JobsChoice {
-
-	private static final Logger jLog = Config.getLogger();
 	
 	private final List<BackUpJob> backUpJobs ;
 	private final String 		  jobsTitleString ;
@@ -133,7 +130,7 @@ public class JobsChoice {
 		for (BackUpTask backUpTask : getTasks(jobTaskType)) {
 			Path targetPath = backUpTask.getTarget() ;
 			if ((targetPath != null) && (Files.exists(targetPath))) {
-				TargetFileStore targetFileStore = new TargetFileStore(targetPath, jLog) ;
+				TargetFileStore targetFileStore = new TargetFileStore(targetPath) ;
 				FileStore fs = targetFileStore.getFileStore() ;
 				if (fs != null) { 
 					if (! targetFileStores.containsKey(fs)) {
