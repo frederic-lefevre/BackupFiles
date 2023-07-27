@@ -85,7 +85,7 @@ class FilesBackUpScannerTest {
 
 		try {	
 			
-			BackUpJobList backUpJobs = new BackUpJobList(configFileDir, log) ;
+			BackUpJobList backUpJobs = new BackUpJobList(configFileDir) ;
 
 			if ((backUpJobs == null) || (backUpJobs.isEmpty())) {
 				fail("Null or empty BackUpJobList");

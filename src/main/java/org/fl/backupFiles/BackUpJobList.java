@@ -34,17 +34,17 @@ import java.util.logging.Logger;
 
 public class BackUpJobList extends Vector<BackUpJob> {
 
+	private static final Logger bLog = Config.getLogger();
+	
 	private static final long serialVersionUID = 1L;
-	private final Logger bLog ;
 	
 	// Class to hold all the back up job
 	// Each back up job is defined by a Json configuration
 	// All the Json configurations are in files located in the directory path "configFilesDir"
 	// which is passed in parameter of the constructor
-	public BackUpJobList(Path configFilesDir, Logger l) {
+	public BackUpJobList(Path configFilesDir) {
 		
 		super() ;
-		bLog = l ;
 		
 		try (DirectoryStream<Path> paths = Files.newDirectoryStream(configFilesDir, "*.json")) {
 			for (Path configFile : paths) {
