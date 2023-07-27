@@ -101,7 +101,7 @@ public class BackupFilesGui  extends JFrame {
 			}
 						
 			//  Tabbed Panel to choose back up configuration. Add it in the first position
-			BackUpConfigChoicePane configChoicePane = new BackUpConfigChoicePane(configFileDir, backUpPanes, bLog) ;
+			BackUpConfigChoicePane configChoicePane = new BackUpConfigChoicePane(configFileDir, backUpPanes) ;
 			bkpTablesPanel.add(configChoicePane, "Configuration", 0) ;
 	
 			// Tabbed Panel to display a summary of operations done. Add it before the standard tabs provided by ApplicationTabbedPane

@@ -94,7 +94,7 @@ class FilesBackUpScannerTest {
 			}
 
 			BackUpJob backUpJob = backUpJobs.firstElement() ;
-			JobsChoice jobsChoice = new JobsChoice(Arrays.asList(backUpJob), log) ;
+			JobsChoice jobsChoice = new JobsChoice(Arrays.asList(backUpJob)) ;
 
 			BackUpJobInfoTableModel  bujitm 	 	= new BackUpJobInfoTableModel() ;
 			ProgressInformationPanel pip    	 	= new ProgressInformationPanel() ;

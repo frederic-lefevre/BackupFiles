@@ -28,7 +28,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -48,8 +47,6 @@ import org.fl.backupFiles.BackUpJob.JobTaskType;
 public class BackUpConfigChoicePane extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-
-	private Logger bLog ;
 	
 	private JList<BackUpJob> backUpJobChoice ;
 	
@@ -57,11 +54,10 @@ public class BackUpConfigChoicePane extends JPanel {
 	
 	private Map<JobTaskType, JobConfigTableModel> jobConfigTablesModel ;
 	
-	public BackUpConfigChoicePane(Path configFileDir, List<BackUpPane> bps, Logger l) {
+	public BackUpConfigChoicePane(Path configFileDir, List<BackUpPane> bps) {
 		super();
 		
 		backUpPanes = bps ;
-		bLog = l ;
 		
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)) ;
 		
@@ -115,7 +111,7 @@ public class BackUpConfigChoicePane extends JPanel {
 			if (arg0.getValueIsAdjusting() == false) {
 							
 				List<BackUpJob> jobsChoiceList = backUpJobChoice.getSelectedValuesList() ;
-				JobsChoice jobsChoice = new JobsChoice(jobsChoiceList, bLog) ;
+				JobsChoice jobsChoice = new JobsChoice(jobsChoiceList) ;
 			
 				for (JobTaskType jtt : JobTaskType.values()) {
 					

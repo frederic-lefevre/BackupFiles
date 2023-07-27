@@ -37,6 +37,8 @@ import org.fl.backupFiles.BackUpJob.JobTaskType;
 
 public class JobsChoice {
 
+	private static final Logger jLog = Config.getLogger();
+	
 	private final List<BackUpJob> backUpJobs ;
 	private final String 		  jobsTitleString ;
 	private final String 		  jobsTitleHtml ;
@@ -46,8 +48,6 @@ public class JobsChoice {
 	private boolean	compareContent;
 	private boolean	compareContentOnAmbiguous;
 	
-	private final Logger jLog ;
-	
 	private final static String jobSeparator  	 = "\n__________________________\n" ;
 	private final static String taskJobSeparator = "\n\n" ;
 	private final static String taskSeparator 	 = "\n" ;
@@ -56,10 +56,9 @@ public class JobsChoice {
 	
 	private Map<FileStore,TargetFileStore> targetFileStores ;
 	
-	public JobsChoice(List<BackUpJob> bj, Logger l) {
+	public JobsChoice(List<BackUpJob> bj) {
 		
-		backUpJobs = bj ;
-		jLog	   = l ;
+		backUpJobs = bj;
 		
 		compareContent = false;
 		compareContentOnAmbiguous = true;
