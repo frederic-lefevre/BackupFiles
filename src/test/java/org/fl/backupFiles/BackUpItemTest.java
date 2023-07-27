@@ -25,17 +25,13 @@ SOFTWARE.
 package org.fl.backupFiles;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.fl.backupFiles.BackUpItem.BackupAction;
 import org.fl.backupFiles.BackUpItem.BackupStatus;
-import org.fl.util.RunningContext;
 import org.fl.util.file.FileComparator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -65,15 +61,8 @@ public class BackUpItemTest {
 	@BeforeAll
 	static void initConfig() {
 		
-		try {
-			RunningContext runningContext = new RunningContext("BackupFilesTest", null, new URI(DEFAULT_PROP_FILE));
-			log = runningContext.getpLog() ;
-			Config.initConfig(runningContext.getProps(), log);
-			
-		} catch (URISyntaxException e) {
-			log.log(Level.SEVERE, "URI exception writing test data", e);
-			fail("URI exception writing test data (BeforeAll method)") ;
-		}
+		Config.initConfig(DEFAULT_PROP_FILE);
+		log = Config.getLogger();
 	}
 	
 	@Test

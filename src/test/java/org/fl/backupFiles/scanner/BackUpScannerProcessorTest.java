@@ -1,3 +1,27 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2023 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.backupFiles.scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,7 +45,6 @@ import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.TestUtils;
-import org.fl.util.RunningContext;
 import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -34,41 +57,39 @@ class BackUpScannerProcessorTest {
 	private final static String SOURCE_DATA_DIR1 = "file:///C:/FredericPersonnel/tmp" ;
 	private final static String SOURCE_DATA_DIR2 = "file:///C:/FredericPersonnel/Loisirs/sports" ;
 	
-	private final static String BUFFER_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer/" ;
+	private final static String BUFFER_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer/";
 	private final static String BUFFER_DATA_DIR1 = BUFFER_DATA_DIR + "dir1/" ;
 	private final static String BUFFER_DATA_DIR2 = BUFFER_DATA_DIR + "dir2/" ;
-	private final static String TARGET_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Target/" ;
+	private final static String TARGET_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Target/";
 	
 	private static Logger log ;
 	
 	@BeforeAll
 	static void generateTestData() {
-
-		log = Logger.getGlobal() ;
 		
 		try {
-			RunningContext runningContext = new RunningContext("BackupFilesTest", null, new URI(DEFAULT_PROP_FILE));
-			log = runningContext.getpLog() ;
-			Config.initConfig(runningContext.getProps(), log);
+			Config.initConfig(DEFAULT_PROP_FILE);
+			log = Config.getLogger();
 
 			// Copy test data
 			Path srcPath1 = Paths.get(new URI(SOURCE_DATA_DIR1));
-			Path srcPath2 = Paths.get(new URI(SOURCE_DATA_DIR2)) ;
-			Path testDataDir1 = Paths.get(new URI(BUFFER_DATA_DIR1)) ;
-			Path testDataDir2 = Paths.get(new URI(BUFFER_DATA_DIR2)) ;
-			boolean b1 = FilesUtils.copyDirectoryTree(srcPath1, testDataDir1, log) ;
-			boolean b2 = FilesUtils.copyDirectoryTree(srcPath2, testDataDir2, log) ;
+			Path srcPath2 = Paths.get(new URI(SOURCE_DATA_DIR2));
+			Path testDataDir1 = Paths.get(new URI(BUFFER_DATA_DIR1));
+			Path testDataDir2 = Paths.get(new URI(BUFFER_DATA_DIR2));
+			boolean b1 = FilesUtils.copyDirectoryTree(srcPath1, testDataDir1, log);
+			boolean b2 = FilesUtils.copyDirectoryTree(srcPath2, testDataDir2, log);
 			if (! (b1 && b2)) {
-				fail("Errors writing test data (BeforeAll method)") ;
+				fail("Errors writing test data (BeforeAll method)");
 			}
-			Path targetDataDir = Paths.get(new URI(TARGET_DATA_DIR)) ;
-			Files.createDirectory(targetDataDir) ;
+			Path targetDataDir = Paths.get(new URI(TARGET_DATA_DIR));
+			Files.createDirectory(targetDataDir);
+			
 		} catch (URISyntaxException e) {
-			log.log(Level.SEVERE, "URI exception writing test data", e);
-			fail("URI exception writing test data (BeforeAll method)") ;
+			Logger.getGlobal().log(Level.SEVERE, "URI exception writing test data", e);
+			fail("URI exception writing test data (BeforeAll method)");
 		} catch (IOException e) {
-			log.log(Level.SEVERE, "IO exception writing test data", e);
-			fail("IO exception writing test data (BeforeAll method)") ;
+			Logger.getGlobal().log(Level.SEVERE, "IO exception writing test data", e);
+			fail("IO exception writing test data (BeforeAll method)");
 		}
 	}
 	
