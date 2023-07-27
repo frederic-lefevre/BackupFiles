@@ -103,7 +103,7 @@ class BackUpScannerProcessorTest {
 			Path src  = TestUtils.getPathFromUriString(BUFFER_DATA_DIR) ;
 			Path tgt  = TestUtils.getPathFromUriString(TARGET_DATA_DIR) ;
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
+			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
@@ -174,7 +174,7 @@ class BackUpScannerProcessorTest {
 			Path src  = TestUtils.getPathFromUriString(BUFFER_DATA_DIR) ;
 			Path tgt  = TestUtils.getPathFromUriString(TARGET_DATA_DIR  + "doesNotExists/") ;
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
+			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
@@ -224,7 +224,7 @@ class BackUpScannerProcessorTest {
 			assertTrue(Files.exists(src)) ;
 			
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
+			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
@@ -261,7 +261,7 @@ class BackUpScannerProcessorTest {
 			assertTrue(Files.exists(src)) ;
 			assertFalse(Files.exists(tgt)) ;
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
+			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
@@ -298,7 +298,7 @@ class BackUpScannerProcessorTest {
 			assertFalse(Files.exists(src)) ;
 			assertTrue(Files.exists(tgt)) ;
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
+			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
@@ -336,7 +336,7 @@ class BackUpScannerProcessorTest {
 			assertTrue(Files.exists(tgt)) ;
 			assertTrue(Files.isDirectory(tgt)) ;
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
+			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
@@ -371,7 +371,7 @@ class BackUpScannerProcessorTest {
 			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
 			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 
-			BackUpTask backUpTask = new BackUpTask(src, tgt, log) ;
+			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;

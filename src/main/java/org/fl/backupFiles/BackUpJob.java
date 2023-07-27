@@ -161,15 +161,15 @@ public class BackUpJob {
 			if (bufPath != null) {
 				if (Files.isRegularFile(srcPath)) {
 					Path bufFile = bufPath.resolve(srcPath.getFileName()) ;
-					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile, bLog)) ;
+					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile)) ;
 				} else {
-				backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath, bLog)) ;
+				backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath)) ;
 				}
 				if (tgtPath != null) {
-					backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath, bLog)) ;
+					backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath)) ;
 				}
 			} else if (tgtPath != null) {
-				backUpTasks.get(JobTaskType.SOURCE_TO_TARGET).add(new BackUpTask(srcPath, tgtPath, bLog)) ;
+				backUpTasks.get(JobTaskType.SOURCE_TO_TARGET).add(new BackUpTask(srcPath, tgtPath)) ;
 			} else {
 				bLog.severe("No buffer and target element definition for back up job " + title);
 			}
