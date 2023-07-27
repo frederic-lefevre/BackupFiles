@@ -198,7 +198,7 @@ public class UiControl extends JPanel {
 				bLog.fine("Back up action launched");
 				uiControl.setIsRunning(true);
 				
-				FilesBackUpProcessor fProcess = new FilesBackUpProcessor(uiControl, jobTaskType, jobsChoice, backUpTableModel, progressPanel, backUpJobInfoTableModel, bLog);
+				FilesBackUpProcessor fProcess = new FilesBackUpProcessor(uiControl, jobTaskType, jobsChoice, backUpTableModel, progressPanel, backUpJobInfoTableModel);
 				progressPanel.setProcessStatus(SAUVEGARDE_EN_COURS) ;
 				fProcess.execute() ;
 				
@@ -209,7 +209,7 @@ public class UiControl extends JPanel {
 				jobsChoice.setCompareContent(jobTaskType, compareContentSelect.isSelected());
 				jobsChoice.setCompareContentOnAmbiguous(jobTaskType, compareContentOnAmbiguousSelect.isSelected());
 				
-				FilesBackUpScanner fScan = new FilesBackUpScanner(uiControl, jobTaskType, jobsChoice, backUpTableModel, progressPanel, backUpJobInfoTableModel, bLog);				
+				FilesBackUpScanner fScan = new FilesBackUpScanner(uiControl, jobTaskType, jobsChoice, backUpTableModel, progressPanel, backUpJobInfoTableModel);				
 				progressPanel.setProcessStatus(COMPARAISON_EN_COURS);
 				fScan.execute();
 			}  else if (ae.getSource() == stopButton) {	

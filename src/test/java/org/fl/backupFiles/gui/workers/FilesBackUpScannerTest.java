@@ -104,7 +104,7 @@ class FilesBackUpScannerTest {
 			UiControl				 uicB2T		 	= new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm) ;
 			BackUpCounters           backUpCounters ;
 			// SOURCE_TO_BUFFER			
-			FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm, log) ;
+			FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm) ;
 			assertEquals(0, backUpItems.size()) ;
 
 			filesBackUpScanner.execute();
@@ -135,7 +135,7 @@ class FilesBackUpScannerTest {
 			assertEquals(0, backUpItems.size()) ;
 			
 			// BUFFER_TO_TARGET
-			filesBackUpScanner = new FilesBackUpScanner(uicB2T, JobTaskType.BUFFER_TO_TARGET, jobsChoice, btm, pip, bujitm, log) ;
+			filesBackUpScanner = new FilesBackUpScanner(uicB2T, JobTaskType.BUFFER_TO_TARGET, jobsChoice, btm, pip, bujitm) ;
 			assertEquals(0, backUpItems.size()) ;
 
 			filesBackUpScanner.execute();
