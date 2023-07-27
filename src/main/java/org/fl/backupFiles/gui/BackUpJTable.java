@@ -36,27 +36,28 @@ import org.fl.backupFiles.Config;
 
 public class BackUpJTable extends JTable {
 
+	private static final Logger tLog = Config.getLogger();
+	
 	private static final long serialVersionUID = 1L;
-	private Logger tLog ;
 
-	public BackUpJTable(TableModel arg0, Logger l) {
+	public BackUpJTable(TableModel arg0) {
 		super(arg0);	
-		init(l);	
+		init();	
 	}
 
-	public BackUpJTable(TableModel arg0, TableColumnModel arg1, Logger l) {
+	public BackUpJTable(TableModel arg0, TableColumnModel arg1) {
 		super(arg0, arg1);
-		init(l);
+		init();
 	}
 
 	
-	public BackUpJTable(TableModel dm, TableColumnModel cm, ListSelectionModel sm, Logger l) {
+	public BackUpJTable(TableModel dm, TableColumnModel cm, ListSelectionModel sm) {
 		super(dm, cm, sm);
-		init(l);
+		init();
 	}
 
-	private void init(Logger l) {
-		tLog = l ;
+	private void init() {
+		
 		setFillsViewportHeight(true) ;
 		setAutoCreateRowSorter(true) ;
 		getColumnModel().getColumn(BackUpTableModel.ACTION_COL_IDX).setCellRenderer(new BackUpActionCellRenderer()) ;

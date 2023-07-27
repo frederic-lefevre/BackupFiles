@@ -62,7 +62,7 @@ public class BackUpPane extends JPanel {
 		BackUpItemList backUpItemList = new BackUpItemList();
 		BackUpTableModel backUpTableModel = new BackUpTableModel(backUpItemList);
 		
-		BackUpJTable backUpItemTable = new BackUpJTable(backUpTableModel, bLog);
+		BackUpJTable backUpItemTable = new BackUpJTable(backUpTableModel);
 
 		// Tables labels
 		title = new JLabel(jobTaskType.toString() + SEPARATOR + NO_CONFIG) ;
