@@ -1,3 +1,27 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2023 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.backupFiles;
 
 import java.io.IOException;
@@ -12,35 +36,35 @@ import org.fl.util.file.FilesUtils;
 
 public class TargetFileStore {
 
-	private final FileStore fileStore ;
-	private final Path mountPoint ;
-	private final Logger tLog ;
-	private long initialRemainingSpace ;
+	private static final Logger tLog = Config.getLogger();
 	
-	public TargetFileStore(Path path, Logger l) {
+	private final FileStore fileStore;
+	private final Path mountPoint;
+	private long initialRemainingSpace;
+	
+	public TargetFileStore(Path path) {
 		
-		tLog = l ;
-		FileStore fs = null ;
-		Path	  mp = null ;
+		FileStore fs = null;
+		Path mp = null;
 		if ((path != null) && (Files.exists(path))) {
 			try {
-				fs  			  	  = Files.getFileStore(path) ;
-				mp 			  		  = FilesUtils.getMountPoint(path, tLog) ;
-				initialRemainingSpace = fs.getUsableSpace() ;
+				fs = Files.getFileStore(path);
+				mp = FilesUtils.getMountPoint(path, tLog);
+				initialRemainingSpace = fs.getUsableSpace();
 			} catch (IOException e) {	
-				tLog.log(Level.SEVERE, "IOException when getting filestore and mount point for " + path, e) ;
+				tLog.log(Level.SEVERE, "IOException when getting filestore and mount point for " + path, e);
 			}
 		}
-		fileStore   = fs ;
-		mountPoint = mp ;
+		fileStore = fs;
+		mountPoint = mp;
 	}
 
 	public void memorizeInitialRemainingSpace() {
 		if (fileStore != null) {
 			try {
-				initialRemainingSpace = fileStore.getUsableSpace() ;
+				initialRemainingSpace = fileStore.getUsableSpace();
 			} catch (IOException e) {	
-				tLog.log(Level.SEVERE, "IOException when getting remaining space for " + mountPoint, e) ;
+				tLog.log(Level.SEVERE, "IOException when getting remaining space for " + mountPoint, e);
 			}
 		} else {
 			tLog.severe("Ste initial remaining space of a fileStore : Null filestore");

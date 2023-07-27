@@ -54,7 +54,7 @@ import org.fl.backupFiles.JobsChoice;
 
 public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupScannerInformation> {
 
-	private final Logger pLog ;
+	private static final Logger pLog = Config.getLogger();
 	
 	private final UiControl uiControl ;
 	
@@ -71,9 +71,9 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 	private final long 	refreshRate ;
 	private final BackUpCounters backUpCounters ;
 	
-	public FilesBackUpScanner(UiControl u, JobTaskType jtt, JobsChoice jc, BackUpTableModel b, ProgressInformationPanel pip, BackUpJobInfoTableModel bj, Logger l)  {
+	public FilesBackUpScanner(UiControl u, JobTaskType jtt, JobsChoice jc, BackUpTableModel b, ProgressInformationPanel pip, BackUpJobInfoTableModel bj)  {
+		
 		super();
-		pLog 			 = l ;
 		uiControl		 = u ;
 		backUpTableModel = b ;	
 		refreshRate 	 = Config.getScanRefreshRate() ;
@@ -110,7 +110,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				
 				// Launch scanner tasks
 				List<BackUpScannerTask> results = backUpTasks.stream()
-					.map(backupTask ->  new BackUpScannerThread(backupTask, pLog))
+					.map(backupTask ->  new BackUpScannerThread(backupTask))
 					.map(backUpScannerThread -> new BackUpScannerTask(backUpScannerThread, CompletableFuture.supplyAsync(backUpScannerThread::scan, Config.getScanExecutorService())))
 					.collect(Collectors.toList());
 

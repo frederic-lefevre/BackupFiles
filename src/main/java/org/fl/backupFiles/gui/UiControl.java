@@ -42,18 +42,21 @@ import javax.swing.JPanel;
 
 import org.fl.backupFiles.BackUpJob.JobTaskType;
 import org.fl.backupFiles.BackUpTask;
+import org.fl.backupFiles.Config;
 import org.fl.backupFiles.JobsChoice;
 import org.fl.backupFiles.gui.workers.FilesBackUpProcessor;
 import org.fl.backupFiles.gui.workers.FilesBackUpScanner;
 
 public class UiControl extends JPanel {
 
+	private static final Logger bLog = Config.getLogger();
+	
 	private static final long serialVersionUID = 1L;
 	
-	private final Logger  bLog ;
-	private final JButton scanButton ;
-	private final JButton bckpUpButton ;
-	private final JButton stopButton ;
+
+	private final JButton scanButton;
+	private final JButton bckpUpButton;
+	private final JButton stopButton;
 
 	private final JCheckBox compareContentSelect;
 	private final JCheckBox compareContentOnAmbiguousSelect;
@@ -62,12 +65,12 @@ public class UiControl extends JPanel {
 	private boolean stopAsked ;
 	
 	private final ProgressInformationPanel progressPanel;
-	private final JobTaskType 			   jobTaskType ;
+	private final JobTaskType 			   jobTaskType;
 	
-	private JobsChoice				 	   jobsChoice ;
+	private JobsChoice				 	   jobsChoice;
 	
-	private final BackUpTableModel 		  backUpTableModel  ;
-	private final BackUpJobInfoTableModel backUpJobInfoTableModel ;
+	private final BackUpTableModel 		  backUpTableModel ;
+	private final BackUpJobInfoTableModel backUpJobInfoTableModel;
 	
 	public boolean isRunning() {
 		return isRunning;
@@ -76,11 +79,11 @@ public class UiControl extends JPanel {
 	public void setIsRunning(boolean b) {
 		isRunning = b ;
 		if (isRunning) {
-			bckpUpButton.setBackground(Color.ORANGE) ;
-			scanButton.setBackground(Color.ORANGE) ;
+			bckpUpButton.setBackground(Color.ORANGE);
+			scanButton.setBackground(Color.ORANGE);
 		} else {
-			bckpUpButton.setBackground(Color.GREEN) ;
-			scanButton.setBackground(Color.GREEN) ;
+			bckpUpButton.setBackground(Color.GREEN);
+			scanButton.setBackground(Color.GREEN);
 		}
 		bckpUpButton.setEnabled(!isRunning);
 		scanButton.setEnabled(!isRunning);
@@ -95,12 +98,11 @@ public class UiControl extends JPanel {
 		this.stopAsked = stopAsked;
 	}
 
-	public UiControl(JobTaskType jtt, BackUpTableModel b, ProgressInformationPanel pip, BackUpJobInfoTableModel bj, Logger l) {
+	public UiControl(JobTaskType jtt, BackUpTableModel b, ProgressInformationPanel pip, BackUpJobInfoTableModel bj) {
 		
 		super() ;
 		isRunning 	  	  = false ;
 		stopAsked 	  	  = false ;
-		bLog 		  	  = l ;
 		jobsChoice   	  = null ;
 		jobTaskType		  = jtt ;
 		progressPanel 	  = pip ;
@@ -170,33 +172,33 @@ public class UiControl extends JPanel {
 	}
 
 	private void setButtonForEmpyTasks() {
-		bckpUpButton.setBackground(Color.GREEN) ;
-		bckpUpButton.setEnabled(false) ;
-		scanButton.setBackground(Color.GREEN) ;
-		scanButton.setEnabled(false) ;
-		stopButton.setBackground(Color.RED) ;
-		stopButton.setEnabled(false) ;
+		bckpUpButton.setBackground(Color.GREEN);
+		bckpUpButton.setEnabled(false);
+		scanButton.setBackground(Color.GREEN);
+		scanButton.setEnabled(false);
+		stopButton.setBackground(Color.RED);
+		stopButton.setEnabled(false);
 	}
 	
 	private class ControlAction implements ActionListener {
 
-		private UiControl uiControl ;
+		private UiControl uiControl;
 		
 		public ControlAction(UiControl u) {
-			uiControl = u ;
+			uiControl = u;
 		}
 		
-		private final static String COMPARAISON_EN_COURS = "Comparaison de fichiers en cours" ;
-		private final static String SAUVEGARDE_EN_COURS  = "Sauvegarde de fichiers en cours" ;
+		private final static String COMPARAISON_EN_COURS = "Comparaison de fichiers en cours";
+		private final static String SAUVEGARDE_EN_COURS  = "Sauvegarde de fichiers en cours";
 		
 		@Override
 		public void actionPerformed(ActionEvent ae) {
 			
 			if (ae.getSource() == bckpUpButton) {
-				bLog.fine("Back up action launched") ;
+				bLog.fine("Back up action launched");
 				uiControl.setIsRunning(true);
 				
-				FilesBackUpProcessor fProcess = new FilesBackUpProcessor(uiControl, jobTaskType, jobsChoice, backUpTableModel, progressPanel, backUpJobInfoTableModel, bLog) ;
+				FilesBackUpProcessor fProcess = new FilesBackUpProcessor(uiControl, jobTaskType, jobsChoice, backUpTableModel, progressPanel, backUpJobInfoTableModel);
 				progressPanel.setProcessStatus(SAUVEGARDE_EN_COURS) ;
 				fProcess.execute() ;
 				
@@ -207,11 +209,11 @@ public class UiControl extends JPanel {
 				jobsChoice.setCompareContent(jobTaskType, compareContentSelect.isSelected());
 				jobsChoice.setCompareContentOnAmbiguous(jobTaskType, compareContentOnAmbiguousSelect.isSelected());
 				
-				FilesBackUpScanner   fScan 	 = new FilesBackUpScanner(uiControl, jobTaskType, jobsChoice, backUpTableModel, progressPanel, backUpJobInfoTableModel, bLog) ;				
+				FilesBackUpScanner fScan = new FilesBackUpScanner(uiControl, jobTaskType, jobsChoice, backUpTableModel, progressPanel, backUpJobInfoTableModel);				
 				progressPanel.setProcessStatus(COMPARAISON_EN_COURS);
-				fScan.execute() ;
+				fScan.execute();
 			}  else if (ae.getSource() == stopButton) {	
-			 	stopAsked = true   ;
+			 	stopAsked = true;
 			}
 		
 		}

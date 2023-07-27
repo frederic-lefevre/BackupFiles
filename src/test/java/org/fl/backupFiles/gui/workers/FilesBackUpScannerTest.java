@@ -1,9 +1,31 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2023 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.backupFiles.gui.workers;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -21,7 +43,6 @@ import org.fl.backupFiles.gui.BackUpTableModel;
 import org.fl.backupFiles.gui.ProgressInformationPanel;
 import org.fl.backupFiles.gui.UiControl;
 import org.fl.util.AdvancedProperties;
-import org.fl.util.RunningContext;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -39,30 +60,24 @@ class FilesBackUpScannerTest {
 	
 	@BeforeAll
 	static void generateTestData() {
-		
-		log = Logger.getGlobal() ;
-		try {
-			RunningContext runningContext = new RunningContext("BackupFilesTest", null, new URI(DEFAULT_PROP_FILE));
 
-			log = runningContext.getpLog() ;
+		log = Logger.getGlobal();
 
-			AdvancedProperties backupProperty = runningContext.getProps() ;
-			Config.initConfig(runningContext.getProps(), log);
+		Config.initConfig(DEFAULT_PROP_FILE);
+		log = Config.getLogger();
+		AdvancedProperties backupProperty = Config.getRunningContext().getProps();
 
-			// Get the different config path
-			configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir") ;
+		// Get the different config path
+		configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir");
 
-			threadPoolSize = backupProperty.getInt("backupFiles.scan.threadPoolSize", 100) ;
+		threadPoolSize = backupProperty.getInt("backupFiles.scan.threadPoolSize", 100);
 
-			testDataManager = new TestDataManager(configFileDir, log) ;
-			boolean genearationSuccessful = testDataManager.generateTestData(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION) ;
-			if (! genearationSuccessful) {
-				fail("Fail to generate test data") ;
-			}
-		} catch (URISyntaxException e) {
-			log.log(Level.SEVERE, "Exception getting property file URI", e);
-			fail("Fail to generate test data") ;
+		testDataManager = new TestDataManager(configFileDir, log);
+		boolean genearationSuccessful = testDataManager.generateTestData(threadPoolSize * THREAD_TO_NB_DIR_CORRELATION);
+		if (!genearationSuccessful) {
+			fail("Fail to generate test data");
 		}
+
 	}
 	
 	@Test
@@ -70,7 +85,7 @@ class FilesBackUpScannerTest {
 
 		try {	
 			
-			BackUpJobList backUpJobs = new BackUpJobList(configFileDir, log) ;
+			BackUpJobList backUpJobs = new BackUpJobList(configFileDir) ;
 
 			if ((backUpJobs == null) || (backUpJobs.isEmpty())) {
 				fail("Null or empty BackUpJobList");
@@ -79,17 +94,17 @@ class FilesBackUpScannerTest {
 			}
 
 			BackUpJob backUpJob = backUpJobs.firstElement() ;
-			JobsChoice jobsChoice = new JobsChoice(Arrays.asList(backUpJob), log) ;
+			JobsChoice jobsChoice = new JobsChoice(Arrays.asList(backUpJob)) ;
 
 			BackUpJobInfoTableModel  bujitm 	 	= new BackUpJobInfoTableModel() ;
 			ProgressInformationPanel pip    	 	= new ProgressInformationPanel() ;
 			BackUpItemList 			 backUpItems 	= new BackUpItemList() ;
 			BackUpTableModel         btm    	 	= new BackUpTableModel(backUpItems) ;
-			UiControl				 uicS2B		 	= new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm, log) ;
-			UiControl				 uicB2T		 	= new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm, log) ;
+			UiControl				 uicS2B		 	= new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm) ;
+			UiControl				 uicB2T		 	= new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm) ;
 			BackUpCounters           backUpCounters ;
 			// SOURCE_TO_BUFFER			
-			FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm, log) ;
+			FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm) ;
 			assertEquals(0, backUpItems.size()) ;
 
 			filesBackUpScanner.execute();
@@ -120,7 +135,7 @@ class FilesBackUpScannerTest {
 			assertEquals(0, backUpItems.size()) ;
 			
 			// BUFFER_TO_TARGET
-			filesBackUpScanner = new FilesBackUpScanner(uicB2T, JobTaskType.BUFFER_TO_TARGET, jobsChoice, btm, pip, bujitm, log) ;
+			filesBackUpScanner = new FilesBackUpScanner(uicB2T, JobTaskType.BUFFER_TO_TARGET, jobsChoice, btm, pip, bujitm) ;
 			assertEquals(0, backUpItems.size()) ;
 
 			filesBackUpScanner.execute();

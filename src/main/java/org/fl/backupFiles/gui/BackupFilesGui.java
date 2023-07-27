@@ -27,7 +27,6 @@ package org.fl.backupFiles.gui;
 import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -40,15 +39,11 @@ import javax.swing.JFrame;
 
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.BackUpJob.JobTaskType;
-import org.fl.util.AdvancedProperties;
-import org.fl.util.RunningContext;
 import org.fl.util.swing.ApplicationTabbedPane;
 
 // Main class for the back up files application
 public class BackupFilesGui  extends JFrame {
-
-	private static final String DEFAULT_PROP_FILE = "file:///FredericPersonnel/Program/PortableApps/BackUpFiles/backupFiles.properties";
-
+	
 	private static final long serialVersionUID = -2691160306708075667L;
 
 	public static final int WINDOW_WIDTH  = 1880 ;
@@ -59,23 +54,19 @@ public class BackupFilesGui  extends JFrame {
 			public void run() {
 
 				try {
-					// Get context, properties, logger
-					RunningContext runningContext = new RunningContext("BackupFiles", null, new URI(DEFAULT_PROP_FILE));
-					Logger bLog = runningContext.getpLog() ;
-					AdvancedProperties backupProperty = runningContext.getProps() ;
 					
 					// Init config
-					Config.initConfig(backupProperty, bLog) ;
+					Config.initConfig(Config.DEFAULT_PROP_FILE) ;
 					
 					try {
-						BackupFilesGui window = new BackupFilesGui(runningContext, bLog);
+						BackupFilesGui window = new BackupFilesGui();
 						window.setVisible(true);
 					} catch (Exception e) {
-						bLog.log(Level.SEVERE, "Exception in main", e);
+						Config.getLogger().log(Level.SEVERE, "Exception in main", e);
 					}
 					
 				} catch (Exception e) {
-					System.out.println("Exception caught in Main (see default prop file processing)") ;
+					System.out.println("Exception caught in Main (see default prop file processing) " + e.getMessage()) ;
 					e.printStackTrace() ;
 				}				
 			}
@@ -84,11 +75,11 @@ public class BackupFilesGui  extends JFrame {
 	
 	private Logger bLog ;
 	
-	public BackupFilesGui(RunningContext runningContext, Logger l) {
+	public BackupFilesGui() {
 
 		Path configFileDir = Config.getConfigFileDir() ;
-		bLog = l ;
-		if ((runningContext != null) && (configFileDir != null)) {
+		bLog = Config.getLogger() ;
+		if (configFileDir != null) {
 		// Display GUI
 			
 			setBounds(10, 10, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -98,19 +89,19 @@ public class BackupFilesGui  extends JFrame {
 					
 			BackUpJobInfoTableModel jobInformationTable = new BackUpJobInfoTableModel() ;
 			// Tabbed Panel for configuration, tables and controls, and history
-			ApplicationTabbedPane bkpTablesPanel = new ApplicationTabbedPane(runningContext) ;
+			ApplicationTabbedPane bkpTablesPanel = new ApplicationTabbedPane(Config.getRunningContext()) ;
 				
 			ArrayList<BackUpPane> backUpPanes = new ArrayList<BackUpPane>() ;
 			int tabIndex = 0 ;
 			for (JobTaskType jtt : JobTaskType.values()) {
-				BackUpPane taskTypePane = new BackUpPane(jtt, jobInformationTable, bLog) ;
+				BackUpPane taskTypePane = new BackUpPane(jtt, jobInformationTable) ;
 				backUpPanes.add(taskTypePane) ;
 				bkpTablesPanel.add(taskTypePane, jtt.toString(), tabIndex) ;
 				tabIndex++ ;
 			}
 						
 			//  Tabbed Panel to choose back up configuration. Add it in the first position
-			BackUpConfigChoicePane configChoicePane = new BackUpConfigChoicePane(configFileDir, backUpPanes, bLog) ;
+			BackUpConfigChoicePane configChoicePane = new BackUpConfigChoicePane(configFileDir, backUpPanes) ;
 			bkpTablesPanel.add(configChoicePane, "Configuration", 0) ;
 	
 			// Tabbed Panel to display a summary of operations done. Add it before the standard tabs provided by ApplicationTabbedPane
@@ -122,6 +113,8 @@ public class BackupFilesGui  extends JFrame {
 			getContentPane().add(bkpTablesPanel) ;
 			
 			addWindowListener(new ShutdownAppli()) ;
+		} else {
+			bLog.severe("Config files directory is null");
 		}
 	}
 	

@@ -42,6 +42,8 @@ import org.fl.util.file.FilesUtils;
 
 public class BackUpItem {
 
+	private static final Logger bLog = Config.getLogger();
+	
 	private static final String SRC_NOT_EXISTS 		  = "Source path parameter is null or the path does not exist";
 	private static final String TGT_NOT_EXISTS 		  = "Target path parameter is null or the path does not exist";
 	private static final String TGT_SHOULD_NOT_EXISTS = "Target path parameter should not exist";
@@ -66,7 +68,6 @@ public class BackUpItem {
 	private final DirectoryPermanenceLevel permanenceLevel ;
 	private final boolean				   sourcePresent;
 	private final boolean				   targetPresent;
-	private final Logger				   bLog ;
 	
 	// A back up item is :
 	// * a source path (file or directory) to back up 
@@ -86,14 +87,13 @@ public class BackUpItem {
 	//		DONE	 	 	: the item has been backed-up
 	//		FAILED	 	 	: the back up has failed
 	
-	public BackUpItem(Path src, Path tgt, BackupAction bst, BackupStatus bStatus, long sd, BackUpCounters backUpCounters, Logger l) {
+	public BackUpItem(Path src, Path tgt, BackupAction bst, BackupStatus bStatus, long sd, BackUpCounters backUpCounters) {
 		
 		sourcePath 	 	 		  = src ;
 		sourceClosestExistingPath = src ;
 		targetPath 	 	 		  = tgt ;
 		backupAction 	 		  = bst ;
 		backupStatus 	 		  = bStatus;
-		bLog 		 	 		  = l ;
 		sizeDifference			  = sd ;
 		if (targetPath != null) {
 			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(targetPath) ;
@@ -133,13 +133,12 @@ public class BackUpItem {
 	}
 
 	// For delete actions
-	public BackUpItem(Path tgt, BackupAction bst, Path srcExisting, long sd, BackUpCounters backUpCounters, Logger l) {
+	public BackUpItem(Path tgt, BackupAction bst, Path srcExisting, long sd, BackUpCounters backUpCounters) {
 		sourcePath 	 	 		  = null ;
 		sourceClosestExistingPath = srcExisting ;
 		targetPath 	 	 		  = tgt ;
 		backupAction 	 		  = bst ;
 		backupStatus 	 		  = BackupStatus.DIFFERENT ;
-		bLog 		 	 		  = l ;
 		sizeDifference			  = sd ;
 		if (targetPath != null) {
 			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(targetPath) ;

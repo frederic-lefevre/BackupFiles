@@ -1,3 +1,27 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2023 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.backupFiles;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -7,20 +31,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import org.fl.backupFiles.BackUpJob.JobTaskType;
 import org.junit.jupiter.api.Test;
 
 public class BackUpJobTest {
-
-	private static Logger log = Logger.getLogger(BackUpJobTest.class.getName()) ;
 	
 	@Test
 	void testNullJson() {
 		
-		BackUpJob bupj = new BackUpJob(null, log) ;
+		BackUpJob bupj = new BackUpJob(null) ;
 		
 		assertNull(bupj.getTasks(JobTaskType.BUFFER_TO_TARGET)) ;
 		assertNull(bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER)) ;
@@ -30,7 +51,7 @@ public class BackUpJobTest {
 	@Test
 	void testEmptyJson() {
 		
-		BackUpJob bupj = new BackUpJob("", log) ;
+		BackUpJob bupj = new BackUpJob("") ;
 		
 		assertNull(bupj.getTasks(JobTaskType.BUFFER_TO_TARGET)) ;
 		assertNull(bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER)) ;
@@ -61,7 +82,7 @@ public class BackUpJobTest {
 				"		]\r\n" + 
 				"	}" ;
 		
-		BackUpJob bupj = new BackUpJob(json, log) ;
+		BackUpJob bupj = new BackUpJob(json) ;
 		
 		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
 		assertNotNull(bTt) ;
@@ -98,7 +119,7 @@ public class BackUpJobTest {
 				"		]\r\n" + 
 				"	}" ;
 		
-		BackUpJob bupj = new BackUpJob(json, log) ;
+		BackUpJob bupj = new BackUpJob(json) ;
 		
 		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET) ;
 		assertNotNull(bTt) ;
@@ -137,7 +158,7 @@ public class BackUpJobTest {
 				"		]\r\n" + 
 				"	}" ;
 		
-		BackUpJob bupj = new BackUpJob(json, log) ;
+		BackUpJob bupj = new BackUpJob(json) ;
 		
 		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
 		assertNotNull(bTt) ;

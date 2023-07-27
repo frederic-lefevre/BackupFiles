@@ -30,13 +30,13 @@ import java.util.logging.Logger;
 
 public class BackUpTask {
 
+	private static final Logger bLog = Config.getLogger();
+	
 	private final Path source;
 	private final Path target;
 	
 	private boolean compareContent;
 	private boolean compareContentOnAmbiguous;
-	
-	private final Logger bLog;
 	
 	private final static String warning1  = "  Attention : les chemins source et cible n'existent pas";
 	private final static String warning2  = "  Attention : le chemin source n'existe pas";
@@ -44,11 +44,10 @@ public class BackUpTask {
 	private final static String noWarning = "" ;
 	
 	// A back up task is a source directory or file to back up to a destination directory or file
-	public BackUpTask(Path src, Path tgt, Logger l) {
+	public BackUpTask(Path src, Path tgt) {
 		
 		source = src;
 		target = tgt;
-		bLog   = l;
 		
 		if (source == null) {
 			bLog.severe("source path null when creating back up task") ;
