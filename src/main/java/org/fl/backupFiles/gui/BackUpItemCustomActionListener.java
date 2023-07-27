@@ -37,9 +37,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import org.fl.backupFiles.BackUpItem;
+import org.fl.backupFiles.Config;
 import org.fl.util.os.OScommand;
 
 public class BackUpItemCustomActionListener implements java.awt.event.ActionListener {
+	
+	private static final Logger bLog = Config.getLogger();
 	
 	public enum CustomAction { Compare, ShowParentDir };
 	
@@ -48,14 +51,12 @@ public class BackUpItemCustomActionListener implements java.awt.event.ActionList
 	private final BackUpJTable backUpJTable;
 	private final CustomAction customAction ;
 	private final FileElement fileElement;
-	private final Logger bLog;
 	
-	public BackUpItemCustomActionListener(BackUpJTable bkt, CustomAction ca, FileElement elem, Logger l) {
+	public BackUpItemCustomActionListener(BackUpJTable bkt, CustomAction ca, FileElement elem) {
 		
-		backUpJTable = bkt ;
-		fileElement  = elem ;
-		customAction = ca ;
-		bLog		 = l ;
+		backUpJTable = bkt;
+		fileElement  = elem;
+		customAction = ca;
 	}
 	
 	@Override

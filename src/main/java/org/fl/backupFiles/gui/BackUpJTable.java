@@ -77,7 +77,7 @@ public class BackUpJTable extends JTable {
 		
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF) ;
 		
-		addMouseListener(new BackupItemMouseAdapter(this, Config.getOsActions(), tLog));
+		addMouseListener(new BackupItemMouseAdapter(this, Config.getOsActions()));
 		setAutoCreateRowSorter(true);
 	}
 	

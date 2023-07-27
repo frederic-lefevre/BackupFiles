@@ -28,20 +28,21 @@ import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
 import org.fl.backupFiles.BackUpItem;
+import org.fl.backupFiles.Config;
 import org.fl.util.os.OScommand;
 
 public class BackUpItemCommandListener implements java.awt.event.ActionListener{
 
+	private static final Logger bLog = Config.getLogger();
+	
 	private final BackUpJTable backUpJTable;
 	private final String command;
 	private final FileElement fileElement;
-	private final Logger bLog;
 	
-	public BackUpItemCommandListener(BackUpJTable bkt, String cmd, FileElement elem, Logger l) {
+	public BackUpItemCommandListener(BackUpJTable bkt, String cmd, FileElement elem) {
 		backUpJTable = bkt;
 		fileElement = elem;
 		command	= cmd;
-		bLog = l;
 	}
 	
 	@Override

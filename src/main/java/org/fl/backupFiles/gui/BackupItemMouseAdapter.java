@@ -30,7 +30,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -50,7 +49,7 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 	private List<JMenuItem> bothMenuItems ;
 	private List<JMenuItem> anyMenuItems ;
 	
-	public BackupItemMouseAdapter(BackUpJTable bkt, List<OsAction> osActions, Logger bLog) {
+	public BackupItemMouseAdapter(BackUpJTable bkt, List<OsAction> osActions) {
 		super() ;
 		backUpJTable 	= bkt ;
 		localJPopupMenu = new JPopupMenu();
@@ -84,25 +83,25 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 		for (OsAction osAction : osActions) {
 
 			if (osAction.paramSeparated()) {
-				ActionListener actionSourceListener  = new BackUpItemCommandListener(bkt, osAction.getActionCommand(), FileElement.Source, bLog);
-				ActionListener actionCibleListener   = new BackUpItemCommandListener(bkt, osAction.getActionCommand(), FileElement.Cible,  bLog);
+				ActionListener actionSourceListener  = new BackUpItemCommandListener(bkt, osAction.getActionCommand(), FileElement.Source);
+				ActionListener actionCibleListener   = new BackUpItemCommandListener(bkt, osAction.getActionCommand(), FileElement.Cible);
 
 				sourceMenuItems.add(addMenuItem(osAction.getActionTitle() + " source",  actionSourceListener));
 				targetMenuItems.add(addMenuItem(osAction.getActionTitle() + " cible",   actionCibleListener));
 			} else {
-				ActionListener actionBothListener   = new BackUpItemCommandListener(bkt, osAction.getActionCommand(), FileElement.Both,  bLog);
+				ActionListener actionBothListener   = new BackUpItemCommandListener(bkt, osAction.getActionCommand(), FileElement.Both);
 
 				bothMenuItems.add(addMenuItem(osAction.getActionTitle(),  actionBothListener)) ;
 			}
 		}
 		
-		ActionListener infosActionListener = new BackUpItemCustomActionListener(bkt, CustomAction.Compare, FileElement.Both, bLog) ;
+		ActionListener infosActionListener = new BackUpItemCustomActionListener(bkt, CustomAction.Compare, FileElement.Both) ;
 		JMenuItem infosMenuItem = addMenuItem("Afficher des informations sur la source et la cible dont le résultat de la comparaison binaire", infosActionListener) ;
 		anyMenuItems.add(infosMenuItem) ;
 		
-		ActionListener srcParentActionListener = new BackUpItemCustomActionListener(bkt, CustomAction.ShowParentDir, FileElement.Source, bLog) ;
+		ActionListener srcParentActionListener = new BackUpItemCustomActionListener(bkt, CustomAction.ShowParentDir, FileElement.Source) ;
 		sourceMenuItems.add(addMenuItem("Afficher le dossier parent de la source", srcParentActionListener)) ;
-		ActionListener tgtParentActionListener = new BackUpItemCustomActionListener(bkt, CustomAction.ShowParentDir, FileElement.Cible, bLog) ;
+		ActionListener tgtParentActionListener = new BackUpItemCustomActionListener(bkt, CustomAction.ShowParentDir, FileElement.Cible) ;
 		targetMenuItems.add(addMenuItem("Afficher le dossier parent de la cible", tgtParentActionListener)) ;
 
 	}
