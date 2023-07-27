@@ -1,3 +1,27 @@
+/*
+ * MIT License
+
+Copyright (c) 2017, 2023 Frederic Lefevre
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 package org.fl.backupFiles;
 
 import java.net.URI;
@@ -21,8 +45,9 @@ import com.google.gson.JsonSyntaxException;
 
 public class BackUpJob {
 
+	private static final Logger bLog = Config.getLogger();
+	
 	private String title ;
-	private final Logger bLog ;
 	
 	public enum JobTaskType { 
 		SOURCE_TO_BUFFER("Source vers buffer"), 
@@ -54,9 +79,8 @@ public class BackUpJob {
 	//  - a list of back up task from buffer directories to target directories
 	// or a single list of back up task from source directories to target directories
 	// A back up task is a source directory to back up and a destination directory to back up
-	public BackUpJob(String jsonConfig, Logger l) {
+	public BackUpJob(String jsonConfig) {
 		
-		bLog = l ;
 		backUpTasks = new HashMap<JobTaskType, List<BackUpTask>>() ;
 		if (jsonConfig != null) {
 			
