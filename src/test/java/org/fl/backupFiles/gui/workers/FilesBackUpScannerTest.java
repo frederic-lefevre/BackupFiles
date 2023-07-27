@@ -100,8 +100,8 @@ class FilesBackUpScannerTest {
 			ProgressInformationPanel pip    	 	= new ProgressInformationPanel() ;
 			BackUpItemList 			 backUpItems 	= new BackUpItemList() ;
 			BackUpTableModel         btm    	 	= new BackUpTableModel(backUpItems) ;
-			UiControl				 uicS2B		 	= new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm, log) ;
-			UiControl				 uicB2T		 	= new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm, log) ;
+			UiControl				 uicS2B		 	= new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm) ;
+			UiControl				 uicB2T		 	= new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm) ;
 			BackUpCounters           backUpCounters ;
 			// SOURCE_TO_BUFFER			
 			FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm, log) ;

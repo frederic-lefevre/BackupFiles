@@ -27,7 +27,6 @@ package org.fl.backupFiles.gui;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -52,7 +51,7 @@ public class BackUpPane extends JPanel {
 	private final static String SEPARATOR = " - Configuration actuellement sélectionnée: " ;
 	private final static String NO_TASKS = " aucune tâche à effectuer";
 	
-	public BackUpPane(JobTaskType jtt, BackUpJobInfoTableModel backUpJobInfoTableModel, Logger bLog) {
+	public BackUpPane(JobTaskType jtt, BackUpJobInfoTableModel backUpJobInfoTableModel) {
 		super() ;
 		
 		jobTaskType = jtt ;
@@ -79,7 +78,7 @@ public class BackUpPane extends JPanel {
 		pip.setStepInfos("Aucune action effectuée", 0) ;
 		
 		// Scan and Back up buttons
-		backUpControl = new UiControl(jobTaskType, backUpTableModel, pip, backUpJobInfoTableModel, bLog) ;
+		backUpControl = new UiControl(jobTaskType, backUpTableModel, pip, backUpJobInfoTableModel) ;
 		add(backUpControl) ;
 		
 		// Table headers

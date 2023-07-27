@@ -94,7 +94,7 @@ public class BackupFilesGui  extends JFrame {
 			ArrayList<BackUpPane> backUpPanes = new ArrayList<BackUpPane>() ;
 			int tabIndex = 0 ;
 			for (JobTaskType jtt : JobTaskType.values()) {
-				BackUpPane taskTypePane = new BackUpPane(jtt, jobInformationTable, bLog) ;
+				BackUpPane taskTypePane = new BackUpPane(jtt, jobInformationTable) ;
 				backUpPanes.add(taskTypePane) ;
 				bkpTablesPanel.add(taskTypePane, jtt.toString(), tabIndex) ;
 				tabIndex++ ;
