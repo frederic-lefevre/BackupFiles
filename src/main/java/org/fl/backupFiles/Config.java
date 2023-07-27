@@ -107,7 +107,7 @@ public class Config {
 
 			String permanenceConf = backupProperty.getFileContentFromURI("backupFiles.dirPermanenceFile",
 					StandardCharsets.UTF_8);
-			directoryPermanence = new DirectoryPermanenceMap(permanenceConf, backupLogger);
+			directoryPermanence = new DirectoryPermanenceMap(permanenceConf);
 
 		} catch (Exception e) {
 			System.out.println("Exception caught in Config init (see default prop file processing)");
