@@ -49,6 +49,8 @@ import org.fl.util.file.FilesUtils;
 
 public class BackUpScannerThread {
 
+	private static final Logger pLog = Config.getLogger();
+	
 	private boolean stopAsked ;
 
 	private List<Path> filesVisitFailed ;
@@ -58,8 +60,7 @@ public class BackUpScannerThread {
 	private BackUpCounters backUpCounters ;
 	
 	private final BackUpTask backUpTask ;
-	
-	private final Logger pLog ;
+
 	
 	private final FileComparator fileComparator ;
 	
@@ -69,22 +70,21 @@ public class BackUpScannerThread {
 	private final int maxDepth;
 	private int	currDepth;
 
-	public BackUpScannerThread(BackUpTask but, Logger l) {
+	public BackUpScannerThread(BackUpTask but) {
 		
 		stopAsked	= false ;
 		backUpTask  = but ;
 		maxDepth	= Config.getMaxDepth() ;
-		pLog = l ;
 		
-		backUpCounters = new BackUpCounters() ;
-		done = false ;
+		backUpCounters = new BackUpCounters();
+		done = false;
 
 		status = backUpTask.toString() + " ";
 		fileComparator = new FileComparator(pLog);
 	}
 
 	public void stopAsked(boolean b) {
-		stopAsked = b ;
+		stopAsked = b;
 	}
 	
 	public String getCurrentStatus() {
@@ -147,7 +147,7 @@ public class BackUpScannerThread {
 			 try (DirectoryStream<Path> sourceFileStream = Files.newDirectoryStream(sourceDirectory)) {
 				 
 				 for (Path sourceFile : sourceFileStream) {				 
-					 filesBasicAttributes.put(sourceFile.getFileName(), new PathPairBasicAttributes(sourceFile, pLog)) ;
+					 filesBasicAttributes.put(sourceFile.getFileName(), new PathPairBasicAttributes(sourceFile)) ;
 				 }
 			 } catch (Exception e) {
 				 backUpCounters.nbSourceFilesFailed++ ;

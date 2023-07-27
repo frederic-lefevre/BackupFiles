@@ -110,7 +110,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				
 				// Launch scanner tasks
 				List<BackUpScannerTask> results = backUpTasks.stream()
-					.map(backupTask ->  new BackUpScannerThread(backupTask, pLog))
+					.map(backupTask ->  new BackUpScannerThread(backupTask))
 					.map(backUpScannerThread -> new BackUpScannerTask(backUpScannerThread, CompletableFuture.supplyAsync(backUpScannerThread::scan, Config.getScanExecutorService())))
 					.collect(Collectors.toList());
 

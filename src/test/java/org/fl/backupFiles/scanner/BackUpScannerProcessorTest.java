@@ -105,7 +105,7 @@ class BackUpScannerProcessorTest {
 			
 			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
 			
 			ScannerThreadResponse scannerResp = backUpRes.get() ;
@@ -145,7 +145,7 @@ class BackUpScannerProcessorTest {
 			
 			// Recompare directory
 			backUpTask.setCompareContent(true) ;
-			backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
+			backUpScannerThread = new BackUpScannerThread(backUpTask) ;
 			backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
 			
 			scannerResp = backUpRes.get() ;
@@ -176,7 +176,7 @@ class BackUpScannerProcessorTest {
 			
 			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
 			
 			ScannerThreadResponse scannerResp = backUpRes.get() ;
@@ -226,7 +226,7 @@ class BackUpScannerProcessorTest {
 			
 			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
 		
 			ScannerThreadResponse scannerResp = backUpRes.get() ;
@@ -263,7 +263,7 @@ class BackUpScannerProcessorTest {
 			
 			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
 		
 			ScannerThreadResponse scannerResp = backUpRes.get() ;
@@ -300,7 +300,7 @@ class BackUpScannerProcessorTest {
 			
 			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
 		
 			ScannerThreadResponse scannerResp = backUpRes.get() ;
@@ -338,7 +338,7 @@ class BackUpScannerProcessorTest {
 			
 			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
 		
 			ScannerThreadResponse scannerResp = backUpRes.get() ;
@@ -373,7 +373,7 @@ class BackUpScannerProcessorTest {
 
 			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask, log) ;
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
 			
 			ScannerThreadResponse scannerResp = backUpRes.get() ;
