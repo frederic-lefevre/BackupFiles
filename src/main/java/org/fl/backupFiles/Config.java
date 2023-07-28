@@ -60,6 +60,9 @@ public class Config {
 	private static Logger backupLogger;
 	private static boolean initialized = false;
 
+	private Config() {
+	}
+	
 	public static void initConfig(String propertyFile) {
 
 		try {
