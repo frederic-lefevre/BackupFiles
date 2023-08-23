@@ -24,7 +24,9 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.net.URI;
 import java.nio.file.Files;
@@ -43,9 +45,9 @@ public class BackUpJobTest {
 		
 		BackUpJob bupj = new BackUpJob(null) ;
 		
-		assertNull(bupj.getTasks(JobTaskType.BUFFER_TO_TARGET)) ;
-		assertNull(bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER)) ;
-		assertNull(bupj.toString()) ;
+		assertThat(bupj.getTasks(JobTaskType.BUFFER_TO_TARGET)).isNull();
+		assertThat(bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER)).isNull();
+		assertThat(bupj.toString()).isNull();
 	}
 	
 	@Test
@@ -53,9 +55,9 @@ public class BackUpJobTest {
 		
 		BackUpJob bupj = new BackUpJob("") ;
 		
-		assertNull(bupj.getTasks(JobTaskType.BUFFER_TO_TARGET)) ;
-		assertNull(bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER)) ;
-		assertNull(bupj.toString()) ;
+		assertThat(bupj.getTasks(JobTaskType.BUFFER_TO_TARGET)).isNull();
+		assertThat(bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER)).isNull();
+		assertThat(bupj.toString()).isNull();
 	}
 	
 	@Test
@@ -85,12 +87,13 @@ public class BackUpJobTest {
 		BackUpJob bupj = new BackUpJob(json) ;
 		
 		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
-		assertNotNull(bTt) ;
-		assertNotNull(bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER)) ;
-		assertNotNull(bupj.toString()) ;
-		assertEquals("FredericPersonnel sur USB S:", bupj.toString()) ;
-		
-		assertEquals(3, bTt.size()) ;
+		assertThat(bTt).isNotNull();
+		assertThat(bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER)).isNotNull();
+		assertThat(bupj.toString())
+			.isNotNull()
+			.isEqualTo("FredericPersonnel sur USB S:");
+	
+		assertThat(bTt).hasSize(3);
 	}
 	
 	@Test
@@ -122,15 +125,16 @@ public class BackUpJobTest {
 		BackUpJob bupj = new BackUpJob(json) ;
 		
 		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET) ;
-		assertNotNull(bTt) ;
+		assertThat(bTt).isNotNull();
 		List<BackUpTask> sTb = bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER) ;
-		assertNotNull(sTb) ;
-		assertNotNull(bupj.toString()) ;
-		assertEquals("FredericPersonnel sur USB S:", bupj.toString()) ;
+		assertThat(sTb).isNotNull();
+		assertThat(bupj.toString())
+			.isNotNull()
+			.hasToString("FredericPersonnel sur USB S:");
 		
 		long expectedNbTasks = nbFileInDir("file:///C:/FredericPersonnel/") + 2;
-		assertEquals(expectedNbTasks, sTb.size()) ;
-		assertEquals(expectedNbTasks, bTt.size()) ;
+		assertThat(sTb).hasSize((int) expectedNbTasks);
+		assertThat(bTt).hasSize((int) expectedNbTasks);
 
 	}
 	
@@ -161,10 +165,12 @@ public class BackUpJobTest {
 		BackUpJob bupj = new BackUpJob(json) ;
 		
 		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
-		assertNotNull(bTt) ;
+		assertThat(bTt)
+			.isNotNull()
+			.hasSize(3);
 		
-		assertEquals(3, bTt.size()) ;
-		assertThrows(UnsupportedOperationException.class , () -> bTt.clear());
+		assertThatExceptionOfType(UnsupportedOperationException.class)
+			.isThrownBy(() -> bTt.clear());
 	}
 	
 	private long nbFileInDir(String dir) {
