@@ -88,62 +88,65 @@ public class BackUpCounters {
 	
 	@Override
 	public String toString() {
-		
-		StringBuilder res = new StringBuilder() ;
-		
-		res.append(COPY_NEW_LABEL	 ).append(copyNewNb	   ).append(DELETE_LABEL	).append(deleteNb	).append("\n") ;
-		res.append(COPY_REPLACE_LABEL).append(copyReplaceNb).append(DELETE_DIR_LABEL).append(deleteDirNb).append("\n") ;
-		res.append(COPY_TREE_LABEL	 ).append(copyTreeNb   ).append(AMBIGUOUS_LABEL	).append(ambiguousNb).append("\n") ;
+
+		StringBuilder res = new StringBuilder();
+
+		res.append(COPY_NEW_LABEL).append(copyNewNb).append(DELETE_LABEL).append(deleteNb).append("\n");
+		res.append(COPY_REPLACE_LABEL).append(copyReplaceNb).append(DELETE_DIR_LABEL).append(deleteDirNb).append("\n");
+		res.append(COPY_TREE_LABEL).append(copyTreeNb).append(AMBIGUOUS_LABEL).append(ambiguousNb).append("\n");
 		res.append(COPY_TARGET_LABEL).append(copyTargetNb).append("\n");
-		
-		res.append(SOURCE_OK_LABEL).append(nbSourceFilesProcessed).append(SOURCE_KO_LABEL).append(nbSourceFilesFailed).append("\n") ;
-		res.append(TARGET_OK_LABEL).append(nbTargetFilesProcessed).append(TARGET_KO_LABEL).append(nbTargetFilesFailed).append("\n") ;
-		
-		res.append(SIZE_ABOVE_LIMIT_LABEL).append(backupWithSizeAboveThreshold).append("\n") ;
-		res.append(HIGH_PERMANENCE_LABEL).append(nbHighPermanencePath).append(MEDIUM_PERMANENCE_LABEL).append(nbMediumPermanencePath).append("\n") ;
-		
+
+		res.append(SOURCE_OK_LABEL).append(nbSourceFilesProcessed).append(SOURCE_KO_LABEL).append(nbSourceFilesFailed)
+				.append("\n");
+		res.append(TARGET_OK_LABEL).append(nbTargetFilesProcessed).append(TARGET_KO_LABEL).append(nbTargetFilesFailed)
+				.append("\n");
+
+		res.append(SIZE_ABOVE_LIMIT_LABEL).append(backupWithSizeAboveThreshold).append("\n");
+		res.append(HIGH_PERMANENCE_LABEL).append(nbHighPermanencePath).append(MEDIUM_PERMANENCE_LABEL)
+				.append(nbMediumPermanencePath).append("\n");
+
 		if (contentDifferentNb != 0) {
-			res.append(CONTENT_DIFFERENT_LABEL).append(contentDifferentNb) ;
+			res.append(CONTENT_DIFFERENT_LABEL).append(contentDifferentNb);
 		}
-		res.append(TOTAL_SIZE_DIFF_LABEL).append(totalSizeDifference).append("\n") ;
-		return res.toString() ;
+		res.append(TOTAL_SIZE_DIFF_LABEL).append(totalSizeDifference).append("\n");
+		return res.toString();
 	}
 	
 	public void appendHtmlFragment(StringBuilder res) {
-		
-		res.append(TABLE_BEGIN) ;
-		appendCellCouple(res, COPY_TREE_LABEL, copyTreeNb, null) ;
-		appendCellCouple(res, COPY_NEW_LABEL, copyNewNb, null) ;
-		appendCellCouple(res, COPY_REPLACE_LABEL, copyReplaceNb, null) ;
-		
-		res.append(NEW_ROW) ;
-		appendCellCouple(res, DELETE_LABEL, deleteNb, null) ;
-		appendCellCouple(res, DELETE_DIR_LABEL, deleteDirNb, null) ;
-		appendCellCouple(res, AMBIGUOUS_LABEL, ambiguousNb, "red") ;
-		appendCellCouple(res, COPY_TARGET_LABEL, copyTargetNb, "red") ;
-		
-		res.append(NEW_ROW) ;		
-		appendCellCouple(res, SOURCE_OK_LABEL, nbSourceFilesProcessed, null) ;
-		appendCellCouple(res, SOURCE_KO_LABEL, nbSourceFilesFailed,  "red") ;
-		
-		res.append(NEW_ROW) ;
-		appendCellCouple(res, TARGET_OK_LABEL, nbTargetFilesProcessed, null) ;
-		appendCellCouple(res, TARGET_KO_LABEL, nbTargetFilesFailed,  "red") ;
-		
-		res.append(NEW_ROW) ;
-		appendCellCouple(res, TOTAL_SIZE_DIFF_LABEL, totalSizeDifference, null) ;
-		appendCellCouple(res, SIZE_ABOVE_LIMIT_LABEL, backupWithSizeAboveThreshold, "red") ;
-		
-		res.append(NEW_ROW) ;
-		appendCellCouple(res, HIGH_PERMANENCE_LABEL, nbHighPermanencePath, "red") ;
-		appendCellCouple(res, MEDIUM_PERMANENCE_LABEL, nbMediumPermanencePath,  "#ff8f00") ;
-		
+
+		res.append(TABLE_BEGIN);
+		appendCellCouple(res, COPY_TREE_LABEL, copyTreeNb, null);
+		appendCellCouple(res, COPY_NEW_LABEL, copyNewNb, null);
+		appendCellCouple(res, COPY_REPLACE_LABEL, copyReplaceNb, null);
+
+		res.append(NEW_ROW);
+		appendCellCouple(res, DELETE_LABEL, deleteNb, null);
+		appendCellCouple(res, DELETE_DIR_LABEL, deleteDirNb, null);
+		appendCellCouple(res, AMBIGUOUS_LABEL, ambiguousNb, "red");
+		appendCellCouple(res, COPY_TARGET_LABEL, copyTargetNb, "red");
+
+		res.append(NEW_ROW);
+		appendCellCouple(res, SOURCE_OK_LABEL, nbSourceFilesProcessed, null);
+		appendCellCouple(res, SOURCE_KO_LABEL, nbSourceFilesFailed, "red");
+
+		res.append(NEW_ROW);
+		appendCellCouple(res, TARGET_OK_LABEL, nbTargetFilesProcessed, null);
+		appendCellCouple(res, TARGET_KO_LABEL, nbTargetFilesFailed, "red");
+
+		res.append(NEW_ROW);
+		appendCellCouple(res, TOTAL_SIZE_DIFF_LABEL, totalSizeDifference, null);
+		appendCellCouple(res, SIZE_ABOVE_LIMIT_LABEL, backupWithSizeAboveThreshold, "red");
+
+		res.append(NEW_ROW);
+		appendCellCouple(res, HIGH_PERMANENCE_LABEL, nbHighPermanencePath, "red");
+		appendCellCouple(res, MEDIUM_PERMANENCE_LABEL, nbMediumPermanencePath, "#ff8f00");
+
 		if (contentDifferentNb != 0) {
-			res.append(NEW_ROW) ;
-			appendCellCouple(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, null) ;
+			res.append(NEW_ROW);
+			appendCellCouple(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, null);
 		}
-		res.append(TABLE_END) ;
-				
+		res.append(TABLE_END);
+
 	}
 	
 	private static final String NEW_ROW    			  = "</tr><tr>" ;
