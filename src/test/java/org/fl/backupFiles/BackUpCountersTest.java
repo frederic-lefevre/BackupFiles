@@ -24,7 +24,7 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
@@ -85,40 +85,40 @@ class BackUpCountersTest {
 	
 	private static void assertFieldValue(BackUpCounters bc, long val) {
 		
-		assertEquals(val, bc.ambiguousNb);
-		assertEquals(val, bc.backupWithSizeAboveThreshold);
-		assertEquals(val, bc.contentDifferentNb);
-		assertEquals(val, bc.copyNewNb);
-		assertEquals(val, bc.copyReplaceNb);
-		assertEquals(val, bc.copyTreeNb);
-		assertEquals(val, bc.deleteDirNb);
-		assertEquals(val, bc.deleteNb);
-		assertEquals(val, bc.nbHighPermanencePath);
-		assertEquals(val, bc.nbMediumPermanencePath);
-		assertEquals(val, bc.nbSourceFilesFailed);
-		assertEquals(val, bc.nbSourceFilesProcessed);
-		assertEquals(val, bc.nbTargetFilesFailed);
-		assertEquals(val, bc.nbTargetFilesProcessed);
-		assertEquals(val, bc.totalSizeDifference);
+		assertThat(bc.ambiguousNb).isEqualTo(val);
+		assertThat(bc.backupWithSizeAboveThreshold).isEqualTo(val);
+		assertThat(bc.contentDifferentNb).isEqualTo(val);
+		assertThat(bc.copyNewNb).isEqualTo(val);
+		assertThat(bc.copyReplaceNb).isEqualTo(val);
+		assertThat(bc.copyTreeNb).isEqualTo(val);
+		assertThat(bc.deleteDirNb).isEqualTo(val);
+		assertThat(bc.deleteNb).isEqualTo(val);
+		assertThat(bc.nbHighPermanencePath).isEqualTo(val);
+		assertThat(bc.nbMediumPermanencePath).isEqualTo(val);
+		assertThat(bc.nbSourceFilesFailed).isEqualTo(val);
+		assertThat(bc.nbSourceFilesProcessed).isEqualTo(val);
+		assertThat(bc.nbTargetFilesFailed).isEqualTo(val);
+		assertThat(bc.nbTargetFilesProcessed).isEqualTo(val);
+		assertThat(bc.totalSizeDifference).isEqualTo(val);
 	}
 
 	private static void assertFieldValueWithIncrement(BackUpCounters bc, long val, long m) {
 		
-		assertEquals(val, bc.ambiguousNb);
-		assertEquals(val+1*m, bc.backupWithSizeAboveThreshold);
-		assertEquals(val+2*m, bc.contentDifferentNb);
-		assertEquals(val+3*m, bc.copyNewNb);
-		assertEquals(val+4*m, bc.copyReplaceNb);
-		assertEquals(val+5*m, bc.copyTreeNb);
-		assertEquals(val+6*m, bc.deleteDirNb);
-		assertEquals(val+7*m, bc.deleteNb);
-		assertEquals(val+8*m, bc.nbHighPermanencePath);
-		assertEquals(val+9*m, bc.nbMediumPermanencePath);
-		assertEquals(val+10*m, bc.nbSourceFilesFailed);
-		assertEquals(val+11*m, bc.nbSourceFilesProcessed);
-		assertEquals(val+12*m, bc.nbTargetFilesFailed);
-		assertEquals(val+13*m, bc.nbTargetFilesProcessed);
-		assertEquals(val+14*m, bc.totalSizeDifference);
+		assertThat(bc.ambiguousNb).isEqualTo(val);
+		assertThat(bc.backupWithSizeAboveThreshold).isEqualTo(val+1*m);
+		assertThat(bc.contentDifferentNb).isEqualTo(val+2*m);
+		assertThat(bc.copyNewNb).isEqualTo(val+3*m);
+		assertThat(bc.copyReplaceNb).isEqualTo(val+4*m);
+		assertThat(bc.copyTreeNb).isEqualTo(val+5*m);
+		assertThat(bc.deleteDirNb).isEqualTo(val+6*m);
+		assertThat(bc.deleteNb).isEqualTo(val+7*m);
+		assertThat(bc.nbHighPermanencePath).isEqualTo(val+8*m);
+		assertThat(bc.nbMediumPermanencePath).isEqualTo(val+9*m);
+		assertThat(bc.nbSourceFilesFailed).isEqualTo(val+10*m);
+		assertThat(bc.nbSourceFilesProcessed).isEqualTo(val+11*m);
+		assertThat(bc.nbTargetFilesFailed).isEqualTo(val+12*m);
+		assertThat(bc.nbTargetFilesProcessed).isEqualTo(val+13*m);
+		assertThat(bc.totalSizeDifference).isEqualTo(val+14*m);
 	}
 	
 	private static void setFieldValue(BackUpCounters bc, long val) {
