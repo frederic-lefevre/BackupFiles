@@ -43,212 +43,207 @@ public class BackUpItemTest {
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles.properties";
 
 	private static Logger log;
-	
+
 	private static final String SRC_FOLDER = "file:///ForTests/BackUpFiles/TestDir1/";
 	private static final String SRC_FILE1 = SRC_FOLDER + "File1.pdf";
 	private static final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
 	private static final String UNEXISTANT_FILE = "file:///ForTests/BackUpFiles/TestDir1/doesNotExists.pdf";
-	
-	private static final Path EXISTANT_SOURCE_FOLDER  = TestUtils.getPathFromUriString(SRC_FOLDER);
-	private static final Path EXISTANT_SOURCE  = TestUtils.getPathFromUriString(SRC_FILE1);
-	private static final Path UNEXISTANT_TARGET  = TestUtils.getPathFromUriString(TGT_FILE1);
+
+	private static final Path EXISTANT_SOURCE_FOLDER = TestUtils.getPathFromUriString(SRC_FOLDER);
+	private static final Path EXISTANT_SOURCE = TestUtils.getPathFromUriString(SRC_FILE1);
+	private static final Path UNEXISTANT_TARGET = TestUtils.getPathFromUriString(TGT_FILE1);
 	private static final Path UNEXISTANT_PATH = TestUtils.getPathFromUriString(UNEXISTANT_FILE);
-	
-	
-	private static final String UNEXISTANT_FOLDER = "file:///ForTests/BackUpFiles/doesNotExists" ;
-	private static final Path UNEXISTANT_FOLDER_PATH  = TestUtils.getPathFromUriString(UNEXISTANT_FOLDER) ;
-	
+
+	private static final String UNEXISTANT_FOLDER = "file:///ForTests/BackUpFiles/doesNotExists";
+	private static final Path UNEXISTANT_FOLDER_PATH = TestUtils.getPathFromUriString(UNEXISTANT_FOLDER);
+
 	@BeforeAll
 	static void initConfig() {
-		
+
 		Config.initConfig(DEFAULT_PROP_FILE);
 		log = Config.getLogger();
 	}
-	
+
 	@Test
 	void test1() {
-		
-		Path src 		 = Paths.get("") ;
-		Path tgt 		 = Paths.get("") ;
-		
-		BackUpCounters counters = new BackUpCounters() ;
-		BackUpItem backUpItem = new BackUpItem(src, tgt, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters) ;
-		
-		BackupAction action = backUpItem.getBackupAction() ;
-		
+
+		Path src = Paths.get("");
+		Path tgt = Paths.get("");
+
+		BackUpCounters counters = new BackUpCounters();
+		BackUpItem backUpItem = new BackUpItem(src, tgt, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0,
+				counters);
+
+		BackupAction action = backUpItem.getBackupAction();
+
 		assertThat(action).isEqualTo(BackupAction.COPY_REPLACE);
 	}
-		
+
 	@Test
 	void test2() {
-		
-		BackUpCounters counters = new BackUpCounters() ;
-		BackUpItem backUpItem = new BackUpItem(EXISTANT_SOURCE, UNEXISTANT_TARGET, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters) ;
-		
+
+		BackUpCounters counters = new BackUpCounters();
+		BackUpItem backUpItem = new BackUpItem(EXISTANT_SOURCE, UNEXISTANT_TARGET, BackupAction.COPY_NEW,
+				BackupStatus.DIFFERENT, 0, counters);
+
 		assertThat(getTotalCounters(counters)).isEqualTo(1);
-		
+
 		counters.reset();
 		backUpItem.execute(counters);
-		
-		FileComparator fileComparator = new FileComparator(log) ;
-		
+
+		FileComparator fileComparator = new FileComparator(log);
+
 		assertThat(fileComparator.haveSameContent(EXISTANT_SOURCE, UNEXISTANT_TARGET)).isTrue();
-	
+
 		assertThat(counters.nbSourceFilesProcessed).isEqualTo(1);
 		assertThat(counters.copyNewNb).isEqualTo(1);
 		assertThat(getTotalCounters(counters)).isEqualTo(2);
-		
+
 		counters.reset();
-		backUpItem = new BackUpItem(UNEXISTANT_TARGET, BackupAction.DELETE, EXISTANT_SOURCE.getParent(), 0, counters) ;
-		
+		backUpItem = new BackUpItem(UNEXISTANT_TARGET, BackupAction.DELETE, EXISTANT_SOURCE.getParent(), 0, counters);
+
 		assertThat(counters.copyNewNb).isZero();
 		assertThat(counters.nbSourceFilesProcessed).isZero();
 		assertThat(counters.nbTargetFilesProcessed).isZero();
 		assertThat(counters.deleteNb).isEqualTo(1);
 		assertThat(getTotalCounters(counters)).isEqualTo(1);
-		
+
 		counters.reset();
 		backUpItem.execute(counters);
-		
+
 		assertThat(Files.exists(UNEXISTANT_TARGET)).isFalse();
 		assertThat(counters.nbSourceFilesProcessed).isZero();
 		assertThat(counters.deleteNb).isEqualTo(1);
 		assertThat(counters.nbTargetFilesProcessed).isEqualTo(1);
 		assertThat(getTotalCounters(counters)).isEqualTo(2);
 	}
-	
+
 	@Test
 	void nullSrcShouldThrowException() {
-		
-		BackUpCounters counters = new BackUpCounters() ;
 
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(null, UNEXISTANT_TARGET, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(null, UNEXISTANT_TARGET, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(null, UNEXISTANT_TARGET, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, 0, counters));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() ->
-			new BackUpItem(null, UNEXISTANT_TARGET, BackupAction.AMBIGUOUS, BackupStatus.SAME_CONTENT, 0, counters));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(null, UNEXISTANT_TARGET, BackupAction.COPY_TARGET, BackupStatus.SAME_CONTENT, 0, counters));
+		BackUpCounters counters = new BackUpCounters();
+
+		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> new BackUpItem(null,
+				UNEXISTANT_TARGET, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters));
+		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> new BackUpItem(null,
+				UNEXISTANT_TARGET, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters));
+		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> new BackUpItem(null,
+				UNEXISTANT_TARGET, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, 0, counters));
+		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> new BackUpItem(null,
+				UNEXISTANT_TARGET, BackupAction.AMBIGUOUS, BackupStatus.SAME_CONTENT, 0, counters));
+		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> new BackUpItem(null,
+				UNEXISTANT_TARGET, BackupAction.COPY_TARGET, BackupStatus.SAME_CONTENT, 0, counters));
 	}
+
 	@Test
-	
-	void illegalCopyShouldThrowException() {
-		
-		Path tgt  = EXISTANT_SOURCE;
-		
-		BackUpCounters counters = new BackUpCounters() ;
 
-		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> 
-			new BackUpItem(tgt, BackupAction.COPY_NEW, EXISTANT_SOURCE_FOLDER, 0, counters));
-		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> 
-			new BackUpItem(tgt, BackupAction.COPY_REPLACE, EXISTANT_SOURCE_FOLDER, 0, counters));
-		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> 
-			new BackUpItem(tgt, BackupAction.COPY_TREE, EXISTANT_SOURCE_FOLDER, 0, counters));
-		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> 
-			new BackUpItem(tgt, BackupAction.AMBIGUOUS, EXISTANT_SOURCE_FOLDER, 0, counters));
-		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> 
-			new BackUpItem(tgt, BackupAction.COPY_TARGET, EXISTANT_SOURCE_FOLDER, 0, counters));
+	void illegalCopyShouldThrowException() {
+
+		Path tgt = EXISTANT_SOURCE;
+
+		BackUpCounters counters = new BackUpCounters();
+
+		assertThatExceptionOfType(IllegalBackupActionException.class)
+				.isThrownBy(() -> new BackUpItem(tgt, BackupAction.COPY_NEW, EXISTANT_SOURCE_FOLDER, 0, counters));
+		assertThatExceptionOfType(IllegalBackupActionException.class)
+				.isThrownBy(() -> new BackUpItem(tgt, BackupAction.COPY_REPLACE, EXISTANT_SOURCE_FOLDER, 0, counters));
+		assertThatExceptionOfType(IllegalBackupActionException.class)
+				.isThrownBy(() -> new BackUpItem(tgt, BackupAction.COPY_TREE, EXISTANT_SOURCE_FOLDER, 0, counters));
+		assertThatExceptionOfType(IllegalBackupActionException.class)
+				.isThrownBy(() -> new BackUpItem(tgt, BackupAction.AMBIGUOUS, EXISTANT_SOURCE_FOLDER, 0, counters));
+		assertThatExceptionOfType(IllegalBackupActionException.class)
+				.isThrownBy(() -> new BackUpItem(tgt, BackupAction.COPY_TARGET, EXISTANT_SOURCE_FOLDER, 0, counters));
 	}
-	
+
 	@Test
 	void illegalDeleteShouldThrowException() {
-		
-		BackUpCounters counters = new BackUpCounters() ;
 
-		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> 
-			new BackUpItem(EXISTANT_SOURCE, UNEXISTANT_TARGET, BackupAction.DELETE, BackupStatus.DIFFERENT, 0, counters));
-		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> 
-			new BackUpItem(EXISTANT_SOURCE, UNEXISTANT_TARGET, BackupAction.DELETE_DIR, BackupStatus.DIFFERENT, 0, counters));
+		BackUpCounters counters = new BackUpCounters();
+
+		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> new BackUpItem(EXISTANT_SOURCE,
+				UNEXISTANT_TARGET, BackupAction.DELETE, BackupStatus.DIFFERENT, 0, counters));
+		assertThatExceptionOfType(IllegalBackupActionException.class).isThrownBy(() -> new BackUpItem(EXISTANT_SOURCE,
+				UNEXISTANT_TARGET, BackupAction.DELETE_DIR, BackupStatus.DIFFERENT, 0, counters));
 	}
-	
+
 	@Test
 	void unexistantSrcShouldThrowException() {
-		
-		BackUpCounters counters = new BackUpCounters() ;
 
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(UNEXISTANT_PATH, UNEXISTANT_TARGET, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(UNEXISTANT_PATH, UNEXISTANT_TARGET, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(UNEXISTANT_PATH, UNEXISTANT_TARGET, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, 0, counters));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(UNEXISTANT_PATH, UNEXISTANT_TARGET, BackupAction.AMBIGUOUS, BackupStatus.DIFFERENT, 0, counters));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(UNEXISTANT_PATH, UNEXISTANT_TARGET, BackupAction.COPY_TARGET, BackupStatus.DIFFERENT, 0, counters));
+		BackUpCounters counters = new BackUpCounters();
+
+		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> new BackUpItem(UNEXISTANT_PATH,
+				UNEXISTANT_TARGET, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters));
+		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> new BackUpItem(UNEXISTANT_PATH,
+				UNEXISTANT_TARGET, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, 0, counters));
+		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> new BackUpItem(UNEXISTANT_PATH,
+				UNEXISTANT_TARGET, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, 0, counters));
+		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> new BackUpItem(UNEXISTANT_PATH,
+				UNEXISTANT_TARGET, BackupAction.AMBIGUOUS, BackupStatus.DIFFERENT, 0, counters));
+		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> new BackUpItem(UNEXISTANT_PATH,
+				UNEXISTANT_TARGET, BackupAction.COPY_TARGET, BackupStatus.DIFFERENT, 0, counters));
 	}
-	
+
 	@Test
 	void unexistantExistingSrcShouldThrowException() throws IOException {
-		
-		BackUpCounters counters = new BackUpCounters() ;
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(UNEXISTANT_TARGET, BackupAction.DELETE, UNEXISTANT_FOLDER_PATH, 0, counters));
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(UNEXISTANT_TARGET, BackupAction.DELETE_DIR, UNEXISTANT_FOLDER_PATH, 0, counters));
+
+		BackUpCounters counters = new BackUpCounters();
+		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(
+				() -> new BackUpItem(UNEXISTANT_TARGET, BackupAction.DELETE, UNEXISTANT_FOLDER_PATH, 0, counters));
+		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(
+				() -> new BackUpItem(UNEXISTANT_TARGET, BackupAction.DELETE_DIR, UNEXISTANT_FOLDER_PATH, 0, counters));
 	}
-	
+
 	@Test
 	void existantTgtShouldThrowException() throws IOException {
-			
+
 		Files.copy(EXISTANT_SOURCE, UNEXISTANT_TARGET);
 		Path nowExists = UNEXISTANT_TARGET;
-		
+
 		assertThat(Files.exists(EXISTANT_SOURCE)).isTrue();
 		assertThat(Files.exists(nowExists)).isTrue();
-		
-		BackUpCounters counters = new BackUpCounters() ;
-		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> 
-			new BackUpItem(EXISTANT_SOURCE, nowExists, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters));
+
+		BackUpCounters counters = new BackUpCounters();
+		assertThatExceptionOfType(IllegalBackUpItemException.class).isThrownBy(() -> new BackUpItem(EXISTANT_SOURCE,
+				nowExists, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, 0, counters));
 	}
-	
+
 	@Test
 	void shouldCopyTarget() throws IOException {
-			
+
 		Files.copy(EXISTANT_SOURCE, UNEXISTANT_TARGET);
-		
+
 		Path nowExists = UNEXISTANT_TARGET;
 		assertThat(Files.exists(EXISTANT_SOURCE)).isTrue();
 		assertThat(Files.exists(nowExists)).isTrue();
-		
-		BackUpCounters counters = new BackUpCounters() ;
-		
-		BackUpItem backUpItem = new BackUpItem(EXISTANT_SOURCE, nowExists, BackupAction.COPY_TARGET, BackupStatus.SAME_CONTENT, 0, counters) ;
-		
+
+		BackUpCounters counters = new BackUpCounters();
+
+		BackUpItem backUpItem = new BackUpItem(EXISTANT_SOURCE, nowExists, BackupAction.COPY_TARGET,
+				BackupStatus.SAME_CONTENT, 0, counters);
+
 		assertThat(counters.copyTargetNb).isEqualTo(1);
-		
+
 		counters.reset();
 		backUpItem.execute(counters);
-		
+
 		assertThat(counters.copyTargetNb).isEqualTo(1);
 		assertThat(getTotalCounters(counters)).isEqualTo(2);
 	}
-	
+
 	@AfterEach
 	void clean() throws IOException {
-		
+
 		if (Files.exists(UNEXISTANT_TARGET)) {
 			Files.delete(UNEXISTANT_TARGET);
 		}
-	
+
 	}
-	
+
 	private long getTotalCounters(BackUpCounters counters) {
-		
-		return	counters.ambiguousNb			+
-				counters.contentDifferentNb		+
-				counters.copyNewNb				+
-				counters.copyReplaceNb			+
-				counters.copyTreeNb				+
-				counters.deleteDirNb			+
-				counters.deleteNb				+
-				counters.copyTargetNb			+
-				counters.nbSourceFilesFailed	+
-				counters.nbSourceFilesProcessed	+
-				counters.nbTargetFilesFailed	+
-				counters.nbTargetFilesProcessed	;
+
+		return counters.ambiguousNb + counters.contentDifferentNb + counters.copyNewNb + counters.copyReplaceNb
+				+ counters.copyTreeNb + counters.deleteDirNb + counters.deleteNb + counters.copyTargetNb
+				+ counters.nbSourceFilesFailed + counters.nbSourceFilesProcessed + counters.nbTargetFilesFailed
+				+ counters.nbTargetFilesProcessed;
 	}
 }
