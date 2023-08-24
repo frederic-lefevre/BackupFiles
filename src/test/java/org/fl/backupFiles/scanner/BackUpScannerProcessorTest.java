@@ -25,7 +25,7 @@ SOFTWARE.
 package org.fl.backupFiles.scanner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
 import java.net.URI;
@@ -373,7 +373,7 @@ class BackUpScannerProcessorTest {
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackUpItem.BackupAction.DELETE_DIR);
 
 			Files.delete(tgt);
-			assertFalse(Files.exists(tgt));
+			assertThat(tgt).doesNotExist();
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
@@ -383,51 +383,52 @@ class BackUpScannerProcessorTest {
 	
 	@Test
 	void testUnexistingSourceAndTarget() {
-		
-		try {
-			
-			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
-			
-			final String SRC_FILE1 =  BUFFER_DATA_DIR + "doesNotExists" ;
-			final String TGT_FILE1 =  TARGET_DATA_DIR + "doesNotExists" ;
-			
-			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
-			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 
-			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
-			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
-			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
-			
-			ScannerThreadResponse scannerResp = backUpRes.get() ;
-			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
-			assertNotNull(backUpItemList) ;
-			assertEquals(0, backUpItemList.size());
+		try {
+
+			ExecutorService scannerExecutor = Config.getScanExecutorService();
+
+			final String SRC_FILE1 = BUFFER_DATA_DIR + "doesNotExists";
+			final String TGT_FILE1 = TARGET_DATA_DIR + "doesNotExists";
+
+			Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+			Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+
+			BackUpTask backUpTask = new BackUpTask(src, tgt);
+
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
+
+			ScannerThreadResponse scannerResp = backUpRes.get();
+			BackUpItemList backUpItemList = scannerResp.getBackUpItemList();
+			assertThat(backUpItemList)
+				.isNotNull()
+				.isEmpty();
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
 			fail("Exception " + e.getMessage());
-		}	
+		}
 	}
 	
 	@AfterAll
 	static void deleteTestData() {
 		
 		try {
-			Path bufferDataDir = Paths.get(new URI(BUFFER_DATA_DIR)) ;
-			Path targetDataDir = Paths.get(new URI(TARGET_DATA_DIR)) ;
-		
-			boolean b1 = FilesUtils.deleteDirectoryTree(bufferDataDir, true, log) ;
-			boolean b2 = FilesUtils.deleteDirectoryTree(targetDataDir, true, log) ;
-			if (! (b1 && b2)) {
-				fail("Errors deleting test data (AfterAll method)") ;
-			} 
+			Path bufferDataDir = Paths.get(new URI(BUFFER_DATA_DIR));
+			Path targetDataDir = Paths.get(new URI(TARGET_DATA_DIR));
+
+			boolean b1 = FilesUtils.deleteDirectoryTree(bufferDataDir, true, log);
+			boolean b2 = FilesUtils.deleteDirectoryTree(targetDataDir, true, log);
+			if (!(b1 && b2)) {
+				fail("Errors deleting test data (AfterAll method)");
+			}
 		} catch (URISyntaxException e) {
-			log.log(Level.SEVERE, "URI exception deleting test data", e) ;
-			fail("URI exception deleting test data (AfterAll method)") ;
+			log.log(Level.SEVERE, "URI exception deleting test data", e);
+			fail("URI exception deleting test data (AfterAll method)");
 		} catch (IOException e) {
-			log.log(Level.SEVERE, "IO exception writing test data", e) ;
-			fail("IO exception writing test data (BeforeAll method)") ;
+			log.log(Level.SEVERE, "IO exception writing test data", e);
+			fail("IO exception writing test data (BeforeAll method)");
 		}
 
 	}
