@@ -24,6 +24,7 @@ SOFTWARE.
 
 package org.fl.backupFiles.scanner;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
@@ -98,33 +99,38 @@ class BackUpScannerProcessorTest {
 		
 		try {
 								
-			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
+			ExecutorService scannerExecutor = Config.getScanExecutorService();
 			
-			Path src  = TestUtils.getPathFromUriString(BUFFER_DATA_DIR) ;
-			Path tgt  = TestUtils.getPathFromUriString(TARGET_DATA_DIR) ;
+			Path src = TestUtils.getPathFromUriString(BUFFER_DATA_DIR);
+			Path tgt = TestUtils.getPathFromUriString(TARGET_DATA_DIR);
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
+			BackUpTask backUpTask = new BackUpTask(src, tgt);
 			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
-			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
 			
-			ScannerThreadResponse scannerResp = backUpRes.get() ;
-			BackUpCounters backUpCounters = scannerResp.getBackUpCounters() ;			
-			assertEquals(0, backUpCounters.ambiguousNb) ;
-			assertEquals(0, backUpCounters.contentDifferentNb) ;
-			assertEquals(0, backUpCounters.copyNewNb) ;
-			assertEquals(0, backUpCounters.copyReplaceNb) ;
-			assertEquals(2, backUpCounters.copyTreeNb) ;
-			assertEquals(0, backUpCounters.deleteDirNb) ;
-			assertEquals(0, backUpCounters.deleteNb) ;
-			assertEquals(0, backUpCounters.nbSourceFilesFailed) ;
-			assertEquals(3, backUpCounters.nbSourceFilesProcessed) ;
-			assertEquals(0, backUpCounters.nbTargetFilesFailed) ;
-			assertEquals(0, backUpCounters.nbTargetFilesProcessed) ;
+			ScannerThreadResponse scannerResp = backUpRes.get();
+			BackUpCounters backUpCounters = scannerResp.getBackUpCounters();
+			assertThat(backUpCounters.ambiguousNb).isZero();
+			assertThat(backUpCounters.copyNewNb).isZero();
+			assertThat(backUpCounters.copyReplaceNb).isZero();
+			assertThat(backUpCounters.copyTreeNb).isEqualTo(2);
+			assertThat(backUpCounters.deleteDirNb).isZero();
+			assertThat(backUpCounters.deleteNb).isZero();
+			assertThat(backUpCounters.backupWithSizeAboveThreshold).isEqualTo(2);
+			assertThat(backUpCounters.contentDifferentNb).isZero();
+			assertThat(backUpCounters.nbHighPermanencePath).isZero();
+			assertThat(backUpCounters.nbMediumPermanencePath).isEqualTo(2);
+			assertThat(backUpCounters.nbSourceFilesFailed).isZero();
+			assertThat(backUpCounters.nbSourceFilesProcessed).isEqualTo(3);
+			assertThat(backUpCounters.nbTargetFilesProcessed).isZero();
+			assertThat(backUpCounters.nbTargetFilesFailed).isZero();
+			assertThat(backUpCounters.copyTargetNb).isZero();
 			
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
-			assertNotNull(backUpItemList) ;
-			assertEquals(2, backUpItemList.size()) ;
+			assertThat(backUpItemList)
+				.isNotNull()
+				.hasSize(2);
 
 			// Execute backup
 			backUpCounters.reset() ;
