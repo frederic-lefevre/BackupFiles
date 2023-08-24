@@ -131,6 +131,7 @@ class FilesBackUpScannerTest {
 			assertThat(backUpCounters.nbTargetFilesProcessed).isEqualTo(19700);
 			assertThat(backUpCounters.nbTargetFilesFailed).isZero();
 			assertThat(backUpCounters.totalSizeDifference).isZero();
+			assertThat(backUpCounters.copyTargetNb).isZero();
 
 			assertThat(backUpItems).isEmpty();
 			
@@ -143,7 +144,7 @@ class FilesBackUpScannerTest {
 			// Wait for filesBackUpScanner end
 			filesBackUpScanner.get() ;
 			filesBackUpScanner.done();
-			backUpCounters = filesBackUpScanner.getBackUpCounters() ;
+			backUpCounters = filesBackUpScanner.getBackUpCounters();
 
 			// target is supposed to be empty
 			assertThat(backUpCounters.ambiguousNb).isZero();
@@ -161,6 +162,7 @@ class FilesBackUpScannerTest {
 			assertThat(backUpCounters.nbTargetFilesProcessed).isZero();		
 			assertThat(backUpCounters.nbTargetFilesFailed).isZero();
 			assertThat(backUpCounters.totalSizeDifference).isEqualTo(4997400);
+			assertThat(backUpCounters.copyTargetNb).isZero();
 		
 			assertThat(backUpItems).hasSize(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION);
 			
