@@ -180,30 +180,34 @@ class BackUpScannerProcessorTest {
 		
 		try {
 								
-			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
+			ExecutorService scannerExecutor = Config.getScanExecutorService();
 			
-			Path src  = TestUtils.getPathFromUriString(BUFFER_DATA_DIR) ;
-			Path tgt  = TestUtils.getPathFromUriString(TARGET_DATA_DIR  + "doesNotExists/") ;
+			Path src  = TestUtils.getPathFromUriString(BUFFER_DATA_DIR);
+			Path tgt  = TestUtils.getPathFromUriString(TARGET_DATA_DIR  + "doesNotExists/");
 			
 			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
-			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
 			
-			ScannerThreadResponse scannerResp = backUpRes.get() ;
-			BackUpCounters backUpCounters = scannerResp.getBackUpCounters() ;			
-			assertEquals(0, backUpCounters.ambiguousNb) ;
-			assertEquals(0, backUpCounters.contentDifferentNb) ;
-			assertEquals(0, backUpCounters.copyNewNb) ;
-			assertEquals(0, backUpCounters.copyReplaceNb) ;
-			assertEquals(1, backUpCounters.copyTreeNb) ;
-			assertEquals(0, backUpCounters.deleteDirNb) ;
-			assertEquals(0, backUpCounters.deleteNb) ;
-			assertEquals(0, backUpCounters.nbSourceFilesFailed) ;
-			assertEquals(1, backUpCounters.nbSourceFilesProcessed) ;
-			assertEquals(0, backUpCounters.nbTargetFilesFailed) ;
-			assertEquals(0, backUpCounters.nbTargetFilesProcessed) ;
-			
+			ScannerThreadResponse scannerResp = backUpRes.get();
+			BackUpCounters backUpCounters = scannerResp.getBackUpCounters();
+			assertThat(backUpCounters.ambiguousNb).isZero();
+			assertThat(backUpCounters.copyNewNb).isZero();
+			assertThat(backUpCounters.copyReplaceNb).isZero();
+			assertThat(backUpCounters.copyTreeNb).isEqualTo(1);
+			assertThat(backUpCounters.deleteDirNb).isZero();
+			assertThat(backUpCounters.deleteNb).isZero();
+			assertThat(backUpCounters.backupWithSizeAboveThreshold).isEqualTo(1);
+			assertThat(backUpCounters.contentDifferentNb).isZero();
+			assertThat(backUpCounters.nbHighPermanencePath).isZero();
+			assertThat(backUpCounters.nbMediumPermanencePath).isEqualTo(1);
+			assertThat(backUpCounters.nbSourceFilesFailed).isZero();
+			assertThat(backUpCounters.nbSourceFilesProcessed).isEqualTo(1);
+			assertThat(backUpCounters.nbTargetFilesProcessed).isZero();
+			assertThat(backUpCounters.nbTargetFilesFailed).isZero();
+			assertThat(backUpCounters.copyTargetNb).isZero();
+
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
 			assertNotNull(backUpItemList) ;
 			assertEquals(1, backUpItemList.size()) ;
