@@ -137,17 +137,21 @@ class BackUpScannerProcessorTest {
 			for (BackUpItem backUpItem : backUpItemList) {
 				backUpItem.execute(backUpCounters);
 			}
-			assertEquals(0, backUpCounters.ambiguousNb) ;
-			assertEquals(0, backUpCounters.contentDifferentNb) ;
-			assertEquals(0, backUpCounters.copyNewNb) ;
-			assertEquals(0, backUpCounters.copyReplaceNb) ;
-			assertEquals(2, backUpCounters.copyTreeNb) ;
-			assertEquals(0, backUpCounters.deleteDirNb) ;
-			assertEquals(0, backUpCounters.deleteNb) ;
-			assertEquals(0, backUpCounters.nbSourceFilesFailed) ;
-			assertEquals(2, backUpCounters.nbSourceFilesProcessed) ;
-			assertEquals(0, backUpCounters.nbTargetFilesFailed) ;
-			assertEquals(0, backUpCounters.nbTargetFilesProcessed) ;
+			assertThat(backUpCounters.ambiguousNb).isZero();
+			assertThat(backUpCounters.copyNewNb).isZero();
+			assertThat(backUpCounters.copyReplaceNb).isZero();
+			assertThat(backUpCounters.copyTreeNb).isEqualTo(2);
+			assertThat(backUpCounters.deleteDirNb).isZero();
+			assertThat(backUpCounters.deleteNb).isZero();
+			assertThat(backUpCounters.backupWithSizeAboveThreshold).isEqualTo(2);
+			assertThat(backUpCounters.contentDifferentNb).isZero();
+			assertThat(backUpCounters.nbHighPermanencePath).isZero();
+			assertThat(backUpCounters.nbMediumPermanencePath).isEqualTo(2);
+			assertThat(backUpCounters.nbSourceFilesFailed).isZero();
+			assertThat(backUpCounters.nbSourceFilesProcessed).isEqualTo(2);
+			assertThat(backUpCounters.nbTargetFilesProcessed).isZero();
+			assertThat(backUpCounters.nbTargetFilesFailed).isZero();
+			assertThat(backUpCounters.copyTargetNb).isZero();
 			
 			// Recompare directory
 			backUpTask.setCompareContent(true) ;
@@ -157,8 +161,9 @@ class BackUpScannerProcessorTest {
 			scannerResp = backUpRes.get() ;
 			backUpItemList = scannerResp.getBackUpItemList() ;
 			
-			assertNotNull(backUpItemList) ;
-			assertEquals(0, backUpItemList.size()) ;
+			assertThat(backUpItemList)
+				.isNotNull()
+				.isEmpty();
 			
 			// Delete target dir to recover initial state
 			FilesUtils.deleteDirectoryTree(tgt, false, log) ;
