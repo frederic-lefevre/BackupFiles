@@ -302,39 +302,41 @@ class BackUpScannerProcessorTest {
 	
 	@Test
 	void testSingleFileUnexistingSource() {
-		
-		try {
-			
-			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
-			
-			final String SRC_FILE1 =  BUFFER_DATA_DIR + "doesNotExists" ;
-			final String TGT_FILE1 =  TARGET_DATA_DIR + "singleFile" ;
-			
-			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
-			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 
-			Files.write(tgt, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne"))) ;
+		try {
+
+			ExecutorService scannerExecutor = Config.getScanExecutorService();
+
+			final String SRC_FILE1 = BUFFER_DATA_DIR + "doesNotExists";
+			final String TGT_FILE1 = TARGET_DATA_DIR + "singleFile";
+
+			Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+			Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+
+			Files.write(tgt, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne")));
+
+			assertThat(src).doesNotExist();
+			assertThat(tgt).exists();
+
+			BackUpTask backUpTask = new BackUpTask(src, tgt);
+
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
+
+			ScannerThreadResponse scannerResp = backUpRes.get();
+			BackUpItemList backUpItemList = scannerResp.getBackUpItemList();
+			assertThat(backUpItemList)
+				.isNotNull()
+				.hasSize(1);
 			
-			assertFalse(Files.exists(src)) ;
-			assertTrue(Files.exists(tgt)) ;
-			
-			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
-			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
-			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
-		
-			ScannerThreadResponse scannerResp = backUpRes.get() ;
-			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
-			assertNotNull(backUpItemList) ;
-			assertEquals(1, backUpItemList.size()) ;
-			BackUpItem backUpItem = backUpItemList.get(0) ;
-			assertNotNull(backUpItem) ;
-			assertEquals(BackUpItem.BackupAction.DELETE, backUpItem.getBackupAction()) ;
+			BackUpItem backUpItem = backUpItemList.get(0);
+			assertThat(backUpItem).isNotNull();
+			assertThat(backUpItem.getBackupAction()).isEqualTo(BackUpItem.BackupAction.DELETE);
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
 			fail("Exception " + e.getMessage());
-		}	
+		}
 	}
 	
 	@Test
