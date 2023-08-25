@@ -24,7 +24,7 @@ SOFTWARE.
 
 package org.fl.backupFiles.directoryPermanence;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,17 +49,17 @@ class PermanencePathComparatorTest {
 		permanenceMap.put(Paths.get("/Fred/Pers/famille"), "a");
 
 		Set<Path> pathKeys = permanenceMap.keySet();
-		assertEquals(
-				"[\\Fred\\Pers\\famille, \\Fred\\Pers\\Photos\\tmp, \\Fred\\Pers\\Photos, \\Fred\\Pers, \\Fred\\tmp, \\Fred]",
-				pathKeys.toString());
+		assertThat(pathKeys)
+			.hasToString("[\\Fred\\Pers\\famille, \\Fred\\Pers\\Photos\\tmp, \\Fred\\Pers\\Photos, \\Fred\\Pers, \\Fred\\tmp, \\Fred]");
+
 	}
 
 	@Test
 	void test2() {
 		
-		PermanencePathComparator permComp = new PermanencePathComparator() ;
+		PermanencePathComparator permComp = new PermanencePathComparator();
 		
-		int comp = permComp.compare(Paths.get("/toto/titi/tata"), Paths.get("/toto/titi/tata")) ;
-		assertEquals(0, comp) ;
+		int comp = permComp.compare(Paths.get("/toto/titi/tata"), Paths.get("/toto/titi/tata"));
+		assertThat(comp).isZero();
 	}
 }

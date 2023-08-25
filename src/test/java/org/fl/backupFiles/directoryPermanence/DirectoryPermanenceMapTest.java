@@ -24,7 +24,7 @@ SOFTWARE.
 
 package org.fl.backupFiles.directoryPermanence;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Paths;
 
@@ -35,26 +35,25 @@ class DirectoryPermanenceMapTest {
 	private final static String JSON_CONF = 
 		"[{\"path\" : \"/FredericPersonnel/photos/\",\"permanence\" : \"HIGH\"}," +
 		" {\"path\" : \"/FredericPersonnel/tmp/\",   \"permanence\" : \"MEDIUM\"}," +
-		" {\"path\" : \"/FredericPersonnel/tmp/low/insideMedium\",   \"permanence\" : \"LOW\"}]" ;
+		" {\"path\" : \"/FredericPersonnel/tmp/low/insideMedium\",   \"permanence\" : \"LOW\"}]";
 	
 	@Test
 	void test() {
 		
-		DirectoryPermanenceMap permMap = new DirectoryPermanenceMap(JSON_CONF) ;
+		DirectoryPermanenceMap permMap = new DirectoryPermanenceMap(JSON_CONF);
 		
-		DirectoryPermanenceLevel lvl1 = permMap.getPermanenceLevel(Paths.get("C:\\FredericPersonnel\\photos\\bidon")) ;
-		assertEquals(DirectoryPermanenceLevel.HIGH, lvl1) ;
+		DirectoryPermanenceLevel lvl1 = permMap.getPermanenceLevel(Paths.get("C:\\FredericPersonnel\\photos\\bidon"));
+		assertThat(lvl1).isEqualTo(DirectoryPermanenceLevel.HIGH);
 		
-		DirectoryPermanenceLevel lvl2 = permMap.getPermanenceLevel(Paths.get("C:\\FredericPersonnel\\tmp\\bidon")) ;
-		assertEquals(DirectoryPermanenceLevel.MEDIUM, lvl2) ;
+		DirectoryPermanenceLevel lvl2 = permMap.getPermanenceLevel(Paths.get("C:\\FredericPersonnel\\tmp\\bidon"));
+		assertThat(lvl2).isEqualTo(DirectoryPermanenceLevel.MEDIUM);
 
-		DirectoryPermanenceLevel lvl3 = permMap.getPermanenceLevel(Paths.get("C:\\FredericPersonnel\\tmp\\low\\insideMedium\\bidon")) ;
-		assertEquals(DirectoryPermanenceLevel.LOW, lvl3) ;
+		DirectoryPermanenceLevel lvl3 = permMap.getPermanenceLevel(Paths.get("C:\\FredericPersonnel\\tmp\\low\\insideMedium\\bidon"));
+		assertThat(lvl3).isEqualTo(DirectoryPermanenceLevel.LOW);
 
-		DirectoryPermanenceLevel lvl4 = permMap.getPermanenceLevel(Paths.get("C:\\FredericPersonnel\\default")) ;
-		assertEquals(DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL, lvl4) ;
+		DirectoryPermanenceLevel lvl4 = permMap.getPermanenceLevel(Paths.get("C:\\FredericPersonnel\\default"));
+		assertThat(lvl4).isEqualTo(DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL);
 		
-
 	}
 
 }

@@ -24,7 +24,8 @@ SOFTWARE.
 
 package org.fl.backupFiles.scanner;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
 import java.net.URI;
@@ -98,50 +99,59 @@ class BackUpScannerProcessorTest {
 		
 		try {
 								
-			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
+			ExecutorService scannerExecutor = Config.getScanExecutorService();
 			
-			Path src  = TestUtils.getPathFromUriString(BUFFER_DATA_DIR) ;
-			Path tgt  = TestUtils.getPathFromUriString(TARGET_DATA_DIR) ;
+			Path src = TestUtils.getPathFromUriString(BUFFER_DATA_DIR);
+			Path tgt = TestUtils.getPathFromUriString(TARGET_DATA_DIR);
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
+			BackUpTask backUpTask = new BackUpTask(src, tgt);
 			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
-			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
 			
-			ScannerThreadResponse scannerResp = backUpRes.get() ;
-			BackUpCounters backUpCounters = scannerResp.getBackUpCounters() ;			
-			assertEquals(0, backUpCounters.ambiguousNb) ;
-			assertEquals(0, backUpCounters.contentDifferentNb) ;
-			assertEquals(0, backUpCounters.copyNewNb) ;
-			assertEquals(0, backUpCounters.copyReplaceNb) ;
-			assertEquals(2, backUpCounters.copyTreeNb) ;
-			assertEquals(0, backUpCounters.deleteDirNb) ;
-			assertEquals(0, backUpCounters.deleteNb) ;
-			assertEquals(0, backUpCounters.nbSourceFilesFailed) ;
-			assertEquals(3, backUpCounters.nbSourceFilesProcessed) ;
-			assertEquals(0, backUpCounters.nbTargetFilesFailed) ;
-			assertEquals(0, backUpCounters.nbTargetFilesProcessed) ;
+			ScannerThreadResponse scannerResp = backUpRes.get();
+			BackUpCounters backUpCounters = scannerResp.getBackUpCounters();
+			assertThat(backUpCounters.ambiguousNb).isZero();
+			assertThat(backUpCounters.copyNewNb).isZero();
+			assertThat(backUpCounters.copyReplaceNb).isZero();
+			assertThat(backUpCounters.copyTreeNb).isEqualTo(2);
+			assertThat(backUpCounters.deleteDirNb).isZero();
+			assertThat(backUpCounters.deleteNb).isZero();
+			assertThat(backUpCounters.backupWithSizeAboveThreshold).isEqualTo(2);
+			assertThat(backUpCounters.contentDifferentNb).isZero();
+			assertThat(backUpCounters.nbHighPermanencePath).isZero();
+			assertThat(backUpCounters.nbMediumPermanencePath).isEqualTo(2);
+			assertThat(backUpCounters.nbSourceFilesFailed).isZero();
+			assertThat(backUpCounters.nbSourceFilesProcessed).isEqualTo(3);
+			assertThat(backUpCounters.nbTargetFilesProcessed).isZero();
+			assertThat(backUpCounters.nbTargetFilesFailed).isZero();
+			assertThat(backUpCounters.copyTargetNb).isZero();
 			
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
-			assertNotNull(backUpItemList) ;
-			assertEquals(2, backUpItemList.size()) ;
+			assertThat(backUpItemList)
+				.isNotNull()
+				.hasSize(2);
 
 			// Execute backup
 			backUpCounters.reset() ;
 			for (BackUpItem backUpItem : backUpItemList) {
 				backUpItem.execute(backUpCounters);
 			}
-			assertEquals(0, backUpCounters.ambiguousNb) ;
-			assertEquals(0, backUpCounters.contentDifferentNb) ;
-			assertEquals(0, backUpCounters.copyNewNb) ;
-			assertEquals(0, backUpCounters.copyReplaceNb) ;
-			assertEquals(2, backUpCounters.copyTreeNb) ;
-			assertEquals(0, backUpCounters.deleteDirNb) ;
-			assertEquals(0, backUpCounters.deleteNb) ;
-			assertEquals(0, backUpCounters.nbSourceFilesFailed) ;
-			assertEquals(2, backUpCounters.nbSourceFilesProcessed) ;
-			assertEquals(0, backUpCounters.nbTargetFilesFailed) ;
-			assertEquals(0, backUpCounters.nbTargetFilesProcessed) ;
+			assertThat(backUpCounters.ambiguousNb).isZero();
+			assertThat(backUpCounters.copyNewNb).isZero();
+			assertThat(backUpCounters.copyReplaceNb).isZero();
+			assertThat(backUpCounters.copyTreeNb).isEqualTo(2);
+			assertThat(backUpCounters.deleteDirNb).isZero();
+			assertThat(backUpCounters.deleteNb).isZero();
+			assertThat(backUpCounters.backupWithSizeAboveThreshold).isEqualTo(2);
+			assertThat(backUpCounters.contentDifferentNb).isZero();
+			assertThat(backUpCounters.nbHighPermanencePath).isZero();
+			assertThat(backUpCounters.nbMediumPermanencePath).isEqualTo(2);
+			assertThat(backUpCounters.nbSourceFilesFailed).isZero();
+			assertThat(backUpCounters.nbSourceFilesProcessed).isEqualTo(2);
+			assertThat(backUpCounters.nbTargetFilesProcessed).isZero();
+			assertThat(backUpCounters.nbTargetFilesFailed).isZero();
+			assertThat(backUpCounters.copyTargetNb).isZero();
 			
 			// Recompare directory
 			backUpTask.setCompareContent(true) ;
@@ -151,8 +161,9 @@ class BackUpScannerProcessorTest {
 			scannerResp = backUpRes.get() ;
 			backUpItemList = scannerResp.getBackUpItemList() ;
 			
-			assertNotNull(backUpItemList) ;
-			assertEquals(0, backUpItemList.size()) ;
+			assertThat(backUpItemList)
+				.isNotNull()
+				.isEmpty();
 			
 			// Delete target dir to recover initial state
 			FilesUtils.deleteDirectoryTree(tgt, false, log) ;
@@ -169,36 +180,42 @@ class BackUpScannerProcessorTest {
 		
 		try {
 								
-			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
+			ExecutorService scannerExecutor = Config.getScanExecutorService();
 			
-			Path src  = TestUtils.getPathFromUriString(BUFFER_DATA_DIR) ;
-			Path tgt  = TestUtils.getPathFromUriString(TARGET_DATA_DIR  + "doesNotExists/") ;
+			Path src  = TestUtils.getPathFromUriString(BUFFER_DATA_DIR);
+			Path tgt  = TestUtils.getPathFromUriString(TARGET_DATA_DIR  + "doesNotExists/");
 			
 			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
 			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
-			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
 			
-			ScannerThreadResponse scannerResp = backUpRes.get() ;
-			BackUpCounters backUpCounters = scannerResp.getBackUpCounters() ;			
-			assertEquals(0, backUpCounters.ambiguousNb) ;
-			assertEquals(0, backUpCounters.contentDifferentNb) ;
-			assertEquals(0, backUpCounters.copyNewNb) ;
-			assertEquals(0, backUpCounters.copyReplaceNb) ;
-			assertEquals(1, backUpCounters.copyTreeNb) ;
-			assertEquals(0, backUpCounters.deleteDirNb) ;
-			assertEquals(0, backUpCounters.deleteNb) ;
-			assertEquals(0, backUpCounters.nbSourceFilesFailed) ;
-			assertEquals(1, backUpCounters.nbSourceFilesProcessed) ;
-			assertEquals(0, backUpCounters.nbTargetFilesFailed) ;
-			assertEquals(0, backUpCounters.nbTargetFilesProcessed) ;
-			
-			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
-			assertNotNull(backUpItemList) ;
-			assertEquals(1, backUpItemList.size()) ;
-			BackUpItem backUpItem = backUpItemList.get(0) ;
-			assertNotNull(backUpItem) ;
-			assertEquals(BackUpItem.BackupAction.COPY_TREE, backUpItem.getBackupAction()) ;
+			ScannerThreadResponse scannerResp = backUpRes.get();
+			BackUpCounters backUpCounters = scannerResp.getBackUpCounters();
+			assertThat(backUpCounters.ambiguousNb).isZero();
+			assertThat(backUpCounters.copyNewNb).isZero();
+			assertThat(backUpCounters.copyReplaceNb).isZero();
+			assertThat(backUpCounters.copyTreeNb).isEqualTo(1);
+			assertThat(backUpCounters.deleteDirNb).isZero();
+			assertThat(backUpCounters.deleteNb).isZero();
+			assertThat(backUpCounters.backupWithSizeAboveThreshold).isEqualTo(1);
+			assertThat(backUpCounters.contentDifferentNb).isZero();
+			assertThat(backUpCounters.nbHighPermanencePath).isZero();
+			assertThat(backUpCounters.nbMediumPermanencePath).isEqualTo(1);
+			assertThat(backUpCounters.nbSourceFilesFailed).isZero();
+			assertThat(backUpCounters.nbSourceFilesProcessed).isEqualTo(1);
+			assertThat(backUpCounters.nbTargetFilesProcessed).isZero();
+			assertThat(backUpCounters.nbTargetFilesFailed).isZero();
+			assertThat(backUpCounters.copyTargetNb).isZero();
+
+			BackUpItemList backUpItemList = scannerResp.getBackUpItemList();
+			assertThat(backUpItemList)
+				.isNotNull()
+				.hasSize(1);
+
+			BackUpItem backUpItem = backUpItemList.get(0);
+			assertThat(backUpItem).isNotNull();
+			assertThat(backUpItem.getBackupAction()).isEqualTo(BackUpItem.BackupAction.COPY_TREE);
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
@@ -211,31 +228,32 @@ class BackUpScannerProcessorTest {
 		
 		try {
 			
-			final String TGT_FILE1 =  TARGET_DATA_DIR + "singleFile" ;
-			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
-			Files.write(tgt, new ArrayList<String>(Arrays.asList("autre chose sur une ligne"))) ;
-			assertTrue(Files.exists(tgt)) ;
+			final String TGT_FILE1 =  TARGET_DATA_DIR + "singleFile";
+			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1);
+			Files.write(tgt, new ArrayList<String>(Arrays.asList("autre chose sur une ligne")));
+			assertThat(tgt).exists();
 			
-			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
+			ExecutorService scannerExecutor = Config.getScanExecutorService();
 			
-			final String SRC_FILE1 =  BUFFER_DATA_DIR + "singleFile" ;
-			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
-			Files.write(src, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne"))) ;
-			assertTrue(Files.exists(src)) ;
+			final String SRC_FILE1 =  BUFFER_DATA_DIR + "singleFile";
+			Path src  = TestUtils.getPathFromUriString(SRC_FILE1);
+			Files.write(src, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne")));
+			assertThat(src).exists();
 			
+			BackUpTask backUpTask = new BackUpTask(src, tgt);
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
-			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
-			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
 		
-			ScannerThreadResponse scannerResp = backUpRes.get() ;
-			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
-			assertNotNull(backUpItemList) ;
-			assertEquals(1, backUpItemList.size()) ;
-			BackUpItem backUpItem = backUpItemList.get(0) ;
-			assertNotNull(backUpItem) ;
-			assertEquals(BackUpItem.BackupAction.COPY_REPLACE, backUpItem.getBackupAction()) ;
+			ScannerThreadResponse scannerResp = backUpRes.get();
+			BackUpItemList backUpItemList = scannerResp.getBackUpItemList();
+			assertThat(backUpItemList)
+				.isNotNull()
+				.hasSize(1);
+
+			BackUpItem backUpItem = backUpItemList.get(0);
+			assertThat(backUpItem).isNotNull();
+			assertThat(backUpItem.getBackupAction()).isEqualTo(BackUpItem.BackupAction.COPY_REPLACE);
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
@@ -247,32 +265,34 @@ class BackUpScannerProcessorTest {
 	void testSingleFileUnexistingTarget() {
 		
 		try {
-			
-			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
-			
-			final String SRC_FILE1 =  BUFFER_DATA_DIR + "singleFile" ;
-			final String TGT_FILE1 =  TARGET_DATA_DIR + "doesNotExists" ;
-			
-			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
-			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 
-			Files.write(src, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne"))) ;
+			ExecutorService scannerExecutor = Config.getScanExecutorService();
+
+			final String SRC_FILE1 = BUFFER_DATA_DIR + "singleFile";
+			final String TGT_FILE1 = TARGET_DATA_DIR + "doesNotExists";
+
+			Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+			Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+
+			Files.write(src, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne")));
 			
-			assertTrue(Files.exists(src)) ;
-			assertFalse(Files.exists(tgt)) ;
+			assertThat(src).exists();
+			assertThat(tgt).doesNotExist();
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
+			BackUpTask backUpTask = new BackUpTask(src, tgt);
 			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
-			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
 		
-			ScannerThreadResponse scannerResp = backUpRes.get() ;
-			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
-			assertNotNull(backUpItemList) ;
-			assertEquals(1, backUpItemList.size()) ;
-			BackUpItem backUpItem = backUpItemList.get(0) ;
-			assertNotNull(backUpItem) ;
-			assertEquals(BackUpItem.BackupAction.COPY_NEW, backUpItem.getBackupAction()) ;
+			ScannerThreadResponse scannerResp = backUpRes.get();
+			BackUpItemList backUpItemList = scannerResp.getBackUpItemList();
+			assertThat(backUpItemList)
+				.isNotNull()
+				.hasSize(1);
+			
+			BackUpItem backUpItem = backUpItemList.get(0);
+			assertThat(backUpItem).isNotNull();
+			assertThat(backUpItem.getBackupAction()).isEqualTo(BackUpItem.BackupAction.COPY_NEW);
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
@@ -282,129 +302,133 @@ class BackUpScannerProcessorTest {
 	
 	@Test
 	void testSingleFileUnexistingSource() {
-		
-		try {
-			
-			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
-			
-			final String SRC_FILE1 =  BUFFER_DATA_DIR + "doesNotExists" ;
-			final String TGT_FILE1 =  TARGET_DATA_DIR + "singleFile" ;
-			
-			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
-			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 
-			Files.write(tgt, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne"))) ;
+		try {
+
+			ExecutorService scannerExecutor = Config.getScanExecutorService();
+
+			final String SRC_FILE1 = BUFFER_DATA_DIR + "doesNotExists";
+			final String TGT_FILE1 = TARGET_DATA_DIR + "singleFile";
+
+			Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+			Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+
+			Files.write(tgt, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne")));
+
+			assertThat(src).doesNotExist();
+			assertThat(tgt).exists();
+
+			BackUpTask backUpTask = new BackUpTask(src, tgt);
+
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
+
+			ScannerThreadResponse scannerResp = backUpRes.get();
+			BackUpItemList backUpItemList = scannerResp.getBackUpItemList();
+			assertThat(backUpItemList)
+				.isNotNull()
+				.hasSize(1);
 			
-			assertFalse(Files.exists(src)) ;
-			assertTrue(Files.exists(tgt)) ;
-			
-			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
-			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
-			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
-		
-			ScannerThreadResponse scannerResp = backUpRes.get() ;
-			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
-			assertNotNull(backUpItemList) ;
-			assertEquals(1, backUpItemList.size()) ;
-			BackUpItem backUpItem = backUpItemList.get(0) ;
-			assertNotNull(backUpItem) ;
-			assertEquals(BackUpItem.BackupAction.DELETE, backUpItem.getBackupAction()) ;
+			BackUpItem backUpItem = backUpItemList.get(0);
+			assertThat(backUpItem).isNotNull();
+			assertThat(backUpItem.getBackupAction()).isEqualTo(BackUpItem.BackupAction.DELETE);
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
 			fail("Exception " + e.getMessage());
-		}	
+		}
 	}
 	
 	@Test
 	void testTargetDirectoryAndUnexistingSource() {
-		
-		try {
-			
-			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
-			
-			final String SRC_FILE1 =  BUFFER_DATA_DIR + "doesNotExists" ;
-			final String TGT_FILE1 =  TARGET_DATA_DIR + "targetDir/" ;
-			
-			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
-			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 
-			Files.createDirectory(tgt) ;
+		try {
+
+			ExecutorService scannerExecutor = Config.getScanExecutorService();
+
+			final String SRC_FILE1 = BUFFER_DATA_DIR + "doesNotExists";
+			final String TGT_FILE1 = TARGET_DATA_DIR + "targetDir/";
+
+			Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+			Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+
+			Files.createDirectory(tgt);
+
+			assertThat(src).doesNotExist();
+			assertThat(tgt).exists().isDirectory();
+
+			BackUpTask backUpTask = new BackUpTask(src, tgt);
+
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
+
+			ScannerThreadResponse scannerResp = backUpRes.get();
+			BackUpItemList backUpItemList = scannerResp.getBackUpItemList();
+			assertThat(backUpItemList)
+				.isNotNull()
+				.hasSize(1);
 			
-			assertFalse(Files.exists(src)) ;
-			assertTrue(Files.exists(tgt)) ;
-			assertTrue(Files.isDirectory(tgt)) ;
-			
-			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
-			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
-			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
-		
-			ScannerThreadResponse scannerResp = backUpRes.get() ;
-			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
-			assertNotNull(backUpItemList) ;
-			assertEquals(1, backUpItemList.size()) ;
-			BackUpItem backUpItem = backUpItemList.get(0) ;
-			assertNotNull(backUpItem) ;
-			assertEquals(BackUpItem.BackupAction.DELETE_DIR, backUpItem.getBackupAction()) ;
-			
-			Files.delete(tgt) ;
-			assertFalse(Files.exists(tgt)) ;
+			BackUpItem backUpItem = backUpItemList.get(0);
+			assertThat(backUpItem).isNotNull();
+			assertThat(backUpItem.getBackupAction()).isEqualTo(BackUpItem.BackupAction.DELETE_DIR);
+
+			Files.delete(tgt);
+			assertThat(tgt).doesNotExist();
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
 			fail("Exception " + e.getMessage());
-		}	
+		}
 	}
 	
 	@Test
 	void testUnexistingSourceAndTarget() {
-		
-		try {
-			
-			ExecutorService scannerExecutor = Config.getScanExecutorService() ;
-			
-			final String SRC_FILE1 =  BUFFER_DATA_DIR + "doesNotExists" ;
-			final String TGT_FILE1 =  TARGET_DATA_DIR + "doesNotExists" ;
-			
-			Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
-			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
 
-			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
-			
-			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask) ;
-			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor) ;
-			
-			ScannerThreadResponse scannerResp = backUpRes.get() ;
-			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
-			assertNotNull(backUpItemList) ;
-			assertEquals(0, backUpItemList.size());
+		try {
+
+			ExecutorService scannerExecutor = Config.getScanExecutorService();
+
+			final String SRC_FILE1 = BUFFER_DATA_DIR + "doesNotExists";
+			final String TGT_FILE1 = TARGET_DATA_DIR + "doesNotExists";
+
+			Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+			Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+
+			BackUpTask backUpTask = new BackUpTask(src, tgt);
+
+			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
+			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
+
+			ScannerThreadResponse scannerResp = backUpRes.get();
+			BackUpItemList backUpItemList = scannerResp.getBackUpItemList();
+			assertThat(backUpItemList)
+				.isNotNull()
+				.isEmpty();
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
 			fail("Exception " + e.getMessage());
-		}	
+		}
 	}
 	
 	@AfterAll
 	static void deleteTestData() {
 		
 		try {
-			Path bufferDataDir = Paths.get(new URI(BUFFER_DATA_DIR)) ;
-			Path targetDataDir = Paths.get(new URI(TARGET_DATA_DIR)) ;
-		
-			boolean b1 = FilesUtils.deleteDirectoryTree(bufferDataDir, true, log) ;
-			boolean b2 = FilesUtils.deleteDirectoryTree(targetDataDir, true, log) ;
-			if (! (b1 && b2)) {
-				fail("Errors deleting test data (AfterAll method)") ;
-			} 
+			Path bufferDataDir = Paths.get(new URI(BUFFER_DATA_DIR));
+			Path targetDataDir = Paths.get(new URI(TARGET_DATA_DIR));
+
+			boolean b1 = FilesUtils.deleteDirectoryTree(bufferDataDir, true, log);
+			boolean b2 = FilesUtils.deleteDirectoryTree(targetDataDir, true, log);
+			if (!(b1 && b2)) {
+				fail("Errors deleting test data (AfterAll method)");
+			}
 		} catch (URISyntaxException e) {
-			log.log(Level.SEVERE, "URI exception deleting test data", e) ;
-			fail("URI exception deleting test data (AfterAll method)") ;
+			log.log(Level.SEVERE, "URI exception deleting test data", e);
+			fail("URI exception deleting test data (AfterAll method)");
 		} catch (IOException e) {
-			log.log(Level.SEVERE, "IO exception writing test data", e) ;
-			fail("IO exception writing test data (BeforeAll method)") ;
+			log.log(Level.SEVERE, "IO exception writing test data", e);
+			fail("IO exception writing test data (BeforeAll method)");
 		}
 
 	}

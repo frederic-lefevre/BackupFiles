@@ -397,7 +397,7 @@ public class BackUpScannerThread {
 				}
 			} else {
 				// Source path does not exist : delete target
-				pLog.warning("Source path does not exist: " + srcPath) ;
+				pLog.info("Source path does not exist: " + srcPath) ;
 				if (Files.exists(tgtPath)) {
 					BasicFileAttributes targetAttributes = Files.readAttributes(tgtPath, BasicFileAttributes.class);
 					if (targetAttributes.isDirectory()) {
