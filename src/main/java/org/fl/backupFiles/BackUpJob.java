@@ -32,8 +32,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -141,18 +143,55 @@ public class BackUpJob {
 	}
 	
 	private void addParallelBackUpTasks(Path srcPath, Path bufPath, Path tgtPath) {
-		
-		 try (DirectoryStream<Path> sourceFileStream = Files.newDirectoryStream(srcPath)) {
-			 
-			 for (Path sourceSubPath : sourceFileStream) {	
-				 
-				 Path bufSubPath = bufPath.resolve(srcPath.relativize(sourceSubPath)) ;
-				 Path tgtSubPath = tgtPath.resolve(srcPath.relativize(sourceSubPath)) ;
-				 addBackUpTask(sourceSubPath, bufSubPath, tgtSubPath) ;
-				 
-			 }
-		 } catch (Exception e) {
+
+		Set<Path> srcFilenameSet = new HashSet<Path>();
+		Set<Path> bufFilenameSet = new HashSet<Path>();
+
+		try (DirectoryStream<Path> sourceFileStream = Files.newDirectoryStream(srcPath)) {
+
+			for (Path sourceSubPath : sourceFileStream) {
+
+				Path bufSubPath = bufPath.resolve(srcPath.relativize(sourceSubPath));
+				Path tgtSubPath = tgtPath.resolve(srcPath.relativize(sourceSubPath));
+				addBackUpTask(sourceSubPath, bufSubPath, tgtSubPath);
+				srcFilenameSet.add(sourceSubPath.getFileName());
+			}
+		} catch (Exception e) {
 			bLog.log(Level.SEVERE, "Exception when scanning directory to create parallel scan " + srcPath, e);
+		}
+
+		if (Files.exists(bufPath)) {
+			try (DirectoryStream<Path> bufferFileStream = Files.newDirectoryStream(bufPath)) {
+
+				for (Path bufferSubPath : bufferFileStream) {
+
+					if (!srcFilenameSet.contains(bufferSubPath.getFileName())) {
+						Path srcSubPath = srcPath.resolve(bufPath.relativize(bufferSubPath));
+						Path tgtSubPath = tgtPath.resolve(bufPath.relativize(bufferSubPath));
+						addBackUpTask(srcSubPath, bufferSubPath, tgtSubPath);
+						bufFilenameSet.add(bufferSubPath.getFileName());
+					}
+				}
+			} catch (Exception e) {
+				bLog.log(Level.SEVERE, "Exception when scanning directory to create parallel scan " + bufPath, e);
+			}
+		}
+
+		if (Files.exists(tgtPath)) {
+			try (DirectoryStream<Path> targetFileStream = Files.newDirectoryStream(tgtPath)) {
+
+				for (Path targetSubPath : targetFileStream) {
+					if ((!srcFilenameSet.contains(targetSubPath.getFileName()))
+							&& (!bufFilenameSet.contains(targetSubPath.getFileName()))) {
+						Path srcSubPath = srcPath.resolve(tgtPath.relativize(targetSubPath));
+						Path bufSubPath = bufPath.resolve(tgtPath.relativize(targetSubPath));
+						addBackUpTask(srcSubPath, bufSubPath, targetSubPath);
+					}
+				}
+
+			} catch (Exception e) {
+				bLog.log(Level.SEVERE, "Exception when scanning directory to create parallel scan " + tgtPath, e);
+			}
 		}
 	}
 	
@@ -160,23 +199,23 @@ public class BackUpJob {
 		if ((srcPath != null)) {
 			if (bufPath != null) {
 				if (Files.isRegularFile(srcPath)) {
-					Path bufFile = bufPath.resolve(srcPath.getFileName()) ;
-					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile)) ;
+					Path bufFile = bufPath.resolve(srcPath.getFileName());
+					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile));
 				} else {
-				backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath)) ;
+					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath));
 				}
 				if (tgtPath != null) {
-					backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath)) ;
+					backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath));
 				}
 			} else if (tgtPath != null) {
-				backUpTasks.get(JobTaskType.SOURCE_TO_TARGET).add(new BackUpTask(srcPath, tgtPath)) ;
+				backUpTasks.get(JobTaskType.SOURCE_TO_TARGET).add(new BackUpTask(srcPath, tgtPath));
 			} else {
 				bLog.severe("No buffer and target element definition for back up job " + title);
 			}
 		} else {
 			bLog.severe("No source element definition for back up job " + title);
 		}
-	
+
 	}
 	
 	public String toString() {

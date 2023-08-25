@@ -120,13 +120,13 @@ public class BackUpJobTest {
 				"				\"parallelScan\" : false\r\n" +
 				"			}\r\n" + 
 				"		]\r\n" + 
-				"	}" ;
+				"	}";
 		
 		BackUpJob bupj = new BackUpJob(json) ;
 		
-		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET) ;
+		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
 		assertThat(bTt).isNotNull();
-		List<BackUpTask> sTb = bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER) ;
+		List<BackUpTask> sTb = bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER);
 		assertThat(sTb).isNotNull();
 		assertThat(bupj.toString())
 			.isNotNull()
@@ -135,6 +135,37 @@ public class BackUpJobTest {
 		long expectedNbTasks = nbFileInDir("file:///C:/FredericPersonnel/") + 2;
 		assertThat(sTb).hasSize((int) expectedNbTasks);
 		assertThat(bTt).hasSize((int) expectedNbTasks);
+
+	}
+	
+	@Test
+	void testParallelJson2() {
+		
+		String json = "	{\r\n" + 
+				"		\"titre\" : \"Parrallel test with delete\" ,\r\n" + 
+				"		\"items\" : [\r\n" + 
+				"			{\r\n" + 
+				"				\"source\" : \"file:///C:/ForTests/BackUpFiles/FP_Test_Source3/\",\r\n" + 
+				"				\"target\" : \"file:///C:/ForTests/BackUpFiles/FP_Test_Target3/\",\r\n" + 
+				"				\"buffer\" : \"file:///C:/ForTests/BackUpFiles/FP_Test_Buffer3/\",\r\n" + 
+				"				\"parallelScan\" : true\r\n" +
+				"			}" +
+				"		]\r\n" + 
+				"	}";
+		
+		BackUpJob bupj = new BackUpJob(json) ;
+		
+		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
+		assertThat(bTt).isNotNull();
+		List<BackUpTask> sTb = bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER);
+		assertThat(sTb).isNotNull();
+		assertThat(bupj.toString())
+			.isNotNull()
+			.hasToString("Parrallel test with delete");
+		
+		// 3 folder in source, 3 + 1 folder in buffer, 3 + 1 folder in target
+		assertThat(sTb).hasSize((int) 5);
+		assertThat(bTt).hasSize((int) 5);
 
 	}
 	
