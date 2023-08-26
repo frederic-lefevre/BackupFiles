@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.fail;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,20 +44,30 @@ public class BackUpJobTest {
 	@Test
 	void testNullJson() {
 		
-		BackUpJob bupj = new BackUpJob(null) ;
+		BackUpJob bupj = new BackUpJob(null);
 		
-		assertThat(bupj.getTasks(JobTaskType.BUFFER_TO_TARGET)).isNull();
-		assertThat(bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER)).isNull();
+		Stream.of(JobTaskType.values())
+			.forEach(jobTaskType -> 
+				assertThat(bupj.getTasks(jobTaskType))
+					.isNotNull()
+					.isEmpty()
+			);
+		
 		assertThat(bupj.toString()).isNull();
 	}
 	
 	@Test
 	void testEmptyJson() {
 		
-		BackUpJob bupj = new BackUpJob("") ;
+		BackUpJob bupj = new BackUpJob("");
 		
-		assertThat(bupj.getTasks(JobTaskType.BUFFER_TO_TARGET)).isNull();
-		assertThat(bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER)).isNull();
+		Stream.of(JobTaskType.values())
+			.forEach(jobTaskType -> 
+			assertThat(bupj.getTasks(jobTaskType))
+				.isNotNull()
+				.isEmpty()
+		);
+		
 		assertThat(bupj.toString()).isNull();
 	}
 	
@@ -139,7 +150,7 @@ public class BackUpJobTest {
 	}
 	
 	@Test
-	void testParallelJson2() {
+	void testParallelJson2() throws IOException {
 		
 		String json = "	{\r\n" + 
 				"		\"titre\" : \"Parrallel test with delete\" ,\r\n" + 
@@ -167,6 +178,37 @@ public class BackUpJobTest {
 		assertThat(sTb).hasSize((int) 5);
 		assertThat(bTt).hasSize((int) 5);
 
+		// Add a folder in target
+		Path tgtPath = Paths.get(URI.create("file:///C:/ForTests/BackUpFiles/FP_Test_Target3"));
+		
+		Path newFolderPath = tgtPath.resolve("aNewFolder");
+		Files.createDirectory(newFolderPath);
+		
+		List<BackUpTask> bTt2 = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
+		assertThat(bTt).isNotNull();
+		List<BackUpTask> sTb2 = bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER);
+		assertThat(sTb2).isNotNull();
+		assertThat(bupj.toString())
+			.isNotNull()
+			.hasToString("Parrallel test with delete");
+		
+		// 3 folder in source, 3 + 1 folder in buffer, 3 + 2 folder in target
+		assertThat(sTb2).hasSize((int) 6);
+		assertThat(bTt2).hasSize((int) 6);
+		
+		Files.delete(newFolderPath);
+		
+		List<BackUpTask> bTt3 = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
+		assertThat(bTt).isNotNull();
+		List<BackUpTask> sTb3 = bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER);
+		assertThat(sTb3).isNotNull();
+		assertThat(bupj.toString())
+			.isNotNull()
+			.hasToString("Parrallel test with delete");
+		
+		// 3 folder in source, 3 + 1 folder in buffer, 3 + 1 folder in target
+		assertThat(sTb3).hasSize((int) 5);
+		assertThat(bTt3).hasSize((int) 5);
 	}
 	
 	@Test

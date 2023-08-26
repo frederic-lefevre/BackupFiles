@@ -49,7 +49,9 @@ public class BackUpJob {
 
 	private static final Logger bLog = Config.getLogger();
 	
-	private String title ;
+	private String title;
+	
+	private List<FullBackUpTask> fullBackUpTaskList;
 	
 	public enum JobTaskType { 
 		SOURCE_TO_BUFFER("Source vers buffer"), 
@@ -82,47 +84,85 @@ public class BackUpJob {
 	// or a single list of back up task from source directories to target directories
 	// A back up task is a source directory to back up and a destination directory to back up
 	public BackUpJob(String jsonConfig) {
+
+		fullBackUpTaskList = new ArrayList<FullBackUpTask>();
 		
-		backUpTasks = new HashMap<JobTaskType, List<BackUpTask>>() ;
+		initBackUpTasksMap();
+
 		if (jsonConfig != null) {
-			
+
 			try {
-				JsonElement jElemConf = JsonParser.parseString(jsonConfig) ;
-				
+				JsonElement jElemConf = JsonParser.parseString(jsonConfig);
+
 				if ((jElemConf != null) && (jElemConf.isJsonObject())) {
-					
-					JsonObject jsonObjectConf = jElemConf.getAsJsonObject() ;
-					
-					JsonElement jElem = jsonObjectConf.get(TITLE) ;
+
+					JsonObject jsonObjectConf = jElemConf.getAsJsonObject();
+
+					JsonElement jElem = jsonObjectConf.get(TITLE);
 					if (jElem != null) {
-						title = jElem.getAsString() ;
+						title = jElem.getAsString();
 					} else {
-						bLog.severe("No title found inJSON configuration: " + jsonConfig );
+						bLog.severe("No title found inJSON configuration: " + jsonConfig);
 					}
-					
-					jElem = jsonObjectConf.get(ITEMS) ;
+
+					jElem = jsonObjectConf.get(ITEMS);
 					if (jElem != null) {
-						
+
 						getBackUpTasks(jElem.getAsJsonArray());
 
 					} else {
-						bLog.severe("No items found inJSON configuration: " + jsonConfig );
+						bLog.severe("No items found inJSON configuration: " + jsonConfig);
 					}
 				}
 			} catch (JsonSyntaxException e) {
-				bLog.log(Level.SEVERE, "Invalid JSON configuration: " + jsonConfig, e) ;
+				bLog.log(Level.SEVERE, "Invalid JSON configuration: " + jsonConfig, e);
 			} catch (Exception e) {
-				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig, e) ;
+				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig, e);
 			}
 		}
 	}
 
-	private void getBackUpTasks(JsonArray jItems) {
-
+	private void initBackUpTasksMap() {
+		
+		backUpTasks = new HashMap<JobTaskType, List<BackUpTask>>();
 		for (JobTaskType jtt : JobTaskType.values()) {
-			ArrayList<BackUpTask> tasksForJtt = new ArrayList<BackUpTask>() ;
-			backUpTasks.put(jtt, tasksForJtt) ;
+			backUpTasks.put(jtt, new ArrayList<BackUpTask>());
 		}
+	}
+	
+	private class FullBackUpTask {
+		
+		private final Path srcPath;
+		private final Path bufPath;
+		private final Path tgtPath;
+		private final boolean scanInParallel;
+
+		public FullBackUpTask(Path srcPath, Path bufPath, Path tgtPath, boolean scanInParallel) {
+			super();
+			this.srcPath = srcPath;
+			this.bufPath = bufPath;
+			this.tgtPath = tgtPath;
+			this.scanInParallel = scanInParallel;
+		}
+		
+		public Path getSrcPath() {
+			return srcPath;
+		}
+
+		public Path getBufPath() {
+			return bufPath;
+		}
+
+		public Path getTgtPath() {
+			return tgtPath;
+		}
+		
+		public boolean isScanInParallel() {
+			return scanInParallel;
+		}
+	}
+	
+	private void getBackUpTasks(JsonArray jItems) {
 
 		for (JsonElement jItem : jItems) {
 
@@ -134,11 +174,7 @@ public class BackUpJob {
 
 			boolean scanInParallel = getParallelScanElement(jObjItem, PARALLEL_SCAN) ;
 
-			if (scanInParallel) {
-				addParallelBackUpTasks(srcPath, bufPath, tgtPath) ;
-			} else {
-				addBackUpTask(srcPath, bufPath, tgtPath) ;
-			}
+			fullBackUpTaskList.add(new FullBackUpTask(srcPath, bufPath, tgtPath, scanInParallel));
 		}
 	}
 	
@@ -223,6 +259,18 @@ public class BackUpJob {
 	}
 
 	public List<BackUpTask> getTasks(JobTaskType jobTaskType) {
+		
+		initBackUpTasksMap();
+		
+		fullBackUpTaskList.forEach(fullBackUpTask -> {
+						
+			if (fullBackUpTask.isScanInParallel()) {
+				addParallelBackUpTasks(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath()) ;
+			} else {
+				addBackUpTask(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath());
+			}
+			
+		});
 		
 		if (backUpTasks.get(jobTaskType) == null) {
 			return null ;
