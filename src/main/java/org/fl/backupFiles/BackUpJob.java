@@ -49,7 +49,9 @@ public class BackUpJob {
 
 	private static final Logger bLog = Config.getLogger();
 	
-	private String title ;
+	private String title;
+	
+	private List<FullBackUpTask> fullBackUpTaskList;
 	
 	public enum JobTaskType { 
 		SOURCE_TO_BUFFER("Source vers buffer"), 
@@ -83,11 +85,9 @@ public class BackUpJob {
 	// A back up task is a source directory to back up and a destination directory to back up
 	public BackUpJob(String jsonConfig) {
 
-		backUpTasks = new HashMap<JobTaskType, List<BackUpTask>>();
-		for (JobTaskType jtt : JobTaskType.values()) {
-			ArrayList<BackUpTask> tasksForJtt = new ArrayList<BackUpTask>();
-			backUpTasks.put(jtt, tasksForJtt);
-		}
+		fullBackUpTaskList = new ArrayList<FullBackUpTask>();
+		
+		initBackUpTasksMap();
 
 		if (jsonConfig != null) {
 
@@ -122,6 +122,46 @@ public class BackUpJob {
 		}
 	}
 
+	private void initBackUpTasksMap() {
+		
+		backUpTasks = new HashMap<JobTaskType, List<BackUpTask>>();
+		for (JobTaskType jtt : JobTaskType.values()) {
+			backUpTasks.put(jtt, new ArrayList<BackUpTask>());
+		}
+	}
+	
+	private class FullBackUpTask {
+		
+		private final Path srcPath;
+		private final Path bufPath;
+		private final Path tgtPath;
+		private final boolean scanInParallel;
+
+		public FullBackUpTask(Path srcPath, Path bufPath, Path tgtPath, boolean scanInParallel) {
+			super();
+			this.srcPath = srcPath;
+			this.bufPath = bufPath;
+			this.tgtPath = tgtPath;
+			this.scanInParallel = scanInParallel;
+		}
+		
+		public Path getSrcPath() {
+			return srcPath;
+		}
+
+		public Path getBufPath() {
+			return bufPath;
+		}
+
+		public Path getTgtPath() {
+			return tgtPath;
+		}
+		
+		public boolean isScanInParallel() {
+			return scanInParallel;
+		}
+	}
+	
 	private void getBackUpTasks(JsonArray jItems) {
 
 		for (JsonElement jItem : jItems) {
@@ -134,11 +174,7 @@ public class BackUpJob {
 
 			boolean scanInParallel = getParallelScanElement(jObjItem, PARALLEL_SCAN) ;
 
-			if (scanInParallel) {
-				addParallelBackUpTasks(srcPath, bufPath, tgtPath) ;
-			} else {
-				addBackUpTask(srcPath, bufPath, tgtPath) ;
-			}
+			fullBackUpTaskList.add(new FullBackUpTask(srcPath, bufPath, tgtPath, scanInParallel));
 		}
 	}
 	
@@ -223,6 +259,18 @@ public class BackUpJob {
 	}
 
 	public List<BackUpTask> getTasks(JobTaskType jobTaskType) {
+		
+		initBackUpTasksMap();
+		
+		fullBackUpTaskList.forEach(fullBackUpTask -> {
+						
+			if (fullBackUpTask.isScanInParallel()) {
+				addParallelBackUpTasks(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath()) ;
+			} else {
+				addBackUpTask(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath());
+			}
+			
+		});
 		
 		if (backUpTasks.get(jobTaskType) == null) {
 			return null ;
