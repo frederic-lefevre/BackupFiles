@@ -43,20 +43,30 @@ public class BackUpJobTest {
 	@Test
 	void testNullJson() {
 		
-		BackUpJob bupj = new BackUpJob(null) ;
+		BackUpJob bupj = new BackUpJob(null);
 		
-		assertThat(bupj.getTasks(JobTaskType.BUFFER_TO_TARGET)).isNull();
-		assertThat(bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER)).isNull();
+		Stream.of(JobTaskType.values())
+			.forEach(jobTaskType -> 
+				assertThat(bupj.getTasks(jobTaskType))
+					.isNotNull()
+					.isEmpty()
+			);
+		
 		assertThat(bupj.toString()).isNull();
 	}
 	
 	@Test
 	void testEmptyJson() {
 		
-		BackUpJob bupj = new BackUpJob("") ;
+		BackUpJob bupj = new BackUpJob("");
 		
-		assertThat(bupj.getTasks(JobTaskType.BUFFER_TO_TARGET)).isNull();
-		assertThat(bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER)).isNull();
+		Stream.of(JobTaskType.values())
+			.forEach(jobTaskType -> 
+			assertThat(bupj.getTasks(jobTaskType))
+				.isNotNull()
+				.isEmpty()
+		);
+		
 		assertThat(bupj.toString()).isNull();
 	}
 	

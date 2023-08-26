@@ -82,47 +82,47 @@ public class BackUpJob {
 	// or a single list of back up task from source directories to target directories
 	// A back up task is a source directory to back up and a destination directory to back up
 	public BackUpJob(String jsonConfig) {
-		
-		backUpTasks = new HashMap<JobTaskType, List<BackUpTask>>() ;
+
+		backUpTasks = new HashMap<JobTaskType, List<BackUpTask>>();
+		for (JobTaskType jtt : JobTaskType.values()) {
+			ArrayList<BackUpTask> tasksForJtt = new ArrayList<BackUpTask>();
+			backUpTasks.put(jtt, tasksForJtt);
+		}
+
 		if (jsonConfig != null) {
-			
+
 			try {
-				JsonElement jElemConf = JsonParser.parseString(jsonConfig) ;
-				
+				JsonElement jElemConf = JsonParser.parseString(jsonConfig);
+
 				if ((jElemConf != null) && (jElemConf.isJsonObject())) {
-					
-					JsonObject jsonObjectConf = jElemConf.getAsJsonObject() ;
-					
-					JsonElement jElem = jsonObjectConf.get(TITLE) ;
+
+					JsonObject jsonObjectConf = jElemConf.getAsJsonObject();
+
+					JsonElement jElem = jsonObjectConf.get(TITLE);
 					if (jElem != null) {
-						title = jElem.getAsString() ;
+						title = jElem.getAsString();
 					} else {
-						bLog.severe("No title found inJSON configuration: " + jsonConfig );
+						bLog.severe("No title found inJSON configuration: " + jsonConfig);
 					}
-					
-					jElem = jsonObjectConf.get(ITEMS) ;
+
+					jElem = jsonObjectConf.get(ITEMS);
 					if (jElem != null) {
-						
+
 						getBackUpTasks(jElem.getAsJsonArray());
 
 					} else {
-						bLog.severe("No items found inJSON configuration: " + jsonConfig );
+						bLog.severe("No items found inJSON configuration: " + jsonConfig);
 					}
 				}
 			} catch (JsonSyntaxException e) {
-				bLog.log(Level.SEVERE, "Invalid JSON configuration: " + jsonConfig, e) ;
+				bLog.log(Level.SEVERE, "Invalid JSON configuration: " + jsonConfig, e);
 			} catch (Exception e) {
-				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig, e) ;
+				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig, e);
 			}
 		}
 	}
 
 	private void getBackUpTasks(JsonArray jItems) {
-
-		for (JobTaskType jtt : JobTaskType.values()) {
-			ArrayList<BackUpTask> tasksForJtt = new ArrayList<BackUpTask>() ;
-			backUpTasks.put(jtt, tasksForJtt) ;
-		}
 
 		for (JsonElement jItem : jItems) {
 
