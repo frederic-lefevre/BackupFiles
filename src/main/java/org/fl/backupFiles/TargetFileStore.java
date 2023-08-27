@@ -40,7 +40,8 @@ public class TargetFileStore {
 	private static final Logger tLog = Config.getLogger();
 	
 	// Locale.FRANCE affiche le séparateur de milliers avec un "Narrow non-breaking space", ce qui pose des problèmes
-	// d'affichage avec beaucoup d'outils (console Eclipse, lorsqu'on édite les logs avec Notepad++ par exemple)
+	// d'affichage avec beaucoup d'outils (console Eclipse et lorsqu'on édite les logs avec Notepad++ par exemple)
+	// Par contre, aucun problème lorsqu'on affiche dans des composants java.swing
 	private static final Locale localeForFormat = Locale.CANADA_FRENCH;
 	
 	private static final NumberFormat numberFormat = NumberFormat.getInstance(localeForFormat);
