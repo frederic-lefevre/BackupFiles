@@ -26,6 +26,8 @@ package org.fl.backupFiles.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -33,9 +35,12 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 public class BackUpSizeDifferenceCellRenderer extends DefaultTableCellRenderer {
 
+	private static final Locale localeForFormat = Locale.FRANCE;
+	private static final NumberFormat numberFormat = NumberFormat.getInstance(localeForFormat);
+	
 	private static final long serialVersionUID = 1L;
-	private static final Color ABOVE_LIMIT_COLOR = new Color(255, 100, 100) ;
-	private static final Color BELOW_LIMIT_COLOR = new Color(255, 255, 255) ;
+	private static final Color ABOVE_LIMIT_COLOR = new Color(255, 100, 100);
+	private static final Color BELOW_LIMIT_COLOR = new Color(255, 255, 255);
 
 	private static long fileSizeWarningThreshold ;
 	public static void setFileSizeWarningThreshold(long fileSizeWarningThreshold) {
@@ -46,14 +51,16 @@ public class BackUpSizeDifferenceCellRenderer extends DefaultTableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
  
-        Long sizeDifference = (Long)value ;
+        Long sizeDifference = (Long)value;
+        
+        setToolTipText(numberFormat.format(sizeDifference));
         
         if (sizeDifference > fileSizeWarningThreshold) {
-        	setBackground(ABOVE_LIMIT_COLOR) ;
+        	setBackground(ABOVE_LIMIT_COLOR);
         } else {
-        	setBackground(BELOW_LIMIT_COLOR) ;
+        	setBackground(BELOW_LIMIT_COLOR);
         }
-        setHorizontalAlignment(SwingConstants.CENTER) ;
+        setHorizontalAlignment(SwingConstants.CENTER);
         return this ;
 	}
 
