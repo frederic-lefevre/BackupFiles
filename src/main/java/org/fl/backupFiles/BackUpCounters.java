@@ -24,8 +24,17 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 public class BackUpCounters {
 
+	// Locale.FRANCE affiche le séparateur de milliers avec un "Narrow non-breaking space", ce qui pose des problèmes
+	// d'affichage avec beaucoup d'outils (console Eclipse, lorsqu'on édite les logs avec Notepad++ par exemple)
+	private static final Locale localeForFormat = Locale.CANADA_FRENCH;
+	
+	private final NumberFormat numberFormat = NumberFormat.getInstance(localeForFormat);
+	
 	public long copyNewNb;
 	public long copyReplaceNb;
 	public long copyTreeNb;
@@ -108,7 +117,7 @@ public class BackUpCounters {
 		if (contentDifferentNb != 0) {
 			res.append(CONTENT_DIFFERENT_LABEL).append(contentDifferentNb);
 		}
-		res.append(TOTAL_SIZE_DIFF_LABEL).append(totalSizeDifference).append("\n");
+		res.append(TOTAL_SIZE_DIFF_LABEL).append(numberFormat.format(totalSizeDifference)).append("\n");
 		return res.toString();
 	}
 	
@@ -172,7 +181,8 @@ public class BackUpCounters {
 	
 	private void appendCellCouple(StringBuilder res, String label, long value, String color) {
 		
-		boolean colorPresent = (color != null) && (! color.isEmpty()) && (value > 0) ;
+		boolean colorPresent = (color != null) && (! color.isEmpty()) && (value > 0);
+		String formattedValue = numberFormat.format(value);
 		if (label == null) {
 			res.append(TWO_EMPTY_CELLS) ;
 		} else if (colorPresent) {
@@ -183,13 +193,13 @@ public class BackUpCounters {
 				.append(CELL_WITH_COLOR_BREAK)
 				.append(color)
 				.append(TAG_END)
-				.append(value)
+				.append(formattedValue)
 				.append(CELL_END);
 		} else {
 			res.append(CELL_BEGIN)
 				.append(label)
 				.append(CELL_BREAK)
-				.append(value)
+				.append(formattedValue)
 				.append(CELL_END);
 		}
 	}
