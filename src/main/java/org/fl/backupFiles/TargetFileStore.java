@@ -29,6 +29,7 @@ import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,6 +38,12 @@ import org.fl.util.file.FilesUtils;
 public class TargetFileStore {
 
 	private static final Logger tLog = Config.getLogger();
+	
+	// Locale.FRANCE affiche le séparateur de milliers avec un "Narrow non-breaking space", ce qui pose des problèmes
+	// d'affichage avec beaucoup d'outils (console Eclipse, lorsqu'on édite les logs avec Notepad++ par exemple)
+	private static final Locale localeForFormat = Locale.CANADA_FRENCH;
+	
+	private static final NumberFormat numberFormat = NumberFormat.getInstance(localeForFormat);
 	
 	private final FileStore fileStore;
 	private final Path mountPoint;
@@ -72,24 +79,24 @@ public class TargetFileStore {
 	}
 
 	public void getSpaceEvolution(StringBuilder result) {
-		
+
 		if (fileStore != null) {
-			
-			result.append(fileStore.name()).append(" ").append(mountPoint).append(" = ") ;
+
+			result.append(fileStore.name()).append(" ").append(mountPoint).append(" = ");
 			try {
-				long currentSpace = fileStore.getUsableSpace() ;
-				long difference = currentSpace - initialRemainingSpace ;
-				
-				result.append( NumberFormat.getNumberInstance().format(currentSpace)).append(" ( ") ;
+				long currentSpace = fileStore.getUsableSpace();
+				long difference = currentSpace - initialRemainingSpace;
+
+				result.append(numberFormat.format(currentSpace)).append(" ( ");
 				if (difference > 0) {
-					result.append("+") ;
-				} 
-				result.append(NumberFormat.getNumberInstance().format(difference)).append(" ) bytes") ;
-				
+					result.append("+");
+				}
+				result.append(numberFormat.format(difference)).append(" ) bytes");
+
 			} catch (IOException e) {
-				String error = "IOException getting usable space of filestore " + fileStore.name() ;
+				String error = "IOException getting usable space of filestore " + fileStore.name();
 				tLog.log(Level.SEVERE, error, e);
-				result.append(error) ;
+				result.append(error);
 			}
 		}
 	}
