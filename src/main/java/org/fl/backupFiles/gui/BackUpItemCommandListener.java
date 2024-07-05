@@ -25,6 +25,7 @@ SOFTWARE.
 package org.fl.backupFiles.gui;
 
 import java.awt.event.ActionEvent;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.fl.backupFiles.BackUpItem;
@@ -52,22 +53,19 @@ public class BackUpItemCommandListener implements java.awt.event.ActionListener{
 
 		if (selectedEntry != null) {
 			// Command defined in the property file, passed for execution to the OS (maybe an external binary editor for instance)
-			StringBuilder fullCommand = new StringBuilder(command) ;
 
-			String filePaths = null ;
-
+			List<String> filePaths;
 			if (fileElement.equals(FileElement.Source)) {
-				filePaths = selectedEntry.getSourcePath().toAbsolutePath().toString() ;
+				filePaths = List.of(selectedEntry.getSourcePath().toAbsolutePath().toString());
 			} else if (fileElement.equals(FileElement.Cible)) {
-				filePaths = selectedEntry.getTargetPath().toAbsolutePath().toString() ;
+				filePaths = List.of(selectedEntry.getTargetPath().toAbsolutePath().toString());
 			} else if (fileElement.equals(FileElement.Both)) {
-				filePaths = selectedEntry.getSourcePath().toAbsolutePath().toString() + " " + selectedEntry.getTargetPath().toAbsolutePath().toString() ;
-			}
-			if (filePaths != null) {
-				fullCommand.append(" ").append(filePaths) ;
+				filePaths = List.of(selectedEntry.getSourcePath().toAbsolutePath().toString(), selectedEntry.getTargetPath().toAbsolutePath().toString());
+			} else {
+				filePaths = null;
 			}
 
-			OScommand osCommand = new OScommand(fullCommand.toString(), null, null, false, bLog) ;
+			OScommand osCommand = new OScommand(command, filePaths, null, false, bLog) ;
 			osCommand.run();
 		}
 	}
