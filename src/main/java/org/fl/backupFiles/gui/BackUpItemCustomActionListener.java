@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2024 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ import java.awt.event.ActionEvent;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -101,7 +102,7 @@ public class BackUpItemCustomActionListener implements java.awt.event.ActionList
 					if (filePath != null) {
 						Path parentDir = filePath.getParent();
 						if (Files.exists(parentDir)) {
-							OScommand osCommand = new OScommand(showParentDirCmd + " " + parentDir.toAbsolutePath(), false, bLog) ;
+							OScommand osCommand = new OScommand(showParentDirCmd, List.of(parentDir.toAbsolutePath().toString()), null, false, bLog) ;
 							osCommand.run();
 						} else {
 							bLog.warning("Showing parent directory: parent directory of " + filePath + " does not exists");
