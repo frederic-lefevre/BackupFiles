@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ import org.fl.backupFiles.Config;
 
 public class BackUpJTable extends JTable {
 
-	private static final Logger tLog = Config.getLogger();
+	private static final Logger tLog = Logger.getLogger(BackUpJTable.class.getName());
 	
 	private static final long serialVersionUID = 1L;
 
