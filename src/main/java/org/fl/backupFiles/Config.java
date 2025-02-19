@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2024 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryPermanence.DirectoryPermanence;
 import org.fl.backupFiles.directoryPermanence.DirectoryPermanenceMap;
@@ -57,7 +56,6 @@ public class Config {
 	private static ScheduledExecutorService scheduler;
 	private static List<OsAction> osActions;
 	private static DirectoryPermanence directoryPermanence;
-	private static final Logger backupLogger = Logger.getLogger(Config.class.getName());
 	private static boolean initialized = false;
 
 	private Config() {
@@ -124,13 +122,6 @@ public class Config {
 			initConfig(DEFAULT_PROP_FILE);
 		}
 		return runningContext;
-	}
-	
-	public static Logger getLogger() {
-		if (!initialized) {
-			initConfig(DEFAULT_PROP_FILE);
-		}
-		return backupLogger;
 	}
 	
 	public static Path getConfigFileDir() {

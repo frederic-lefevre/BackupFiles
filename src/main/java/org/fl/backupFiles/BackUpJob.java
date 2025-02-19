@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,15 +39,16 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class BackUpJob {
 
-	private static final Logger bLog = Config.getLogger();
+	private static final Logger bLog = Logger.getLogger(BackUpJob.class.getName());
+	
+	private static final ObjectMapper mapper = new ObjectMapper();
 	
 	private String title;
 	
@@ -58,14 +59,16 @@ public class BackUpJob {
 		BUFFER_TO_TARGET("Buffer vers target"),
 		SOURCE_TO_TARGET("Source vers target");
 		
-		private String jobName ;
+		private String jobName;
 		
 		private JobTaskType(String name) { 
-			jobName = name ; 
+			jobName = name; 
 		}
 		
 		@Override
-        public String toString() { return jobName ; } 
+        public String toString() { 
+			return jobName; 
+		} 
 	} ;
 	
 	private Map<JobTaskType, List<BackUpTask>> backUpTasks ;
@@ -92,29 +95,25 @@ public class BackUpJob {
 		if (jsonConfig != null) {
 
 			try {
-				JsonElement jElemConf = JsonParser.parseString(jsonConfig);
+				JsonNode jsonObjectConf = mapper.readTree(jsonConfig);
 
-				if ((jElemConf != null) && (jElemConf.isJsonObject())) {
-
-					JsonObject jsonObjectConf = jElemConf.getAsJsonObject();
-
-					JsonElement jElem = jsonObjectConf.get(TITLE);
-					if (jElem != null) {
-						title = jElem.getAsString();
-					} else {
-						bLog.severe("No title found inJSON configuration: " + jsonConfig);
-					}
-
-					jElem = jsonObjectConf.get(ITEMS);
-					if (jElem != null) {
-
-						getBackUpTasks(jElem.getAsJsonArray());
-
-					} else {
-						bLog.severe("No items found inJSON configuration: " + jsonConfig);
-					}
+				JsonNode jTitle = jsonObjectConf.get(TITLE);
+				if (jTitle != null) {
+					title = jTitle.asText();
+				} else {
+					bLog.severe("No title found in JSON configuration: " + jsonConfig);
 				}
-			} catch (JsonSyntaxException e) {
+
+				JsonNode jBackupItems = jsonObjectConf.get(ITEMS);
+				if (jBackupItems == null) {
+					bLog.severe("No items found inJSON configuration: " + jsonConfig);					
+				} else if (jBackupItems.isArray()){
+					getBackUpTasks((ArrayNode) jBackupItems);
+				} else {
+					bLog.severe("The items property in JSON configuration should be an array: " + jsonConfig);					
+				}
+
+			} catch (JsonProcessingException e) {
 				bLog.log(Level.SEVERE, "Invalid JSON configuration: " + jsonConfig, e);
 			} catch (Exception e) {
 				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig, e);
@@ -162,17 +161,15 @@ public class BackUpJob {
 		}
 	}
 	
-	private void getBackUpTasks(JsonArray jItems) {
+	private void getBackUpTasks(ArrayNode jItems) {
 
-		for (JsonElement jItem : jItems) {
+		for (JsonNode jObjItem : jItems) {
 
-			JsonObject jObjItem = jItem.getAsJsonObject() ;
+			Path srcPath = getPathElement(jObjItem, SOURCE);
+			Path tgtPath = getPathElement(jObjItem, TARGET);
+			Path bufPath = getPathElement(jObjItem, BUFFER);
 
-			Path srcPath = getPathElement(jObjItem, SOURCE) ;
-			Path tgtPath = getPathElement(jObjItem, TARGET) ;
-			Path bufPath = getPathElement(jObjItem, BUFFER) ;
-
-			boolean scanInParallel = getParallelScanElement(jObjItem, PARALLEL_SCAN) ;
+			boolean scanInParallel = getParallelScanElement(jObjItem, PARALLEL_SCAN);
 
 			fullBackUpTaskList.add(new FullBackUpTask(srcPath, bufPath, tgtPath, scanInParallel));
 		}
@@ -255,7 +252,7 @@ public class BackUpJob {
 	}
 	
 	public String toString() {
-		return title ;
+		return title;
 	}
 
 	public List<BackUpTask> getTasks(JobTaskType jobTaskType) {
@@ -265,7 +262,7 @@ public class BackUpJob {
 		fullBackUpTaskList.forEach(fullBackUpTask -> {
 						
 			if (fullBackUpTask.isScanInParallel()) {
-				addParallelBackUpTasks(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath()) ;
+				addParallelBackUpTasks(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath());
 			} else {
 				addBackUpTask(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath());
 			}
@@ -273,29 +270,29 @@ public class BackUpJob {
 		});
 		
 		if (backUpTasks.get(jobTaskType) == null) {
-			return null ;
+			return null;
 		} else {
-			return Collections.unmodifiableList(backUpTasks.get(jobTaskType)) ;
+			return Collections.unmodifiableList(backUpTasks.get(jobTaskType));
 		}
 	}
 	
-	private Path getPathElement(JsonObject jObjItem, String prop) {
-		
-		Path returnPath = null ;
-		JsonElement elem = jObjItem.get(prop) ;
+	private Path getPathElement(JsonNode jObjItem, String prop) {
+
+		Path returnPath = null;
+		JsonNode elem = jObjItem.get(prop);
 		if (elem != null) {
-			returnPath = Paths.get(URI.create(elem.getAsString())) ;
+			returnPath = Paths.get(URI.create(elem.asText()));
 		}
-		return returnPath ;
+		return returnPath;
 	}
-	
-	private boolean getParallelScanElement(JsonObject jObjItem, String prop) {
-		
-		boolean scanInParallel = false ;
-		JsonElement elem = jObjItem.get(prop) ;
+
+	private boolean getParallelScanElement(JsonNode jObjItem, String prop) {
+
+		boolean scanInParallel = false;
+		JsonNode elem = jObjItem.get(prop);
 		if (elem != null) {
-			scanInParallel = elem.getAsBoolean();
+			scanInParallel = elem.asBoolean();
 		}
-		return scanInParallel ;
+		return scanInParallel;
 	}
 }
