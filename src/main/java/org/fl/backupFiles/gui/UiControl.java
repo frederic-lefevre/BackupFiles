@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,14 +42,13 @@ import javax.swing.JPanel;
 
 import org.fl.backupFiles.BackUpJob.JobTaskType;
 import org.fl.backupFiles.BackUpTask;
-import org.fl.backupFiles.Config;
 import org.fl.backupFiles.JobsChoice;
 import org.fl.backupFiles.gui.workers.FilesBackUpProcessor;
 import org.fl.backupFiles.gui.workers.FilesBackUpScanner;
 
 public class UiControl extends JPanel {
 
-	private static final Logger bLog = Config.getLogger();
+	private static final Logger bLog = Logger.getLogger(UiControl.class.getName());
 	
 	private static final long serialVersionUID = 1L;
 	
