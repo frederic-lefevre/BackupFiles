@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2024 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,12 +29,11 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.fl.backupFiles.BackUpItem;
-import org.fl.backupFiles.Config;
 import org.fl.util.os.OScommand;
 
 public class BackUpItemCommandListener implements java.awt.event.ActionListener{
 
-	private static final Logger bLog = Config.getLogger();
+	private static final Logger bLog = Logger.getLogger(BackUpItemCommandListener.class.getName());
 	
 	private final BackUpJTable backUpJTable;
 	private final String command;
