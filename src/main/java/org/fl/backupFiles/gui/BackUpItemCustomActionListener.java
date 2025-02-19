@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2024 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,25 +38,24 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import org.fl.backupFiles.BackUpItem;
-import org.fl.backupFiles.Config;
 import org.fl.util.os.OScommand;
 
 public class BackUpItemCustomActionListener implements java.awt.event.ActionListener {
 	
-	private static final Logger bLog = Config.getLogger();
+	private static final Logger bLog = Logger.getLogger(BackUpItemCustomActionListener.class.getName());
 	
 	public enum CustomAction { Compare, ShowParentDir };
 	
 	private static Map<CustomAction, String> customActionCommands;
 	
 	private final BackUpJTable backUpJTable;
-	private final CustomAction customAction ;
+	private final CustomAction customAction;
 	private final FileElement fileElement;
 	
 	public BackUpItemCustomActionListener(BackUpJTable bkt, CustomAction ca, FileElement elem) {
 		
 		backUpJTable = bkt;
-		fileElement  = elem;
+		fileElement = elem;
 		customAction = ca;
 	}
 	
@@ -71,38 +70,38 @@ public class BackUpItemCustomActionListener implements java.awt.event.ActionList
 				// Display all possible informations on the source and target files 
 				// including the result of a binary compare 
 
-				StringBuilder compareInfos = new StringBuilder() ;
+				StringBuilder compareInfos = new StringBuilder();
 
-				selectedEntry.getInformation(compareInfos) ;
-				compareInfos.append("- - - - - - - - - - - - - - -\n") ;
+				selectedEntry.getInformation(compareInfos);
+				compareInfos.append("- - - - - - - - - - - - - - -\n");
 
 
 				// Show informations in popup message
 				JTextArea infoFiles = new JTextArea(40, 200);	
 				infoFiles.setText(compareInfos.toString());
 				infoFiles.setFont(new Font("monospaced", Font.BOLD, 14));
-				JScrollPane infoFilesScroll = new JScrollPane(infoFiles) ;
+				JScrollPane infoFilesScroll = new JScrollPane(infoFiles);
 				JOptionPane.showMessageDialog(null, infoFilesScroll, "Informations", JOptionPane.INFORMATION_MESSAGE);
 
 			}  else if (customAction.equals(CustomAction.ShowParentDir)) {
 				// Launch a file explorer on the parent directory
 
-				String showParentDirCmd = customActionCommands.get(CustomAction.ShowParentDir) ;
+				String showParentDirCmd = customActionCommands.get(CustomAction.ShowParentDir);
 
 				if ((showParentDirCmd != null) && (! showParentDirCmd.isEmpty())) {
 
 
 					Path filePath ;
 					if (fileElement.equals(FileElement.Source)) {
-						filePath = selectedEntry.getSourcePath() ;
+						filePath = selectedEntry.getSourcePath();
 					} else {
-						filePath = selectedEntry.getTargetPath() ;
+						filePath = selectedEntry.getTargetPath();
 					}
 
 					if (filePath != null) {
 						Path parentDir = filePath.getParent();
 						if (Files.exists(parentDir)) {
-							OScommand osCommand = new OScommand(showParentDirCmd, List.of(parentDir.toAbsolutePath().toString()), null, false, bLog) ;
+							OScommand osCommand = new OScommand(showParentDirCmd, List.of(parentDir.toAbsolutePath().toString()), null, false, bLog);
 							osCommand.run();
 						} else {
 							bLog.warning("Showing parent directory: parent directory of " + filePath + " does not exists");
@@ -116,6 +115,6 @@ public class BackUpItemCustomActionListener implements java.awt.event.ActionList
 	}
 
 	public static void setCustomActionCommands(HashMap<CustomAction, String> cac) {
-		customActionCommands = cac ;
+		customActionCommands = cac;
 	}
 }
