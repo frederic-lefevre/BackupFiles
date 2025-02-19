@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,8 +46,10 @@ public class BackupFilesGui  extends JFrame {
 	
 	private static final long serialVersionUID = -2691160306708075667L;
 
-	public static final int WINDOW_WIDTH  = 1880 ;
-	public static final int WINDOW_HEIGHT = 1000 ;
+	private static final Logger bLog = Logger.getLogger(BackupFilesGui.class.getName());
+
+	public static final int WINDOW_WIDTH = 1880;
+	public static final int WINDOW_HEIGHT = 1000;
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -56,29 +58,26 @@ public class BackupFilesGui  extends JFrame {
 				try {
 					
 					// Init config
-					Config.initConfig(Config.DEFAULT_PROP_FILE) ;
+					Config.initConfig(Config.DEFAULT_PROP_FILE);
 					
 					try {
 						BackupFilesGui window = new BackupFilesGui();
 						window.setVisible(true);
 					} catch (Exception e) {
-						Config.getLogger().log(Level.SEVERE, "Exception in main", e);
+						bLog.log(Level.SEVERE, "Exception in main", e);
 					}
 					
 				} catch (Exception e) {
-					System.out.println("Exception caught in Main (see default prop file processing) " + e.getMessage()) ;
-					e.printStackTrace() ;
+					System.out.println("Exception caught in Main (see default prop file processing) " + e.getMessage());
+					e.printStackTrace();
 				}				
 			}
 		});
 	}
 	
-	private Logger bLog ;
-	
 	public BackupFilesGui() {
 
-		Path configFileDir = Config.getConfigFileDir() ;
-		bLog = Config.getLogger() ;
+		Path configFileDir = Config.getConfigFileDir();
 		if (configFileDir != null) {
 		// Display GUI
 			
@@ -92,27 +91,27 @@ public class BackupFilesGui  extends JFrame {
 			ApplicationTabbedPane bkpTablesPanel = new ApplicationTabbedPane(Config.getRunningContext()) ;
 				
 			ArrayList<BackUpPane> backUpPanes = new ArrayList<BackUpPane>() ;
-			int tabIndex = 0 ;
+			int tabIndex = 0;
 			for (JobTaskType jtt : JobTaskType.values()) {
-				BackUpPane taskTypePane = new BackUpPane(jtt, jobInformationTable) ;
+				BackUpPane taskTypePane = new BackUpPane(jtt, jobInformationTable);
 				backUpPanes.add(taskTypePane) ;
-				bkpTablesPanel.add(taskTypePane, jtt.toString(), tabIndex) ;
-				tabIndex++ ;
+				bkpTablesPanel.add(taskTypePane, jtt.toString(), tabIndex);
+				tabIndex++;
 			}
 						
 			//  Tabbed Panel to choose back up configuration. Add it in the first position
 			BackUpConfigChoicePane configChoicePane = new BackUpConfigChoicePane(configFileDir, backUpPanes) ;
-			bkpTablesPanel.add(configChoicePane, "Configuration", 0) ;
+			bkpTablesPanel.add(configChoicePane, "Configuration", 0);
 	
 			// Tabbed Panel to display a summary of operations done. Add it before the standard tabs provided by ApplicationTabbedPane
-			BackUpJobInfoPanel historiqueTab = new BackUpJobInfoPanel(jobInformationTable) ;
+			BackUpJobInfoPanel historiqueTab = new BackUpJobInfoPanel(jobInformationTable);
 			bkpTablesPanel.add(historiqueTab, "Historique", tabIndex+1);
 			
-			bkpTablesPanel.setSelectedIndex(0) ;
+			bkpTablesPanel.setSelectedIndex(0);
 			
-			getContentPane().add(bkpTablesPanel) ;
+			getContentPane().add(bkpTablesPanel);
 			
-			addWindowListener(new ShutdownAppli()) ;
+			addWindowListener(new ShutdownAppli());
 		} else {
 			bLog.severe("Config files directory is null");
 		}
@@ -123,7 +122,7 @@ public class BackupFilesGui  extends JFrame {
         @Override
         public void windowClosing(WindowEvent e)
         {
-        	terminateExecutor(Config.getScanExecutorService(), "executor for scan") ;
+        	terminateExecutor(Config.getScanExecutorService(), "executor for scan");
         	terminateExecutor(Config.getScheduler(), "scheduled executor for information refresh");
         }
         
@@ -135,19 +134,19 @@ public class BackupFilesGui  extends JFrame {
     			if (! execSvc.awaitTermination(10, TimeUnit.SECONDS)) {
     				// Cancel currently executing tasks
     				execSvc.shutdownNow();
-    				bLog.fine("shutdown NOW " + executorType) ;
+    				bLog.fine("shutdown NOW " + executorType);
     			} else {
-        			bLog.fine("shutdown normal " + executorType) ;
+        			bLog.fine("shutdown normal " + executorType);
         		}
     			
     			if (! execSvc.awaitTermination(5, TimeUnit.SECONDS)) {
     				bLog.severe(executorType + " not terminated " + execSvc.isTerminated());
     			} else {
-    				bLog.fine("shutdown ok " + executorType) ;
+    				bLog.fine("shutdown ok " + executorType);
     			}
     		} catch (InterruptedException ie) {
     			// (Re-)Cancel if current thread also interrupted
-    			bLog.warning("Interrupted exception during threads shutdown " + executorType) ;
+    			bLog.warning("Interrupted exception during threads shutdown " + executorType);
     			execSvc.shutdownNow();
     			// Preserve interrupt status
     			Thread.currentThread().interrupt();
