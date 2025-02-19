@@ -106,7 +106,7 @@ public class BackUpJob {
 
 				JsonNode jBackupItems = jsonObjectConf.get(ITEMS);
 				if (jBackupItems == null) {
-					bLog.severe("No items found inJSON configuration: " + jsonConfig);					
+					bLog.severe("No items found in JSON configuration: " + jsonConfig);					
 				} else if (jBackupItems.isArray()){
 					getBackUpTasks((ArrayNode) jBackupItems);
 				} else {

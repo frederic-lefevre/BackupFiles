@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,7 @@ SOFTWARE.
 
 package org.fl.backupFiles.scanner;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -63,14 +62,13 @@ class BackUpScannerProcessorTest {
 	private final static String BUFFER_DATA_DIR2 = BUFFER_DATA_DIR + "dir2/" ;
 	private final static String TARGET_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Target/";
 	
-	private static Logger log ;
+	private static final Logger log = Logger.getLogger(BackUpScannerProcessorTest.class.getName()) ;
 	
 	@BeforeAll
 	static void generateTestData() {
 		
 		try {
 			Config.initConfig(DEFAULT_PROP_FILE);
-			log = Config.getLogger();
 
 			// Copy test data
 			Path srcPath1 = Paths.get(new URI(SOURCE_DATA_DIR1));

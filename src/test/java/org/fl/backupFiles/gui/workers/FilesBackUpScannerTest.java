@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,7 @@ SOFTWARE.
 
 package org.fl.backupFiles.gui.workers;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -54,7 +53,7 @@ class FilesBackUpScannerTest {
 	
 	private static final int THREAD_TO_NB_DIR_CORRELATION = 2;
 
-	private static Logger log;
+	private static final Logger log = Logger.getLogger(FilesBackUpScannerTest.class.getName());
 	private static TestDataManager testDataManager;
 	private static Path configFileDir;
 	private static int threadPoolSize;
@@ -62,10 +61,7 @@ class FilesBackUpScannerTest {
 	@BeforeAll
 	static void generateTestData() {
 
-		log = Logger.getGlobal();
-
 		Config.initConfig(DEFAULT_PROP_FILE);
-		log = Config.getLogger();
 		AdvancedProperties backupProperty = Config.getRunningContext().getProps();
 
 		// Get the different config path
