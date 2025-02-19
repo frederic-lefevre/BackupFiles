@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,14 +26,14 @@ package org.fl.backupFiles;
 
 public class OsAction {
 
-	private final String  actionTitle ;
-	private final String  actionCommand ;
-	private final boolean separateParam ;
-	
+	private final String actionTitle;
+	private final String actionCommand;
+	private final boolean separateParam;
+
 	public OsAction(String t, String c, boolean s) {
-		actionTitle   = t ;
-		actionCommand = c ;
-		separateParam = s ;
+		actionTitle = t;
+		actionCommand = c;
+		separateParam = s;
 	}
 
 	public String getActionTitle() {
@@ -45,6 +45,6 @@ public class OsAction {
 	}
 
 	public boolean paramSeparated() {
-		return separateParam ;
+		return separateParam;
 	}
 }
