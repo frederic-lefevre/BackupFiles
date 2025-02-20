@@ -92,7 +92,7 @@ public class BackUpJob {
 		
 		initBackUpTasksMap();
 
-		if (jsonConfig != null) {
+		if ((jsonConfig != null) && !jsonConfig.isEmpty()) {
 
 			try {
 				JsonNode jsonObjectConf = mapper.readTree(jsonConfig);
@@ -118,6 +118,8 @@ public class BackUpJob {
 			} catch (Exception e) {
 				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig, e);
 			}
+		} else {
+			bLog.severe("JSON configuration null or empty");
 		}
 	}
 
