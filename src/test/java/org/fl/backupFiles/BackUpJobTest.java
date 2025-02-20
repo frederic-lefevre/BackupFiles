@@ -32,15 +32,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import org.fl.backupFiles.BackUpJob.JobTaskType;
+import org.fl.util.FilterCounter;
+import org.fl.util.FilterCounter.LogRecordCounter;
 import org.junit.jupiter.api.Test;
 
 public class BackUpJobTest {
 	
 	@Test
 	void testNullJson() {
+		
+		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger("org.fl.backupFiles.BackUpJob"));
 		
 		BackUpJob bupj = new BackUpJob(null);
 		
@@ -52,10 +58,15 @@ public class BackUpJobTest {
 			);
 		
 		assertThat(bupj.toString()).isNull();
+		
+		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	@Test
 	void testEmptyJson() {
+		
+		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger("org.fl.backupFiles.BackUpJob"));
 		
 		BackUpJob bupj = new BackUpJob("");
 		
@@ -67,6 +78,9 @@ public class BackUpJobTest {
 		);
 		
 		assertThat(bupj.toString()).isNull();
+		
+		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	@Test
