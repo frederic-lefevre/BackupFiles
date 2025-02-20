@@ -43,6 +43,8 @@ import org.fl.backupFiles.gui.BackUpTableModel;
 import org.fl.backupFiles.gui.ProgressInformationPanel;
 import org.fl.backupFiles.gui.UiControl;
 import org.fl.util.AdvancedProperties;
+import org.fl.util.FilterCounter;
+import org.fl.util.FilterCounter.LogRecordCounter;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -80,6 +82,12 @@ class FilesBackUpScannerTest {
 	@Test
 	void test() {
 		try {	
+			
+			LogRecordCounter logCounterForFilesBackUpScanner = 
+					FilterCounter.getLogRecordCounter(Logger.getLogger("org.fl.backupFiles.gui.workers.FilesBackUpScanner"));
+			
+			LogRecordCounter logCounterForscannerBackUpScannerThread = 
+					FilterCounter.getLogRecordCounter(Logger.getLogger("org.fl.backupFiles.scanner.BackUpScannerThread"));
 			
 			BackUpJobList backUpJobs = new BackUpJobList(configFileDir) ;
 
@@ -161,6 +169,12 @@ class FilesBackUpScannerTest {
 			assertThat(backUpCounters.copyTargetNb).isZero();
 		
 			assertThat(backUpItems).hasSize(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION);
+			
+			assertThat(logCounterForFilesBackUpScanner.getLogRecordCount()).isEqualTo(2);
+			assertThat(logCounterForFilesBackUpScanner.getLogRecordCount(Level.INFO)).isEqualTo(2);
+			
+			// Stack trace is too long to have the test method in it. So warning are not counted
+			assertThat(logCounterForscannerBackUpScannerThread.getLogRecordCount()).isZero();
 			
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
