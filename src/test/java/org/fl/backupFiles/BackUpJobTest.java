@@ -45,8 +45,8 @@ public class BackUpJobTest {
 	
 	@Test
 	void testNullJson() {
-		
-		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger("org.fl.backupFiles.BackUpJob"));
+
+		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpJob.class.getName()));
 		
 		BackUpJob bupj = new BackUpJob(null);
 		
@@ -66,7 +66,7 @@ public class BackUpJobTest {
 	@Test
 	void testEmptyJson() {
 		
-		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger("org.fl.backupFiles.BackUpJob"));
+		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpJob.class.getName()));
 		
 		BackUpJob bupj = new BackUpJob("");
 		
