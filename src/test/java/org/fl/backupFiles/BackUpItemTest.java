@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ public class BackUpItemTest {
 
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles.properties";
 
-	private static Logger log;
+	private static Logger log = Logger.getLogger(BackUpItemTest.class.getName());
 
 	private static final String SRC_FOLDER = "file:///ForTests/BackUpFiles/TestDir1/";
 	private static final String SRC_FILE1 = SRC_FOLDER + "File1.pdf";
@@ -61,7 +61,6 @@ public class BackUpItemTest {
 	static void initConfig() {
 
 		Config.initConfig(DEFAULT_PROP_FILE);
-		log = Config.getLogger();
 	}
 
 	@Test

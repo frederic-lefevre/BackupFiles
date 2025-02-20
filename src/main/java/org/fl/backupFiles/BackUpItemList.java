@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ public class BackUpItemList extends LinkedList<BackUpItem> {
 	private static final long serialVersionUID = 1L;
 	
 	public BackUpItemList() {
-		super() ;
+		super();
 	}
 	
 	public void removeItemsDone() {

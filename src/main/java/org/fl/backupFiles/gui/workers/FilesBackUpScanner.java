@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -54,55 +54,55 @@ import org.fl.backupFiles.JobsChoice;
 
 public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupScannerInformation> {
 
-	private static final Logger pLog = Config.getLogger();
+	private static final Logger pLog = Logger.getLogger(FilesBackUpScanner.class.getName());
 	
-	private final UiControl uiControl ;
-	
-	private final BackUpTableModel 		   backUpTableModel ;
-	private final BackUpItemList 		   backUpItemList ;
-	private final BackUpJobInfoTableModel  backUpJobInfoTableModel ;	
+	private final UiControl uiControl;
+
+	private final BackUpTableModel backUpTableModel;
+	private final BackUpItemList backUpItemList;
+	private final BackUpJobInfoTableModel backUpJobInfoTableModel;
 	private final ProgressInformationPanel progressPanel;
-	
-	private final JobsChoice	jobsChoice ;
-	private final JobTaskType 	jobTaskType ;
-	
-	private List<Path> filesVisitFailed ;
-	
-	private final long 	refreshRate ;
-	private final BackUpCounters backUpCounters ;
+
+	private final JobsChoice jobsChoice;
+	private final JobTaskType jobTaskType;
+
+	private List<Path> filesVisitFailed;
+
+	private final long refreshRate;
+	private final BackUpCounters backUpCounters;
 	
 	public FilesBackUpScanner(UiControl u, JobTaskType jtt, JobsChoice jc, BackUpTableModel b, ProgressInformationPanel pip, BackUpJobInfoTableModel bj)  {
 		
 		super();
-		uiControl		 = u ;
-		backUpTableModel = b ;	
-		refreshRate 	 = Config.getScanRefreshRate() ;
-		progressPanel	 = pip ;
-		
+		uiControl = u;
+		backUpTableModel = b;
+		refreshRate = Config.getScanRefreshRate();
+		progressPanel = pip;
+
 		// back up items
-		backUpItemList = backUpTableModel.getBackUpItems() ;
-		
-		jobsChoice 				= jc ;
-		jobTaskType				= jtt ;		
-		backUpJobInfoTableModel = bj ;
-		
-		backUpCounters = new BackUpCounters() ;
+		backUpItemList = backUpTableModel.getBackUpItems();
+
+		jobsChoice = jc;
+		jobTaskType = jtt;
+		backUpJobInfoTableModel = bj;
+
+		backUpCounters = new BackUpCounters();
 	}
 
 	@Override
 	protected BackUpScannerResult doInBackground() throws Exception {
 		// The worker itself is multi-threaded
 		
-		pLog.info("Scan triggered for " + jobsChoice.getTitleAsString()) ;
-		backUpItemList.clear() ;
-		
-		backUpCounters.reset();
-		
-		filesVisitFailed = new ArrayList<Path>() ;	
+		pLog.info("Scan triggered for " + jobsChoice.getTitleAsString());
+		backUpItemList.clear();
 
-		long 			 startTime   = System.currentTimeMillis() ;
-		Path 			 sourcePath  = null ;
-		List<BackUpTask> backUpTasks = jobsChoice.getTasks(jobTaskType) ;
+		backUpCounters.reset();
+
+		filesVisitFailed = new ArrayList<Path>();
+
+		long startTime = System.currentTimeMillis();
+		Path sourcePath = null;
+		List<BackUpTask> backUpTasks = jobsChoice.getTasks(jobTaskType);
 	
 		List<ScannerThreadResponse> scannerThreadResponse = null; 
 		try {
@@ -115,7 +115,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 					.collect(Collectors.toList());
 
 				// Report scanner task progress
-				ScannerProgress scannerProgress = new ScannerProgress(results) ;
+				ScannerProgress scannerProgress = new ScannerProgress(results);
 				ScheduledFuture<?> progressRecordTask = Config.getScheduler().scheduleAtFixedRate(scannerProgress::getProgress, 0, refreshRate, TimeUnit.MILLISECONDS);
 
 				// Wait scanner tasks completion
@@ -134,21 +134,21 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 	
 	private class ScannerProgress {
 	
-		private final StringBuilder jobProgress ;
-		private final List<BackUpScannerTask> results ;	
+		private final StringBuilder jobProgress;
+		private final List<BackUpScannerTask> results;	
 		
 		public ScannerProgress(List<BackUpScannerTask> results) {
 			super();
 			this.results = results;
-			jobProgress = new StringBuilder(1024) ;
+			jobProgress = new StringBuilder(1024);
 		}
 
 		public void getProgress() {
 
 			if (results != null) {
 				
-				jobProgress.setLength(0) ;
-				jobProgress.append(HTML_BEGIN) ;
+				jobProgress.setLength(0);
+				jobProgress.append(HTML_BEGIN);
 				for (BackUpScannerTask oneResult : results) {
 					
 					if (oneResult != null) {
@@ -159,27 +159,27 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 							// one backUpTask has finished																			
 							// publish task result
 								try {
-									publish(new BackupScannerInformation(null, futureResponse.get())) ;
+									publish(new BackupScannerInformation(null, futureResponse.get()));
 									oneResult.setResultRecorded(true) ;
 								} catch (InterruptedException | ExecutionException e) {
-									pLog.log(Level.SEVERE, "Exception getting task results", e) ;
+									pLog.log(Level.SEVERE, "Exception getting task results", e);
 								}	
 							}
 						}
 						
-						BackUpScannerThread backupScannerThread = oneResult.getBackUpScannerThread() ;
+						BackUpScannerThread backupScannerThread = oneResult.getBackUpScannerThread();
 						if (backupScannerThread != null) {
 							backupScannerThread.stopAsked(uiControl.isStopAsked());
 							
 							// publish intermediate result of the scanner thread
-							jobProgress.append(backupScannerThread.getCurrentStatus()).append("<br/>") ;
+							jobProgress.append(backupScannerThread.getCurrentStatus()).append("<br/>");
 						}
 					}
 				}
-				jobProgress.append(HTML_END) ;
+				jobProgress.append(HTML_END);
 				
 				// Refresh progress information
-				publish(new BackupScannerInformation(jobProgress.toString(), null)) ;
+				publish(new BackupScannerInformation(jobProgress.toString(), null));
 			}
 		}
 	}
@@ -189,12 +189,12 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 		for (BackupScannerInformation scannerInfo : chunks) {
 			
-			ScannerThreadResponse scannerResp = scannerInfo.getScannerThreadResponse() ;
+			ScannerThreadResponse scannerResp = scannerInfo.getScannerThreadResponse();
 			if ((scannerResp != null) && (scannerResp.hasNotBeenProcessed())) {
 				// One scanner thread has ended
 				// It is necessary to test if the result has not been processed
 				// because done() may have been called before
-				processScannerThreadResponse(scannerResp) ;
+				processScannerThreadResponse(scannerResp);
 			}
 		}
 		
@@ -204,7 +204,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		backUpTableModel.fireTableDataChanged();
 		String lastInfo = latestResult.getInformation();
 		if ((lastInfo != null) && (!lastInfo.isEmpty())) {
-			long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed ;
+			long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
 			progressPanel.setStepInfos(lastInfo, nbFilesProcessed);
 		}
 	}
@@ -214,10 +214,10 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 		try {
 			BackUpScannerResult results = get();
-			List<ScannerThreadResponse> taskResults = results.getTaskResults() ;
+			List<ScannerThreadResponse> taskResults = results.getTaskResults();
 			
 			if ((taskResults == null) || (taskResults.isEmpty())) {
-				pLog.warning("back up tasks is null") ;							
+				pLog.warning("back up tasks is null");							
 				progressPanel.setStepInfos(backUpCounters.toHtmlString(), 0);
 				progressPanel.setProcessStatus("Aucune taches à effectuer");
 			} else {
@@ -227,7 +227,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 						// count number of backup items
 						if (backRes.hasNotBeenProcessed()) {
 							// Process the response that may have not been processed
-							processScannerThreadResponse(backRes) ;
+							processScannerThreadResponse(backRes);
 						}
 						return backRes.getBackUpItemList().size(); })
 					.sum() ;
@@ -238,85 +238,85 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				}
 				
 				// Update progress info panel
-				long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed ;
-				StringBuilder finalStatus = new StringBuilder(1024) ;
-				finalStatus.append("Comparaison de fichiers terminée (") ;				
-				finalStatus.append(jobTaskType.toString()) ;
-				finalStatus.append(" - ") ;
-				finalStatus.append(jobsChoice.getTitleAsString()) ;
-				finalStatus.append(")") ;
+				long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
+				StringBuilder finalStatus = new StringBuilder(1024);
+				finalStatus.append("Comparaison de fichiers terminée (");
+				finalStatus.append(jobTaskType.toString());
+				finalStatus.append(" - ");
+				finalStatus.append(jobsChoice.getTitleAsString());
+				finalStatus.append(")");
 				progressPanel.setStepInfos(backUpCounters.toHtmlString(), nbFilesProcessed);
 				progressPanel.setProcessStatus(finalStatus.toString());
 				
-				long duration = results.getDuration() ;
-				
+				long duration = results.getDuration();
+
 				// Log info
-				StringBuilder infoScanner = new StringBuilder(1024) ;		
-				infoScanner.append(jobsChoice.getTitleAsString()).append("\n") ;
+				StringBuilder infoScanner = new StringBuilder(1024);
+				infoScanner.append(jobsChoice.getTitleAsString()).append("\n");
 				for (ScannerThreadResponse oneResult : taskResults) {
-					infoScanner.append(oneResult.getStatus()).append("\n") ;
+					infoScanner.append(oneResult.getStatus()).append("\n");
 				}
-				pLog.info(getScanInfoText(infoScanner, duration)) ;
-				
+				pLog.info(getScanInfoText(infoScanner, duration));
+
 				// Update history tab
-				StringBuilder scanInfo = new StringBuilder(1024) ;
-				getScanInfoHtml(scanInfo, duration) ;
-				String compareType = "Comparaison" ;
+				StringBuilder scanInfo = new StringBuilder(1024);
+				getScanInfoHtml(scanInfo, duration);
+				String compareType = "Comparaison";
 				if (jobsChoice.compareContent()) {
 					compareType = compareType + " avec comparaison du contenu";
 				} else if (jobsChoice.compareContentOnAmbiguous()) {
 					compareType = compareType + " avec comparaison du contenu pour les fichiers ambigues";
 				}
 				BackUpJobInformation jobInfo = new BackUpJobInformation( jobsChoice.getTitleAsHtml(), System.currentTimeMillis(), scanInfo.toString(), compareType, jobTaskType.toString()) ;
-				backUpJobInfoTableModel.add(jobInfo) ;
+				backUpJobInfoTableModel.add(jobInfo);
 			}
 		} catch (InterruptedException | ExecutionException e) {
-			pLog.log(Level.SEVERE, "Exception when getting FileBackupScanner result", e) ;
+			pLog.log(Level.SEVERE, "Exception when getting FileBackupScanner result", e);
 		} 
 
-		backUpTableModel.fireTableDataChanged() ;
-		backUpJobInfoTableModel.fireTableDataChanged() ;
+		backUpTableModel.fireTableDataChanged();
+		backUpJobInfoTableModel.fireTableDataChanged();
 		
-		uiControl.setStopAsked(false) ;
-		uiControl.setIsRunning(false) ;
+		uiControl.setStopAsked(false);
+		uiControl.setIsRunning(false);
 	}
 	  
 	private void processScannerThreadResponse(ScannerThreadResponse scannerResp) {
 		backUpCounters.add(scannerResp.getBackUpCounters());
-		filesVisitFailed.addAll(scannerResp.getFilesVisitFailed()) ;
-		backUpItemList.addAll(scannerResp.getBackUpItemList()) ;
+		filesVisitFailed.addAll(scannerResp.getFilesVisitFailed());
+		backUpItemList.addAll(scannerResp.getBackUpItemList());
 		
 		scannerResp.setHasNotBeenProcessed(false) ;
 	}
 	
-	private static final String HTML_BEGIN = "<html><body>\n" ;
-	private static final String HTML_END   = "</body></html>\n" ;
+	private static final String HTML_BEGIN = "<html><body>\n";
+	private static final String HTML_END = "</body></html>\n";
 
-	 private void getScanInfoHtml(StringBuilder scanInfo, long duration) {
-		 		
-		 scanInfo.append(HTML_BEGIN) ;
-		 backUpCounters.appendHtmlFragment(scanInfo) ;
-		 scanInfo.append("<p>Durée scan (ms)= ").append(duration) ;
-		 if ((filesVisitFailed != null) && (! filesVisitFailed.isEmpty())) {
-			 scanInfo.append("<br>Fichiers visités en erreur:") ;
-			 for (Path fileOnError : filesVisitFailed) {
-				 scanInfo.append("<br>").append(fileOnError) ;
-			 }
-		 }
-		 scanInfo.append(HTML_END) ;
-	 }
-	 
-	 private String getScanInfoText(StringBuilder scanInfo, long duration) {
+	private void getScanInfoHtml(StringBuilder scanInfo, long duration) {
 
-		 scanInfo.append(backUpCounters.toString()).append("\nScan duration (ms)= ").append(duration) ;
-		 if ((filesVisitFailed != null) && (! filesVisitFailed.isEmpty())) {
-			 scanInfo.append("\nFichiers visités en erreur:") ;
-			 for (Path fileOnError : filesVisitFailed) {
-				 scanInfo.append("\n").append(fileOnError) ;
-			 }
-		 }
-		 return scanInfo.toString() ;
-	 }
+		scanInfo.append(HTML_BEGIN);
+		backUpCounters.appendHtmlFragment(scanInfo);
+		scanInfo.append("<p>Durée scan (ms)= ").append(duration);
+		if ((filesVisitFailed != null) && (!filesVisitFailed.isEmpty())) {
+			scanInfo.append("<br>Fichiers visités en erreur:");
+			for (Path fileOnError : filesVisitFailed) {
+				scanInfo.append("<br>").append(fileOnError);
+			}
+		}
+		scanInfo.append(HTML_END);
+	}
+
+	private String getScanInfoText(StringBuilder scanInfo, long duration) {
+
+		scanInfo.append(backUpCounters.toString()).append("\nScan duration (ms)= ").append(duration);
+		if ((filesVisitFailed != null) && (!filesVisitFailed.isEmpty())) {
+			scanInfo.append("\nFichiers visités en erreur:");
+			for (Path fileOnError : filesVisitFailed) {
+				scanInfo.append("\n").append(fileOnError);
+			}
+		}
+		return scanInfo.toString();
+	}
 
 	protected BackUpItemList getBackUpItemList() {
 		return backUpItemList;

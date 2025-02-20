@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ import org.fl.util.file.FilesUtils;
 
 public class BackUpItem {
 
-	private static final Logger bLog = Config.getLogger();
+	private static final Logger bLog = Logger.getLogger(BackUpItem.class.getName());
 	
 	private static final String SRC_NOT_EXISTS 		  = "Source path parameter is null or the path does not exist";
 	private static final String TGT_NOT_EXISTS 		  = "Target path parameter is null or the path does not exist";

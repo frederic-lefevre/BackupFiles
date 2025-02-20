@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,14 +44,14 @@ public class BackUpCounters {
 	public long copyTargetNb;
 	public long contentDifferentNb;
 	
-	public long nbSourceFilesProcessed ;
-	public long nbTargetFilesProcessed ;
-	public long nbSourceFilesFailed ;
-	public long nbTargetFilesFailed ;
-	public long backupWithSizeAboveThreshold ;
-	public long nbHighPermanencePath ;
-	public long nbMediumPermanencePath ;
-	public long totalSizeDifference ;
+	public long nbSourceFilesProcessed;
+	public long nbTargetFilesProcessed;
+	public long nbSourceFilesFailed;
+	public long nbTargetFilesFailed;
+	public long backupWithSizeAboveThreshold;
+	public long nbHighPermanencePath;
+	public long nbMediumPermanencePath;
+	public long totalSizeDifference;
 	
 	private final static String COPY_NEW_LABEL 		= "  Copier nouveau:     " ;
 	private final static String COPY_REPLACE_LABEL  = "  Remplacer:          " ;

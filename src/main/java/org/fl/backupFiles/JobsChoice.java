@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,83 +36,83 @@ import org.fl.backupFiles.BackUpJob.JobTaskType;
 
 public class JobsChoice {
 	
-	private final List<BackUpJob> backUpJobs ;
-	private final String 		  jobsTitleString ;
-	private final String 		  jobsTitleHtml ;
-	private final String 		  jobsDetail ;
-	private final StringBuilder   details ;
-	
-	private boolean	compareContent;
-	private boolean	compareContentOnAmbiguous;
-	
-	private final static String jobSeparator  	 = "\n__________________________\n" ;
-	private final static String taskJobSeparator = "\n\n" ;
-	private final static String taskSeparator 	 = "\n" ;
-	
-	private final Map<JobTaskType, ArrayList<BackUpTask>> backUpTasks ;
-	
-	private Map<FileStore,TargetFileStore> targetFileStores ;
+	private final List<BackUpJob> backUpJobs;
+	private final String jobsTitleString;
+	private final String jobsTitleHtml;
+	private final String jobsDetail;
+	private final StringBuilder details;
+
+	private boolean compareContent;
+	private boolean compareContentOnAmbiguous;
+
+	private final static String jobSeparator = "\n__________________________\n";
+	private final static String taskJobSeparator = "\n\n";
+	private final static String taskSeparator = "\n";
+
+	private final Map<JobTaskType, ArrayList<BackUpTask>> backUpTasks;
+
+	private Map<FileStore, TargetFileStore> targetFileStores;
 	
 	public JobsChoice(List<BackUpJob> bj) {
-		
+
 		backUpJobs = bj;
-		
+
 		compareContent = false;
 		compareContentOnAmbiguous = true;
-		
-		targetFileStores = new HashMap<FileStore,TargetFileStore>() ;
-		
-		StringBuilder titlesString = new StringBuilder() ;
-		StringBuilder titlesHtml   = new StringBuilder("<html><body>") ;
+
+		targetFileStores = new HashMap<FileStore, TargetFileStore>();
+
+		StringBuilder titlesString = new StringBuilder();
+		StringBuilder titlesHtml = new StringBuilder("<html><body>");
 		for (BackUpJob backUpJob : backUpJobs) {
-			titlesString.append(backUpJob.toString()).append("\n") ;
-			titlesHtml.append(backUpJob.toString()).append("<br/>") ;
+			titlesString.append(backUpJob.toString()).append("\n");
+			titlesHtml.append(backUpJob.toString()).append("<br/>");
 		}
-		titlesHtml.append("</body></html>") ;
-		jobsTitleString = titlesString.toString() ;
-		jobsTitleHtml   = titlesHtml.toString() ;
-		
-		details = new StringBuilder(1024) ;
-		backUpTasks = new HashMap<JobTaskType, ArrayList<BackUpTask>>() ;
+		titlesHtml.append("</body></html>");
+		jobsTitleString = titlesString.toString();
+		jobsTitleHtml = titlesHtml.toString();
+
+		details = new StringBuilder(1024);
+		backUpTasks = new HashMap<JobTaskType, ArrayList<BackUpTask>>();
 		for (JobTaskType jtt : JobTaskType.values()) {
-			ArrayList<BackUpTask> tasksForJtt = new ArrayList<BackUpTask>() ;
-			details.append(jobSeparator).append(jtt.toString()).append(taskJobSeparator) ;
-			backUpTasks.put(jtt, tasksForJtt) ;
+			ArrayList<BackUpTask> tasksForJtt = new ArrayList<BackUpTask>();
+			details.append(jobSeparator).append(jtt.toString()).append(taskJobSeparator);
+			backUpTasks.put(jtt, tasksForJtt);
 			for (BackUpJob backUpJob : backUpJobs) {
-				addAllTasks(tasksForJtt, backUpJob.getTasks(jtt)) ;
+				addAllTasks(tasksForJtt, backUpJob.getTasks(jtt));
 			}
 		}
-		jobsDetail = details.toString() ;
-		
+		jobsDetail = details.toString();
+
 	}
 
 	public String getTitleAsString() {
-		return jobsTitleString ;
+		return jobsTitleString;
 	}
-	
+
 	public String getTitleAsHtml() {
-		return jobsTitleHtml ;
+		return jobsTitleHtml;
 	}
-	
+
 	public String printDetail() {
-		return jobsDetail ;
+		return jobsDetail;
 	}
-	
+
 	public List<BackUpTask> getTasks(JobTaskType jobTaskType) {
-				
-		return backUpTasks.get(jobTaskType) ;
+
+		return backUpTasks.get(jobTaskType);
 	}
-	
+
 	public void setCompareContent(JobTaskType jobTaskType, boolean cc) {
 		
-		compareContent = cc ;
+		compareContent = cc;
 		getTasks(jobTaskType)
 			.forEach(backUpTask -> backUpTask.setCompareContent(cc));
 	}
 	
 	public void setCompareContentOnAmbiguous(JobTaskType jobTaskType, boolean cc) {
 		
-		compareContentOnAmbiguous = cc ;
+		compareContentOnAmbiguous = cc;
 		getTasks(jobTaskType)
 			.forEach(backUpTask -> backUpTask.setCompareContentOnAmbiguous(cc));
 	}
@@ -121,30 +121,28 @@ public class JobsChoice {
 		for (BackUpTask taskToAdd : tasksToAdd) {
 			if (! tasks.contains(taskToAdd)) {
 				tasks.add(taskToAdd) ;
-				details.append(taskToAdd.toString()).append(taskToAdd.eventualWarning()).append(taskSeparator) ;
+				details.append(taskToAdd.toString()).append(taskToAdd.eventualWarning()).append(taskSeparator);
 			}
 		}
 	}
 	
 	public void initTargetFileStores(JobTaskType jobTaskType) {
 		for (BackUpTask backUpTask : getTasks(jobTaskType)) {
-			Path targetPath = backUpTask.getTarget() ;
+			Path targetPath = backUpTask.getTarget();
 			if ((targetPath != null) && (Files.exists(targetPath))) {
-				TargetFileStore targetFileStore = new TargetFileStore(targetPath) ;
-				FileStore fs = targetFileStore.getFileStore() ;
+				TargetFileStore targetFileStore = new TargetFileStore(targetPath);
+				FileStore fs = targetFileStore.getFileStore();
 				if (fs != null) { 
 					if (! targetFileStores.containsKey(fs)) {
 						// put the new target file store in the map
-						targetFileStores.put(fs, targetFileStore) ;
+						targetFileStores.put(fs, targetFileStore);
 					} else {
 						// Target file store exists in the map
 						// just update remaining space
-						targetFileStores.get(fs).memorizeInitialRemainingSpace() ;
+						targetFileStores.get(fs).memorizeInitialRemainingSpace();
 					}
 				}
-			}
-			
-			
+			}			
 		}
 	}
 	

@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,14 +34,14 @@ import org.fl.util.swing.FileActions;
 
 public class BackUpItemActionListener implements java.awt.event.ActionListener {
 	
-	private BackUpJTable backUpJTable ;
+	private BackUpJTable backUpJTable;
 	private Desktop.Action action;
 	private FileElement fileElement;
 	
 	public BackUpItemActionListener(BackUpJTable bkt, Desktop.Action act, FileElement elem) {
 		backUpJTable = bkt;
-		action 		 = act;
-		fileElement  = elem;
+		action = act;
+		fileElement = elem;
 	}
 	
 	@Override
@@ -52,7 +52,7 @@ public class BackUpItemActionListener implements java.awt.event.ActionListener {
 		if (selectedEntry != null) {
 			// OS command (Java Desktop class OS action on File object: Edit, Open, Print)
 
-			File file = null ;
+			File file = null;
 			if (fileElement.equals(FileElement.Source)) {
 				file = selectedEntry.getSourceFile();
 			} else if (fileElement.equals(FileElement.Cible)) {

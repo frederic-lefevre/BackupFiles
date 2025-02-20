@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ import org.fl.util.file.FilesUtils;
 
 public class TargetFileStore {
 
-	private static final Logger tLog = Config.getLogger();
+	private static final Logger tLog = Logger.getLogger(TargetFileStore.class.getName());
 	
 	// Locale.FRANCE affiche le séparateur de milliers avec un "Narrow non-breaking space", ce qui pose des problèmes
 	// d'affichage avec beaucoup d'outils (console Eclipse et lorsqu'on édite les logs avec Notepad++ par exemple)

@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,13 +33,13 @@ public class PermanencePathComparator implements Comparator<Path> {
 	public int compare(Path path1, Path path2) {
 		
 		if (path1.equals(path2)) {
-			return 0 ;
+			return 0;
 		} else if (path1.startsWith(path2)) {
-			return -1 ;
+			return -1;
 		} else if (path2.startsWith(path1)) {
-			return 1 ;
+			return 1;
 		} else {
-			return path1.compareTo(path2) ;
+			return path1.compareTo(path2);
 		}
 	}
 

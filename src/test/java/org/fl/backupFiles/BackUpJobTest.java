@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,7 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -34,15 +32,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import org.fl.backupFiles.BackUpJob.JobTaskType;
+import org.fl.util.FilterCounter;
+import org.fl.util.FilterCounter.LogRecordCounter;
 import org.junit.jupiter.api.Test;
 
 public class BackUpJobTest {
 	
 	@Test
 	void testNullJson() {
+
+		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpJob.class.getName()));
 		
 		BackUpJob bupj = new BackUpJob(null);
 		
@@ -54,10 +58,15 @@ public class BackUpJobTest {
 			);
 		
 		assertThat(bupj.toString()).isNull();
+		
+		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	@Test
 	void testEmptyJson() {
+		
+		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpJob.class.getName()));
 		
 		BackUpJob bupj = new BackUpJob("");
 		
@@ -69,6 +78,9 @@ public class BackUpJobTest {
 		);
 		
 		assertThat(bupj.toString()).isNull();
+		
+		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	@Test

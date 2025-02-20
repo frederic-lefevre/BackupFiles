@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,18 @@ SOFTWARE.
 package org.fl.backupFiles.directoryPermanence;
 
 public enum DirectoryPermanenceLevel {
-	HIGH ("1: Haut"), MEDIUM("2: Moyen"), LOW("3: Faible") ;
-	private final String name ;
+	
+	HIGH ("1: Haut"), 
+	MEDIUM("2: Moyen"), 
+	LOW("3: Faible");
+	
+	private final String name;
+	
 	private DirectoryPermanenceLevel(String n) {
-		name  = n ;
+		name  = n;
 	}
 	@Override
-    public String toString()  { return name ; }
+	public String toString() {
+		return name;
+	}
 }

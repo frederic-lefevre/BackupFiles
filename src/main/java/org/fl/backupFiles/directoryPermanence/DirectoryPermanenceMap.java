@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,47 +32,50 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.fl.backupFiles.Config;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 
 public class DirectoryPermanenceMap implements DirectoryPermanence {
 
-	private static final Logger bLog = Config.getLogger();
+	private static final Logger bLog = Logger.getLogger(DirectoryPermanenceMap.class.getName());
 	
-	private static final String PATH 	   = "path" ;
-	private static final String PERMANENCE = "permanence" ;
+	private static final ObjectMapper mapper = new ObjectMapper();
 	
-	private final Map<Path,DirectoryPermanenceLevel> permanenceMap ;
-	private final Set<Path> pathKeys ;
-	
+	private static final String PATH = "path";
+	private static final String PERMANENCE = "permanence";
+
+	private final Map<Path, DirectoryPermanenceLevel> permanenceMap;
+	private final Set<Path> pathKeys;
+
 	public DirectoryPermanenceMap(String jsonConfig) {
 		super();
-		permanenceMap = new TreeMap<Path,DirectoryPermanenceLevel>(new PermanencePathComparator()) ;
-		
+		permanenceMap = new TreeMap<Path, DirectoryPermanenceLevel>(new PermanencePathComparator());
+
 		if (jsonConfig != null) {
-			
+
 			try {
-				JsonArray jPaths = JsonParser.parseString(jsonConfig).getAsJsonArray() ;
-				for (JsonElement jElem : jPaths) {
-					JsonObject jPathPermanence = jElem.getAsJsonObject() ;
-					
-					Path sPath = Paths.get(jPathPermanence.get(PATH).getAsString()) ;
-					DirectoryPermanenceLevel sPermanence = DirectoryPermanenceLevel.valueOf(jPathPermanence.get(PERMANENCE).getAsString()) ;
-					permanenceMap.put(sPath, sPermanence) ;
+				JsonNode jPathsNode = mapper.readTree(jsonConfig);
+				if ((jPathsNode != null) && (jPathsNode.isArray())) {
+
+					for (JsonNode jPathPermanence : jPathsNode) {
+
+						Path sPath = Paths.get(jPathPermanence.get(PATH).asText());
+						DirectoryPermanenceLevel sPermanence = DirectoryPermanenceLevel.valueOf(jPathPermanence.get(PERMANENCE).asText());
+						permanenceMap.put(sPath, sPermanence);
+					}
+				} else {
+					bLog.severe("Json null or not an array:\n" + jsonConfig);
 				}
-		
-			} catch (JsonSyntaxException e) {
-				bLog.log(Level.SEVERE, "Invalid JSON configuration: " + jsonConfig, e) ;
+
+			} catch (JsonProcessingException e) {
+				bLog.log(Level.SEVERE, "Invalid JSON configuration: " + jsonConfig, e);
 			} catch (Exception e) {
-				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig, e) ;
+				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig, e);
 			}
 		}
-		pathKeys = permanenceMap.keySet() ;
+		pathKeys = permanenceMap.keySet();
 	}
 
 	@Override

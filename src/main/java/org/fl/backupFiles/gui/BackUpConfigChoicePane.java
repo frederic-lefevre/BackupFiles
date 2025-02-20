@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -48,55 +48,55 @@ public class BackUpConfigChoicePane extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
-	private JList<BackUpJob> backUpJobChoice ;
+	private final JList<BackUpJob> backUpJobChoice;
 	
-	private List<BackUpPane> backUpPanes ;
+	private final List<BackUpPane> backUpPanes;
 	
-	private Map<JobTaskType, JobConfigTableModel> jobConfigTablesModel ;
+	private final Map<JobTaskType, JobConfigTableModel> jobConfigTablesModel;
 	
 	public BackUpConfigChoicePane(Path configFileDir, List<BackUpPane> bps) {
 		super();
 		
-		backUpPanes = bps ;
+		backUpPanes = bps;
 		
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)) ;
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
 		// Backup configuration choice
-		JPanel bkpChoicePanel = new JPanel() ;
+		JPanel bkpChoicePanel = new JPanel();
 		bkpChoicePanel.setLayout(new BoxLayout(bkpChoicePanel, BoxLayout.X_AXIS));
 		
 		// List of all possible back up jobs
 		// The back up jobs are defined in JSON files (one file per back up job)
 		// The first user action is to choose the back up job to execute
-		BackUpJobList backUpJobs = new BackUpJobList(configFileDir) ;
+		BackUpJobList backUpJobs = new BackUpJobList(configFileDir);
 		
-		JLabel choiceLbl = new JLabel("Choix de la configuration de sauvegarde") ;
+		JLabel choiceLbl = new JLabel("Choix de la configuration de sauvegarde");
 		choiceLbl.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		bkpChoicePanel.add(choiceLbl);
-		backUpJobChoice = new JList<BackUpJob>(backUpJobs) ;
+		backUpJobChoice = new JList<BackUpJob>(backUpJobs);
 		backUpJobChoice.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-		bkpChoicePanel.add(backUpJobChoice) ;
+		bkpChoicePanel.add(backUpJobChoice);
 			
-		add(bkpChoicePanel) ;
+		add(bkpChoicePanel);
 		
-		JPanel resultPanel = new JPanel() ;
+		JPanel resultPanel = new JPanel();
 		resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
 
-		jobConfigTablesModel = new HashMap<JobTaskType, JobConfigTableModel>() ;
+		jobConfigTablesModel = new HashMap<JobTaskType, JobConfigTableModel>();
 		for (JobTaskType jtt : JobTaskType.values()) {
-			JLabel jttLab = new JLabel(jtt.toString()) ;
-			resultPanel.add(jttLab) ;
-			
-			JobConfigTableModel jctm = new JobConfigTableModel() ;
-			jobConfigTablesModel.put(jtt, jctm) ;
-			JTable tasksTable = new JTable(jctm) ;
-			resultPanel.add(tasksTable.getTableHeader()) ;
-			resultPanel.add(tasksTable) ;
+			JLabel jttLab = new JLabel(jtt.toString());
+			resultPanel.add(jttLab);
+
+			JobConfigTableModel jctm = new JobConfigTableModel();
+			jobConfigTablesModel.put(jtt, jctm);
+			JTable tasksTable = new JTable(jctm);
+			resultPanel.add(tasksTable.getTableHeader());
+			resultPanel.add(tasksTable);
 		}
 		
-		JScrollPane resultScrollPane = new JScrollPane(resultPanel) ;
+		JScrollPane resultScrollPane = new JScrollPane(resultPanel);
 		
-		add(resultScrollPane) ;
+		add(resultScrollPane);
 		
 		// Each time a back up job is chosen, the backUpTasks are updated accordingly
 		backUpJobChoice.addListSelectionListener(new ChooseJobs());
@@ -110,18 +110,18 @@ public class BackUpConfigChoicePane extends JPanel {
 			
 			if (arg0.getValueIsAdjusting() == false) {
 							
-				List<BackUpJob> jobsChoiceList = backUpJobChoice.getSelectedValuesList() ;
-				JobsChoice jobsChoice = new JobsChoice(jobsChoiceList) ;
+				List<BackUpJob> jobsChoiceList = backUpJobChoice.getSelectedValuesList();
+				JobsChoice jobsChoice = new JobsChoice(jobsChoiceList);
 			
 				for (JobTaskType jtt : JobTaskType.values()) {
 					
-					JobConfigTableModel configTableModel = jobConfigTablesModel.get(jtt) ;
+					JobConfigTableModel configTableModel = jobConfigTablesModel.get(jtt);
 					configTableModel.setBackUpTasks(jobsChoice.getTasks(jtt));
-					configTableModel.fireTableDataChanged() ;
+					configTableModel.fireTableDataChanged();
 				}
 				
 				for (BackUpPane backUpPane : backUpPanes) {
-					backUpPane.setJobChoice(jobsChoice) ;
+					backUpPane.setJobChoice(jobsChoice);
 				}
 			}
 		}

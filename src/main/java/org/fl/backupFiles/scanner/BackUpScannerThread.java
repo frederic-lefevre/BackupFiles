@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,20 +49,19 @@ import org.fl.util.file.FilesUtils;
 
 public class BackUpScannerThread {
 
-	private static final Logger pLog = Config.getLogger();
+	private static final Logger pLog = Logger.getLogger(BackUpScannerThread.class.getName());
 	
-	private boolean stopAsked ;
+	private boolean stopAsked;
 
-	private List<Path> filesVisitFailed ;
-	
-	private BackUpItemList 	backUpItemList ;
-	
-	private BackUpCounters backUpCounters ;
-	
-	private final BackUpTask backUpTask ;
+	private List<Path> filesVisitFailed;
 
-	
-	private final FileComparator fileComparator ;
+	private BackUpItemList backUpItemList;
+
+	private BackUpCounters backUpCounters;
+
+	private final BackUpTask backUpTask;
+
+	private final FileComparator fileComparator;
 	
 	private Path currentFile;	
 	private String status;	
@@ -72,10 +71,10 @@ public class BackUpScannerThread {
 
 	public BackUpScannerThread(BackUpTask but) {
 		
-		stopAsked	= false ;
-		backUpTask  = but ;
-		maxDepth	= Config.getMaxDepth() ;
-		
+		stopAsked = false;
+		backUpTask = but;
+		maxDepth = Config.getMaxDepth();
+
 		backUpCounters = new BackUpCounters();
 		done = false;
 
@@ -99,10 +98,10 @@ public class BackUpScannerThread {
 
 	public ScannerThreadResponse scan() {
 
-		Path sourcePath  = backUpTask.getSource() ; 
-		Path targetPath  = backUpTask.getTarget() ;
+		Path sourcePath = backUpTask.getSource();
+		Path targetPath = backUpTask.getTarget();
 
-		currentFile = sourcePath ;
+		currentFile = sourcePath;
 		
 		backUpCounters.reset();
 
@@ -112,34 +111,34 @@ public class BackUpScannerThread {
 		
 		try {
 			if ((Files.exists(sourcePath)) && (Files.isDirectory(sourcePath))) {
-				currDepth = 0 ;
-				directoryCompare(sourcePath, targetPath) ;
+				currDepth = 0;
+				directoryCompare(sourcePath, targetPath);
 			} else {
-				topLevelFileCompare(sourcePath, targetPath) ;
+				topLevelFileCompare(sourcePath, targetPath);
 			}
 		} catch (Exception e) {
 			pLog.log(Level.SEVERE, "Exception when comparing directory " + sourcePath + " with " + targetPath, e);
 		}
-		backUpCounters.nbSourceFilesProcessed++ ;
+		backUpCounters.nbSourceFilesProcessed++;
 
-		long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed ;
-		status = status + "| Scan done " ;
-		done = true ;
+		long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
+		status = status + "| Scan done ";
+		done = true;
 		if (backUpTask.compareContent()) {
-			status = status + "with content compare " ;
+			status = status + "with content compare ";
 		} else if (backUpTask.compareContentOnAmbiguous()) {
-			status = status + "with content compare on ambiguous files " ;
+			status = status + "with content compare on ambiguous files ";
 		}
-		status = status + "| Number of files processed: " + nbFilesProcessed ;
-		ScannerThreadResponse resp = new ScannerThreadResponse(backUpTask, backUpItemList, backUpCounters, filesVisitFailed, status) ;
+		status = status + "| Number of files processed: " + nbFilesProcessed;
+		ScannerThreadResponse resp = new ScannerThreadResponse(backUpTask, backUpItemList, backUpCounters, filesVisitFailed, status);
 		return resp ;
 	}
 		
 	 // Walk directory tree without using SimpleFileVisitor class (much faster)
 	private void directoryCompare(Path sourceDirectory, Path targetDirectory) {
 		
-		boolean targetIsDirectory = true ;
-		HashMap<Path,PathPairBasicAttributes> filesBasicAttributes = new HashMap<Path, PathPairBasicAttributes>() ;
+		boolean targetIsDirectory = true;
+		HashMap<Path,PathPairBasicAttributes> filesBasicAttributes = new HashMap<Path, PathPairBasicAttributes>();
 		
 		// Get source directory files attributes
 		if (! stopAsked) {
@@ -147,7 +146,7 @@ public class BackUpScannerThread {
 			 try (DirectoryStream<Path> sourceFileStream = Files.newDirectoryStream(sourceDirectory)) {
 				 
 				 for (Path sourceFile : sourceFileStream) {				 
-					 filesBasicAttributes.put(sourceFile.getFileName(), new PathPairBasicAttributes(sourceFile)) ;
+					 filesBasicAttributes.put(sourceFile.getFileName(), new PathPairBasicAttributes(sourceFile));
 				 }
 			 } catch (Exception e) {
 				 backUpCounters.nbSourceFilesFailed++ ;
@@ -164,22 +163,22 @@ public class BackUpScannerThread {
 
 					for (Path targetFile : targetFileStream) {
 
-						Path targetFileName = targetFile.getFileName() ;
+						Path targetFileName = targetFile.getFileName();
 
-						PathPairBasicAttributes pairFiles = filesBasicAttributes.get(targetFileName) ;
+						PathPairBasicAttributes pairFiles = filesBasicAttributes.get(targetFileName);
 						if (pairFiles == null) {
 							// no corresponding source file : target is to be deleted
 
-							BackupAction action ;
-							long sizeDiff ;
+							BackupAction action;
+							long sizeDiff;
 							if (Files.isDirectory(targetFile)) {
 								action = BackupAction.DELETE_DIR ;
-								sizeDiff = 0 - FilesUtils.folderSize(targetFile, pLog) ;
+								sizeDiff = 0 - FilesUtils.folderSize(targetFile, pLog);
 							} else {
 								action = BackupAction.DELETE ;
-								sizeDiff = 0 - Files.size(targetFile) ;
+								sizeDiff = 0 - Files.size(targetFile);
 							}
-							backUpItemList.add(new BackUpItem(targetFile, action, sourceDirectory, sizeDiff, backUpCounters)) ;
+							backUpItemList.add(new BackUpItem(targetFile, action, sourceDirectory, sizeDiff, backUpCounters));
 
 						} else {
 							pairFiles.setTargetPath(targetFile);
@@ -204,7 +203,7 @@ public class BackUpScannerThread {
 					} catch (IOException e) {
 						pLog.log(Level.SEVERE, "IOException when getting the size of " + targetDirectory, e);
 					}
-					backUpItemList.add(new BackUpItem(targetDirectory, BackupAction.DELETE, sourceDirectory, sizeDiff, backUpCounters)) ;
+					backUpItemList.add(new BackUpItem(targetDirectory, BackupAction.DELETE, sourceDirectory, sizeDiff, backUpCounters));
 				} else {
 					// source is a directory but target does not exists : copy source tree				
 					pLog.warning("Source " + sourceDirectory + " is a directory\n" + "but target does not exists " + targetDirectory);
@@ -218,15 +217,15 @@ public class BackUpScannerThread {
 		if ((! stopAsked) && (targetIsDirectory)) {
 			for (Map.Entry<Path, PathPairBasicAttributes> entry : filesBasicAttributes.entrySet()) {
 				
-				PathPairBasicAttributes pairBasicAttributes = entry.getValue() ;
-				Path srcPath = pairBasicAttributes.getSourcePath() ;
-				BasicFileAttributes sourceAttributes = pairBasicAttributes.getSourceBasicAttributes() ;			
-				currentFile = srcPath ;
+				PathPairBasicAttributes pairBasicAttributes = entry.getValue();
+				Path srcPath = pairBasicAttributes.getSourcePath();
+				BasicFileAttributes sourceAttributes = pairBasicAttributes.getSourceBasicAttributes();			
+				currentFile = srcPath;
 				if (sourceAttributes != null) {
 					if (pairBasicAttributes.noTargetPath()) {
 						// no target file, copy source
 										
-						Path tgtPath = targetDirectory.resolve(sourceDirectory.relativize(srcPath)) ;
+						Path tgtPath = targetDirectory.resolve(sourceDirectory.relativize(srcPath));
 						
 						if (sourceAttributes.isDirectory()) {
 							// source is a directory
@@ -406,13 +405,13 @@ public class BackUpScannerThread {
 					}  else {
 						long sizeDiff = 0 - targetAttributes.size() ;
 						BackUpItem deleteItem = new BackUpItem(tgtPath, BackupAction.DELETE, srcPath.getParent(), sizeDiff, backUpCounters) ;
-						backUpItemList.add(deleteItem) ;
+						backUpItemList.add(deleteItem);
 					}
 				} 
 			}
 		} catch (Exception e) {
-			filesVisitFailed.add(tgtPath) ;
-			backUpCounters.nbTargetFilesFailed++ ;
+			filesVisitFailed.add(tgtPath);
+			backUpCounters.nbTargetFilesFailed++;
 			pLog.log(Level.SEVERE, "Exception when comparing file " + srcPath + " and " + tgtPath, e);
 
 		}	
