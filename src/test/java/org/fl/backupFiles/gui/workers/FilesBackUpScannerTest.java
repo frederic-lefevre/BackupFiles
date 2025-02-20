@@ -42,6 +42,7 @@ import org.fl.backupFiles.gui.BackUpJobInfoTableModel;
 import org.fl.backupFiles.gui.BackUpTableModel;
 import org.fl.backupFiles.gui.ProgressInformationPanel;
 import org.fl.backupFiles.gui.UiControl;
+import org.fl.backupFiles.scanner.BackUpScannerThread;
 import org.fl.util.AdvancedProperties;
 import org.fl.util.FilterCounter;
 import org.fl.util.FilterCounter.LogRecordCounter;
@@ -84,10 +85,10 @@ class FilesBackUpScannerTest {
 		try {	
 			
 			LogRecordCounter logCounterForFilesBackUpScanner = 
-					FilterCounter.getLogRecordCounter(Logger.getLogger("org.fl.backupFiles.gui.workers.FilesBackUpScanner"));
+					FilterCounter.getLogRecordCounter(Logger.getLogger(FilesBackUpScanner.class.getName()));
 			
 			LogRecordCounter logCounterForscannerBackUpScannerThread = 
-					FilterCounter.getLogRecordCounter(Logger.getLogger("org.fl.backupFiles.scanner.BackUpScannerThread"));
+					FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpScannerThread.class.getName()));
 			
 			BackUpJobList backUpJobs = new BackUpJobList(configFileDir) ;
 
@@ -173,7 +174,8 @@ class FilesBackUpScannerTest {
 			assertThat(logCounterForFilesBackUpScanner.getLogRecordCount()).isEqualTo(2);
 			assertThat(logCounterForFilesBackUpScanner.getLogRecordCount(Level.INFO)).isEqualTo(2);
 			
-			// Stack trace is too long to have the test method in it. So warning are not counted
+			// Test method is not in the stack trace because the errors are logged in separate threads. 
+			// So warning in the BackUpScannerThread are not counted (but they are not published
 			assertThat(logCounterForscannerBackUpScannerThread.getLogRecordCount()).isZero();
 			
 		} catch (Exception e) {
