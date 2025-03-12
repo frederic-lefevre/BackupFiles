@@ -2,16 +2,16 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.fl.backupFiles</groupId>
-	<artifactId>BackupFiles</artifactId>
-	<version>2.5.0</version>
+	<groupId>org.fl</groupId>
+	<artifactId>backupFiles</artifactId>
+	<version>2.6.0</version>
 	<name>BackupFiles</name>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.fl.FlUtils</groupId>
+			<groupId>org.fl</groupId>
 			<artifactId>FlUtils</artifactId>
-			<version>6.1.0</version>
+			<version>7.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
