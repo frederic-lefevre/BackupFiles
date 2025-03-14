@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,23 +37,28 @@ public class PermanenceCellRenderer extends DefaultTableCellRenderer {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Color HIGH_COLOR = Color.RED ;
-	private static final Color MEDIUM_COLOR = Color.PINK ;
+	private static final Color HIGH_COLOR = Color.RED;
+	private static final Color MEDIUM_COLOR = Color.PINK;
+	
+	public PermanenceCellRenderer() {
+		super();
+		setHorizontalAlignment(SwingConstants.CENTER);
+	}
 	
 	@Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
  
-        DirectoryPermanenceLevel permanenceLevel = (DirectoryPermanenceLevel) value ;
+        DirectoryPermanenceLevel permanenceLevel = (DirectoryPermanenceLevel) value;
         
         if (permanenceLevel.equals(DirectoryPermanenceLevel.HIGH)) {
-        	setBackground(HIGH_COLOR) ;
+        	setBackground(HIGH_COLOR);
         } else if (permanenceLevel.equals(DirectoryPermanenceLevel.MEDIUM)) {
-        	setBackground(MEDIUM_COLOR) ;
+        	setBackground(MEDIUM_COLOR);
         } else {
-        	setBackground(Color.WHITE) ;
+        	setBackground(Color.WHITE);
         }
-        setHorizontalAlignment(SwingConstants.CENTER) ;
-        return this ;
+    
+        return this;
 	}
 }
