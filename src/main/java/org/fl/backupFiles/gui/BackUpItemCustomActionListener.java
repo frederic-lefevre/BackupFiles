@@ -44,6 +44,8 @@ public class BackUpItemCustomActionListener implements java.awt.event.ActionList
 	
 	private static final Logger bLog = Logger.getLogger(BackUpItemCustomActionListener.class.getName());
 	
+	private static final Font font = new Font("monospaced", Font.BOLD, 14);
+	
 	public enum CustomAction { Compare, ShowParentDir };
 	
 	private static Map<CustomAction, String> customActionCommands;
@@ -79,7 +81,7 @@ public class BackUpItemCustomActionListener implements java.awt.event.ActionList
 				// Show informations in popup message
 				JTextArea infoFiles = new JTextArea(40, 200);	
 				infoFiles.setText(compareInfos.toString());
-				infoFiles.setFont(new Font("monospaced", Font.BOLD, 14));
+				infoFiles.setFont(font);
 				JScrollPane infoFilesScroll = new JScrollPane(infoFiles);
 				JOptionPane.showMessageDialog(null, infoFilesScroll, "Informations", JOptionPane.INFORMATION_MESSAGE);
 
