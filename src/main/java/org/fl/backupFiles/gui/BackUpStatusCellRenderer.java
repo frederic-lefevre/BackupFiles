@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,13 +41,23 @@ public class BackUpStatusCellRenderer extends DefaultTableCellRenderer {
 	private static final Color DIFF_BY_CONTENT_COLOR = new Color(255, 120, 120);
 	private static final Color SAME_CONTENT_COLOR = new Color(128, 191, 255);
 
+	private static final Font font = new Font("Dialog", Font.BOLD, 12);
+	
+	public BackUpStatusCellRenderer() {
+		super();
+		setHorizontalAlignment(SwingConstants.CENTER);
+	}
+	
 	@Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
  
+        // DefaultTableCellRenderer.getTableCellRendererComponent sets the font at each call
+        // So it is ineffective to change the font in the constructor
+        setFont(font);
+        
         BackupStatus backupStatus = (BackupStatus) value;
  
-        setFont(getFont().deriveFont(Font.BOLD));
         if (backupStatus.equals(BackupStatus.DIFFERENT)) {
 			setBackground(DIFFERENT_COLOR);
 			setForeground(Color.BLACK);
@@ -64,7 +74,6 @@ public class BackUpStatusCellRenderer extends DefaultTableCellRenderer {
 			setBackground(SAME_CONTENT_COLOR);
 			setForeground(Color.BLACK);
 		}
-		setHorizontalAlignment(SwingConstants.CENTER) ;
         return this;
     }
 }

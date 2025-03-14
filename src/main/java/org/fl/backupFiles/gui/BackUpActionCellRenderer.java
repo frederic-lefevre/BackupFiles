@@ -38,14 +38,23 @@ import org.fl.backupFiles.IllegalBackupActionException;
 public class BackUpActionCellRenderer extends DefaultTableCellRenderer {
 
 	private static final long serialVersionUID = 1L;
+	private static final Font font = new Font("Dialog", Font.BOLD, 12);
 
+	public BackUpActionCellRenderer() {
+		super();
+		setHorizontalAlignment(SwingConstants.CENTER);
+	}
+	
 	@Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
  
+        // DefaultTableCellRenderer.getTableCellRendererComponent sets the font at each call
+        // So it is ineffective to change the font in the constructor
+        setFont(font);
+        
         BackupAction backupAction = (BackupAction) value;
  
-        setFont(getFont().deriveFont(Font.BOLD));
 		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
 			setBackground(Color.MAGENTA);
 		} else if (backupAction.equals(BackupAction.COPY_NEW)) {
@@ -63,7 +72,6 @@ public class BackUpActionCellRenderer extends DefaultTableCellRenderer {
 		} else {
 			throw new IllegalBackupActionException("Invalid backup action: ", backupAction);
 		}
-		setHorizontalAlignment(SwingConstants.CENTER);
         return this;
     }
 

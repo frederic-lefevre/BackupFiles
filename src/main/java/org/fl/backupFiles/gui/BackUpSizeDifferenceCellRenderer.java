@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,10 +43,16 @@ public class BackUpSizeDifferenceCellRenderer extends DefaultTableCellRenderer {
 	private static final Color BELOW_LIMIT_COLOR = new Color(255, 255, 255);
 
 	private static long fileSizeWarningThreshold ;
+	
 	public static void setFileSizeWarningThreshold(long fileSizeWarningThreshold) {
-		BackUpSizeDifferenceCellRenderer.fileSizeWarningThreshold = fileSizeWarningThreshold;
+		BackUpSizeDifferenceCellRenderer.fileSizeWarningThreshold = fileSizeWarningThreshold;	
 	}
 
+	public BackUpSizeDifferenceCellRenderer() {
+		super();
+		setHorizontalAlignment(SwingConstants.CENTER);
+	}
+	
 	@Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -60,7 +66,6 @@ public class BackUpSizeDifferenceCellRenderer extends DefaultTableCellRenderer {
         } else {
         	setBackground(BELOW_LIMIT_COLOR);
         }
-        setHorizontalAlignment(SwingConstants.CENTER);
         return this ;
 	}
 
