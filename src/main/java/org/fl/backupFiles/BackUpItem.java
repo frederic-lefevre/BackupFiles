@@ -44,30 +44,34 @@ public class BackUpItem {
 
 	private static final Logger bLog = Logger.getLogger(BackUpItem.class.getName());
 	
-	private static final String SRC_NOT_EXISTS 		  = "Source path parameter is null or the path does not exist";
-	private static final String TGT_NOT_EXISTS 		  = "Target path parameter is null or the path does not exist";
+	private static final String SRC_NOT_EXISTS = "Source path parameter is null or the path does not exist";
+	private static final String TGT_NOT_EXISTS = "Target path parameter is null or the path does not exist";
 	private static final String TGT_SHOULD_NOT_EXISTS = "Target path parameter should not exist";
-	private static final String EXIST_SRC_NOT_EXISTS  = "Existing source path parameter is null or the path does not exist";
+	private static final String EXIST_SRC_NOT_EXISTS = "Existing source path parameter is null or the path does not exist";
 
-	
-	private static long fileSizeWarningThreshold ;
+	private static long fileSizeWarningThreshold;
+
 	public static void setFileSizeWarningThreshold(long fileSizeWarningThreshold) {
 		BackUpItem.fileSizeWarningThreshold = fileSizeWarningThreshold;
 	}
-	
-	public enum BackupAction { COPY_NEW, COPY_REPLACE, COPY_TREE, DELETE, DELETE_DIR, AMBIGUOUS, COPY_TARGET };
-	
-	public enum BackupStatus { DIFFERENT, DIFF_BY_CONTENT, SAME_CONTENT, DONE, FAILED } ;
 
-	private final Path	 				   sourcePath ;
-	private final Path 		 			   sourceClosestExistingPath ;
-	private final Path 		 			   targetPath ;
-	private final BackupAction 			   backupAction ;
-	private final long					   sizeDifference ;
-	private BackupStatus 				   backupStatus ;
-	private final DirectoryPermanenceLevel permanenceLevel ;
-	private final boolean				   sourcePresent;
-	private final boolean				   targetPresent;
+	public enum BackupAction {
+		COPY_NEW, COPY_REPLACE, COPY_TREE, DELETE, DELETE_DIR, AMBIGUOUS, COPY_TARGET
+	};
+
+	public enum BackupStatus {
+		DIFFERENT, DIFF_BY_CONTENT, SAME_CONTENT, DONE, FAILED
+	};
+
+	private final Path sourcePath;
+	private final Path sourceClosestExistingPath;
+	private final Path targetPath;
+	private final BackupAction backupAction;
+	private final long sizeDifference;
+	private BackupStatus backupStatus;
+	private final DirectoryPermanenceLevel permanenceLevel;
+	private final boolean sourcePresent;
+	private final boolean targetPresent;
 	
 	// A back up item is :
 	// * a source path (file or directory) to back up 
@@ -89,18 +93,18 @@ public class BackUpItem {
 	
 	public BackUpItem(Path src, Path tgt, BackupAction bst, BackupStatus bStatus, long sd, BackUpCounters backUpCounters) {
 		
-		sourcePath 	 	 		  = src ;
-		sourceClosestExistingPath = src ;
-		targetPath 	 	 		  = tgt ;
-		backupAction 	 		  = bst ;
-		backupStatus 	 		  = bStatus;
-		sizeDifference			  = sd ;
+		sourcePath = src;
+		sourceClosestExistingPath = src;
+		targetPath = tgt;
+		backupAction = bst;
+		backupStatus = bStatus;
+		sizeDifference = sd;
 		if (targetPath != null) {
-			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(targetPath) ;
+			permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(targetPath);
 		} else if (src != null) {
-			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(src) ;
+			permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(src);
 		} else {
-			permanenceLevel		  = DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL ;
+			permanenceLevel = DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL;
 		}
 		
 		// Update counters
@@ -109,80 +113,81 @@ public class BackUpItem {
 		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
 			checkPathExists(tgt, TGT_NOT_EXISTS);
 			targetPresent = true;
-			backUpCounters.copyReplaceNb++ ;
+			backUpCounters.copyReplaceNb++;
 		} else if (backupAction.equals(BackupAction.COPY_NEW)) {
 			checkPathDoesNotExist(tgt, TGT_SHOULD_NOT_EXISTS);
 			targetPresent = false;
-			backUpCounters.copyNewNb++ ;
+			backUpCounters.copyNewNb++;
 		} else if (backupAction.equals(BackupAction.COPY_TREE)) {
 			checkPathDoesNotExist(tgt, TGT_SHOULD_NOT_EXISTS);
 			targetPresent = false;
-			backUpCounters.copyTreeNb++ ;
+			backUpCounters.copyTreeNb++;
 		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
 			checkPathExists(tgt, TGT_NOT_EXISTS);
 			targetPresent = true;
-			backUpCounters.ambiguousNb++ ;
+			backUpCounters.ambiguousNb++;
 		} else if (backupAction.equals(BackupAction.COPY_TARGET)) {
 			checkPathExists(tgt, TGT_NOT_EXISTS);
 			targetPresent = true;
-			backUpCounters.copyTargetNb++ ;
+			backUpCounters.copyTargetNb++;
 		} else {
-			throw new IllegalBackupActionException("Illegal backup action", backupAction) ;
+			throw new IllegalBackupActionException("Illegal backup action", backupAction);
 		}
-		updateLimtsCounters(backUpCounters) ;
+		updateLimtsCounters(backUpCounters);
 	}
 
 	// For delete actions
 	public BackUpItem(Path tgt, BackupAction bst, Path srcExisting, long sd, BackUpCounters backUpCounters) {
-		sourcePath 	 	 		  = null ;
-		sourceClosestExistingPath = srcExisting ;
-		targetPath 	 	 		  = tgt ;
-		backupAction 	 		  = bst ;
-		backupStatus 	 		  = BackupStatus.DIFFERENT ;
-		sizeDifference			  = sd ;
+		sourcePath = null;
+		sourceClosestExistingPath = srcExisting;
+		targetPath = tgt;
+		backupAction = bst;
+		backupStatus = BackupStatus.DIFFERENT;
+		sizeDifference = sd;
 		if (targetPath != null) {
-			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(targetPath) ;
+			permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(targetPath);
 		} else if (srcExisting != null) {
-			permanenceLevel		  = Config.getDirectoryPermanence().getPermanenceLevel(srcExisting) ;
+			permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(srcExisting);
 		} else {
-			permanenceLevel		  = DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL ;
+			permanenceLevel = DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL;
 		}
-		
+
 		checkPathExists(srcExisting, EXIST_SRC_NOT_EXISTS);
 		checkPathExists(tgt, TGT_NOT_EXISTS);
 		sourcePresent = false;
 		targetPresent = true;
-		
+
 		// Update counters
 		if (backupAction.equals(BackupAction.DELETE)) {
-			backUpCounters.deleteNb++ ;
+			backUpCounters.deleteNb++;
 		} else if (backupAction.equals(BackupAction.DELETE_DIR)) {
-			backUpCounters.deleteDirNb++ ;
+			backUpCounters.deleteDirNb++;
 		} else {
-			throw new IllegalBackupActionException("Illegal backup action (should be a delete action)", backupAction) ;
+			throw new IllegalBackupActionException("Illegal backup action (should be a delete action)", backupAction);
 		}
-		updateLimtsCounters(backUpCounters) ;
+		updateLimtsCounters(backUpCounters);
 	}
 	
 	private void checkPathExists(Path path, String exceptionMessage) {
 		if ((path == null) || (Files.notExists(path))) {
-			throw new IllegalBackUpItemException(exceptionMessage, path) ;
+			throw new IllegalBackUpItemException(exceptionMessage, path);
 		}
 	}
-	
+
 	private void checkPathDoesNotExist(Path path, String exceptionMessage) {
 		if ((path != null) && (Files.exists(path))) {
-			throw new IllegalBackUpItemException(exceptionMessage, path) ;
+			throw new IllegalBackUpItemException(exceptionMessage, path);
 		}
 	}
-	
+
 	private void updateLimtsCounters(BackUpCounters backUpCounters) {
-		backUpCounters.totalSizeDifference = backUpCounters.totalSizeDifference + sizeDifference ;
-		if (sizeDifference > fileSizeWarningThreshold) backUpCounters.backupWithSizeAboveThreshold++ ;
+		backUpCounters.totalSizeDifference = backUpCounters.totalSizeDifference + sizeDifference;
+		if (sizeDifference > fileSizeWarningThreshold)
+			backUpCounters.backupWithSizeAboveThreshold++;
 		if (permanenceLevel.equals(DirectoryPermanenceLevel.HIGH)) {
-			backUpCounters.nbHighPermanencePath++ ;
+			backUpCounters.nbHighPermanencePath++;
 		} else if (permanenceLevel.equals(DirectoryPermanenceLevel.MEDIUM)) {
-			backUpCounters.nbMediumPermanencePath++ ;
+			backUpCounters.nbMediumPermanencePath++;
 		}
 	}
 	
@@ -198,7 +203,7 @@ public class BackUpItem {
 		if (sourcePath != null) {
 			return sourcePath.toFile();
 		} else {
-			return null ;
+			return null;
 		}
 	}
 
@@ -206,10 +211,10 @@ public class BackUpItem {
 		if (targetPath != null) {
 			return targetPath.toFile();
 		} else {
-			return null ;
+			return null;
 		}
 	}
-	
+
 	public BackupAction getBackupAction() {
 		return backupAction;
 	}
@@ -238,39 +243,39 @@ public class BackUpItem {
 		
 		try {
 			if (executeAction(backUpCounters)) {
-				backupStatus = BackupStatus.DONE ;
-				updateLimtsCounters(backUpCounters) ;
+				backupStatus = BackupStatus.DONE;
+				updateLimtsCounters(backUpCounters);
 			} else {
-				backupStatus = BackupStatus.FAILED ;
+				backupStatus = BackupStatus.FAILED;
 			}
 		} catch (AccessDeniedException e) {
 			// try to set the file writable
 			try {
-				FilesSecurityUtils.setWritable(targetPath, sourceClosestExistingPath) ;
+				FilesSecurityUtils.setWritable(targetPath, sourceClosestExistingPath);
 				if (executeAction(backUpCounters)) {
-					backupStatus = BackupStatus.DONE ;
+					backupStatus = BackupStatus.DONE;
 				} else {
-					backupStatus = BackupStatus.FAILED ;
+					backupStatus = BackupStatus.FAILED;
 				}
 			} catch (Exception e1) {
-				bLog.log(Level.SEVERE, "Exception trying to set file writable and execute action : " + targetPath + " " + backupAction, e1) ;
-				backupStatus = BackupStatus.FAILED ;
-				if ((backupAction.equals(BackupAction.DELETE)) || 
-						(backupAction.equals(BackupAction.DELETE_DIR)) ) {
-					backUpCounters.nbTargetFilesFailed++ ;
+				bLog.log(Level.SEVERE,
+						"Exception trying to set file writable and execute action : " + targetPath + " " + backupAction,
+						e1);
+				backupStatus = BackupStatus.FAILED;
+				if ((backupAction.equals(BackupAction.DELETE)) || (backupAction.equals(BackupAction.DELETE_DIR))) {
+					backUpCounters.nbTargetFilesFailed++;
 				} else {
-					backUpCounters.nbSourceFilesFailed++ ;
+					backUpCounters.nbSourceFilesFailed++;
 				}
 			}
 
 		} catch (Exception e) {
-			bLog.log(Level.SEVERE, "Exception executing action : " + targetPath + " " + backupAction, e) ;
-			backupStatus = BackupStatus.FAILED ;
-			if ((backupAction.equals(BackupAction.DELETE)) || 
-				(backupAction.equals(BackupAction.DELETE_DIR)) ) {
-				backUpCounters.nbTargetFilesFailed++ ;
+			bLog.log(Level.SEVERE, "Exception executing action : " + targetPath + " " + backupAction, e);
+			backupStatus = BackupStatus.FAILED;
+			if ((backupAction.equals(BackupAction.DELETE)) || (backupAction.equals(BackupAction.DELETE_DIR))) {
+				backUpCounters.nbTargetFilesFailed++;
 			} else {
-				backUpCounters.nbSourceFilesFailed++ ;
+				backUpCounters.nbSourceFilesFailed++;
 			}
 		}
 		return backupStatus == BackupStatus.DONE;
@@ -278,77 +283,80 @@ public class BackUpItem {
 	
 	private boolean executeAction(BackUpCounters backUpCounters) throws Exception {
 		
-		boolean success = true ;
+		boolean success = true;
 		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
-			Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES, LinkOption.NOFOLLOW_LINKS) ;
-			backUpCounters.copyReplaceNb++ ;
-			backUpCounters.nbSourceFilesProcessed++ ;
+			Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES,
+					LinkOption.NOFOLLOW_LINKS);
+			backUpCounters.copyReplaceNb++;
+			backUpCounters.nbSourceFilesProcessed++;
 		} else if (backupAction.equals(BackupAction.COPY_NEW)) {
-			Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES, LinkOption.NOFOLLOW_LINKS) ;
-			backUpCounters.copyNewNb++ ;
-			backUpCounters.nbSourceFilesProcessed++ ;
+			Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES,
+					LinkOption.NOFOLLOW_LINKS);
+			backUpCounters.copyNewNb++;
+			backUpCounters.nbSourceFilesProcessed++;
 		} else if (backupAction.equals(BackupAction.DELETE)) {
 			Files.delete(targetPath);
-			backUpCounters.deleteNb++ ;
-			backUpCounters.nbTargetFilesProcessed++ ;
+			backUpCounters.deleteNb++;
+			backUpCounters.nbTargetFilesProcessed++;
 		} else if (backupAction.equals(BackupAction.COPY_TREE)) {
-			success = FilesUtils.copyDirectoryTree(sourcePath, targetPath, bLog) ;
+			success = FilesUtils.copyDirectoryTree(sourcePath, targetPath, bLog);
 			if (success) {
-				backUpCounters.copyTreeNb++ ;
-				backUpCounters.nbSourceFilesProcessed++ ;
+				backUpCounters.copyTreeNb++;
+				backUpCounters.nbSourceFilesProcessed++;
 			} else {
-				backUpCounters.nbSourceFilesFailed++ ;
+				backUpCounters.nbSourceFilesFailed++;
 			}
-		} else if (backupAction.equals(BackupAction.DELETE_DIR)) {				
-			success = FilesUtils.deleteDirectoryTree(targetPath, true, bLog) ;
+		} else if (backupAction.equals(BackupAction.DELETE_DIR)) {
+			success = FilesUtils.deleteDirectoryTree(targetPath, true, bLog);
 			if (success) {
-				backUpCounters.deleteDirNb++ ;
-				backUpCounters.nbTargetFilesProcessed++ ;
+				backUpCounters.deleteDirNb++;
+				backUpCounters.nbTargetFilesProcessed++;
 			} else {
-				backUpCounters.nbTargetFilesFailed++ ;
+				backUpCounters.nbTargetFilesFailed++;
 			}
 		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
-			Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES, LinkOption.NOFOLLOW_LINKS) ;
-			backUpCounters.ambiguousNb++ ;
-			backUpCounters.nbSourceFilesProcessed++ ;
+			Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES,
+					LinkOption.NOFOLLOW_LINKS);
+			backUpCounters.ambiguousNb++;
+			backUpCounters.nbSourceFilesProcessed++;
 		} else if (backupAction.equals(BackupAction.COPY_TARGET)) {
-			Files.copy(targetPath, sourcePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES, LinkOption.NOFOLLOW_LINKS);
+			Files.copy(targetPath, sourcePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES,
+					LinkOption.NOFOLLOW_LINKS);
 			backUpCounters.copyTargetNb++;
 			backUpCounters.nbSourceFilesProcessed++;
 		} else {
 			throw new IllegalBackupActionException("Invalid backup action: ", backupAction);
 		}
-		return success ;
+		return success;
 	}
 	
 	public void getInformation(StringBuilder infos) {
-	
+
 		try {
-			
-			infos.append("Source file : ") ;
-			BasicFileAttributes sourceBasicAttributes = FilesUtils.appendFileInformations(sourcePath, infos, bLog) ;			
-			
-			infos.append("\nTarget file : ") ;
-			BasicFileAttributes targetBasicAttributes = FilesUtils.appendFileInformations(targetPath, infos, bLog) ;
-			
-			if ((sourceBasicAttributes != null) && 
-				(targetBasicAttributes != null) && 
-				(sourceBasicAttributes.isRegularFile()) && 
-				(targetBasicAttributes.isRegularFile())) {
+
+			infos.append("Source file : ");
+			BasicFileAttributes sourceBasicAttributes = FilesUtils.appendFileInformations(sourcePath, infos, bLog);
+
+			infos.append("\nTarget file : ");
+			BasicFileAttributes targetBasicAttributes = FilesUtils.appendFileInformations(targetPath, infos, bLog);
+
+			if ((sourceBasicAttributes != null) && (targetBasicAttributes != null)
+					&& (sourceBasicAttributes.isRegularFile()) && (targetBasicAttributes.isRegularFile())) {
 				// compare files
-				
-				 FileComparator fileCompare = new FileComparator(bLog) ;
-				 if (fileCompare.haveSameContent(sourcePath, targetPath)) {
-					 infos.append("\nThe contents of source and target files are the same\n") ;
-				 } else if (fileCompare.isOnError()) {
-					 infos.append("\nThe files comparaison raised an error\n") ;					 
-				 } else {
-					 infos.append("\nThe contents of source and target files are different\n") ;
-				 }
+
+				FileComparator fileCompare = new FileComparator(bLog);
+				if (fileCompare.haveSameContent(sourcePath, targetPath)) {
+					infos.append("\nThe contents of source and target files are the same\n");
+				} else if (fileCompare.isOnError()) {
+					infos.append("\nThe files comparaison raised an error\n");
+				} else {
+					infos.append("\nThe contents of source and target files are different\n");
+				}
 			}
-						
+
 		} catch (Exception e) {
-			bLog.log(Level.SEVERE, "Exception when getting information on backup item.\nSource Path=" + sourcePath + "\nTargetpath=" + targetPath, e);
+			bLog.log(Level.SEVERE, "Exception when getting information on backup item.\nSource Path=" + sourcePath
+					+ "\nTargetpath=" + targetPath, e);
 		}
 	}
 
