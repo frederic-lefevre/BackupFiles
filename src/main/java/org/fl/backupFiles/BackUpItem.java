@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryPermanence.DirectoryPermanence;
 import org.fl.backupFiles.directoryPermanence.DirectoryPermanenceLevel;
+import org.fl.backupFiles.scanner.PathPairBasicAttributes;
 import org.fl.util.file.FileComparator;
 import org.fl.util.file.FilesSecurityUtils;
 import org.fl.util.file.FilesUtils;
@@ -63,9 +64,10 @@ public class BackUpItem {
 		DIFFERENT, DIFF_BY_CONTENT, SAME_CONTENT, DONE, FAILED
 	};
 
+	private final PathPairBasicAttributes pathPairBasicAttributes;
 	private final Path sourcePath;
-	private final Path sourceClosestExistingPath;
 	private final Path targetPath;
+	private final Path sourceClosestExistingPath;
 	private final BackupAction backupAction;
 	private final long sizeDifference;
 	private BackupStatus backupStatus;
@@ -91,43 +93,45 @@ public class BackUpItem {
 	//		DONE	 	 	: the item has been backed-up
 	//		FAILED	 	 	: the back up has failed
 	
-	public BackUpItem(Path src, Path tgt, BackupAction bst, BackupStatus bStatus, long sd, BackUpCounters backUpCounters) {
+	public BackUpItem(PathPairBasicAttributes pathPairBasicAttributes, BackupAction bst, BackupStatus bStatus, long sd, BackUpCounters backUpCounters) {
 		
-		sourcePath = src;
-		sourceClosestExistingPath = src;
-		targetPath = tgt;
+		this.pathPairBasicAttributes = pathPairBasicAttributes;
+		sourcePath = this.pathPairBasicAttributes.getSourcePath();
+		targetPath = this.pathPairBasicAttributes.getTargetPath();
+		sourceClosestExistingPath = sourcePath;
 		backupAction = bst;
 		backupStatus = bStatus;
 		sizeDifference = sd;
+		
 		if (targetPath != null) {
 			permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(targetPath);
-		} else if (src != null) {
-			permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(src);
+		} else if (sourcePath != null) {
+			permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(sourcePath);
 		} else {
 			permanenceLevel = DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL;
 		}
 		
 		// Update counters
-		checkPathExists(src, SRC_NOT_EXISTS);
+		checkPathExists(sourcePath, SRC_NOT_EXISTS);
 		sourcePresent = true;
 		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
-			checkPathExists(tgt, TGT_NOT_EXISTS);
+			checkPathExists(targetPath, TGT_NOT_EXISTS);
 			targetPresent = true;
 			backUpCounters.copyReplaceNb++;
 		} else if (backupAction.equals(BackupAction.COPY_NEW)) {
-			checkPathDoesNotExist(tgt, TGT_SHOULD_NOT_EXISTS);
+			checkPathDoesNotExist(targetPath, TGT_SHOULD_NOT_EXISTS);
 			targetPresent = false;
 			backUpCounters.copyNewNb++;
 		} else if (backupAction.equals(BackupAction.COPY_TREE)) {
-			checkPathDoesNotExist(tgt, TGT_SHOULD_NOT_EXISTS);
+			checkPathDoesNotExist(targetPath, TGT_SHOULD_NOT_EXISTS);
 			targetPresent = false;
 			backUpCounters.copyTreeNb++;
 		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
-			checkPathExists(tgt, TGT_NOT_EXISTS);
+			checkPathExists(targetPath, TGT_NOT_EXISTS);
 			targetPresent = true;
 			backUpCounters.ambiguousNb++;
 		} else if (backupAction.equals(BackupAction.COPY_TARGET)) {
-			checkPathExists(tgt, TGT_NOT_EXISTS);
+			checkPathExists(targetPath, TGT_NOT_EXISTS);
 			targetPresent = true;
 			backUpCounters.copyTargetNb++;
 		} else {
@@ -137,10 +141,12 @@ public class BackUpItem {
 	}
 
 	// For delete actions
-	public BackUpItem(Path tgt, BackupAction bst, Path srcExisting, long sd, BackUpCounters backUpCounters) {
-		sourcePath = null;
+	public BackUpItem(PathPairBasicAttributes pathPairBasicAttributes, BackupAction bst, Path srcExisting, long sd, BackUpCounters backUpCounters) {
+		
+		this.pathPairBasicAttributes = pathPairBasicAttributes;
+		sourcePath = pathPairBasicAttributes.getSourcePath();
+		targetPath = pathPairBasicAttributes.getTargetPath();
 		sourceClosestExistingPath = srcExisting;
-		targetPath = tgt;
 		backupAction = bst;
 		backupStatus = BackupStatus.DIFFERENT;
 		sizeDifference = sd;
@@ -153,7 +159,7 @@ public class BackUpItem {
 		}
 
 		checkPathExists(srcExisting, EXIST_SRC_NOT_EXISTS);
-		checkPathExists(tgt, TGT_NOT_EXISTS);
+		checkPathExists(targetPath, TGT_NOT_EXISTS);
 		sourcePresent = false;
 		targetPresent = true;
 
@@ -191,6 +197,10 @@ public class BackUpItem {
 		}
 	}
 	
+	public PathPairBasicAttributes getPathPairBasicAttributes() {
+		return pathPairBasicAttributes;
+	}
+
 	public Path getSourcePath() {
 		return sourcePath;
 	}
