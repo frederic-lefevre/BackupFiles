@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,13 +25,14 @@ SOFTWARE.
 package org.fl.backupFiles;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 public class IllegalBackUpItemException extends IllegalArgumentException {
 
 	private static final long serialVersionUID = 1L;
 
-	public IllegalBackUpItemException(String s, Path p) {
-		super(s + "Path=" + p);
+	public IllegalBackUpItemException(String message, Path path) {
+		super(message + " Path=" + Objects.toString(path));
 	}
 	
 }
