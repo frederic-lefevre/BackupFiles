@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
 import java.util.logging.Logger;
 
 import org.fl.backupFiles.scanner.PathPairBasicAttributes;
@@ -136,6 +138,8 @@ public class BackUpItemTest {
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.AMBIGUOUS, BackupStatus.SAME_CONTENT, 0, counters));
 		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TARGET, BackupStatus.SAME_CONTENT, 0, counters));
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.ADJUST_TIME, BackupStatus.SAME_CONTENT, 0, counters));
 	}
 
 	@Test
@@ -146,15 +150,17 @@ public class BackUpItemTest {
 		BackUpCounters counters = new BackUpCounters();
 
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-				.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, EXISTANT_SOURCE_FOLDER, 0, counters));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, EXISTANT_SOURCE_FOLDER, 0, counters));
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-				.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_REPLACE, EXISTANT_SOURCE_FOLDER, 0, counters));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_REPLACE, EXISTANT_SOURCE_FOLDER, 0, counters));
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-				.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TREE, EXISTANT_SOURCE_FOLDER, 0, counters));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TREE, EXISTANT_SOURCE_FOLDER, 0, counters));
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-				.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.AMBIGUOUS, EXISTANT_SOURCE_FOLDER, 0, counters));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.AMBIGUOUS, EXISTANT_SOURCE_FOLDER, 0, counters));
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-				.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TARGET, EXISTANT_SOURCE_FOLDER, 0, counters));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TARGET, EXISTANT_SOURCE_FOLDER, 0, counters));
+		assertThatExceptionOfType(IllegalBackupActionException.class)
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.ADJUST_TIME, EXISTANT_SOURCE_FOLDER, 0, counters));
 	}
 
 	@Test
@@ -185,6 +191,8 @@ public class BackUpItemTest {
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.AMBIGUOUS, BackupStatus.DIFFERENT, 0, counters));
 		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TARGET, BackupStatus.DIFFERENT, 0, counters));
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.ADJUST_TIME, BackupStatus.DIFFERENT, 0, counters));
 	}
 
 	@Test
@@ -238,6 +246,46 @@ public class BackUpItemTest {
 		assertThat(getTotalCounters(counters)).isEqualTo(2);
 	}
 
+	@Test
+	void shouldAdjustTargetTime() throws IOException {
+
+		Files.copy(EXISTANT_SOURCE, UNEXISTANT_TARGET);
+
+		Path nowExists = UNEXISTANT_TARGET;
+		assertThat(Files.exists(EXISTANT_SOURCE)).isTrue();
+		assertThat(Files.exists(nowExists)).isTrue();
+
+		// Change target file last modified time
+		FileTime now = FileTime.from(Instant.now());
+		Files.setLastModifiedTime(nowExists, now);
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, nowExists);
+		
+		assertThat(pathPairBasicAttributes.getTargetBasicAttributes().lastModifiedTime().compareTo(now)).isZero();
+		
+		BackUpCounters counters = new BackUpCounters();
+
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.ADJUST_TIME, BackupStatus.SAME_CONTENT, 0, counters);
+
+		assertThat(counters.adjustTimeNb).isEqualTo(1);
+
+		counters.reset();
+		backUpItem.execute(counters);
+
+		// Check with Files.getLastModifiedTime
+		assertThat(Files.getLastModifiedTime(nowExists)
+			.compareTo(pathPairBasicAttributes.getSourceBasicAttributes().lastModifiedTime())).isZero();
+		
+		// Check reading again with PathPairBasicAttributes
+		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(EXISTANT_SOURCE, nowExists);
+		
+		assertThat(pathPairBasicAttributes2.getTargetBasicAttributes().lastModifiedTime()
+				.compareTo(pathPairBasicAttributes2.getSourceBasicAttributes().lastModifiedTime())).isZero();
+		
+		assertThat(counters.adjustTimeNb).isEqualTo(1);
+		assertThat(getTotalCounters(counters)).isEqualTo(2);
+	}
+	
 	@AfterEach
 	void clean() throws IOException {
 
@@ -250,7 +298,7 @@ public class BackUpItemTest {
 	private long getTotalCounters(BackUpCounters counters) {
 
 		return counters.ambiguousNb + counters.contentDifferentNb + counters.copyNewNb + counters.copyReplaceNb
-				+ counters.copyTreeNb + counters.deleteDirNb + counters.deleteNb + counters.copyTargetNb
+				+ counters.copyTreeNb + counters.deleteDirNb + counters.deleteNb + counters.copyTargetNb + counters.adjustTimeNb
 				+ counters.nbSourceFilesFailed + counters.nbSourceFilesProcessed + counters.nbTargetFilesFailed
 				+ counters.nbTargetFilesProcessed;
 	}

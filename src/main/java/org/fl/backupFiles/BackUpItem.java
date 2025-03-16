@@ -31,6 +31,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,7 +58,7 @@ public class BackUpItem {
 	}
 
 	public enum BackupAction {
-		COPY_NEW, COPY_REPLACE, COPY_TREE, DELETE, DELETE_DIR, AMBIGUOUS, COPY_TARGET
+		COPY_NEW, COPY_REPLACE, COPY_TREE, DELETE, DELETE_DIR, AMBIGUOUS, COPY_TARGET, ADJUST_TIME
 	};
 
 	public enum BackupStatus {
@@ -134,6 +135,10 @@ public class BackUpItem {
 			checkPathExists(targetPath, TGT_NOT_EXISTS);
 			targetPresent = true;
 			backUpCounters.copyTargetNb++;
+		} else if (backupAction.equals(BackupAction.ADJUST_TIME)) {
+			checkPathExists(targetPath, TGT_NOT_EXISTS);
+			targetPresent = true;
+			backUpCounters.adjustTimeNb++;
 		} else {
 			throw new IllegalBackupActionException("Illegal backup action", backupAction);
 		}
@@ -333,6 +338,11 @@ public class BackUpItem {
 			Files.copy(targetPath, sourcePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES,
 					LinkOption.NOFOLLOW_LINKS);
 			backUpCounters.copyTargetNb++;
+			backUpCounters.nbSourceFilesProcessed++;
+		} else if (backupAction.equals(BackupAction.ADJUST_TIME)) {
+			FileTime sourceLastModifiedTime = pathPairBasicAttributes.getSourceBasicAttributes().lastModifiedTime();
+			Files.setLastModifiedTime(targetPath, sourceLastModifiedTime);
+			backUpCounters.adjustTimeNb++;
 			backUpCounters.nbSourceFilesProcessed++;
 		} else {
 			throw new IllegalBackupActionException("Invalid backup action: ", backupAction);

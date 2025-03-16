@@ -69,6 +69,8 @@ public class BackUpActionCellRenderer extends DefaultTableCellRenderer {
 			setBackground(Color.RED);
 		} else if (backupAction.equals(BackupAction.COPY_TARGET)) {
 			setBackground(Color.PINK);
+		} else if (backupAction.equals(BackupAction.ADJUST_TIME)) {
+			setBackground(Color.PINK);
 		} else {
 			throw new IllegalBackupActionException("Invalid backup action: ", backupAction);
 		}
