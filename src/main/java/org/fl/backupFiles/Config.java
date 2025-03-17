@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryPermanence.DirectoryPermanence;
 import org.fl.backupFiles.directoryPermanence.DirectoryPermanenceMap;
@@ -46,7 +48,10 @@ public class Config {
 	
 	public static final String DEFAULT_PROP_FILE = "file:///FredericPersonnel/Program/PortableApps/BackUpFiles/backupFiles.properties";
 	
+	private static final Logger rootLogger = Logger.getLogger("");
+	
 	private static RunningContext runningContext;
+	private static AdvancedProperties backupProperty;
 	private static Path configFileDir;
 	private static long scanRefreshRate;
 	private static long backUpMaxRefreshInterval;
@@ -57,6 +62,7 @@ public class Config {
 	private static List<OsAction> osActions;
 	private static DirectoryPermanence directoryPermanence;
 	private static boolean initialized = false;
+	private static BackUpItem.BackupAction acionOnSameTargetContentButNewer;
 
 	private Config() {
 	}
@@ -68,7 +74,7 @@ public class Config {
 			// Get context, properties, logger
 			runningContext = new RunningContext("org.fl.backupFiles", null, new URI(propertyFile));
 
-			AdvancedProperties backupProperty = runningContext.getProps();
+			backupProperty = runningContext.getProps();
 
 			configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir");
 			scanRefreshRate = backupProperty.getLong("backupFiles.scan.refreshRate", 2000);
@@ -109,14 +115,30 @@ public class Config {
 					StandardCharsets.UTF_8);
 			directoryPermanence = new DirectoryPermanenceMap(permanenceConf);
 
+			acionOnSameTargetContentButNewer = getBackUpAction("backupFiles.actionOnTargetWithSameContentButNewer", BackUpItem.BackupAction.ADJUST_TIME);
+			
 		} catch (Exception e) {
-			System.out.println("Exception caught in Config init (see default prop file processing)");
-			e.printStackTrace();
+			rootLogger.log(Level.SEVERE, "Exception caught in Config init (see default prop file processing)", e);
 		}
 
 		initialized = true;
 	}
 
+	private static BackUpItem.BackupAction getBackUpAction(String property, BackUpItem.BackupAction defaultAction) {
+		
+		String backupAction = backupProperty.getProperty("backupFiles.actionOnTargetWithSameContentButNewer");
+		if ((backupAction != null) && !backupAction.isEmpty()) {
+			try {
+				return BackUpItem.BackupAction.valueOf(backupAction);
+			} catch (IllegalArgumentException e) {
+				return defaultAction;
+			}
+		} else {
+			rootLogger.warning("Cannot find in configuration file BackUpAction for prperty " + property);
+			return defaultAction;
+		}
+	}
+	
 	public static RunningContext getRunningContext() {
 		if (!initialized) {
 			initConfig(DEFAULT_PROP_FILE);
@@ -187,4 +209,10 @@ public class Config {
 		return directoryPermanence;
 	}
 
+	public static BackUpItem.BackupAction getAcionOnSameTargetContentButNewer() {
+		if (!initialized) {
+			initConfig(DEFAULT_PROP_FILE);
+		}
+		return acionOnSameTargetContentButNewer;
+	}
 }

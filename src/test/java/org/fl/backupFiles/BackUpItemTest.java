@@ -25,9 +25,12 @@ SOFTWARE.
 package org.fl.backupFiles;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
 import java.util.logging.Logger;
 
 import org.fl.backupFiles.scanner.PathPairBasicAttributes;
@@ -136,6 +139,8 @@ public class BackUpItemTest {
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.AMBIGUOUS, BackupStatus.SAME_CONTENT, 0, counters));
 		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TARGET, BackupStatus.SAME_CONTENT, 0, counters));
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.ADJUST_TIME, BackupStatus.SAME_CONTENT, 0, counters));
 	}
 
 	@Test
@@ -146,15 +151,17 @@ public class BackUpItemTest {
 		BackUpCounters counters = new BackUpCounters();
 
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-				.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, EXISTANT_SOURCE_FOLDER, 0, counters));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, EXISTANT_SOURCE_FOLDER, 0, counters));
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-				.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_REPLACE, EXISTANT_SOURCE_FOLDER, 0, counters));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_REPLACE, EXISTANT_SOURCE_FOLDER, 0, counters));
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-				.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TREE, EXISTANT_SOURCE_FOLDER, 0, counters));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TREE, EXISTANT_SOURCE_FOLDER, 0, counters));
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-				.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.AMBIGUOUS, EXISTANT_SOURCE_FOLDER, 0, counters));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.AMBIGUOUS, EXISTANT_SOURCE_FOLDER, 0, counters));
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-				.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TARGET, EXISTANT_SOURCE_FOLDER, 0, counters));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TARGET, EXISTANT_SOURCE_FOLDER, 0, counters));
+		assertThatExceptionOfType(IllegalBackupActionException.class)
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.ADJUST_TIME, EXISTANT_SOURCE_FOLDER, 0, counters));
 	}
 
 	@Test
@@ -185,6 +192,8 @@ public class BackUpItemTest {
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.AMBIGUOUS, BackupStatus.DIFFERENT, 0, counters));
 		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TARGET, BackupStatus.DIFFERENT, 0, counters));
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.ADJUST_TIME, BackupStatus.DIFFERENT, 0, counters));
 	}
 
 	@Test
@@ -238,6 +247,86 @@ public class BackUpItemTest {
 		assertThat(getTotalCounters(counters)).isEqualTo(2);
 	}
 
+	@Test
+	void shouldAdjustTargetTime() throws IOException, URISyntaxException {
+
+		boolean debug = false;
+		boolean testWithExternalDrive = false;
+		
+		Path SOURCE_FILE;
+		Path TARGET_FILE;
+		
+		if (testWithExternalDrive) {
+			SOURCE_FILE = Paths.get(new java.net.URI("file:///E:/Musique/a/Aerosmith/Rocks/01.Back%20in%20the%20Saddle.flac"));
+			TARGET_FILE = Paths.get(new java.net.URI("file:///I:/Musique/a/Aerosmith/Rocks/01.Back%20in%20the%20Saddle.flac"));		
+			org.fl.util.file.FilesSecurityUtils.setWritable(TARGET_FILE, SOURCE_FILE.getParent());
+		} else {
+			SOURCE_FILE = EXISTANT_SOURCE;
+			TARGET_FILE = UNEXISTANT_TARGET;
+		}
+		
+//		Path SOURCE_FILE = Paths.get(new java.net.URI("file:///C:/FredericPersonnel/Pratique/Voitures/SkodaRoomster/Assurance/NoticeEssentiel.pdf"));
+//		Path TARGET_FILE = Paths.get(new java.net.URI("file:///C:/FP_BackUpBuffer/FredericPersonnel/Pratique/Voitures/SkodaRoomster/Assurance/NoticeEssentiel.pdf"));		
+				
+		if (!Files.exists(TARGET_FILE)) {
+			Files.copy(SOURCE_FILE, TARGET_FILE);
+		}
+
+		assertThat(Files.exists(SOURCE_FILE)).isTrue();
+		assertThat(Files.exists(TARGET_FILE)).isTrue();
+
+		// Change target file last modified time 
+		FileTime now = FileTime.from(Instant.now());
+		Files.setLastModifiedTime(TARGET_FILE, now);
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(SOURCE_FILE, TARGET_FILE);
+		if (debug) {
+			System.out.println("1-FileTime now to millis=" + now.toMillis());
+			System.out.println("1-Source attribute to millis=" + pathPairBasicAttributes.getSourceBasicAttributes().lastModifiedTime().toMillis());
+			System.out.println("1-Target attribute to millis=" + pathPairBasicAttributes.getTargetBasicAttributes().lastModifiedTime().toMillis());
+		}
+		
+		assertThat(pathPairBasicAttributes.getTargetBasicAttributes().lastModifiedTime().compareTo(now)).isZero();
+		assertThat(pathPairBasicAttributes.getTargetBasicAttributes().lastModifiedTime().toMillis())
+			.isEqualTo(now.toMillis());
+		assertThat(pathPairBasicAttributes.getTargetBasicAttributes().lastModifiedTime()
+				.compareTo(pathPairBasicAttributes.getSourceBasicAttributes().lastModifiedTime())).isEqualTo(1);
+		if (debug) {
+			System.out.println("2-Source attribute to millis=" + pathPairBasicAttributes.getSourceBasicAttributes().lastModifiedTime().toMillis());
+			System.out.println("2-Target attribute now to millis=" + pathPairBasicAttributes.getTargetBasicAttributes().lastModifiedTime().toMillis());
+			System.out.println("2-FileTime now to millis=" + now.toMillis());
+		}
+		
+		BackUpCounters counters = new BackUpCounters();
+
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.ADJUST_TIME, BackupStatus.SAME_CONTENT, 0, counters);
+
+		assertThat(counters.adjustTimeNb).isEqualTo(1);
+
+		counters.reset();
+		backUpItem.execute(counters);
+
+		// Check with Files.getLastModifiedTime
+		assertThat(Files.getLastModifiedTime(TARGET_FILE)
+			.compareTo(pathPairBasicAttributes.getSourceBasicAttributes().lastModifiedTime())).isZero();
+		
+		// Check reading again with PathPairBasicAttributes
+		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(SOURCE_FILE, TARGET_FILE);
+		if (debug) {
+			System.out.println("3-Source attribute to millis=" + pathPairBasicAttributes2.getSourceBasicAttributes().lastModifiedTime().toMillis());
+			System.out.println("3-Target attribute now to millis=" + pathPairBasicAttributes2.getTargetBasicAttributes().lastModifiedTime().toMillis());
+		}
+		
+		assertThat(pathPairBasicAttributes2.getTargetBasicAttributes().lastModifiedTime()
+				.compareTo(pathPairBasicAttributes2.getSourceBasicAttributes().lastModifiedTime())).isZero();
+		
+		assertThat(pathPairBasicAttributes2.getTargetBasicAttributes().lastModifiedTime().toMillis())
+			.isEqualTo(pathPairBasicAttributes2.getSourceBasicAttributes().lastModifiedTime().toMillis());
+		
+		assertThat(counters.adjustTimeNb).isEqualTo(1);
+		assertThat(getTotalCounters(counters)).isEqualTo(2);
+	}
+	
 	@AfterEach
 	void clean() throws IOException {
 
@@ -250,7 +339,7 @@ public class BackUpItemTest {
 	private long getTotalCounters(BackUpCounters counters) {
 
 		return counters.ambiguousNb + counters.contentDifferentNb + counters.copyNewNb + counters.copyReplaceNb
-				+ counters.copyTreeNb + counters.deleteDirNb + counters.deleteNb + counters.copyTargetNb
+				+ counters.copyTreeNb + counters.deleteDirNb + counters.deleteNb + counters.copyTargetNb + counters.adjustTimeNb
 				+ counters.nbSourceFilesFailed + counters.nbSourceFilesProcessed + counters.nbTargetFilesFailed
 				+ counters.nbTargetFilesProcessed;
 	}

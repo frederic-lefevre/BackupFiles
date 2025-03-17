@@ -42,6 +42,7 @@ public class BackUpCounters {
 	public long deleteDirNb;
 	public long ambiguousNb;
 	public long copyTargetNb;
+	public long adjustTimeNb;
 	public long contentDifferentNb;
 	
 	public long nbSourceFilesProcessed;
@@ -60,6 +61,7 @@ public class BackUpCounters {
 	private final static String DELETE_DIR_LABEL 	= "  Effacer arbre:      " ;
 	private final static String AMBIGUOUS_LABEL 	= "  Ambigu:             " ;
 	private final static String COPY_TARGET_LABEL 	= "  Copier target:      " ;
+	private final static String ADJUST_TIME_LABEL 	= "  Ajuster temps:      " ;
 	
 	private final static String SOURCE_OK_LABEL 	= "  Eléments source traités:   " ;
 	private final static String SOURCE_KO_LABEL 	= "  Eléments source en erreur: " ;
@@ -73,26 +75,27 @@ public class BackUpCounters {
 	private final static String TOTAL_SIZE_DIFF_LABEL		= "  Différence totale de taille: " ;
 	
 	public BackUpCounters() {
-		reset() ;
+		reset();
 	}
 
 	public void reset() {
-		copyNewNb 					 = 0 ;
-		copyReplaceNb 				 = 0 ;
-		copyTreeNb 					 = 0 ;
-		deleteNb					 = 0 ;
-		deleteDirNb 				 = 0 ;
-		ambiguousNb 				 = 0 ; 
-		copyTargetNb				 = 0 ; 
-		contentDifferentNb			 = 0 ;
-		nbSourceFilesProcessed 		 = 0 ;
-		nbTargetFilesProcessed 		 = 0 ;
-		nbSourceFilesFailed 		 = 0 ;
-		nbTargetFilesFailed 		 = 0 ;
-		backupWithSizeAboveThreshold = 0 ;
-		nbHighPermanencePath		 = 0 ;
-		nbMediumPermanencePath		 = 0 ;
-		totalSizeDifference			 = 0 ;
+		copyNewNb = 0;
+		copyReplaceNb = 0;
+		copyTreeNb = 0;
+		deleteNb = 0;
+		deleteDirNb = 0;
+		ambiguousNb = 0;
+		copyTargetNb = 0;
+		adjustTimeNb = 0;
+		contentDifferentNb = 0;
+		nbSourceFilesProcessed = 0;
+		nbTargetFilesProcessed = 0;
+		nbSourceFilesFailed = 0;
+		nbTargetFilesFailed = 0;
+		backupWithSizeAboveThreshold = 0;
+		nbHighPermanencePath = 0;
+		nbMediumPermanencePath = 0;
+		totalSizeDifference = 0;
 	}
 	
 	@Override
@@ -103,7 +106,7 @@ public class BackUpCounters {
 		res.append(COPY_NEW_LABEL).append(copyNewNb).append(DELETE_LABEL).append(deleteNb).append("\n");
 		res.append(COPY_REPLACE_LABEL).append(copyReplaceNb).append(DELETE_DIR_LABEL).append(deleteDirNb).append("\n");
 		res.append(COPY_TREE_LABEL).append(copyTreeNb).append(AMBIGUOUS_LABEL).append(ambiguousNb).append("\n");
-		res.append(COPY_TARGET_LABEL).append(copyTargetNb).append("\n");
+		res.append(COPY_TARGET_LABEL).append(copyTargetNb).append(ADJUST_TIME_LABEL).append(adjustTimeNb).append("\n");
 
 		res.append(SOURCE_OK_LABEL).append(nbSourceFilesProcessed).append(SOURCE_KO_LABEL).append(nbSourceFilesFailed)
 				.append("\n");
@@ -127,12 +130,13 @@ public class BackUpCounters {
 		appendCellCouple(res, COPY_TREE_LABEL, copyTreeNb, null);
 		appendCellCouple(res, COPY_NEW_LABEL, copyNewNb, null);
 		appendCellCouple(res, COPY_REPLACE_LABEL, copyReplaceNb, null);
+		appendCellCouple(res, COPY_TARGET_LABEL, copyTargetNb, "red");
 
 		res.append(NEW_ROW);
 		appendCellCouple(res, DELETE_LABEL, deleteNb, null);
 		appendCellCouple(res, DELETE_DIR_LABEL, deleteDirNb, null);
 		appendCellCouple(res, AMBIGUOUS_LABEL, ambiguousNb, "red");
-		appendCellCouple(res, COPY_TARGET_LABEL, copyTargetNb, "red");
+		appendCellCouple(res, ADJUST_TIME_LABEL, adjustTimeNb, "red");
 
 		res.append(NEW_ROW);
 		appendCellCouple(res, SOURCE_OK_LABEL, nbSourceFilesProcessed, null);
@@ -204,23 +208,24 @@ public class BackUpCounters {
 		}
 	}
 	
-	public void add(BackUpCounters counters)  {
-		
-		copyNewNb 					 = copyNewNb 			 		+ counters.copyNewNb ;
-		copyReplaceNb 				 = copyReplaceNb 		 		+ counters.copyReplaceNb ;
-		copyTreeNb 					 = copyTreeNb 			 		+ counters.copyTreeNb ;
-		deleteNb					 = deleteNb 				 	+ counters.deleteNb ;
-		deleteDirNb 				 = deleteDirNb 			 		+ counters.deleteDirNb ;
-		ambiguousNb 				 = ambiguousNb 			 		+ counters.ambiguousNb ; 
-		copyTargetNb 				 = copyTargetNb 			 	+ counters.copyTargetNb ;
-		contentDifferentNb 			 = contentDifferentNb	 		+ counters.contentDifferentNb ; 
-		nbSourceFilesProcessed 		 = nbSourceFilesProcessed 		+ counters.nbSourceFilesProcessed ;
-		nbTargetFilesProcessed 		 = nbTargetFilesProcessed 		+ counters.nbTargetFilesProcessed ;
-		nbSourceFilesFailed 		 = nbSourceFilesFailed 	 		+ counters.nbSourceFilesFailed ;
-		nbTargetFilesFailed 		 = nbTargetFilesFailed 	 		+ counters.nbTargetFilesFailed ;
-		backupWithSizeAboveThreshold = backupWithSizeAboveThreshold + counters.backupWithSizeAboveThreshold ;
-		nbHighPermanencePath		 = nbHighPermanencePath			+ counters.nbHighPermanencePath ;
-		nbMediumPermanencePath		 = nbMediumPermanencePath		+ counters.nbMediumPermanencePath ;
-		totalSizeDifference			 = totalSizeDifference			+ counters.totalSizeDifference ;
+	public void add(BackUpCounters counters) {
+
+		copyNewNb = copyNewNb + counters.copyNewNb;
+		copyReplaceNb = copyReplaceNb + counters.copyReplaceNb;
+		copyTreeNb = copyTreeNb + counters.copyTreeNb;
+		deleteNb = deleteNb + counters.deleteNb;
+		deleteDirNb = deleteDirNb + counters.deleteDirNb;
+		ambiguousNb = ambiguousNb + counters.ambiguousNb;
+		copyTargetNb = copyTargetNb + counters.copyTargetNb;
+		adjustTimeNb = adjustTimeNb + counters.adjustTimeNb;
+		contentDifferentNb = contentDifferentNb + counters.contentDifferentNb;
+		nbSourceFilesProcessed = nbSourceFilesProcessed + counters.nbSourceFilesProcessed;
+		nbTargetFilesProcessed = nbTargetFilesProcessed + counters.nbTargetFilesProcessed;
+		nbSourceFilesFailed = nbSourceFilesFailed + counters.nbSourceFilesFailed;
+		nbTargetFilesFailed = nbTargetFilesFailed + counters.nbTargetFilesFailed;
+		backupWithSizeAboveThreshold = backupWithSizeAboveThreshold + counters.backupWithSizeAboveThreshold;
+		nbHighPermanencePath = nbHighPermanencePath + counters.nbHighPermanencePath;
+		nbMediumPermanencePath = nbMediumPermanencePath + counters.nbMediumPermanencePath;
+		totalSizeDifference = totalSizeDifference + counters.totalSizeDifference;
 	}
 }

@@ -63,6 +63,7 @@ public class BackUpScannerThread {
 	private final BackUpTask backUpTask;
 
 	private final FileComparator fileComparator;
+	private final BackUpItem.BackupAction acionOnSameTargetContentButNewer;
 	
 	private Path currentFile;	
 	private String status;	
@@ -81,6 +82,7 @@ public class BackUpScannerThread {
 
 		status = backUpTask.toString() + " ";
 		fileComparator = new FileComparator(pLog);
+		acionOnSameTargetContentButNewer = Config.getAcionOnSameTargetContentButNewer();
 	}
 
 	public void stopAsked(boolean b) {
@@ -350,7 +352,7 @@ public class BackUpScannerThread {
 					// target file is newer
 					
 					if (backUpTask.compareContentOnAmbiguous()) {
-						compareFileContent(pathPairBasicAttributes, BackupAction.COPY_REPLACE, BackupAction.COPY_TARGET);
+						compareFileContent(pathPairBasicAttributes, BackupAction.COPY_REPLACE, acionOnSameTargetContentButNewer);
 					} else {
 						BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.AMBIGUOUS, BackupStatus.DIFFERENT, sizeDiff, backUpCounters);
 						backUpItemList.add(backUpItem);
