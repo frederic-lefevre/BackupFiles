@@ -25,6 +25,7 @@ SOFTWARE.
 package org.fl.backupFiles;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -247,21 +248,54 @@ public class BackUpItemTest {
 	}
 
 	@Test
-	void shouldAdjustTargetTime() throws IOException {
+	void shouldAdjustTargetTime() throws IOException, URISyntaxException {
 
-		Files.copy(EXISTANT_SOURCE, UNEXISTANT_TARGET);
-
-		Path nowExists = UNEXISTANT_TARGET;
-		assertThat(Files.exists(EXISTANT_SOURCE)).isTrue();
-		assertThat(Files.exists(nowExists)).isTrue();
-
-		// Change target file last modified time
-		FileTime now = FileTime.from(Instant.now());
-		Files.setLastModifiedTime(nowExists, now);
+		boolean debug = false;
+		boolean testWithExternalDrive = false;
 		
-		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, nowExists);
+		Path SOURCE_FILE;
+		Path TARGET_FILE;
+		
+		if (testWithExternalDrive) {
+			SOURCE_FILE = Paths.get(new java.net.URI("file:///E:/Musique/a/Aerosmith/Rocks/01.Back%20in%20the%20Saddle.flac"));
+			TARGET_FILE = Paths.get(new java.net.URI("file:///I:/Musique/a/Aerosmith/Rocks/01.Back%20in%20the%20Saddle.flac"));		
+			org.fl.util.file.FilesSecurityUtils.setWritable(TARGET_FILE, SOURCE_FILE.getParent());
+		} else {
+			SOURCE_FILE = EXISTANT_SOURCE;
+			TARGET_FILE = UNEXISTANT_TARGET;
+		}
+		
+//		Path SOURCE_FILE = Paths.get(new java.net.URI("file:///C:/FredericPersonnel/Pratique/Voitures/SkodaRoomster/Assurance/NoticeEssentiel.pdf"));
+//		Path TARGET_FILE = Paths.get(new java.net.URI("file:///C:/FP_BackUpBuffer/FredericPersonnel/Pratique/Voitures/SkodaRoomster/Assurance/NoticeEssentiel.pdf"));		
+				
+		if (!Files.exists(TARGET_FILE)) {
+			Files.copy(SOURCE_FILE, TARGET_FILE);
+		}
+
+		assertThat(Files.exists(SOURCE_FILE)).isTrue();
+		assertThat(Files.exists(TARGET_FILE)).isTrue();
+
+		// Change target file last modified time 
+		FileTime now = FileTime.from(Instant.now());
+		Files.setLastModifiedTime(TARGET_FILE, now);
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(SOURCE_FILE, TARGET_FILE);
+		if (debug) {
+			System.out.println("1-FileTime now to millis=" + now.toMillis());
+			System.out.println("1-Source attribute to millis=" + pathPairBasicAttributes.getSourceBasicAttributes().lastModifiedTime().toMillis());
+			System.out.println("1-Target attribute to millis=" + pathPairBasicAttributes.getTargetBasicAttributes().lastModifiedTime().toMillis());
+		}
 		
 		assertThat(pathPairBasicAttributes.getTargetBasicAttributes().lastModifiedTime().compareTo(now)).isZero();
+		assertThat(pathPairBasicAttributes.getTargetBasicAttributes().lastModifiedTime().toMillis())
+			.isEqualTo(now.toMillis());
+		assertThat(pathPairBasicAttributes.getTargetBasicAttributes().lastModifiedTime()
+				.compareTo(pathPairBasicAttributes.getSourceBasicAttributes().lastModifiedTime())).isEqualTo(1);
+		if (debug) {
+			System.out.println("2-Source attribute to millis=" + pathPairBasicAttributes.getSourceBasicAttributes().lastModifiedTime().toMillis());
+			System.out.println("2-Target attribute now to millis=" + pathPairBasicAttributes.getTargetBasicAttributes().lastModifiedTime().toMillis());
+			System.out.println("2-FileTime now to millis=" + now.toMillis());
+		}
 		
 		BackUpCounters counters = new BackUpCounters();
 
@@ -273,14 +307,21 @@ public class BackUpItemTest {
 		backUpItem.execute(counters);
 
 		// Check with Files.getLastModifiedTime
-		assertThat(Files.getLastModifiedTime(nowExists)
+		assertThat(Files.getLastModifiedTime(TARGET_FILE)
 			.compareTo(pathPairBasicAttributes.getSourceBasicAttributes().lastModifiedTime())).isZero();
 		
 		// Check reading again with PathPairBasicAttributes
-		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(EXISTANT_SOURCE, nowExists);
+		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(SOURCE_FILE, TARGET_FILE);
+		if (debug) {
+			System.out.println("3-Source attribute to millis=" + pathPairBasicAttributes2.getSourceBasicAttributes().lastModifiedTime().toMillis());
+			System.out.println("3-Target attribute now to millis=" + pathPairBasicAttributes2.getTargetBasicAttributes().lastModifiedTime().toMillis());
+		}
 		
 		assertThat(pathPairBasicAttributes2.getTargetBasicAttributes().lastModifiedTime()
 				.compareTo(pathPairBasicAttributes2.getSourceBasicAttributes().lastModifiedTime())).isZero();
+		
+		assertThat(pathPairBasicAttributes2.getTargetBasicAttributes().lastModifiedTime().toMillis())
+			.isEqualTo(pathPairBasicAttributes2.getSourceBasicAttributes().lastModifiedTime().toMillis());
 		
 		assertThat(counters.adjustTimeNb).isEqualTo(1);
 		assertThat(getTotalCounters(counters)).isEqualTo(2);
