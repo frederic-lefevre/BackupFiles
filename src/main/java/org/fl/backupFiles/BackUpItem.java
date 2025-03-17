@@ -342,7 +342,21 @@ public class BackUpItem {
 		} else if (backupAction.equals(BackupAction.ADJUST_TIME)) {
 			FileTime sourceLastModifiedTime = pathPairBasicAttributes.getSourceBasicAttributes().lastModifiedTime();
 			Files.setLastModifiedTime(targetPath, sourceLastModifiedTime);
-			backUpCounters.adjustTimeNb++;
+			
+			if (Files.getLastModifiedTime(targetPath).compareTo(sourceLastModifiedTime) == 0) {
+				// Last modified time of target has been successfully set to the source one
+				backUpCounters.adjustTimeNb++;
+			} else {
+				// Fail to modify last modified time of target
+				// It is not possible on some external drive on windows
+				// Then copy target to source is the only solution
+				bLog.info("Fail to adjust time for " + targetPath.getFileName());
+				Files.copy(targetPath, sourcePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES,
+						LinkOption.NOFOLLOW_LINKS);
+				backUpCounters.copyTargetNb++;
+			}
+			
+			
 			backUpCounters.nbSourceFilesProcessed++;
 		} else {
 			throw new IllegalBackupActionException("Invalid backup action: ", backupAction);
