@@ -71,14 +71,14 @@ public class BackUpJob {
 		} 
 	} ;
 	
-	private Map<JobTaskType, List<BackUpTask>> backUpTasks ;
-	
-	private final static String TITLE  = "titre"  ;
-	private final static String ITEMS  = "items"  ;
-	private final static String SOURCE = "source" ;
-	private final static String TARGET = "target" ;
-	private final static String BUFFER = "buffer" ;
-	private final static String PARALLEL_SCAN = "parallelScan";
+	private Map<JobTaskType, List<BackUpTask>> backUpTasks;
+
+	private static final String TITLE = "titre";
+	private static final String ITEMS = "items";
+	private static final String SOURCE = "source";
+	private static final String TARGET = "target";
+	private static final String BUFFER = "buffer";
+	private static final String PARALLEL_SCAN = "parallelScan";
 	
 	// A back up jobs is defined by a JSON object (passed in parameter of this constructor)
 	// It is basically either 2 lists of back up tasks :
