@@ -90,6 +90,7 @@ public class Config {
 			long fileSizeWarningThreshold = backupProperty.getLong("backupFiles.fileSize.warningThreshold",
 					Long.MAX_VALUE);
 			BackUpSizeDifferenceCellRenderer.setFileSizeWarningThreshold(fileSizeWarningThreshold);
+			BackUpJob.setDefaultWarningSizeLimit(fileSizeWarningThreshold);
 			BackUpItem.setFileSizeWarningThreshold(fileSizeWarningThreshold);
 
 			osActions = new ArrayList<OsAction>();

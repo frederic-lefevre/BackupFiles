@@ -50,6 +50,8 @@ public class BackUpJob {
 	
 	private static final ObjectMapper mapper = new ObjectMapper();
 	
+	private static long defaultWarningSizeLimit = 10_000_000L;
+	
 	private String title;
 	
 	private List<FullBackUpTask> fullBackUpTaskList;
@@ -79,6 +81,7 @@ public class BackUpJob {
 	private static final String TARGET = "target";
 	private static final String BUFFER = "buffer";
 	private static final String PARALLEL_SCAN = "parallelScan";
+	private static final String SIZE_WARNING_LIMIT = "sizeWarningLimit";
 	
 	// A back up jobs is defined by a JSON object (passed in parameter of this constructor)
 	// It is basically either 2 lists of back up tasks :
@@ -137,13 +140,15 @@ public class BackUpJob {
 		private final Path bufPath;
 		private final Path tgtPath;
 		private final boolean scanInParallel;
+		private final long sizeWarningLimit;
 
-		public FullBackUpTask(Path srcPath, Path bufPath, Path tgtPath, boolean scanInParallel) {
+		public FullBackUpTask(Path srcPath, Path bufPath, Path tgtPath, boolean scanInParallel, long sizeWarningLimit) {
 			super();
 			this.srcPath = srcPath;
 			this.bufPath = bufPath;
 			this.tgtPath = tgtPath;
 			this.scanInParallel = scanInParallel;
+			this.sizeWarningLimit = sizeWarningLimit;
 		}
 		
 		public Path getSrcPath() {
@@ -161,6 +166,10 @@ public class BackUpJob {
 		public boolean isScanInParallel() {
 			return scanInParallel;
 		}
+
+		public long getSizeWarningLimit() {
+			return sizeWarningLimit;
+		}
 	}
 	
 	private void getBackUpTasks(ArrayNode jItems) {
@@ -172,8 +181,9 @@ public class BackUpJob {
 			Path bufPath = getPathElement(jObjItem, BUFFER);
 
 			boolean scanInParallel = getParallelScanElement(jObjItem, PARALLEL_SCAN);
+			long sizeWarningLimit = getSizeWarningLimit(jObjItem, SIZE_WARNING_LIMIT);
 
-			fullBackUpTaskList.add(new FullBackUpTask(srcPath, bufPath, tgtPath, scanInParallel));
+			fullBackUpTaskList.add(new FullBackUpTask(srcPath, bufPath, tgtPath, scanInParallel, sizeWarningLimit));
 		}
 	}
 	
@@ -253,6 +263,10 @@ public class BackUpJob {
 
 	}
 	
+	public static void setDefaultWarningSizeLimit(long defaultWarningSizeLimit) {
+		BackUpJob.defaultWarningSizeLimit = defaultWarningSizeLimit;
+	}
+
 	public String toString() {
 		return title;
 	}
@@ -296,5 +310,15 @@ public class BackUpJob {
 			scanInParallel = elem.asBoolean();
 		}
 		return scanInParallel;
+	}
+	
+	private long getSizeWarningLimit(JsonNode jObjItem, String prop) {
+		
+		JsonNode elem = jObjItem.get(prop);
+		if (elem != null) {
+			return elem.asLong();
+		} else {
+			return defaultWarningSizeLimit;
+		}
 	}
 }
