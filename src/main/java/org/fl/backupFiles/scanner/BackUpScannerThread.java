@@ -288,13 +288,11 @@ public class BackUpScannerThread {
 				backUpCounters.nbTargetFilesFailed++; 
 			} else if (backupActionOnDifferent != null) {
 				// content are not the same
-				BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, backupActionOnDifferent, BackupStatus.DIFF_BY_CONTENT, backUpCounters);
-				backUpItemList.add(backUpItem);
+				backUpItemList.add( new BackUpItem(pathPairBasicAttributes, backupActionOnDifferent, BackupStatus.DIFF_BY_CONTENT, backUpCounters));
 				backUpCounters.contentDifferentNb++;
 			}
 		} else if (backupActionOnEqual != null) {
-			BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, backupActionOnEqual, BackupStatus.SAME_CONTENT, backUpCounters);
-			backUpItemList.add(backUpItem);
+			backUpItemList.add(new BackUpItem(pathPairBasicAttributes, backupActionOnEqual, BackupStatus.SAME_CONTENT, backUpCounters));
 		}
 		
 	}
