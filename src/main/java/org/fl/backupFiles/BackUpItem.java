@@ -257,6 +257,10 @@ public class BackUpItem {
 		return sizeDifference;
 	}
 
+	public long getFileSizeWarningThreshold() {
+		return fileSizeWarningThreshold;
+	}
+
 	public boolean isSourcePresent() {
 		return sourcePresent;
 	}

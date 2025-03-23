@@ -42,7 +42,6 @@ import org.fl.backupFiles.gui.BackUpItemCustomActionListener;
 import org.fl.backupFiles.gui.BackUpItemCustomActionListener.CustomAction;
 import org.fl.util.AdvancedProperties;
 import org.fl.util.RunningContext;
-import org.fl.backupFiles.gui.BackUpSizeDifferenceCellRenderer;
 
 public class Config {
 	
@@ -89,7 +88,6 @@ public class Config {
 
 			long fileSizeWarningThreshold = backupProperty.getLong("backupFiles.fileSize.warningThreshold",
 					Long.MAX_VALUE);
-			BackUpSizeDifferenceCellRenderer.setFileSizeWarningThreshold(fileSizeWarningThreshold);
 			BackUpJob.setDefaultWarningSizeLimit(fileSizeWarningThreshold);
 
 			osActions = new ArrayList<OsAction>();

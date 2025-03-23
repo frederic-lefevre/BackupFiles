@@ -93,7 +93,7 @@ public class BackUpTableModel extends AbstractTableModel {
         case SOURCE_PATH_COL_IDX:
             return backUpItems.get(rowIndex).getSourcePath();
         case SIZE_DIFF_COL_IDX:
-        	return backUpItems.get(rowIndex).getSizeDifference();
+        	return backUpItems.get(rowIndex);
         case PERMANENCE_COL_IDX:
         	return backUpItems.get(rowIndex).getPermanenceLevel();
         case ACTION_COL_IDX:

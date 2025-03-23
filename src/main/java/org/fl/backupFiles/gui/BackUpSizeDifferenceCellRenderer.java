@@ -28,25 +28,25 @@ import java.awt.Color;
 import java.awt.Component;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.logging.Logger;
 
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
-public class BackUpSizeDifferenceCellRenderer extends DefaultTableCellRenderer {
+import org.fl.backupFiles.BackUpItem;
 
+public class BackUpSizeDifferenceCellRenderer extends JLabel implements TableCellRenderer {
+
+	private static final Logger logger = Logger.getLogger(BackUpSizeDifferenceCellRenderer.class.getName());
+	
 	private static final Locale localeForFormat = Locale.FRANCE;
 	private static final NumberFormat numberFormat = NumberFormat.getInstance(localeForFormat);
 	
 	private static final long serialVersionUID = 1L;
 	private static final Color ABOVE_LIMIT_COLOR = new Color(255, 100, 100);
 	private static final Color BELOW_LIMIT_COLOR = new Color(255, 255, 255);
-
-	private static long fileSizeWarningThreshold ;
-	
-	public static void setFileSizeWarningThreshold(long fileSizeWarningThreshold) {
-		BackUpSizeDifferenceCellRenderer.fileSizeWarningThreshold = fileSizeWarningThreshold;	
-	}
 
 	public BackUpSizeDifferenceCellRenderer() {
 		super();
@@ -55,17 +55,22 @@ public class BackUpSizeDifferenceCellRenderer extends DefaultTableCellRenderer {
 	
 	@Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
  
-        Long sizeDifference = (Long)value;
-        
-        setToolTipText(numberFormat.format(sizeDifference));
-        
-        if (sizeDifference > fileSizeWarningThreshold) {
-        	setBackground(ABOVE_LIMIT_COLOR);
-        } else {
-        	setBackground(BELOW_LIMIT_COLOR);
-        }
+		if (value instanceof BackUpItem) {
+			BackUpItem backUpItem = (BackUpItem)value;
+			long sizeDifference = backUpItem.getSizeDifference();
+			setText(Long.toString(sizeDifference));
+
+			setToolTipText(numberFormat.format(sizeDifference));
+
+			if (sizeDifference > backUpItem.getFileSizeWarningThreshold()) {
+				setBackground(ABOVE_LIMIT_COLOR);
+			} else {
+				setBackground(BELOW_LIMIT_COLOR);
+			}
+		} else {
+			logger.severe("Invalid value type in Size Difference cell. Should be BackUpItem but is " + value.getClass().getName());
+		}
         return this ;
 	}
 
