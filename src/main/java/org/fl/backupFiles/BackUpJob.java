@@ -187,7 +187,7 @@ public class BackUpJob {
 		}
 	}
 	
-	private void addParallelBackUpTasks(Path srcPath, Path bufPath, Path tgtPath) {
+	private void addParallelBackUpTasks(Path srcPath, Path bufPath, Path tgtPath, long sizeWarningLimit) {
 
 		Set<Path> srcFilenameSet = new HashSet<Path>();
 		Set<Path> bufFilenameSet = new HashSet<Path>();
@@ -198,7 +198,7 @@ public class BackUpJob {
 
 				Path bufSubPath = bufPath.resolve(srcPath.relativize(sourceSubPath));
 				Path tgtSubPath = tgtPath.resolve(srcPath.relativize(sourceSubPath));
-				addBackUpTask(sourceSubPath, bufSubPath, tgtSubPath);
+				addBackUpTask(sourceSubPath, bufSubPath, tgtSubPath, sizeWarningLimit);
 				srcFilenameSet.add(sourceSubPath.getFileName());
 			}
 		} catch (Exception e) {
@@ -213,7 +213,7 @@ public class BackUpJob {
 					if (!srcFilenameSet.contains(bufferSubPath.getFileName())) {
 						Path srcSubPath = srcPath.resolve(bufPath.relativize(bufferSubPath));
 						Path tgtSubPath = tgtPath.resolve(bufPath.relativize(bufferSubPath));
-						addBackUpTask(srcSubPath, bufferSubPath, tgtSubPath);
+						addBackUpTask(srcSubPath, bufferSubPath, tgtSubPath, sizeWarningLimit);
 						bufFilenameSet.add(bufferSubPath.getFileName());
 					}
 				}
@@ -230,7 +230,7 @@ public class BackUpJob {
 							&& (!bufFilenameSet.contains(targetSubPath.getFileName()))) {
 						Path srcSubPath = srcPath.resolve(tgtPath.relativize(targetSubPath));
 						Path bufSubPath = bufPath.resolve(tgtPath.relativize(targetSubPath));
-						addBackUpTask(srcSubPath, bufSubPath, targetSubPath);
+						addBackUpTask(srcSubPath, bufSubPath, targetSubPath, sizeWarningLimit);
 					}
 				}
 
@@ -240,20 +240,20 @@ public class BackUpJob {
 		}
 	}
 	
-	private void addBackUpTask(Path srcPath, Path bufPath, Path tgtPath) {
+	private void addBackUpTask(Path srcPath, Path bufPath, Path tgtPath, long sizeWarningLimit) {
 		if ((srcPath != null)) {
 			if (bufPath != null) {
 				if (Files.isRegularFile(srcPath)) {
 					Path bufFile = bufPath.resolve(srcPath.getFileName());
-					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile));
+					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile, sizeWarningLimit));
 				} else {
-					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath));
+					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath, sizeWarningLimit));
 				}
 				if (tgtPath != null) {
-					backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath));
+					backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath, sizeWarningLimit));
 				}
 			} else if (tgtPath != null) {
-				backUpTasks.get(JobTaskType.SOURCE_TO_TARGET).add(new BackUpTask(srcPath, tgtPath));
+				backUpTasks.get(JobTaskType.SOURCE_TO_TARGET).add(new BackUpTask(srcPath, tgtPath, sizeWarningLimit));
 			} else {
 				bLog.severe("No buffer and target element definition for back up job " + title);
 			}
@@ -278,9 +278,9 @@ public class BackUpJob {
 		fullBackUpTaskList.forEach(fullBackUpTask -> {
 						
 			if (fullBackUpTask.isScanInParallel()) {
-				addParallelBackUpTasks(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath());
+				addParallelBackUpTasks(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath(), fullBackUpTask.getSizeWarningLimit());
 			} else {
-				addBackUpTask(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath());
+				addBackUpTask(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath(), fullBackUpTask.getSizeWarningLimit());
 			}
 			
 		});

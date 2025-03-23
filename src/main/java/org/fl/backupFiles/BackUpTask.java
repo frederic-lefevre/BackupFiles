@@ -34,6 +34,7 @@ public class BackUpTask {
 	
 	private final Path source;
 	private final Path target;
+	private final long sizeWarningLimit;
 	
 	private boolean compareContent;
 	private boolean compareContentOnAmbiguous;
@@ -44,10 +45,11 @@ public class BackUpTask {
 	private final static String noWarning = "" ;
 	
 	// A back up task is a source directory or file to back up to a destination directory or file
-	public BackUpTask(Path src, Path tgt) {
+	public BackUpTask(Path src, Path tgt, long sizeWarningLimit) {
 		
 		source = src;
 		target = tgt;
+		this.sizeWarningLimit = sizeWarningLimit;
 		
 		if (source == null) {
 			bLog.severe("source path null when creating back up task") ;
@@ -129,18 +131,23 @@ public class BackUpTask {
 	@Override
 	public boolean equals(Object obj) {
 		
-		if (this == obj) 				  	return true  ;
-		if (obj == null) 				  	return false ;		
-		if (!(obj instanceof BackUpTask)) 	return false ;
-		
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof BackUpTask))
+			return false;
+
 		BackUpTask other = (BackUpTask) obj;
 		if (source == null) {
-			if (other.source != null) 		return false ;
+			if (other.source != null)
+				return false;
 		} else if (!source.equals(other.source)) {
 			return false;
 		}
 		if (target == null) {
-			if (other.target != null)		return false ;
+			if (other.target != null)
+				return false;
 		} else if (!target.equals(other.target)) {
 			return false;
 		}
