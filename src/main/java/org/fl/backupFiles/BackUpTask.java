@@ -66,33 +66,37 @@ public class BackUpTask {
 		return target;
 	}
 
-	public String toString() {
-		String toString ;
-		if ((source != null) && (target != null)) {
-			toString = source.toString() + " ==> " + target.toString() ; 
-		} else {
-			toString = null ;
-		}
-		return toString ;
+	public long getSizeWarningLimit() {
+		return sizeWarningLimit;
 	}
-	
-	public String eventualWarning() {
-		
-		String warning = null ;
+
+	public String toString() {
+		String toString;
 		if ((source != null) && (target != null)) {
-			boolean sourceExists = Files.exists(source) ;
-			boolean targetExists = Files.exists(target) ;
+			toString = source.toString() + " ==> " + target.toString();
+		} else {
+			toString = null;
+		}
+		return toString;
+	}
+
+	public String eventualWarning() {
+
+		String warning = null;
+		if ((source != null) && (target != null)) {
+			boolean sourceExists = Files.exists(source);
+			boolean targetExists = Files.exists(target);
 			if (!sourceExists && !targetExists) {
-				warning = warning1 ;
+				warning = warning1;
 			} else if (!sourceExists) {
-				warning = warning2 ;
+				warning = warning2;
 			} else if (!targetExists) {
-				warning = warning3 ;
+				warning = warning3;
 			} else {
-				warning = noWarning ;
+				warning = noWarning;
 			}
 		}
-		return warning ;
+		return warning;
 	}
 
 	public boolean compareContent() {
@@ -112,20 +116,20 @@ public class BackUpTask {
 	}
 	
 	// Hashcode with lazy init
-	private int hashcode = 0 ;
-	
+	private int hashcode = 0;
+
 	@Override
 	public int hashCode() {
-		
-		int result = hashcode ;
-		
+
+		int result = hashcode;
+
 		if (result == 0) {
-			final int prime = 31 ;
-			result = 1 ;
-			result = prime * result + ((source == null) ? 0 : source.hashCode()) ;
-			result = prime * result + ((target == null) ? 0 : target.hashCode()) ;
+			final int prime = 31;
+			result = 1;
+			result = prime * result + ((source == null) ? 0 : source.hashCode());
+			result = prime * result + ((target == null) ? 0 : target.hashCode());
 		}
-		return result ;
+		return result;
 	}
 
 	@Override
