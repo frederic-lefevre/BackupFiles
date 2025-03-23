@@ -51,12 +51,6 @@ public class BackUpItem {
 	private static final String TGT_SHOULD_NOT_EXISTS = "Target path parameter should not exist";
 	private static final String EXIST_SRC_NOT_EXISTS = "Existing source path parameter is null or the path does not exist";
 
-	private static long fileSizeWarningThreshold;
-
-	public static void setFileSizeWarningThreshold(long fileSizeWarningThreshold) {
-		BackUpItem.fileSizeWarningThreshold = fileSizeWarningThreshold;
-	}
-
 	public enum BackupAction {
 		COPY_NEW, COPY_REPLACE, COPY_TREE, DELETE, DELETE_DIR, AMBIGUOUS, COPY_TARGET, ADJUST_TIME
 	};
@@ -75,6 +69,7 @@ public class BackUpItem {
 	private final DirectoryPermanenceLevel permanenceLevel;
 	private final boolean sourcePresent;
 	private final boolean targetPresent;
+	private final long fileSizeWarningThreshold;
 	
 	// A back up item is :
 	// * a source path (file or directory) to back up 
@@ -94,7 +89,11 @@ public class BackUpItem {
 	//		DONE	 	 	: the item has been backed-up
 	//		FAILED	 	 	: the back up has failed
 	
-	public BackUpItem(PathPairBasicAttributes pathPairBasicAttributes, BackupAction bst, BackupStatus bStatus, BackUpCounters backUpCounters) {
+	public BackUpItem(PathPairBasicAttributes pathPairBasicAttributes, 
+			BackupAction bst, 
+			BackupStatus bStatus, 
+			BackUpCounters backUpCounters,
+			long fileSizeWarningThreshold) {
 		
 		this.pathPairBasicAttributes = pathPairBasicAttributes;
 		sourcePath = this.pathPairBasicAttributes.getSourcePath();
@@ -102,6 +101,7 @@ public class BackUpItem {
 		sourceClosestExistingPath = sourcePath;
 		backupAction = bst;
 		backupStatus = bStatus;
+		this.fileSizeWarningThreshold = fileSizeWarningThreshold;
 		
 		if (targetPath != null) {
 			permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(targetPath);
@@ -151,7 +151,11 @@ public class BackUpItem {
 	}
 
 	// For delete actions
-	public BackUpItem(PathPairBasicAttributes pathPairBasicAttributes, BackupAction bst, Path srcExisting, BackUpCounters backUpCounters) {
+	public BackUpItem(PathPairBasicAttributes pathPairBasicAttributes, 
+			BackupAction bst, 
+			Path srcExisting, 
+			BackUpCounters backUpCounters,
+			long fileSizeWarningThreshold) {
 		
 		this.pathPairBasicAttributes = pathPairBasicAttributes;
 		sourcePath = pathPairBasicAttributes.getSourcePath();
@@ -159,6 +163,7 @@ public class BackUpItem {
 		sourceClosestExistingPath = srcExisting;
 		backupAction = bst;
 		backupStatus = BackupStatus.DIFFERENT;
+		this.fileSizeWarningThreshold = fileSizeWarningThreshold;
 		if (targetPath != null) {
 			permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(targetPath);
 		} else if (srcExisting != null) {
