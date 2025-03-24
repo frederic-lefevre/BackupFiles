@@ -24,6 +24,7 @@ SOFTWARE.
 
 package org.fl.backupFiles.gui;
 
+import java.util.Comparator;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultListSelectionModel;
@@ -31,6 +32,8 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+
 import org.fl.backupFiles.BackUpItem ;
 import org.fl.backupFiles.Config;
 
@@ -80,6 +83,13 @@ public class BackUpJTable extends JTable {
 		
 		addMouseListener(new BackupItemMouseAdapter(this, Config.getOsActions()));
 		setAutoCreateRowSorter(true);
+		
+		// Row sorter
+		TableRowSorter<TableModel> sorter = new TableRowSorter<>(getModel());
+		setRowSorter(sorter);
+		sorter.sort();
+		
+		sorter.setComparator(BackUpTableModel.SIZE_DIFF_COL_IDX, new BackupItemSizeComparator());
 	}
 	
 	// Get the selected BackUpItem
@@ -92,6 +102,22 @@ public class BackUpJTable extends JTable {
 			tLog.severe("Found several selected rows for BackUpJTable. Number of selected rows: " + rowIdxs.length);
 		}
 		return ((BackUpTableModel)getModel()).getBackUpItemAt(convertRowIndexToModel(rowIdxs[0]));
+	}
+	
+	private class BackupItemSizeComparator implements Comparator<BackUpItem> {
+
+		@Override
+		public int compare(BackUpItem o1, BackUpItem o2) {
+			
+			if (o1.getSizeDifference() < o2.getSizeDifference() ) {
+				return 1;
+			} else if (o1.getSizeDifference() > o2.getSizeDifference() ) {
+				return -1;
+			} else {
+				return 0;
+			}
+		}
+		
 	}
 
 }
