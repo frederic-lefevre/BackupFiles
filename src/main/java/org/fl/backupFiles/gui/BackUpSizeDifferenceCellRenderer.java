@@ -51,6 +51,7 @@ public class BackUpSizeDifferenceCellRenderer extends JLabel implements TableCel
 	public BackUpSizeDifferenceCellRenderer() {
 		super();
 		setHorizontalAlignment(SwingConstants.CENTER);
+		setOpaque(true);
 	}
 	
 	@Override
