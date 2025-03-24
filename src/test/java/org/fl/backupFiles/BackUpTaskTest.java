@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,20 +35,20 @@ class BackUpTaskTest {
 	@Test
 	void test1() {
 		
-		final String SRC_FILE1 =  "file:///ForTests/BackUpFiles/TestDir1/File1.pdf" ;
-		final String TGT_FILE1 =  "file:///ForTests/BackUpFiles/TestDir2/File1.pdf" ;
-		
-		Path src  = TestUtils.getPathFromUriString(SRC_FILE1) ;
-		Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1) ;
-		
-		BackUpTask backUpTask = new BackUpTask(src, tgt) ;
-		
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
+
+		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+
+		BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
+
 		assertThat(backUpTask.compareContent()).isFalse();
 		assertThat(backUpTask.compareContentOnAmbiguous()).isTrue();
-		
-		BackUpTask backUpTask2 = new BackUpTask(src, tgt) ;
-		
-		assertThat(backUpTask).isEqualTo(backUpTask2) ;
+
+		BackUpTask backUpTask2 = new BackUpTask(src, tgt, 0);
+
+		assertThat(backUpTask).isEqualTo(backUpTask2);
 	}
 
 }

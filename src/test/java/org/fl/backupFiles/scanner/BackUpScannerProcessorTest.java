@@ -102,7 +102,7 @@ class BackUpScannerProcessorTest {
 			Path src = TestUtils.getPathFromUriString(BUFFER_DATA_DIR);
 			Path tgt = TestUtils.getPathFromUriString(TARGET_DATA_DIR);
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt);
+			BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
@@ -183,7 +183,7 @@ class BackUpScannerProcessorTest {
 			Path src  = TestUtils.getPathFromUriString(BUFFER_DATA_DIR);
 			Path tgt  = TestUtils.getPathFromUriString(TARGET_DATA_DIR  + "doesNotExists/");
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt) ;
+			BackUpTask backUpTask = new BackUpTask(src, tgt, 0) ;
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
@@ -238,7 +238,7 @@ class BackUpScannerProcessorTest {
 			Files.write(src, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne")));
 			assertThat(src).exists();
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt);
+			BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
@@ -277,7 +277,7 @@ class BackUpScannerProcessorTest {
 			assertThat(src).exists();
 			assertThat(tgt).doesNotExist();
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt);
+			BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
@@ -316,7 +316,7 @@ class BackUpScannerProcessorTest {
 			assertThat(src).doesNotExist();
 			assertThat(tgt).exists();
 
-			BackUpTask backUpTask = new BackUpTask(src, tgt);
+			BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
 
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
@@ -355,7 +355,7 @@ class BackUpScannerProcessorTest {
 			assertThat(src).doesNotExist();
 			assertThat(tgt).exists().isDirectory();
 
-			BackUpTask backUpTask = new BackUpTask(src, tgt);
+			BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
 
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
@@ -392,7 +392,7 @@ class BackUpScannerProcessorTest {
 			Path src = TestUtils.getPathFromUriString(SRC_FILE1);
 			Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
 
-			BackUpTask backUpTask = new BackUpTask(src, tgt);
+			BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
 
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);

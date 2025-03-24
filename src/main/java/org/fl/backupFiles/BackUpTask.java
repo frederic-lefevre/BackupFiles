@@ -34,6 +34,7 @@ public class BackUpTask {
 	
 	private final Path source;
 	private final Path target;
+	private final long sizeWarningLimit;
 	
 	private boolean compareContent;
 	private boolean compareContentOnAmbiguous;
@@ -44,10 +45,11 @@ public class BackUpTask {
 	private final static String noWarning = "" ;
 	
 	// A back up task is a source directory or file to back up to a destination directory or file
-	public BackUpTask(Path src, Path tgt) {
+	public BackUpTask(Path src, Path tgt, long sizeWarningLimit) {
 		
 		source = src;
 		target = tgt;
+		this.sizeWarningLimit = sizeWarningLimit;
 		
 		if (source == null) {
 			bLog.severe("source path null when creating back up task") ;
@@ -64,33 +66,37 @@ public class BackUpTask {
 		return target;
 	}
 
-	public String toString() {
-		String toString ;
-		if ((source != null) && (target != null)) {
-			toString = source.toString() + " ==> " + target.toString() ; 
-		} else {
-			toString = null ;
-		}
-		return toString ;
+	public long getSizeWarningLimit() {
+		return sizeWarningLimit;
 	}
-	
-	public String eventualWarning() {
-		
-		String warning = null ;
+
+	public String toString() {
+		String toString;
 		if ((source != null) && (target != null)) {
-			boolean sourceExists = Files.exists(source) ;
-			boolean targetExists = Files.exists(target) ;
+			toString = source.toString() + " ==> " + target.toString();
+		} else {
+			toString = null;
+		}
+		return toString;
+	}
+
+	public String eventualWarning() {
+
+		String warning = null;
+		if ((source != null) && (target != null)) {
+			boolean sourceExists = Files.exists(source);
+			boolean targetExists = Files.exists(target);
 			if (!sourceExists && !targetExists) {
-				warning = warning1 ;
+				warning = warning1;
 			} else if (!sourceExists) {
-				warning = warning2 ;
+				warning = warning2;
 			} else if (!targetExists) {
-				warning = warning3 ;
+				warning = warning3;
 			} else {
-				warning = noWarning ;
+				warning = noWarning;
 			}
 		}
-		return warning ;
+		return warning;
 	}
 
 	public boolean compareContent() {
@@ -110,37 +116,42 @@ public class BackUpTask {
 	}
 	
 	// Hashcode with lazy init
-	private int hashcode = 0 ;
-	
+	private int hashcode = 0;
+
 	@Override
 	public int hashCode() {
-		
-		int result = hashcode ;
-		
+
+		int result = hashcode;
+
 		if (result == 0) {
-			final int prime = 31 ;
-			result = 1 ;
-			result = prime * result + ((source == null) ? 0 : source.hashCode()) ;
-			result = prime * result + ((target == null) ? 0 : target.hashCode()) ;
+			final int prime = 31;
+			result = 1;
+			result = prime * result + ((source == null) ? 0 : source.hashCode());
+			result = prime * result + ((target == null) ? 0 : target.hashCode());
 		}
-		return result ;
+		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		
-		if (this == obj) 				  	return true  ;
-		if (obj == null) 				  	return false ;		
-		if (!(obj instanceof BackUpTask)) 	return false ;
-		
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof BackUpTask))
+			return false;
+
 		BackUpTask other = (BackUpTask) obj;
 		if (source == null) {
-			if (other.source != null) 		return false ;
+			if (other.source != null)
+				return false;
 		} else if (!source.equals(other.source)) {
 			return false;
 		}
 		if (target == null) {
-			if (other.target != null)		return false ;
+			if (other.target != null)
+				return false;
 		} else if (!target.equals(other.target)) {
 			return false;
 		}

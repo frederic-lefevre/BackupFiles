@@ -51,12 +51,6 @@ public class BackUpItem {
 	private static final String TGT_SHOULD_NOT_EXISTS = "Target path parameter should not exist";
 	private static final String EXIST_SRC_NOT_EXISTS = "Existing source path parameter is null or the path does not exist";
 
-	private static long fileSizeWarningThreshold;
-
-	public static void setFileSizeWarningThreshold(long fileSizeWarningThreshold) {
-		BackUpItem.fileSizeWarningThreshold = fileSizeWarningThreshold;
-	}
-
 	public enum BackupAction {
 		COPY_NEW, COPY_REPLACE, COPY_TREE, DELETE, DELETE_DIR, AMBIGUOUS, COPY_TARGET, ADJUST_TIME
 	};
@@ -75,6 +69,7 @@ public class BackUpItem {
 	private final DirectoryPermanenceLevel permanenceLevel;
 	private final boolean sourcePresent;
 	private final boolean targetPresent;
+	private final long fileSizeWarningThreshold;
 	
 	// A back up item is :
 	// * a source path (file or directory) to back up 
@@ -94,7 +89,11 @@ public class BackUpItem {
 	//		DONE	 	 	: the item has been backed-up
 	//		FAILED	 	 	: the back up has failed
 	
-	public BackUpItem(PathPairBasicAttributes pathPairBasicAttributes, BackupAction bst, BackupStatus bStatus, long sd, BackUpCounters backUpCounters) {
+	public BackUpItem(PathPairBasicAttributes pathPairBasicAttributes, 
+			BackupAction bst, 
+			BackupStatus bStatus, 
+			BackUpCounters backUpCounters,
+			long fileSizeWarningThreshold) {
 		
 		this.pathPairBasicAttributes = pathPairBasicAttributes;
 		sourcePath = this.pathPairBasicAttributes.getSourcePath();
@@ -102,7 +101,7 @@ public class BackUpItem {
 		sourceClosestExistingPath = sourcePath;
 		backupAction = bst;
 		backupStatus = bStatus;
-		sizeDifference = sd;
+		this.fileSizeWarningThreshold = fileSizeWarningThreshold;
 		
 		if (targetPath != null) {
 			permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(targetPath);
@@ -117,36 +116,46 @@ public class BackUpItem {
 		sourcePresent = true;
 		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
 			checkPathExists(targetPath, TGT_NOT_EXISTS);
+			sizeDifference = pathPairBasicAttributes.getSourceSize() - pathPairBasicAttributes.getTargetSize();
 			targetPresent = true;
 			backUpCounters.copyReplaceNb++;
 		} else if (backupAction.equals(BackupAction.COPY_NEW)) {
 			checkPathDoesNotExist(targetPath, TGT_SHOULD_NOT_EXISTS);
+			sizeDifference = pathPairBasicAttributes.getSourceSize();
 			targetPresent = false;
 			backUpCounters.copyNewNb++;
 		} else if (backupAction.equals(BackupAction.COPY_TREE)) {
+			sizeDifference = FilesUtils.folderSize(sourcePath, bLog);
 			checkPathDoesNotExist(targetPath, TGT_SHOULD_NOT_EXISTS);
 			targetPresent = false;
 			backUpCounters.copyTreeNb++;
 		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
 			checkPathExists(targetPath, TGT_NOT_EXISTS);
+			sizeDifference = pathPairBasicAttributes.getSourceSize() - pathPairBasicAttributes.getTargetSize();
 			targetPresent = true;
 			backUpCounters.ambiguousNb++;
 		} else if (backupAction.equals(BackupAction.COPY_TARGET)) {
 			checkPathExists(targetPath, TGT_NOT_EXISTS);
+			sizeDifference = pathPairBasicAttributes.getSourceSize() - pathPairBasicAttributes.getTargetSize();
 			targetPresent = true;
 			backUpCounters.copyTargetNb++;
 		} else if (backupAction.equals(BackupAction.ADJUST_TIME)) {
 			checkPathExists(targetPath, TGT_NOT_EXISTS);
+			sizeDifference = 0;
 			targetPresent = true;
 			backUpCounters.adjustTimeNb++;
 		} else {
 			throw new IllegalBackupActionException("Illegal backup action", backupAction);
 		}
-		updateLimtsCounters(backUpCounters);
+		updateLimitsCounters(backUpCounters);
 	}
 
 	// For delete actions
-	public BackUpItem(PathPairBasicAttributes pathPairBasicAttributes, BackupAction bst, Path srcExisting, long sd, BackUpCounters backUpCounters) {
+	public BackUpItem(PathPairBasicAttributes pathPairBasicAttributes, 
+			BackupAction bst, 
+			Path srcExisting, 
+			BackUpCounters backUpCounters,
+			long fileSizeWarningThreshold) {
 		
 		this.pathPairBasicAttributes = pathPairBasicAttributes;
 		sourcePath = pathPairBasicAttributes.getSourcePath();
@@ -154,7 +163,7 @@ public class BackUpItem {
 		sourceClosestExistingPath = srcExisting;
 		backupAction = bst;
 		backupStatus = BackupStatus.DIFFERENT;
-		sizeDifference = sd;
+		this.fileSizeWarningThreshold = fileSizeWarningThreshold;
 		if (targetPath != null) {
 			permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(targetPath);
 		} else if (srcExisting != null) {
@@ -170,13 +179,15 @@ public class BackUpItem {
 
 		// Update counters
 		if (backupAction.equals(BackupAction.DELETE)) {
+			sizeDifference = 0 - pathPairBasicAttributes.getTargetSize();
 			backUpCounters.deleteNb++;
 		} else if (backupAction.equals(BackupAction.DELETE_DIR)) {
+			sizeDifference = 0 - FilesUtils.folderSize(pathPairBasicAttributes.getTargetPath(), bLog);
 			backUpCounters.deleteDirNb++;
 		} else {
 			throw new IllegalBackupActionException("Illegal backup action (should be a delete action)", backupAction);
 		}
-		updateLimtsCounters(backUpCounters);
+		updateLimitsCounters(backUpCounters);
 	}
 	
 	private void checkPathExists(Path path, String exceptionMessage) {
@@ -191,7 +202,7 @@ public class BackUpItem {
 		}
 	}
 
-	private void updateLimtsCounters(BackUpCounters backUpCounters) {
+	private void updateLimitsCounters(BackUpCounters backUpCounters) {
 		backUpCounters.totalSizeDifference = backUpCounters.totalSizeDifference + sizeDifference;
 		if (sizeDifference > fileSizeWarningThreshold)
 			backUpCounters.backupWithSizeAboveThreshold++;
@@ -246,6 +257,10 @@ public class BackUpItem {
 		return sizeDifference;
 	}
 
+	public long getFileSizeWarningThreshold() {
+		return fileSizeWarningThreshold;
+	}
+
 	public boolean isSourcePresent() {
 		return sourcePresent;
 	}
@@ -259,7 +274,7 @@ public class BackUpItem {
 		try {
 			if (executeAction(backUpCounters)) {
 				backupStatus = BackupStatus.DONE;
-				updateLimtsCounters(backUpCounters);
+				updateLimitsCounters(backUpCounters);
 			} else {
 				backupStatus = BackupStatus.FAILED;
 			}

@@ -50,6 +50,8 @@ public class BackUpJob {
 	
 	private static final ObjectMapper mapper = new ObjectMapper();
 	
+	private static long defaultWarningSizeLimit = 10_000_000L;
+	
 	private String title;
 	
 	private List<FullBackUpTask> fullBackUpTaskList;
@@ -71,14 +73,15 @@ public class BackUpJob {
 		} 
 	} ;
 	
-	private Map<JobTaskType, List<BackUpTask>> backUpTasks ;
-	
-	private final static String TITLE  = "titre"  ;
-	private final static String ITEMS  = "items"  ;
-	private final static String SOURCE = "source" ;
-	private final static String TARGET = "target" ;
-	private final static String BUFFER = "buffer" ;
-	private final static String PARALLEL_SCAN = "parallelScan";
+	private Map<JobTaskType, List<BackUpTask>> backUpTasks;
+
+	private static final String TITLE = "titre";
+	private static final String ITEMS = "items";
+	private static final String SOURCE = "source";
+	private static final String TARGET = "target";
+	private static final String BUFFER = "buffer";
+	private static final String PARALLEL_SCAN = "parallelScan";
+	private static final String SIZE_WARNING_LIMIT = "sizeWarningLimit";
 	
 	// A back up jobs is defined by a JSON object (passed in parameter of this constructor)
 	// It is basically either 2 lists of back up tasks :
@@ -137,13 +140,15 @@ public class BackUpJob {
 		private final Path bufPath;
 		private final Path tgtPath;
 		private final boolean scanInParallel;
+		private final long sizeWarningLimit;
 
-		public FullBackUpTask(Path srcPath, Path bufPath, Path tgtPath, boolean scanInParallel) {
+		public FullBackUpTask(Path srcPath, Path bufPath, Path tgtPath, boolean scanInParallel, long sizeWarningLimit) {
 			super();
 			this.srcPath = srcPath;
 			this.bufPath = bufPath;
 			this.tgtPath = tgtPath;
 			this.scanInParallel = scanInParallel;
+			this.sizeWarningLimit = sizeWarningLimit;
 		}
 		
 		public Path getSrcPath() {
@@ -161,6 +166,10 @@ public class BackUpJob {
 		public boolean isScanInParallel() {
 			return scanInParallel;
 		}
+
+		public long getSizeWarningLimit() {
+			return sizeWarningLimit;
+		}
 	}
 	
 	private void getBackUpTasks(ArrayNode jItems) {
@@ -172,12 +181,13 @@ public class BackUpJob {
 			Path bufPath = getPathElement(jObjItem, BUFFER);
 
 			boolean scanInParallel = getParallelScanElement(jObjItem, PARALLEL_SCAN);
+			long sizeWarningLimit = getSizeWarningLimit(jObjItem, SIZE_WARNING_LIMIT);
 
-			fullBackUpTaskList.add(new FullBackUpTask(srcPath, bufPath, tgtPath, scanInParallel));
+			fullBackUpTaskList.add(new FullBackUpTask(srcPath, bufPath, tgtPath, scanInParallel, sizeWarningLimit));
 		}
 	}
 	
-	private void addParallelBackUpTasks(Path srcPath, Path bufPath, Path tgtPath) {
+	private void addParallelBackUpTasks(Path srcPath, Path bufPath, Path tgtPath, long sizeWarningLimit) {
 
 		Set<Path> srcFilenameSet = new HashSet<Path>();
 		Set<Path> bufFilenameSet = new HashSet<Path>();
@@ -188,7 +198,7 @@ public class BackUpJob {
 
 				Path bufSubPath = bufPath.resolve(srcPath.relativize(sourceSubPath));
 				Path tgtSubPath = tgtPath.resolve(srcPath.relativize(sourceSubPath));
-				addBackUpTask(sourceSubPath, bufSubPath, tgtSubPath);
+				addBackUpTask(sourceSubPath, bufSubPath, tgtSubPath, sizeWarningLimit);
 				srcFilenameSet.add(sourceSubPath.getFileName());
 			}
 		} catch (Exception e) {
@@ -203,7 +213,7 @@ public class BackUpJob {
 					if (!srcFilenameSet.contains(bufferSubPath.getFileName())) {
 						Path srcSubPath = srcPath.resolve(bufPath.relativize(bufferSubPath));
 						Path tgtSubPath = tgtPath.resolve(bufPath.relativize(bufferSubPath));
-						addBackUpTask(srcSubPath, bufferSubPath, tgtSubPath);
+						addBackUpTask(srcSubPath, bufferSubPath, tgtSubPath, sizeWarningLimit);
 						bufFilenameSet.add(bufferSubPath.getFileName());
 					}
 				}
@@ -220,7 +230,7 @@ public class BackUpJob {
 							&& (!bufFilenameSet.contains(targetSubPath.getFileName()))) {
 						Path srcSubPath = srcPath.resolve(tgtPath.relativize(targetSubPath));
 						Path bufSubPath = bufPath.resolve(tgtPath.relativize(targetSubPath));
-						addBackUpTask(srcSubPath, bufSubPath, targetSubPath);
+						addBackUpTask(srcSubPath, bufSubPath, targetSubPath, sizeWarningLimit);
 					}
 				}
 
@@ -230,20 +240,20 @@ public class BackUpJob {
 		}
 	}
 	
-	private void addBackUpTask(Path srcPath, Path bufPath, Path tgtPath) {
+	private void addBackUpTask(Path srcPath, Path bufPath, Path tgtPath, long sizeWarningLimit) {
 		if ((srcPath != null)) {
 			if (bufPath != null) {
 				if (Files.isRegularFile(srcPath)) {
 					Path bufFile = bufPath.resolve(srcPath.getFileName());
-					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile));
+					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile, sizeWarningLimit));
 				} else {
-					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath));
+					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath, sizeWarningLimit));
 				}
 				if (tgtPath != null) {
-					backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath));
+					backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath, sizeWarningLimit));
 				}
 			} else if (tgtPath != null) {
-				backUpTasks.get(JobTaskType.SOURCE_TO_TARGET).add(new BackUpTask(srcPath, tgtPath));
+				backUpTasks.get(JobTaskType.SOURCE_TO_TARGET).add(new BackUpTask(srcPath, tgtPath, sizeWarningLimit));
 			} else {
 				bLog.severe("No buffer and target element definition for back up job " + title);
 			}
@@ -253,6 +263,10 @@ public class BackUpJob {
 
 	}
 	
+	public static void setDefaultWarningSizeLimit(long defaultWarningSizeLimit) {
+		BackUpJob.defaultWarningSizeLimit = defaultWarningSizeLimit;
+	}
+
 	public String toString() {
 		return title;
 	}
@@ -264,9 +278,9 @@ public class BackUpJob {
 		fullBackUpTaskList.forEach(fullBackUpTask -> {
 						
 			if (fullBackUpTask.isScanInParallel()) {
-				addParallelBackUpTasks(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath());
+				addParallelBackUpTasks(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath(), fullBackUpTask.getSizeWarningLimit());
 			} else {
-				addBackUpTask(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath());
+				addBackUpTask(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath(), fullBackUpTask.getSizeWarningLimit());
 			}
 			
 		});
@@ -296,5 +310,15 @@ public class BackUpJob {
 			scanInParallel = elem.asBoolean();
 		}
 		return scanInParallel;
+	}
+	
+	private long getSizeWarningLimit(JsonNode jObjItem, String prop) {
+		
+		JsonNode elem = jObjItem.get(prop);
+		if (elem != null) {
+			return elem.asLong();
+		} else {
+			return defaultWarningSizeLimit;
+		}
 	}
 }
