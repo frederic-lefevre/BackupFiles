@@ -46,19 +46,26 @@ public class BackupFilesGui  extends JFrame {
 	
 	private static final long serialVersionUID = -2691160306708075667L;
 
+	private static final String DEFAULT_PROP_FILE = "file:///FredericPersonnel/Program/PortableApps/BackUpFiles/backupFiles.properties";
+	
 	private static final Logger bLog = Logger.getLogger(BackupFilesGui.class.getName());
 
 	public static final int WINDOW_WIDTH = 1880;
 	public static final int WINDOW_HEIGHT = 1000;
 	
+	private static String propertyFile;
+	
 	public static void main(String[] args) {
+		
+		propertyFile = DEFAULT_PROP_FILE;
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 
 				try {
 					
 					// Init config
-					Config.initConfig(Config.DEFAULT_PROP_FILE);
+					Config.initConfig(getPropertyFile());
 					
 					try {
 						BackupFilesGui window = new BackupFilesGui();
@@ -68,6 +75,7 @@ public class BackupFilesGui  extends JFrame {
 					}
 					
 				} catch (Exception e) {
+					bLog.log(Level.SEVERE, "Exception caught in Main (see default prop file processing) ", e);
 					System.out.println("Exception caught in Main (see default prop file processing) " + e.getMessage());
 					e.printStackTrace();
 				}				
@@ -75,7 +83,11 @@ public class BackupFilesGui  extends JFrame {
 		});
 	}
 	
-	public BackupFilesGui() {
+	public static String getPropertyFile() {
+		return propertyFile;
+	}
+	
+	private BackupFilesGui() {
 
 		Path configFileDir = Config.getConfigFileDir();
 		if (configFileDir != null) {
