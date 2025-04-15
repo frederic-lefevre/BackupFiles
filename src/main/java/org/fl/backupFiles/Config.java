@@ -40,12 +40,13 @@ import org.fl.backupFiles.directoryPermanence.DirectoryPermanence;
 import org.fl.backupFiles.directoryPermanence.DirectoryPermanenceMap;
 import org.fl.backupFiles.gui.BackUpItemCustomActionListener;
 import org.fl.backupFiles.gui.BackUpItemCustomActionListener.CustomAction;
+import org.fl.backupFiles.gui.BackupFilesGui;
 import org.fl.util.AdvancedProperties;
 import org.fl.util.RunningContext;
 
 public class Config {
 	
-	public static final String DEFAULT_PROP_FILE = "file:///FredericPersonnel/Program/PortableApps/BackUpFiles/backupFiles.properties";
+	
 	
 	private static final Logger rootLogger = Logger.getLogger("");
 	
@@ -139,77 +140,77 @@ public class Config {
 	
 	public static RunningContext getRunningContext() {
 		if (!initialized) {
-			initConfig(DEFAULT_PROP_FILE);
+			initConfig(BackupFilesGui.getPropertyFile());
 		}
 		return runningContext;
 	}
 	
 	public static Path getConfigFileDir() {
 		if (!initialized) {
-			initConfig(DEFAULT_PROP_FILE);
+			initConfig(BackupFilesGui.getPropertyFile());
 		}
 		return configFileDir;
 	}
 
 	public static long getScanRefreshRate() {
 		if (!initialized) {
-			initConfig(DEFAULT_PROP_FILE);
+			initConfig(BackupFilesGui.getPropertyFile());
 		}
 		return scanRefreshRate;
 	}
 
 	public static long getBackUpMaxRefreshInterval() {
 		if (!initialized) {
-			initConfig(DEFAULT_PROP_FILE);
+			initConfig(BackupFilesGui.getPropertyFile());
 		}
 		return backUpMaxRefreshInterval;
 	}
 
 	public static int getBackUpRefreshRate() {
 		if (!initialized) {
-			initConfig(DEFAULT_PROP_FILE);
+			initConfig(BackupFilesGui.getPropertyFile());
 		}
 		return backUpRefreshRate;
 	}
 
 	public static int getMaxDepth() {
 		if (!initialized) {
-			initConfig(DEFAULT_PROP_FILE);
+			initConfig(BackupFilesGui.getPropertyFile());
 		}
 		return maxDepth;
 	}
 
 	public static ExecutorService getScanExecutorService() {
 		if (!initialized) {
-			initConfig(DEFAULT_PROP_FILE);
+			initConfig(BackupFilesGui.getPropertyFile());
 		}
 		return scanExecutorService;
 	}
 
 	public static ScheduledExecutorService getScheduler() {
 		if (!initialized) {
-			initConfig(DEFAULT_PROP_FILE);
+			initConfig(BackupFilesGui.getPropertyFile());
 		}
 		return scheduler;
 	}
 
 	public static List<OsAction> getOsActions() {
 		if (!initialized) {
-			initConfig(DEFAULT_PROP_FILE);
+			initConfig(BackupFilesGui.getPropertyFile());
 		}
 		return osActions;
 	}
 
 	public static DirectoryPermanence getDirectoryPermanence() {
 		if (!initialized) {
-			initConfig(DEFAULT_PROP_FILE);
+			initConfig(BackupFilesGui.getPropertyFile());
 		}
 		return directoryPermanence;
 	}
 
 	public static BackUpItem.BackupAction getAcionOnSameTargetContentButNewer() {
 		if (!initialized) {
-			initConfig(DEFAULT_PROP_FILE);
+			initConfig(BackupFilesGui.getPropertyFile());
 		}
 		return acionOnSameTargetContentButNewer;
 	}
