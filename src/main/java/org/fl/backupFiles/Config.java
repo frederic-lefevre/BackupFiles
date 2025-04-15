@@ -71,7 +71,7 @@ public class Config {
 		try {
 
 			// Get context, properties, logger
-			runningContext = new RunningContext("org.fl.backupFiles", null, new URI(propertyFile));
+			runningContext = new RunningContext("org.fl.backupFiles", new URI(propertyFile));
 
 			backupProperty = runningContext.getProps();
 
