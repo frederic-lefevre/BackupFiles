@@ -57,8 +57,7 @@ public class BackUpSizeDifferenceCellRenderer extends JLabel implements TableCel
 	@Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
  
-		if (value instanceof BackUpItem) {
-			BackUpItem backUpItem = (BackUpItem)value;
+		if (value instanceof BackUpItem backUpItem) {
 			long sizeDifference = backUpItem.getSizeDifference();
 			setText(Long.toString(sizeDifference));
 
