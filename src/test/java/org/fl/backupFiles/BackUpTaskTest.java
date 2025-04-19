@@ -27,7 +27,11 @@ package org.fl.backupFiles;
 import static org.assertj.core.api.Assertions.*;
 
 import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.fl.util.FilterCounter;
+import org.fl.util.FilterCounter.LogRecordCounter;
 import org.junit.jupiter.api.Test;
 
 class BackUpTaskTest {
@@ -51,4 +55,108 @@ class BackUpTaskTest {
 		assertThat(backUpTask).isEqualTo(backUpTask2);
 	}
 
+	@Test
+	void test2() {
+		
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
+
+		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+
+		BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
+		BackUpTask backUpTask2 = new BackUpTask(src, tgt, 1);
+
+		assertThat(backUpTask).isEqualTo(backUpTask2);
+	}	
+
+	@Test
+	void test3() {
+		
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
+
+		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+
+		BackUpTask backUpTask = new BackUpTask(src, null, 0);
+		BackUpTask backUpTask2 = new BackUpTask(src, tgt, 0);
+
+		assertThat(backUpTask).isNotEqualTo(backUpTask2);
+	}
+	
+	@Test
+	void test4() {
+		
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
+
+		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+
+		LogRecordCounter logRecordCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpTask.class.getName()));
+		
+		BackUpTask backUpTask = new BackUpTask(null, tgt, 0);
+		BackUpTask backUpTask2 = new BackUpTask(src, tgt, 0);
+
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		
+		assertThat(backUpTask).isNotEqualTo(backUpTask2);
+	}
+	
+	@Test
+	void test5() {
+		
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
+
+		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+
+		LogRecordCounter logRecordCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpTask.class.getName()));
+		
+		BackUpTask backUpTask = new BackUpTask(null, null, 0);
+		BackUpTask backUpTask2 = new BackUpTask(src, tgt, 0);
+
+		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		
+		assertThat(backUpTask).isNotEqualTo(backUpTask2);
+	}
+	
+	@Test
+	void test6() {
+		
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
+		final String SRC_FILE2 = "file:///ForTests/BackUpFiles/TestDir1/File2.pdf";
+
+		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+		Path src2 = TestUtils.getPathFromUriString(SRC_FILE2);
+
+		BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
+		BackUpTask backUpTask2 = new BackUpTask(src2, tgt, 0);
+
+		assertThat(backUpTask).isNotEqualTo(backUpTask2);
+	}
+	
+	
+	@Test
+	void test7() {
+		
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
+		final String TGT_FILE2 = "file:///ForTests/BackUpFiles/TestDir1/File2.pdf";
+
+		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+		Path tgt2 = TestUtils.getPathFromUriString(TGT_FILE2);
+
+		BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
+		BackUpTask backUpTask2 = new BackUpTask(src, tgt2, 0);
+
+		assertThat(backUpTask).isNotEqualTo(backUpTask2);
+	}
 }
