@@ -53,11 +53,7 @@ public class BackupFilesGui  extends JFrame {
 	public static final int WINDOW_WIDTH = 1880;
 	public static final int WINDOW_HEIGHT = 1000;
 	
-	private static String propertyFile;
-	
 	public static void main(String[] args) {
-		
-		propertyFile = DEFAULT_PROP_FILE;
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -84,7 +80,7 @@ public class BackupFilesGui  extends JFrame {
 	}
 	
 	public static String getPropertyFile() {
-		return propertyFile;
+		return DEFAULT_PROP_FILE;
 	}
 	
 	private BackupFilesGui() {
