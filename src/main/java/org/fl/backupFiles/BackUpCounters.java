@@ -60,13 +60,13 @@ public class BackUpCounters {
 	private final static String DELETE_LABEL 		= "  Effacer:            " ;
 	private final static String DELETE_DIR_LABEL 	= "  Effacer arbre:      " ;
 	private final static String AMBIGUOUS_LABEL 	= "  Ambigu:             " ;
-	private final static String COPY_TARGET_LABEL 	= "  Copier target:      " ;
+	private final static String COPY_TARGET_LABEL 	= "  Copier cible:       " ;
 	private final static String ADJUST_TIME_LABEL 	= "  Ajuster temps:      " ;
 	
 	private final static String SOURCE_OK_LABEL 	= "  Eléments source traités:   " ;
 	private final static String SOURCE_KO_LABEL 	= "  Eléments source en erreur: " ;
-	private final static String TARGET_OK_LABEL 	= "  Eléments target traités:   " ;
-	private final static String TARGET_KO_LABEL 	= "  Eléments target en erreur: " ;
+	private final static String TARGET_OK_LABEL 	= "  Eléments cible traités:    " ;
+	private final static String TARGET_KO_LABEL 	= "  Eléments cible en erreur:  " ;
 	
 	private final static String CONTENT_DIFFERENT_LABEL 	= "  Fichiers avec contenu différent:  " ;
 	private final static String SIZE_ABOVE_LIMIT_LABEL		= "  Fichiers avec tailles importantes: " ;
