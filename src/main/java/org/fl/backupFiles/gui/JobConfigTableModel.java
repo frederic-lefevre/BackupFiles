@@ -35,7 +35,7 @@ public class JobConfigTableModel extends AbstractTableModel  {
 
 	private static final long serialVersionUID = 1L;
 
-	private final static String[] entetes = {"Chemin source", "Chemin cible", "Commentaires"};
+	private final static String[] entetes = {"Chemin origine", "Chemin destination", "Commentaires"};
 	
 	// underlying data
 	private List<BackUpTask> backUpTasks ;
