@@ -45,9 +45,7 @@ import org.fl.util.AdvancedProperties;
 import org.fl.util.RunningContext;
 
 public class Config {
-	
-	
-	
+		
 	private static final Logger rootLogger = Logger.getLogger("");
 	
 	private static RunningContext runningContext;
