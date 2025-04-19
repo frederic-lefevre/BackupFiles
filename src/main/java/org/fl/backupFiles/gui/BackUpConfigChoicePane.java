@@ -41,6 +41,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.fl.backupFiles.BackUpJob;
 import org.fl.backupFiles.BackUpJobList;
+import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.JobsChoice;
 import org.fl.backupFiles.BackUpJob.JobTaskType;
 
@@ -52,7 +53,7 @@ public class BackUpConfigChoicePane extends JPanel {
 	
 	private final List<BackUpPane> backUpPanes;
 	
-	private final Map<JobTaskType, JobConfigTableModel> jobConfigTablesModel;
+	private final Map<JobTaskType, JobTaskTypeConfigElement> jobConfigTasksElement;
 	
 	public BackUpConfigChoicePane(Path configFileDir, List<BackUpPane> bps) {
 		super();
@@ -82,16 +83,18 @@ public class BackUpConfigChoicePane extends JPanel {
 		JPanel resultPanel = new JPanel();
 		resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
 
-		jobConfigTablesModel = new HashMap<JobTaskType, JobConfigTableModel>();
+		jobConfigTasksElement = new HashMap<JobTaskType, JobTaskTypeConfigElement>();
 		for (JobTaskType jtt : JobTaskType.values()) {
-			JLabel jttLab = new JLabel(jtt.toString());
-			resultPanel.add(jttLab);
 
+			JLabel jttLab = new JLabel(jtt.toString());
 			JobConfigTableModel jctm = new JobConfigTableModel();
-			jobConfigTablesModel.put(jtt, jctm);
 			JTable tasksTable = new JTable(jctm);
+			jobConfigTasksElement.put(jtt, new JobTaskTypeConfigElement(jttLab, jctm, tasksTable));
+	
+			resultPanel.add(jttLab);
 			resultPanel.add(tasksTable.getTableHeader());
 			resultPanel.add(tasksTable);
+			jobConfigTasksElement.get(jtt).setVisible(false);
 		}
 		
 		JScrollPane resultScrollPane = new JScrollPane(resultPanel);
@@ -102,6 +105,32 @@ public class BackUpConfigChoicePane extends JPanel {
 		backUpJobChoice.addListSelectionListener(new ChooseJobs());
 	}
 
+	private static class JobTaskTypeConfigElement {
+
+		private final JLabel taskTypeLabel;
+		private final JobConfigTableModel configTableModel;
+		private final JTable tasksTable;
+		
+		private JobTaskTypeConfigElement(JLabel taskTypeLabel, JobConfigTableModel configTableModel, JTable tasksTable) {
+			super();
+			this.taskTypeLabel = taskTypeLabel;
+			this.configTableModel = configTableModel;
+			this.tasksTable = tasksTable;
+		}
+		
+		private void setBackUpTasks(List<BackUpTask> backUpTasks) {
+			configTableModel.setBackUpTasks(backUpTasks);
+			configTableModel.fireTableDataChanged();
+			setVisible(configTableModel.getRowCount() > 0);			
+		}
+		
+		private void setVisible(boolean visible) {
+			taskTypeLabel.setVisible(visible);
+			tasksTable.getTableHeader().setVisible(visible);
+			tasksTable.setVisible(visible);			
+		}
+	}
+	
 	// Each time back up jobs are chosen, the back up panes are informed
 	private class ChooseJobs  implements ListSelectionListener {
 
@@ -113,11 +142,8 @@ public class BackUpConfigChoicePane extends JPanel {
 				List<BackUpJob> jobsChoiceList = backUpJobChoice.getSelectedValuesList();
 				JobsChoice jobsChoice = new JobsChoice(jobsChoiceList);
 			
-				for (JobTaskType jtt : JobTaskType.values()) {
-					
-					JobConfigTableModel configTableModel = jobConfigTablesModel.get(jtt);
-					configTableModel.setBackUpTasks(jobsChoice.getTasks(jtt));
-					configTableModel.fireTableDataChanged();
+				for (JobTaskType jtt : JobTaskType.values()) {					
+					jobConfigTasksElement.get(jtt).setBackUpTasks(jobsChoice.getTasks(jtt));;			
 				}
 				
 				for (BackUpPane backUpPane : backUpPanes) {

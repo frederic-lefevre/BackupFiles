@@ -39,10 +39,10 @@ public class BackUpTask {
 	private boolean compareContent;
 	private boolean compareContentOnAmbiguous;
 	
-	private final static String warning1  = "  Attention : les chemins source et cible n'existent pas";
-	private final static String warning2  = "  Attention : le chemin source n'existe pas";
-	private final static String warning3  = "  Attention : le chemin cible n'existe pas";
-	private final static String noWarning = "" ;
+	private static final String warning1 = "  Attention : les chemins origine et destination n'existent pas";
+	private static final String warning2 = "  Attention : le chemin origine n'existe pas";
+	private static final String warning3 = "  Attention : le chemin destination n'existe pas";
+	private static final String noWarning = "" ;
 	
 	// A back up task is a source directory or file to back up to a destination directory or file
 	public BackUpTask(Path src, Path tgt, long sizeWarningLimit) {
@@ -52,9 +52,9 @@ public class BackUpTask {
 		this.sizeWarningLimit = sizeWarningLimit;
 		
 		if (source == null) {
-			bLog.severe("source path null when creating back up task") ;
+			bLog.severe("source path null when creating back up task");
 		}		
-		compareContent  = false ;
+		compareContent = false;
 		compareContentOnAmbiguous = true;
 	}
 
@@ -139,20 +139,20 @@ public class BackUpTask {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof BackUpTask))
-			return false;
-
-		BackUpTask other = (BackUpTask) obj;
-		if (source == null) {
-			if (other.source != null)
+		if (obj instanceof BackUpTask other) {
+			if (source == null) {
+				if (other.source != null)
+					return false;
+			} else if (!source.equals(other.source)) {
 				return false;
-		} else if (!source.equals(other.source)) {
-			return false;
-		}
-		if (target == null) {
-			if (other.target != null)
+			}
+			if (target == null) {
+				if (other.target != null)
+					return false;
+			} else if (!target.equals(other.target)) {
 				return false;
-		} else if (!target.equals(other.target)) {
+			}
+		} else {
 			return false;
 		}
 		return true;
