@@ -52,7 +52,24 @@ public class BackUpItem {
 	private static final String EXIST_SRC_NOT_EXISTS = "Existing source path parameter is null or the path does not exist";
 
 	public enum BackupAction {
-		COPY_NEW, COPY_REPLACE, COPY_TREE, DELETE, DELETE_DIR, AMBIGUOUS, COPY_TARGET, ADJUST_TIME
+		COPY_NEW("Copier nouveau"), 
+		COPY_REPLACE("Remplacer"), 
+		COPY_TREE("Copier arbre"), 
+		DELETE("Effacer"), 
+		DELETE_DIR("Effacer arbre"), 
+		AMBIGUOUS("Ambigu"), 
+		COPY_TARGET("Copier cible"), 
+		ADJUST_TIME("Ajuster temps");
+		
+		private final String actionName;
+		
+		private BackupAction(String actionName) {
+			this.actionName = actionName;
+		}
+		
+		public String getActionName() {
+			return actionName;
+		}
 	};
 
 	public enum BackupStatus {

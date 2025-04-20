@@ -54,12 +54,9 @@ public class BackUpActionCellRenderer extends CustomTableCellRenderer {
 				case COPY_TARGET, ADJUST_TIME -> setBackground(Color.PINK);
 				case AMBIGUOUS -> setBackground(Color.RED);
 			}
+			setValue(backupAction.getActionName());
 		} else {
 			throw new IllegalBackupActionException(value);
-		}
-		
-		setValue(value);
+		}	
 	}
-	
-
 }
