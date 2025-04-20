@@ -46,26 +46,16 @@ public class BackUpActionCellRenderer extends CustomTableCellRenderer {
 	@Override
 	public void valueProcessor(Object value) {
 		
-		BackupAction backupAction = (BackupAction) value;
-        
-		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
-			setBackground(Color.MAGENTA);
-		} else if (backupAction.equals(BackupAction.COPY_NEW)) {
-			setBackground(Color.GREEN);
-		} else if (backupAction.equals(BackupAction.DELETE)) {
-			setBackground(Color.ORANGE);
-		} else if (backupAction.equals(BackupAction.COPY_TREE)) {
-			setBackground(Color.GREEN);
-		} else if (backupAction.equals(BackupAction.DELETE_DIR)) {				
-			setBackground(Color.ORANGE);
-		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
-			setBackground(Color.RED);
-		} else if (backupAction.equals(BackupAction.COPY_TARGET)) {
-			setBackground(Color.PINK);
-		} else if (backupAction.equals(BackupAction.ADJUST_TIME)) {
-			setBackground(Color.PINK);
+		if (value instanceof BackupAction backupAction) {
+			switch (backupAction) {
+				case COPY_REPLACE -> setBackground(Color.MAGENTA);
+				case COPY_NEW, COPY_TREE -> setBackground(Color.GREEN);
+				case DELETE, DELETE_DIR -> setBackground(Color.ORANGE);
+				case COPY_TARGET, ADJUST_TIME -> setBackground(Color.PINK);
+				case AMBIGUOUS -> setBackground(Color.RED);
+			}
 		} else {
-			throw new IllegalBackupActionException("Invalid backup action: ", backupAction);
+			throw new IllegalBackupActionException(value);
 		}
 		
 		setValue(value);
