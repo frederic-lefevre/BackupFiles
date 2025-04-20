@@ -25,36 +25,29 @@ SOFTWARE.
 package org.fl.backupFiles.gui;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 
-import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
 
 import org.fl.backupFiles.BackUpItem.BackupAction;
 import org.fl.backupFiles.IllegalBackupActionException;
+import org.fl.util.swing.CustomTableCellRenderer;
 
-public class BackUpActionCellRenderer extends DefaultTableCellRenderer {
+public class BackUpActionCellRenderer extends CustomTableCellRenderer {
 
 	private static final long serialVersionUID = 1L;
 	private static final Font font = new Font("Dialog", Font.BOLD, 12);
-
+	
 	public BackUpActionCellRenderer() {
-		super();
-		setHorizontalAlignment(SwingConstants.CENTER);
+		
+		super(font, SwingConstants.CENTER);	
 	}
 	
 	@Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
- 
-        // DefaultTableCellRenderer.getTableCellRendererComponent sets the font at each call
-        // So it is ineffective to change the font in the constructor
-        setFont(font);
+	public void valueProcessor(Object value) {
+		
+		BackupAction backupAction = (BackupAction) value;
         
-        BackupAction backupAction = (BackupAction) value;
- 
 		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
 			setBackground(Color.MAGENTA);
 		} else if (backupAction.equals(BackupAction.COPY_NEW)) {
@@ -74,7 +67,9 @@ public class BackUpActionCellRenderer extends DefaultTableCellRenderer {
 		} else {
 			throw new IllegalBackupActionException("Invalid backup action: ", backupAction);
 		}
-        return this;
-    }
+		
+		setValue(value);
+	}
+	
 
 }
