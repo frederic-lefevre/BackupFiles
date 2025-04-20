@@ -35,7 +35,7 @@ public class BackUpCounters {
 	// d'affichage avec beaucoup d'outils (console Eclipse, lorsqu'on édite les logs avec Notepad++ par exemple)
 	private static final Locale localeForFormat = Locale.CANADA_FRENCH;
 	
-	private final NumberFormat numberFormat = NumberFormat.getInstance(localeForFormat);
+	private static final NumberFormat numberFormat = NumberFormat.getInstance(localeForFormat);
 	
 	public long copyNewNb;
 	public long copyReplaceNb;
@@ -56,25 +56,25 @@ public class BackUpCounters {
 	public long nbMediumPermanencePath;
 	public long totalSizeDifference;
 	
-	private final static String COPY_NEW_LABEL = BackupAction.COPY_NEW.getActionName() + ": ";
-	private final static String COPY_REPLACE_LABEL = BackupAction.COPY_REPLACE.getActionName() + ": ";
-	private final static String COPY_TREE_LABEL = BackupAction.COPY_TREE.getActionName() + ": ";
-	private final static String DELETE_LABEL = BackupAction.DELETE.getActionName() + ": ";
-	private final static String DELETE_DIR_LABEL = BackupAction.DELETE_DIR.getActionName() + ": ";
-	private final static String AMBIGUOUS_LABEL = BackupAction.AMBIGUOUS.getActionName() + ": ";
-	private final static String COPY_TARGET_LABEL = BackupAction.COPY_TARGET.getActionName() + ": ";
-	private final static String ADJUST_TIME_LABEL = BackupAction.ADJUST_TIME.getActionName() + ": ";
+	private static final String COPY_NEW_LABEL = BackupAction.COPY_NEW.getActionName() + ": ";
+	private static final String COPY_REPLACE_LABEL = BackupAction.COPY_REPLACE.getActionName() + ": ";
+	private static final String COPY_TREE_LABEL = BackupAction.COPY_TREE.getActionName() + ": ";
+	private static final String DELETE_LABEL = BackupAction.DELETE.getActionName() + ": ";
+	private static final String DELETE_DIR_LABEL = BackupAction.DELETE_DIR.getActionName() + ": ";
+	private static final String AMBIGUOUS_LABEL = BackupAction.AMBIGUOUS.getActionName() + ": ";
+	private static final String COPY_TARGET_LABEL = BackupAction.COPY_TARGET.getActionName() + ": ";
+	private static final String ADJUST_TIME_LABEL = BackupAction.ADJUST_TIME.getActionName() + ": ";
 
-	private final static String SOURCE_OK_LABEL = "Eléments source traités: ";
-	private final static String SOURCE_KO_LABEL = "Eléments source en erreur: ";
-	private final static String TARGET_OK_LABEL = "Eléments cible traités: ";
-	private final static String TARGET_KO_LABEL = "Eléments cible en erreur: ";
+	private static final String SOURCE_OK_LABEL = "Eléments source traités: ";
+	private static final String SOURCE_KO_LABEL = "Eléments source en erreur: ";
+	private static final String TARGET_OK_LABEL = "Eléments cible traités: ";
+	private static final String TARGET_KO_LABEL = "Eléments cible en erreur: ";
 
-	private final static String CONTENT_DIFFERENT_LABEL = "Fichiers avec contenu différent:  ";
-	private final static String SIZE_ABOVE_LIMIT_LABEL = "Fichiers avec tailles importantes: ";
-	private final static String HIGH_PERMANENCE_LABEL = "Fichiers à haute permanence: ";
-	private final static String MEDIUM_PERMANENCE_LABEL = "Fichiers à moyenne permanence: ";
-	private final static String TOTAL_SIZE_DIFF_LABEL = "Différence totale de taille: ";
+	private static final String CONTENT_DIFFERENT_LABEL = "Fichiers avec contenu différent:  ";
+	private static final String SIZE_ABOVE_LIMIT_LABEL = "Fichiers avec tailles importantes: ";
+	private static final String HIGH_PERMANENCE_LABEL = "Fichiers à haute permanence: ";
+	private static final String MEDIUM_PERMANENCE_LABEL = "Fichiers à moyenne permanence: ";
+	private static final String TOTAL_SIZE_DIFF_LABEL = "Différence totale de taille: ";
 	
 	public BackUpCounters() {
 		reset();
