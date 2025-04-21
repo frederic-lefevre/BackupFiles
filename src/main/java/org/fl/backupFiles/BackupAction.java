@@ -25,22 +25,28 @@ SOFTWARE.
 package org.fl.backupFiles;
 
 public enum BackupAction {
-	COPY_NEW("Copier nouveau"), 
-	COPY_REPLACE("Remplacer"), 
-	COPY_TREE("Copier arbre"), 
-	DELETE("Effacer"), 
-	DELETE_DIR("Effacer arbre"), 
-	AMBIGUOUS("Ambigu"), 
-	COPY_TARGET("Copier cible"), 
-	ADJUST_TIME("Ajuster temps");
+	COPY_NEW("Copier nouveau", "Copier le fichier source dans la destination"), 
+	COPY_REPLACE("Remplacer", "Remplacer le fichier destination par la source"), 
+	COPY_TREE("Copier arbre", "Copier l'arbre source dans la destination"), 
+	DELETE("Effacer", "Effacer le fichier destination"), 
+	DELETE_DIR("Effacer arbre", "Effacer l'arbre destination"), 
+	AMBIGUOUS("Ambigu", "Le fichier destination est plus récent, remplacer le fichier destination par la source"), 
+	COPY_TARGET("Copier cible", "Remplacer le fichier source par la destination (ils ont un contenu identique)"), 
+	ADJUST_TIME("Ajuster temps", "Remplacer le temps de modification du fichier destination avec celui de la source (ils ont un contenu identique)");
 	
 	private final String actionName;
+	private final String actionDetails;
 	
-	private BackupAction(String actionName) {
+	private BackupAction(String actionName, String actionDetails) {
 		this.actionName = actionName;
+		this.actionDetails = actionDetails;
 	}
 	
 	public String getActionName() {
 		return actionName;
+	}
+	
+	public String getActionDetails() {
+		return actionDetails;
 	}
 }
