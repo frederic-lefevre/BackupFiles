@@ -25,42 +25,39 @@ SOFTWARE.
 package org.fl.backupFiles.gui;
 
 import java.awt.Color;
-import java.awt.Component;
+import java.awt.Font;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.logging.Logger;
 
-import javax.swing.JLabel;
-import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.table.TableCellRenderer;
 
 import org.fl.backupFiles.BackUpItem;
+import org.fl.util.swing.CustomTableCellRenderer;
 
-public class BackUpSizeDifferenceCellRenderer extends JLabel implements TableCellRenderer {
+public class BackUpSizeDifferenceCellRenderer extends CustomTableCellRenderer {
 
 	private static final Logger logger = Logger.getLogger(BackUpSizeDifferenceCellRenderer.class.getName());
 	
 	private static final Locale localeForFormat = Locale.FRANCE;
 	private static final NumberFormat numberFormat = NumberFormat.getInstance(localeForFormat);
+	private static final Font font = new Font("Dialog", Font.PLAIN, 12);
 	
 	private static final long serialVersionUID = 1L;
 	private static final Color ABOVE_LIMIT_COLOR = new Color(255, 100, 100);
 	private static final Color BELOW_LIMIT_COLOR = new Color(255, 255, 255);
 
 	public BackUpSizeDifferenceCellRenderer() {
-		super();
-		setHorizontalAlignment(SwingConstants.CENTER);
-		setOpaque(true);
+		super(font, SwingConstants.CENTER);
 	}
-	
-	@Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
- 
-		if (value instanceof BackUpItem backUpItem) {
-			long sizeDifference = backUpItem.getSizeDifference();
-			setText(Long.toString(sizeDifference));
 
+	@Override
+	public void valueProcessor(Object value) {
+		
+		if (value instanceof BackUpItem backUpItem) {
+			
+			long sizeDifference = backUpItem.getSizeDifference();			
+			setValue(Long.toString(sizeDifference));
 			setToolTipText(numberFormat.format(sizeDifference));
 
 			if (sizeDifference > backUpItem.getFileSizeWarningThreshold()) {
@@ -70,8 +67,6 @@ public class BackUpSizeDifferenceCellRenderer extends JLabel implements TableCel
 			}
 		} else {
 			logger.severe("Invalid value type in Size Difference cell. Should be BackUpItem but is " + value.getClass().getName());
-		}
-        return this ;
+		}		
 	}
-
 }
