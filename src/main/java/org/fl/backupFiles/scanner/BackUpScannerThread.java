@@ -43,8 +43,8 @@ import org.fl.backupFiles.BackUpItem;
 import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.BackupAction;
+import org.fl.backupFiles.BackupStatus;
 import org.fl.backupFiles.Config;
-import org.fl.backupFiles.BackUpItem.BackupStatus;
 import org.fl.util.file.FileComparator;
 
 public class BackUpScannerThread {

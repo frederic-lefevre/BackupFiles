@@ -29,10 +29,11 @@ import java.awt.Component;
 import java.awt.Font;
 
 import javax.swing.table.DefaultTableCellRenderer;
+
+import org.fl.backupFiles.BackupStatus;
+
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
-
-import org.fl.backupFiles.BackUpItem.BackupStatus;
 
 public class BackUpStatusCellRenderer extends DefaultTableCellRenderer {
 

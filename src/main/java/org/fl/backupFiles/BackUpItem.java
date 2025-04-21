@@ -51,10 +51,6 @@ public class BackUpItem {
 	private static final String TGT_SHOULD_NOT_EXISTS = "Target path parameter should not exist";
 	private static final String EXIST_SRC_NOT_EXISTS = "Existing source path parameter is null or the path does not exist";
 
-	public enum BackupStatus {
-		DIFFERENT, DIFF_BY_CONTENT, SAME_CONTENT, DONE, FAILED
-	};
-
 	private final PathPairBasicAttributes pathPairBasicAttributes;
 	private final Path sourcePath;
 	private final Path targetPath;
