@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -43,24 +42,9 @@ public class BackUpJTable extends JTable {
 	
 	private static final long serialVersionUID = 1L;
 
-	public BackUpJTable(TableModel arg0) {
+	public BackUpJTable(BackUpTableModel arg0) {
 		super(arg0);	
-		init();	
-	}
-
-	public BackUpJTable(TableModel arg0, TableColumnModel arg1) {
-		super(arg0, arg1);
-		init();
-	}
-
 	
-	public BackUpJTable(TableModel dm, TableColumnModel cm, ListSelectionModel sm) {
-		super(dm, cm, sm);
-		init();
-	}
-
-	private void init() {
-		
 		setFillsViewportHeight(true) ;
 		setAutoCreateRowSorter(true) ;
 		getColumnModel().getColumn(BackUpTableModel.ACTION_COL_IDX).setCellRenderer(new BackUpActionCellRenderer());
