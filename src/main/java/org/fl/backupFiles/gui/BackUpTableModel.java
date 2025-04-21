@@ -40,7 +40,7 @@ public class BackUpTableModel extends AbstractTableModel {
 	
 	private static final long serialVersionUID = 1L;
 	
-	public final static String[] entetes = {"Chemin source", "Taille", "Permanence", "Action", "Etat", "Chemin cible"};
+	public final static String[] entetes = {"Chemin origine", "Taille", "Permanence", "Action", "Etat", "Chemin destination"};
 	
 	// Underlying data
 	private BackUpItemList backUpItems;
