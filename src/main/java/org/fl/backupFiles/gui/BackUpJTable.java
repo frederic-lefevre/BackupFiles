@@ -63,10 +63,10 @@ public class BackUpJTable extends JTable {
 		
 		setFillsViewportHeight(true) ;
 		setAutoCreateRowSorter(true) ;
-		getColumnModel().getColumn(BackUpTableModel.ACTION_COL_IDX).setCellRenderer(new BackUpActionCellRenderer()) ;
-		getColumnModel().getColumn(BackUpTableModel.STATUS_COL_IDX).setCellRenderer(new BackUpStatusCellRenderer()) ;
+		getColumnModel().getColumn(BackUpTableModel.ACTION_COL_IDX).setCellRenderer(new BackUpActionCellRenderer());
+		getColumnModel().getColumn(BackUpTableModel.STATUS_COL_IDX).setCellRenderer(new BackUpStatusCellRenderer());
 		getColumnModel().getColumn(BackUpTableModel.SIZE_DIFF_COL_IDX).setCellRenderer(new BackUpSizeDifferenceCellRenderer());
-		getColumnModel().getColumn(BackUpTableModel.PERMANENCE_COL_IDX).setCellRenderer(new PermanenceCellRenderer()) ;
+		getColumnModel().getColumn(BackUpTableModel.PERMANENCE_COL_IDX).setCellRenderer(new PermanenceCellRenderer());
 		getColumnModel().getColumn(BackUpTableModel.SOURCE_PATH_COL_IDX).setPreferredWidth(805);
 		getColumnModel().getColumn(BackUpTableModel.SIZE_DIFF_COL_IDX).setPreferredWidth(70);
 		getColumnModel().getColumn(BackUpTableModel.PERMANENCE_COL_IDX).setPreferredWidth(85);
@@ -79,7 +79,7 @@ public class BackUpJTable extends JTable {
 		listSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		setSelectionModel(listSelectionModel);
 		
-		setAutoResizeMode(JTable.AUTO_RESIZE_OFF) ;
+		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
 		addMouseListener(new BackupItemMouseAdapter(this, Config.getOsActions()));
 		setAutoCreateRowSorter(true);
