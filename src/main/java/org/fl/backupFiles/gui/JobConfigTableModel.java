@@ -38,10 +38,10 @@ public class JobConfigTableModel extends AbstractTableModel  {
 	private final static String[] entetes = {"Chemin origine", "Chemin destination", "Commentaires"};
 	
 	// underlying data
-	private List<BackUpTask> backUpTasks ;
+	private List<BackUpTask> backUpTasks;
 	
 	public JobConfigTableModel() {
-		backUpTasks = new ArrayList<BackUpTask>() ;
+		backUpTasks = new ArrayList<BackUpTask>();
 	}
 
 	public void setBackUpTasks(List<BackUpTask> backUpTasks) {
@@ -65,16 +65,11 @@ public class JobConfigTableModel extends AbstractTableModel  {
 	
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		switch(columnIndex){
-        case 0:
-            return backUpTasks.get(rowIndex).getSource();
-        case 1:
-            return backUpTasks.get(rowIndex).getTarget();
-        case 2:
-            return backUpTasks.get(rowIndex).eventualWarning();
-        default:
-            return null;
-		}
+		return switch (columnIndex) {
+			case 0 -> backUpTasks.get(rowIndex).getSource();
+			case 1 -> backUpTasks.get(rowIndex).getTarget();
+			case 2 -> backUpTasks.get(rowIndex).eventualWarning();
+			default -> null;
+		};
 	}
-
 }
