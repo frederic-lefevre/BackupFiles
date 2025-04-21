@@ -24,37 +24,47 @@ SOFTWARE.
 
 package org.fl.backupFiles.gui;
 
-import java.awt.Font;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
 
-public class CaptionPane extends JPanel{
+import org.fl.backupFiles.BackupStatus;
+
+public class CaptionForStatusTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
-	private static final int TOP_CAPTION_SPACE = 25;
+
+	private static final String[] entetes = {"Etat", "Détail"};
 	
-	private static final Font font = new Font("Verdana", Font.BOLD, 18);
+	public static final int STATUS_COL_IDX = 0;
+	public static final int DETAIL_COL_IDX = 1;
 	
-	public CaptionPane() {
-		super();
-		
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		showCaption("Actions", new CaptionForActionTable());
-		showCaption("Etat", new CaptionForStatusTable());
+	private static final List<BackupStatus> statuses = Stream.of(BackupStatus.values()).collect(Collectors.toList());
+	
+	@Override
+	public int getRowCount() {
+		return statuses.size();
+	}
+
+	@Override
+	public int getColumnCount() {
+		return entetes.length;
 	}
 	
-	private void showCaption(String title, JTable captionTable) {
-		
-		JLabel captionTitle = new JLabel(title);
-		captionTitle.setFont(font);
-		captionTitle.setBorder(BorderFactory.createEmptyBorder(TOP_CAPTION_SPACE,0,0,0));
-		
-		add(captionTitle);
-		add(captionTable.getTableHeader());
-		add(captionTable);
+	@Override
+	public String getColumnName(int col) {
+	    return entetes[col];
 	}
+	
+	@Override
+	public Object getValueAt(int rowIndex, int columnIndex) {
+		return switch (columnIndex) {
+			case STATUS_COL_IDX -> statuses.get(rowIndex);
+			case DETAIL_COL_IDX -> statuses.get(rowIndex).getStatusDetail();
+			default -> null;
+		};
+	}
+
 }

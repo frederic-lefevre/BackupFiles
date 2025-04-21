@@ -24,37 +24,18 @@ SOFTWARE.
 
 package org.fl.backupFiles.gui;
 
-import java.awt.Font;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTable;
 
-public class CaptionPane extends JPanel{
-
+public class CaptionForStatusTable extends JTable {
+	
 	private static final long serialVersionUID = 1L;
-	private static final int TOP_CAPTION_SPACE = 25;
 	
-	private static final Font font = new Font("Verdana", Font.BOLD, 18);
-	
-	public CaptionPane() {
-		super();
+	public CaptionForStatusTable() {
+		super(new CaptionForStatusTableModel());
 		
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		showCaption("Actions", new CaptionForActionTable());
-		showCaption("Etat", new CaptionForStatusTable());
+		getColumnModel().getColumn(CaptionForStatusTableModel.STATUS_COL_IDX).setCellRenderer(new BackUpStatusCellRenderer());
+		getColumnModel().getColumn(CaptionForStatusTableModel.STATUS_COL_IDX).setPreferredWidth(120);
+		getColumnModel().getColumn(CaptionForStatusTableModel.DETAIL_COL_IDX).setPreferredWidth(1200);
 	}
-	
-	private void showCaption(String title, JTable captionTable) {
-		
-		JLabel captionTitle = new JLabel(title);
-		captionTitle.setFont(font);
-		captionTitle.setBorder(BorderFactory.createEmptyBorder(TOP_CAPTION_SPACE,0,0,0));
-		
-		add(captionTitle);
-		add(captionTable.getTableHeader());
-		add(captionTable);
-	}
+
 }

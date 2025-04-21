@@ -26,7 +26,7 @@ package org.fl.backupFiles.gui;
 
 import javax.swing.JTable;
 
-public class CaptionForActionTable extends JTable  {
+public class CaptionForActionTable extends JTable {
 
 	private static final long serialVersionUID = 1L;
 
