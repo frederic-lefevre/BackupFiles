@@ -30,13 +30,13 @@ public enum DirectoryPermanenceLevel {
 	MEDIUM("2: Moyen"), 
 	LOW("3: Faible");
 	
-	private final String name;
+	private final String permanenceName;
 	
 	private DirectoryPermanenceLevel(String n) {
-		name  = n;
+		permanenceName  = n;
 	}
-	@Override
-	public String toString() {
-		return name;
+
+	public String getPermanenceName() {
+		return permanenceName;
 	}
 }
