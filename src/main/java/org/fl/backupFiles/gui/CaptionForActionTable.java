@@ -24,30 +24,17 @@ SOFTWARE.
 
 package org.fl.backupFiles.gui;
 
-import java.awt.Font;
+import javax.swing.JTable;
 
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-public class CaptionPane extends JPanel{
+public class CaptionForActionTable extends JTable  {
 
 	private static final long serialVersionUID = 1L;
 
-	public CaptionPane() {
-		super();
+	public CaptionForActionTable() {
+		super(new CaptionForActionTableModel());
 		
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		
-		Font font = new Font("Verdana", Font.BOLD, 18);
-		
-		JLabel actionTitle = new JLabel("Actions");
-		actionTitle.setFont(font);
-		
-		add(actionTitle);
-		CaptionForActionTable captionForActionTable = new CaptionForActionTable();
-		add(captionForActionTable.getTableHeader());		
-		add(captionForActionTable);
-
+		getColumnModel().getColumn(CaptionForActionTableModel.ACTION_COL_IDX).setCellRenderer(new BackUpActionCellRenderer());
+		getColumnModel().getColumn(CaptionForActionTableModel.ACTION_COL_IDX).setPreferredWidth(120);
+		getColumnModel().getColumn(CaptionForActionTableModel.DETAIL_COL_IDX).setPreferredWidth(1200);
 	}
 }

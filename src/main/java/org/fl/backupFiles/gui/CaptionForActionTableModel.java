@@ -24,30 +24,51 @@ SOFTWARE.
 
 package org.fl.backupFiles.gui;
 
-import java.awt.Font;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.table.AbstractTableModel;
 
-public class CaptionPane extends JPanel{
+import org.fl.backupFiles.BackupAction;
+
+public class CaptionForActionTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
-
-	public CaptionPane() {
+	
+	private static final String[] entetes = {"Action", "Détail"};
+	
+	public static final int ACTION_COL_IDX = 0;
+	public static final int DETAIL_COL_IDX = 1;
+	
+	private static final List<BackupAction> actions = Stream.of(BackupAction.values()).collect(Collectors.toList());
+	
+	public CaptionForActionTableModel() {
 		super();
-		
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		
-		Font font = new Font("Verdana", Font.BOLD, 18);
-		
-		JLabel actionTitle = new JLabel("Actions");
-		actionTitle.setFont(font);
-		
-		add(actionTitle);
-		CaptionForActionTable captionForActionTable = new CaptionForActionTable();
-		add(captionForActionTable.getTableHeader());		
-		add(captionForActionTable);
+	}
 
+	@Override
+	public int getRowCount() {
+		return actions.size();
+	}
+
+	@Override
+	public int getColumnCount() {
+		return entetes.length;
+	}
+
+	@Override
+	public String getColumnName(int col) {
+	    return entetes[col];
+	}
+	
+	@Override
+	public Object getValueAt(int rowIndex, int columnIndex) {
+		
+		return switch (columnIndex) {
+			case ACTION_COL_IDX -> actions.get(rowIndex);
+			case DETAIL_COL_IDX -> actions.get(rowIndex).getActionDetails();
+			default -> null;
+		};
 	}
 }
