@@ -25,56 +25,43 @@ SOFTWARE.
 package org.fl.backupFiles.gui;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 
-import javax.swing.table.DefaultTableCellRenderer;
-
 import org.fl.backupFiles.BackupStatus;
+import org.fl.util.swing.CustomTableCellRenderer;
 
-import javax.swing.JTable;
 import javax.swing.SwingConstants;
 
-public class BackUpStatusCellRenderer extends DefaultTableCellRenderer {
+public class BackUpStatusCellRenderer extends CustomTableCellRenderer {
 
 	private static final long serialVersionUID = 1L;
-	private static final Color DIFFERENT_COLOR 		 = new Color(255, 220, 220);
+	private static final Color DIFFERENT_COLOR = new Color(255, 220, 220);
 	private static final Color DIFF_BY_CONTENT_COLOR = new Color(255, 120, 120);
 	private static final Color SAME_CONTENT_COLOR = new Color(128, 191, 255);
 
 	private static final Font font = new Font("Dialog", Font.BOLD, 12);
 	
 	public BackUpStatusCellRenderer() {
-		super();
-		setHorizontalAlignment(SwingConstants.CENTER);
+		super(font, SwingConstants.CENTER);
 	}
 	
 	@Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
- 
-        // DefaultTableCellRenderer.getTableCellRendererComponent sets the font at each call
-        // So it is ineffective to change the font in the constructor
-        setFont(font);
-        
-        BackupStatus backupStatus = (BackupStatus) value;
- 
-        if (backupStatus.equals(BackupStatus.DIFFERENT)) {
-			setBackground(DIFFERENT_COLOR);
+	public void valueProcessor(Object value) {
+		
+		if (value instanceof BackupStatus backupStatus) {
 			setForeground(Color.BLACK);
-        } else if (backupStatus.equals(BackupStatus.DONE)) {
-			setBackground(Color.YELLOW);
-			setForeground(Color.BLACK);
-		} else if (backupStatus.equals(BackupStatus.FAILED)) {
-			setBackground(Color.LIGHT_GRAY);
-			setForeground(Color.RED);
-		} else if (backupStatus.equals(BackupStatus.DIFF_BY_CONTENT)) {
-			setBackground(DIFF_BY_CONTENT_COLOR);
-			setForeground(Color.BLACK);
-		} else if (backupStatus.equals(BackupStatus.SAME_CONTENT)) {
-			setBackground(SAME_CONTENT_COLOR);
-			setForeground(Color.BLACK);
+			switch (backupStatus) {
+				case DIFFERENT -> setBackground(DIFFERENT_COLOR);
+				case DONE -> setBackground(Color.YELLOW);
+				case DIFF_BY_CONTENT -> setBackground(DIFF_BY_CONTENT_COLOR);
+				case SAME_CONTENT -> setBackground(SAME_CONTENT_COLOR);
+				case FAILED -> {
+					setBackground(Color.LIGHT_GRAY);
+					setForeground(Color.RED);
+				}
+			}
+	        setValue(backupStatus.getStatusName());
 		}
-        return this;
-    }
+	}
+
 }
