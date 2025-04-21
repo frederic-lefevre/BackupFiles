@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,10 +38,10 @@ public class BackUpJobInfoPanel extends JPanel {
 
 	public BackUpJobInfoPanel(BackUpJobInfoTableModel tabModel) {
 		
-		super() ;
+		super();
 		
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)) ;
-		setBorder(BorderFactory.createLineBorder(Color.BLACK,5,true)) ;
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		setBorder(BorderFactory.createLineBorder(Color.BLACK,5,true));
 		
 		JTable jobInfosTable = new JTable(tabModel);
 
@@ -53,12 +53,12 @@ public class BackUpJobInfoPanel extends JPanel {
 		}
 		
 		// Table headers
-		add(jobInfosTable.getTableHeader()) ;
+		add(jobInfosTable.getTableHeader());
 		
 		// Scroll pane to contain the table
-		JScrollPane infoScrollTable = new JScrollPane(jobInfosTable) ;
+		JScrollPane infoScrollTable = new JScrollPane(jobInfosTable);
 		
-		add(infoScrollTable) ;
+		add(infoScrollTable);
 	}
 
 }
