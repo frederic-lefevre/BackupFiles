@@ -89,25 +89,18 @@ public class BackUpTableModel extends AbstractTableModel {
 	 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		switch(columnIndex){
-        case SOURCE_PATH_COL_IDX:
-            return backUpItems.get(rowIndex).getSourcePath();
-        case SIZE_DIFF_COL_IDX:
-        	return backUpItems.get(rowIndex);
-        case PERMANENCE_COL_IDX:
-        	return backUpItems.get(rowIndex).getPermanenceLevel();
-        case ACTION_COL_IDX:
-            return backUpItems.get(rowIndex).getBackupAction();
-        case STATUS_COL_IDX:
-            return backUpItems.get(rowIndex).getBackupStatus();
-        case TARGET_PATH_COL_IDX:
-            return backUpItems.get(rowIndex).getTargetPath();
-        default:
-            return null;
-		}
+		return switch(columnIndex){
+        	case SOURCE_PATH_COL_IDX -> backUpItems.get(rowIndex).getSourcePath();
+        	case SIZE_DIFF_COL_IDX -> backUpItems.get(rowIndex);
+        	case PERMANENCE_COL_IDX -> backUpItems.get(rowIndex).getPermanenceLevel();
+        	case ACTION_COL_IDX -> backUpItems.get(rowIndex).getBackupAction();
+        	case STATUS_COL_IDX -> backUpItems.get(rowIndex).getBackupStatus();
+        	case TARGET_PATH_COL_IDX -> backUpItems.get(rowIndex).getTargetPath();
+        	default -> null;
+		};
 	}
 
 	public BackUpItem getBackUpItemAt(int rowIndex) {
-		return backUpItems.get(rowIndex) ;
+		return backUpItems.get(rowIndex);
 	}
 }
