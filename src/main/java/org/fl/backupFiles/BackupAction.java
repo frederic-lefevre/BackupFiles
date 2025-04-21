@@ -24,15 +24,23 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
-public class IllegalBackupActionException extends IllegalArgumentException {
-
-	private static final long serialVersionUID = 1L;
+public enum BackupAction {
+	COPY_NEW("Copier nouveau"), 
+	COPY_REPLACE("Remplacer"), 
+	COPY_TREE("Copier arbre"), 
+	DELETE("Effacer"), 
+	DELETE_DIR("Effacer arbre"), 
+	AMBIGUOUS("Ambigu"), 
+	COPY_TARGET("Copier cible"), 
+	ADJUST_TIME("Ajuster temps");
 	
-	public IllegalBackupActionException(Object value) {
-		super("\"Invalid value type. BackupAction was expected, received " + value.getClass().getName());
+	private final String actionName;
+	
+	private BackupAction(String actionName) {
+		this.actionName = actionName;
 	}
 	
-	public IllegalBackupActionException(String s, BackupAction backupAction) {
-		super(s + " Action=" + backupAction);
+	public String getActionName() {
+		return actionName;
 	}
 }

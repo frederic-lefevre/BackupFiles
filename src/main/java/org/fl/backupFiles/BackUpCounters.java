@@ -27,8 +27,6 @@ package org.fl.backupFiles;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import org.fl.backupFiles.BackUpItem.BackupAction;
-
 public class BackUpCounters {
 
 	// Locale.FRANCE affiche le séparateur de milliers avec un "Narrow non-breaking space", ce qui pose des problèmes

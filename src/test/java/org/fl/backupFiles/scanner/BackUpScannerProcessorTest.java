@@ -43,6 +43,7 @@ import org.fl.backupFiles.BackUpCounters;
 import org.fl.backupFiles.BackUpItem;
 import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpTask;
+import org.fl.backupFiles.BackupAction;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.TestUtils;
 import org.fl.util.file.FilesUtils;
@@ -213,7 +214,7 @@ class BackUpScannerProcessorTest {
 
 			BackUpItem backUpItem = backUpItemList.get(0);
 			assertThat(backUpItem).isNotNull();
-			assertThat(backUpItem.getBackupAction()).isEqualTo(BackUpItem.BackupAction.COPY_TREE);
+			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.COPY_TREE);
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
@@ -251,7 +252,7 @@ class BackUpScannerProcessorTest {
 
 			BackUpItem backUpItem = backUpItemList.get(0);
 			assertThat(backUpItem).isNotNull();
-			assertThat(backUpItem.getBackupAction()).isEqualTo(BackUpItem.BackupAction.COPY_REPLACE);
+			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.COPY_REPLACE);
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
@@ -290,7 +291,7 @@ class BackUpScannerProcessorTest {
 			
 			BackUpItem backUpItem = backUpItemList.get(0);
 			assertThat(backUpItem).isNotNull();
-			assertThat(backUpItem.getBackupAction()).isEqualTo(BackUpItem.BackupAction.COPY_NEW);
+			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.COPY_NEW);
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
@@ -329,7 +330,7 @@ class BackUpScannerProcessorTest {
 			
 			BackUpItem backUpItem = backUpItemList.get(0);
 			assertThat(backUpItem).isNotNull();
-			assertThat(backUpItem.getBackupAction()).isEqualTo(BackUpItem.BackupAction.DELETE);
+			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.DELETE);
 
 		} catch (Exception e) {
 			Logger.getGlobal().log(Level.SEVERE, "Exception in BackUpScannerProcessor test", e);
@@ -368,7 +369,7 @@ class BackUpScannerProcessorTest {
 			
 			BackUpItem backUpItem = backUpItemList.get(0);
 			assertThat(backUpItem).isNotNull();
-			assertThat(backUpItem.getBackupAction()).isEqualTo(BackUpItem.BackupAction.DELETE_DIR);
+			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.DELETE_DIR);
 
 			Files.delete(tgt);
 			assertThat(tgt).doesNotExist();

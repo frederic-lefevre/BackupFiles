@@ -34,7 +34,6 @@ import java.time.Instant;
 import java.util.logging.Logger;
 
 import org.fl.backupFiles.scanner.PathPairBasicAttributes;
-import org.fl.backupFiles.BackUpItem.BackupAction;
 import org.fl.backupFiles.BackUpItem.BackupStatus;
 import org.fl.util.file.FileComparator;
 import org.junit.jupiter.api.AfterEach;

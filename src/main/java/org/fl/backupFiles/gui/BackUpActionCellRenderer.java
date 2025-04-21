@@ -29,7 +29,7 @@ import java.awt.Font;
 
 import javax.swing.SwingConstants;
 
-import org.fl.backupFiles.BackUpItem.BackupAction;
+import org.fl.backupFiles.BackupAction;
 import org.fl.backupFiles.IllegalBackupActionException;
 import org.fl.util.swing.CustomTableCellRenderer;
 

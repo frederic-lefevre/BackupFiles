@@ -51,27 +51,6 @@ public class BackUpItem {
 	private static final String TGT_SHOULD_NOT_EXISTS = "Target path parameter should not exist";
 	private static final String EXIST_SRC_NOT_EXISTS = "Existing source path parameter is null or the path does not exist";
 
-	public enum BackupAction {
-		COPY_NEW("Copier nouveau"), 
-		COPY_REPLACE("Remplacer"), 
-		COPY_TREE("Copier arbre"), 
-		DELETE("Effacer"), 
-		DELETE_DIR("Effacer arbre"), 
-		AMBIGUOUS("Ambigu"), 
-		COPY_TARGET("Copier cible"), 
-		ADJUST_TIME("Ajuster temps");
-		
-		private final String actionName;
-		
-		private BackupAction(String actionName) {
-			this.actionName = actionName;
-		}
-		
-		public String getActionName() {
-			return actionName;
-		}
-	};
-
 	public enum BackupStatus {
 		DIFFERENT, DIFF_BY_CONTENT, SAME_CONTENT, DONE, FAILED
 	};
