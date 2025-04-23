@@ -22,21 +22,49 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package org.fl.backupFiles.directoryPermanence;
+package org.fl.backupFiles.gui;
 
-public enum DirectoryPermanenceLevel {
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.swing.table.AbstractTableModel;
+
+import org.fl.backupFiles.BackupStatus;
+
+public class CaptionForStatusTableModel extends AbstractTableModel {
+
+	private static final long serialVersionUID = 1L;
+
+	private static final String[] entetes = {"Etat", "Détail"};
 	
-	HIGH ("1: Haut"), 
-	MEDIUM("2: Moyen"), 
-	LOW("3: Faible");
+	public static final int STATUS_COL_IDX = 0;
+	public static final int DETAIL_COL_IDX = 1;
 	
-	private final String permanenceName;
+	private static final List<BackupStatus> statuses = Stream.of(BackupStatus.values()).collect(Collectors.toList());
 	
-	private DirectoryPermanenceLevel(String n) {
-		permanenceName  = n;
+	@Override
+	public int getRowCount() {
+		return statuses.size();
 	}
 
-	public String getPermanenceName() {
-		return permanenceName;
+	@Override
+	public int getColumnCount() {
+		return entetes.length;
 	}
+	
+	@Override
+	public String getColumnName(int col) {
+	    return entetes[col];
+	}
+	
+	@Override
+	public Object getValueAt(int rowIndex, int columnIndex) {
+		return switch (columnIndex) {
+			case STATUS_COL_IDX -> statuses.get(rowIndex);
+			case DETAIL_COL_IDX -> statuses.get(rowIndex).getStatusDetail();
+			default -> null;
+		};
+	}
+
 }

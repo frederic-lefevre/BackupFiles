@@ -45,9 +45,7 @@ import org.fl.util.AdvancedProperties;
 import org.fl.util.RunningContext;
 
 public class Config {
-	
-	
-	
+		
 	private static final Logger rootLogger = Logger.getLogger("");
 	
 	private static RunningContext runningContext;
@@ -62,7 +60,7 @@ public class Config {
 	private static List<OsAction> osActions;
 	private static DirectoryPermanence directoryPermanence;
 	private static boolean initialized = false;
-	private static BackUpItem.BackupAction acionOnSameTargetContentButNewer;
+	private static BackupAction acionOnSameTargetContentButNewer;
 
 	private Config() {
 	}
@@ -114,7 +112,7 @@ public class Config {
 					StandardCharsets.UTF_8);
 			directoryPermanence = new DirectoryPermanenceMap(permanenceConf);
 
-			acionOnSameTargetContentButNewer = getBackUpAction("backupFiles.actionOnTargetWithSameContentButNewer", BackUpItem.BackupAction.ADJUST_TIME);
+			acionOnSameTargetContentButNewer = getBackUpAction("backupFiles.actionOnTargetWithSameContentButNewer", BackupAction.ADJUST_TIME);
 			
 		} catch (Exception e) {
 			rootLogger.log(Level.SEVERE, "Exception caught in Config init (see default prop file processing)", e);
@@ -123,12 +121,12 @@ public class Config {
 		initialized = true;
 	}
 
-	private static BackUpItem.BackupAction getBackUpAction(String property, BackUpItem.BackupAction defaultAction) {
+	private static BackupAction getBackUpAction(String property, BackupAction defaultAction) {
 		
 		String backupAction = backupProperty.getProperty("backupFiles.actionOnTargetWithSameContentButNewer");
 		if ((backupAction != null) && !backupAction.isEmpty()) {
 			try {
-				return BackUpItem.BackupAction.valueOf(backupAction);
+				return BackupAction.valueOf(backupAction);
 			} catch (IllegalArgumentException e) {
 				return defaultAction;
 			}
@@ -208,7 +206,7 @@ public class Config {
 		return directoryPermanence;
 	}
 
-	public static BackUpItem.BackupAction getAcionOnSameTargetContentButNewer() {
+	public static BackupAction getAcionOnSameTargetContentButNewer() {
 		if (!initialized) {
 			initConfig(BackupFilesGui.getPropertyFile());
 		}

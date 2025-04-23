@@ -33,7 +33,7 @@ public class BackUpCounters {
 	// d'affichage avec beaucoup d'outils (console Eclipse, lorsqu'on édite les logs avec Notepad++ par exemple)
 	private static final Locale localeForFormat = Locale.CANADA_FRENCH;
 	
-	private final NumberFormat numberFormat = NumberFormat.getInstance(localeForFormat);
+	private static final NumberFormat numberFormat = NumberFormat.getInstance(localeForFormat);
 	
 	public long copyNewNb;
 	public long copyReplaceNb;
@@ -54,25 +54,25 @@ public class BackUpCounters {
 	public long nbMediumPermanencePath;
 	public long totalSizeDifference;
 	
-	private final static String COPY_NEW_LABEL 		= "  Copier nouveau:     " ;
-	private final static String COPY_REPLACE_LABEL  = "  Remplacer:          " ;
-	private final static String COPY_TREE_LABEL 	= "  Copier arbre:       " ;
-	private final static String DELETE_LABEL 		= "  Effacer:            " ;
-	private final static String DELETE_DIR_LABEL 	= "  Effacer arbre:      " ;
-	private final static String AMBIGUOUS_LABEL 	= "  Ambigu:             " ;
-	private final static String COPY_TARGET_LABEL 	= "  Copier target:      " ;
-	private final static String ADJUST_TIME_LABEL 	= "  Ajuster temps:      " ;
-	
-	private final static String SOURCE_OK_LABEL 	= "  Eléments source traités:   " ;
-	private final static String SOURCE_KO_LABEL 	= "  Eléments source en erreur: " ;
-	private final static String TARGET_OK_LABEL 	= "  Eléments target traités:   " ;
-	private final static String TARGET_KO_LABEL 	= "  Eléments target en erreur: " ;
-	
-	private final static String CONTENT_DIFFERENT_LABEL 	= "  Fichiers avec contenu différent:  " ;
-	private final static String SIZE_ABOVE_LIMIT_LABEL		= "  Fichiers avec tailles importantes: " ;
-	private final static String HIGH_PERMANENCE_LABEL		= "  Fichiers à haute permanence: " ;
-	private final static String MEDIUM_PERMANENCE_LABEL		= "  Fichiers à moyenne permanence: " ;
-	private final static String TOTAL_SIZE_DIFF_LABEL		= "  Différence totale de taille: " ;
+	private static final String COPY_NEW_LABEL = BackupAction.COPY_NEW.getActionName() + ": ";
+	private static final String COPY_REPLACE_LABEL = BackupAction.COPY_REPLACE.getActionName() + ": ";
+	private static final String COPY_TREE_LABEL = BackupAction.COPY_TREE.getActionName() + ": ";
+	private static final String DELETE_LABEL = BackupAction.DELETE.getActionName() + ": ";
+	private static final String DELETE_DIR_LABEL = BackupAction.DELETE_DIR.getActionName() + ": ";
+	private static final String AMBIGUOUS_LABEL = BackupAction.AMBIGUOUS.getActionName() + ": ";
+	private static final String COPY_TARGET_LABEL = BackupAction.COPY_TARGET.getActionName() + ": ";
+	private static final String ADJUST_TIME_LABEL = BackupAction.ADJUST_TIME.getActionName() + ": ";
+
+	private static final String SOURCE_OK_LABEL = "Eléments source traités: ";
+	private static final String SOURCE_KO_LABEL = "Eléments source en erreur: ";
+	private static final String TARGET_OK_LABEL = "Eléments cible traités: ";
+	private static final String TARGET_KO_LABEL = "Eléments cible en erreur: ";
+
+	private static final String CONTENT_DIFFERENT_LABEL = "Fichiers avec contenu différent:  ";
+	private static final String SIZE_ABOVE_LIMIT_LABEL = "Fichiers avec tailles importantes: ";
+	private static final String HIGH_PERMANENCE_LABEL = "Fichiers à haute permanence: ";
+	private static final String MEDIUM_PERMANENCE_LABEL = "Fichiers à moyenne permanence: ";
+	private static final String TOTAL_SIZE_DIFF_LABEL = "Différence totale de taille: ";
 	
 	public BackUpCounters() {
 		reset();
@@ -103,22 +103,22 @@ public class BackUpCounters {
 
 		StringBuilder res = new StringBuilder();
 
-		res.append(COPY_NEW_LABEL).append(copyNewNb).append(DELETE_LABEL).append(deleteNb).append("\n");
-		res.append(COPY_REPLACE_LABEL).append(copyReplaceNb).append(DELETE_DIR_LABEL).append(deleteDirNb).append("\n");
-		res.append(COPY_TREE_LABEL).append(copyTreeNb).append(AMBIGUOUS_LABEL).append(ambiguousNb).append("\n");
-		res.append(COPY_TARGET_LABEL).append(copyTargetNb).append(ADJUST_TIME_LABEL).append(adjustTimeNb).append("\n");
+		res.append(COPY_NEW_LABEL).append(copyNewNb).append("\n").append(DELETE_LABEL).append(deleteNb).append("\n");
+		res.append(COPY_REPLACE_LABEL).append(copyReplaceNb).append("\n").append(DELETE_DIR_LABEL).append(deleteDirNb).append("\n");
+		res.append(COPY_TREE_LABEL).append(copyTreeNb).append("\n").append(AMBIGUOUS_LABEL).append(ambiguousNb).append("\n");
+		res.append(COPY_TARGET_LABEL).append(copyTargetNb).append("\n").append(ADJUST_TIME_LABEL).append(adjustTimeNb).append("\n");
 
-		res.append(SOURCE_OK_LABEL).append(nbSourceFilesProcessed).append(SOURCE_KO_LABEL).append(nbSourceFilesFailed)
+		res.append(SOURCE_OK_LABEL).append(nbSourceFilesProcessed).append("\n").append(SOURCE_KO_LABEL).append(nbSourceFilesFailed)
 				.append("\n");
-		res.append(TARGET_OK_LABEL).append(nbTargetFilesProcessed).append(TARGET_KO_LABEL).append(nbTargetFilesFailed)
+		res.append(TARGET_OK_LABEL).append(nbTargetFilesProcessed).append("\n").append(TARGET_KO_LABEL).append(nbTargetFilesFailed)
 				.append("\n");
 
 		res.append(SIZE_ABOVE_LIMIT_LABEL).append(backupWithSizeAboveThreshold).append("\n");
-		res.append(HIGH_PERMANENCE_LABEL).append(nbHighPermanencePath).append(MEDIUM_PERMANENCE_LABEL)
+		res.append(HIGH_PERMANENCE_LABEL).append(nbHighPermanencePath).append("\n").append(MEDIUM_PERMANENCE_LABEL)
 				.append(nbMediumPermanencePath).append("\n");
 
 		if (contentDifferentNb != 0) {
-			res.append(CONTENT_DIFFERENT_LABEL).append(contentDifferentNb);
+			res.append(CONTENT_DIFFERENT_LABEL).append(contentDifferentNb).append("\n");
 		}
 		res.append(TOTAL_SIZE_DIFF_LABEL).append(numberFormat.format(totalSizeDifference)).append("\n");
 		return res.toString();

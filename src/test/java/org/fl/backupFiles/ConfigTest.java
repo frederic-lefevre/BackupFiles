@@ -35,12 +35,15 @@ import java.nio.file.Paths;
 import org.fl.util.RunningContext;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+
 class ConfigTest {
 
 	@Test
-	void testRunningContext() throws URISyntaxException {
+	void testPropertyFile() throws URISyntaxException {
 		
-		RunningContext runningContext =Config.getRunningContext();
+		RunningContext runningContext = Config.getRunningContext();
 		
 		assertThat(runningContext).isNotNull();
 		
@@ -54,5 +57,65 @@ class ConfigTest {
 		Path propertyFilePath = Paths.get(propertyFileUri);
 		
 		assertThat(propertyFilePath).exists().isRegularFile();
+	}
+	
+	private static final String APPLICATION_NAME = "org.fl.backupFiles";
+	
+	@Test
+	void runningContextTest() throws URISyntaxException {
+		
+		RunningContext runningContext = Config.getRunningContext();
+		
+		assertThat(runningContext).isNotNull();
+		assertThat(runningContext.getName()).isNotNull().isEqualTo(APPLICATION_NAME);
+		
+		JsonNode applicationInfo = runningContext.getApplicationInfo(false);
+		assertThat(applicationInfo).isNotNull();
+		
+		JsonNode buildInformation = applicationInfo.get("buildInformation");
+		assertThat(buildInformation).isNotEmpty().hasSize(2)
+		.satisfiesExactlyInAnyOrder(
+				buildInfo -> { 
+					assertThat(buildInfo.get("moduleName")).isNotNull();
+					assertThat(buildInfo.get("moduleName").asText()).isEqualTo(APPLICATION_NAME);
+				},
+				buildInfo -> { 
+					assertThat(buildInfo.get("moduleName")).isNotNull();
+					assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl.util");
+				}
+				);
+	}
+	
+	@Test
+	void buildInformationTest() throws JsonProcessingException, URISyntaxException {
+		
+		RunningContext runningContext = Config.getRunningContext();
+		
+		assertThat(runningContext).isNotNull();
+		
+		JsonNode buildInformation = runningContext.getBuildInformationAsJson();
+		assertThat(buildInformation).isNotNull();
+
+		assertThat(buildInformation).isNotEmpty().hasSize(2)
+			.satisfiesExactlyInAnyOrder(
+				buildInfo -> assertModuleBuildInfo(buildInfo, APPLICATION_NAME),
+				buildInfo -> assertModuleBuildInfo(buildInfo, "org.fl.util")
+			);
+	}
+	
+	private void assertModuleBuildInfo(JsonNode buildInfo, String moduleName) {
+		assertThat(buildInfo).hasSize(11);
+		assertThat(buildInfo.get("moduleName")).isNotNull();
+		assertThat(buildInfo.get("moduleName").asText()).isEqualTo(moduleName);
+		assertThat(buildInfo.has("version")).isTrue();
+		assertThat(buildInfo.has("buildtime")).isTrue();
+		assertThat(buildInfo.has("builder")).isTrue();
+		assertThat(buildInfo.has("buildhost")).isTrue();
+		assertThat(buildInfo.has("buildOs")).isTrue();
+		assertThat(buildInfo.has("gitBranch")).isTrue();
+		assertThat(buildInfo.has("gitCommitId")).isTrue();
+		assertThat(buildInfo.has("gitCommitUrl")).isTrue();
+		assertThat(buildInfo.has("gitCommitTime")).isTrue();
+		assertThat(buildInfo.has("gitDirty")).isTrue();
 	}
 }

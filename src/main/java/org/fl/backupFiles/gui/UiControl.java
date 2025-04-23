@@ -52,23 +52,22 @@ public class UiControl extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	
-
 	private final JButton scanButton;
 	private final JButton bckpUpButton;
 	private final JButton stopButton;
 
 	private final JCheckBox compareContentSelect;
 	private final JCheckBox compareContentOnAmbiguousSelect;
-	
-	private boolean isRunning ;
-	private boolean stopAsked ;
-	
+
+	private boolean isRunning;
+	private boolean stopAsked;
+
 	private final ProgressInformationPanel progressPanel;
-	private final JobTaskType 			   jobTaskType;
-	
-	private JobsChoice				 	   jobsChoice;
-	
-	private final BackUpTableModel 		  backUpTableModel ;
+	private final JobTaskType jobTaskType;
+
+	private JobsChoice jobsChoice;
+
+	private final BackUpTableModel backUpTableModel;
 	private final BackUpJobInfoTableModel backUpJobInfoTableModel;
 	
 	public boolean isRunning() {
@@ -99,48 +98,48 @@ public class UiControl extends JPanel {
 
 	public UiControl(JobTaskType jtt, BackUpTableModel b, ProgressInformationPanel pip, BackUpJobInfoTableModel bj) {
 		
-		super() ;
-		isRunning 	  	  = false ;
-		stopAsked 	  	  = false ;
-		jobsChoice   	  = null ;
-		jobTaskType		  = jtt ;
-		progressPanel 	  = pip ;
-		
-		backUpTableModel  = b ;
-		
-		backUpJobInfoTableModel = bj ;
-		
-		int width = BackupFilesGui.WINDOW_WIDTH - 20 ;
-		setMaximumSize(new Dimension(width, 100)) ;
-		setBorder(BorderFactory.createMatteBorder(10,10,10,10,Color.WHITE)) ;
-		
-		GridBagLayout gLayout = new GridBagLayout() ;
+		super();
+		isRunning = false;
+		stopAsked = false;
+		jobsChoice = null;
+		jobTaskType = jtt;
+		progressPanel = pip;
+
+		backUpTableModel = b;
+
+		backUpJobInfoTableModel = bj;
+
+		int width = BackupFilesGui.WINDOW_WIDTH - 20;
+		setMaximumSize(new Dimension(width, 100));
+		setBorder(BorderFactory.createMatteBorder(10, 10, 10, 10, Color.WHITE));
+
+		GridBagLayout gLayout = new GridBagLayout();
 		GridBagConstraints c = new GridBagConstraints();
-		c.insets = new Insets(0,100,0,100) ;
+		c.insets = new Insets(0, 100, 0, 100);
 		setLayout(gLayout);
-		
+
 		// Compare content check box
-		compareContentSelect = new JCheckBox("Compare files content") ;
+		compareContentSelect = new JCheckBox("Comparer le contenu des fichiers");
 		c.gridx = 0;
 		c.gridy = 0;
 		add(compareContentSelect, c);
-		
+
 		// Compare content check box
-		compareContentOnAmbiguousSelect = new JCheckBox("Compare files content on ambiguous files", true) ;
+		compareContentOnAmbiguousSelect = new JCheckBox("Comparer le contenu des fichiers en cas d'ambiguïté", true);
 		c.gridx = 0;
 		c.gridy = 1;
 		add(compareContentOnAmbiguousSelect, c);
-		
+
 		// Scan and Back up button
-		bckpUpButton = new JButton("Sauvegarde") ;
-		scanButton   = new JButton("Comparaison") ;
-		stopButton	 = new JButton("Stop") ;
+		bckpUpButton = new JButton("Sauvegarde");
+		scanButton = new JButton("Comparaison");
+		stopButton = new JButton("Stop");
 		Font buttonFont = new Font("Verdana", Font.BOLD, 24);
-		bckpUpButton.setFont(buttonFont) ;
-		scanButton.setFont(buttonFont) ;
-		stopButton.setFont(buttonFont) ;
+		bckpUpButton.setFont(buttonFont);
+		scanButton.setFont(buttonFont);
+		stopButton.setFont(buttonFont);
 		setButtonForEmpyTasks();
-		
+
 		ControlAction controlAction = new ControlAction(this);
 		bckpUpButton.addActionListener(controlAction);
 		scanButton.addActionListener(controlAction);
@@ -188,7 +187,7 @@ public class UiControl extends JPanel {
 		}
 		
 		private final static String COMPARAISON_EN_COURS = "Comparaison de fichiers en cours";
-		private final static String SAUVEGARDE_EN_COURS  = "Sauvegarde de fichiers en cours";
+		private final static String SAUVEGARDE_EN_COURS = "Sauvegarde de fichiers en cours";
 		
 		@Override
 		public void actionPerformed(ActionEvent ae) {
@@ -213,11 +212,8 @@ public class UiControl extends JPanel {
 				fScan.execute();
 			}  else if (ae.getSource() == stopButton) {	
 			 	stopAsked = true;
-			}
-		
-		}
-		
-	}
-	
+			}		
+		}		
+	}	
 
 }

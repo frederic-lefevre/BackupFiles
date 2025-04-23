@@ -53,11 +53,7 @@ public class BackupFilesGui  extends JFrame {
 	public static final int WINDOW_WIDTH = 1880;
 	public static final int WINDOW_HEIGHT = 1000;
 	
-	private static String propertyFile;
-	
 	public static void main(String[] args) {
-		
-		propertyFile = DEFAULT_PROP_FILE;
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -84,7 +80,7 @@ public class BackupFilesGui  extends JFrame {
 	}
 	
 	public static String getPropertyFile() {
-		return propertyFile;
+		return DEFAULT_PROP_FILE;
 	}
 	
 	private BackupFilesGui() {
@@ -98,30 +94,32 @@ public class BackupFilesGui  extends JFrame {
 			setTitle("Sauvegarde de fichiers") ;
 			getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));		
 					
-			BackUpJobInfoTableModel jobInformationTable = new BackUpJobInfoTableModel() ;
+			BackUpJobInfoTableModel jobInformationTable = new BackUpJobInfoTableModel();
 			// Tabbed Panel for configuration, tables and controls, and history
-			ApplicationTabbedPane bkpTablesPanel = new ApplicationTabbedPane(Config.getRunningContext()) ;
+			ApplicationTabbedPane mainApplicationTabbedPanel = new ApplicationTabbedPane(Config.getRunningContext());
 				
-			ArrayList<BackUpPane> backUpPanes = new ArrayList<BackUpPane>() ;
+			ArrayList<BackUpPane> backUpPanes = new ArrayList<BackUpPane>();
 			int tabIndex = 0;
 			for (JobTaskType jtt : JobTaskType.values()) {
 				BackUpPane taskTypePane = new BackUpPane(jtt, jobInformationTable);
-				backUpPanes.add(taskTypePane) ;
-				bkpTablesPanel.add(taskTypePane, jtt.toString(), tabIndex);
-				tabIndex++;
+				backUpPanes.add(taskTypePane);
+				mainApplicationTabbedPanel.add(taskTypePane, jtt.toString(), tabIndex++);
 			}
 						
 			//  Tabbed Panel to choose back up configuration. Add it in the first position
 			BackUpConfigChoicePane configChoicePane = new BackUpConfigChoicePane(configFileDir, backUpPanes) ;
-			bkpTablesPanel.add(configChoicePane, "Configuration", 0);
+			mainApplicationTabbedPanel.add(configChoicePane, "Configuration", 0);
+			tabIndex++;
 	
 			// Tabbed Panel to display a summary of operations done. Add it before the standard tabs provided by ApplicationTabbedPane
 			BackUpJobInfoPanel historiqueTab = new BackUpJobInfoPanel(jobInformationTable);
-			bkpTablesPanel.add(historiqueTab, "Historique", tabIndex+1);
+			mainApplicationTabbedPanel.add(historiqueTab, "Historique", tabIndex++);
 			
-			bkpTablesPanel.setSelectedIndex(0);
+			mainApplicationTabbedPanel.add(new CaptionPane(), "Légende", tabIndex++);
 			
-			getContentPane().add(bkpTablesPanel);
+			mainApplicationTabbedPanel.setSelectedIndex(0);
+			
+			getContentPane().add(mainApplicationTabbedPanel);
 			
 			addWindowListener(new ShutdownAppli());
 		} else {

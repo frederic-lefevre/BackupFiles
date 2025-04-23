@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -43,30 +42,15 @@ public class BackUpJTable extends JTable {
 	
 	private static final long serialVersionUID = 1L;
 
-	public BackUpJTable(TableModel arg0) {
+	public BackUpJTable(BackUpTableModel arg0) {
 		super(arg0);	
-		init();	
-	}
-
-	public BackUpJTable(TableModel arg0, TableColumnModel arg1) {
-		super(arg0, arg1);
-		init();
-	}
-
 	
-	public BackUpJTable(TableModel dm, TableColumnModel cm, ListSelectionModel sm) {
-		super(dm, cm, sm);
-		init();
-	}
-
-	private void init() {
-		
 		setFillsViewportHeight(true) ;
 		setAutoCreateRowSorter(true) ;
-		getColumnModel().getColumn(BackUpTableModel.ACTION_COL_IDX).setCellRenderer(new BackUpActionCellRenderer()) ;
-		getColumnModel().getColumn(BackUpTableModel.STATUS_COL_IDX).setCellRenderer(new BackUpStatusCellRenderer()) ;
+		getColumnModel().getColumn(BackUpTableModel.ACTION_COL_IDX).setCellRenderer(new BackUpActionCellRenderer());
+		getColumnModel().getColumn(BackUpTableModel.STATUS_COL_IDX).setCellRenderer(new BackUpStatusCellRenderer());
 		getColumnModel().getColumn(BackUpTableModel.SIZE_DIFF_COL_IDX).setCellRenderer(new BackUpSizeDifferenceCellRenderer());
-		getColumnModel().getColumn(BackUpTableModel.PERMANENCE_COL_IDX).setCellRenderer(new PermanenceCellRenderer()) ;
+		getColumnModel().getColumn(BackUpTableModel.PERMANENCE_COL_IDX).setCellRenderer(new PermanenceCellRenderer());
 		getColumnModel().getColumn(BackUpTableModel.SOURCE_PATH_COL_IDX).setPreferredWidth(805);
 		getColumnModel().getColumn(BackUpTableModel.SIZE_DIFF_COL_IDX).setPreferredWidth(70);
 		getColumnModel().getColumn(BackUpTableModel.PERMANENCE_COL_IDX).setPreferredWidth(85);
@@ -79,7 +63,7 @@ public class BackUpJTable extends JTable {
 		listSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		setSelectionModel(listSelectionModel);
 		
-		setAutoResizeMode(JTable.AUTO_RESIZE_OFF) ;
+		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
 		addMouseListener(new BackupItemMouseAdapter(this, Config.getOsActions()));
 		setAutoCreateRowSorter(true);

@@ -22,21 +22,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package org.fl.backupFiles.directoryPermanence;
+package org.fl.backupFiles.gui;
 
-public enum DirectoryPermanenceLevel {
-	
-	HIGH ("1: Haut"), 
-	MEDIUM("2: Moyen"), 
-	LOW("3: Faible");
-	
-	private final String permanenceName;
-	
-	private DirectoryPermanenceLevel(String n) {
-		permanenceName  = n;
-	}
+import javax.swing.JTable;
 
-	public String getPermanenceName() {
-		return permanenceName;
+public class CaptionForActionTable extends JTable {
+
+	private static final long serialVersionUID = 1L;
+
+	public CaptionForActionTable() {
+		super(new CaptionForActionTableModel());
+		
+		getColumnModel().getColumn(CaptionForActionTableModel.ACTION_COL_IDX).setCellRenderer(new BackUpActionCellRenderer());
+		getColumnModel().getColumn(CaptionForActionTableModel.ACTION_COL_IDX).setPreferredWidth(120);
+		getColumnModel().getColumn(CaptionForActionTableModel.DETAIL_COL_IDX).setPreferredWidth(1200);
 	}
 }

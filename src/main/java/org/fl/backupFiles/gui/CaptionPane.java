@@ -22,21 +22,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package org.fl.backupFiles.directoryPermanence;
+package org.fl.backupFiles.gui;
 
-public enum DirectoryPermanenceLevel {
+import java.awt.Font;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+
+public class CaptionPane extends JPanel{
+
+	private static final long serialVersionUID = 1L;
+	private static final int TOP_CAPTION_SPACE = 25;
 	
-	HIGH ("1: Haut"), 
-	MEDIUM("2: Moyen"), 
-	LOW("3: Faible");
+	private static final Font font = new Font("Verdana", Font.BOLD, 18);
 	
-	private final String permanenceName;
-	
-	private DirectoryPermanenceLevel(String n) {
-		permanenceName  = n;
+	public CaptionPane() {
+		super();
+		
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		showCaption("Actions", new CaptionForActionTable());
+		showCaption("Etat", new CaptionForStatusTable());
 	}
-
-	public String getPermanenceName() {
-		return permanenceName;
+	
+	private void showCaption(String title, JTable captionTable) {
+		
+		JLabel captionTitle = new JLabel(title);
+		captionTitle.setFont(font);
+		captionTitle.setBorder(BorderFactory.createEmptyBorder(TOP_CAPTION_SPACE,0,0,0));
+		
+		add(captionTitle);
+		add(captionTable.getTableHeader());
+		add(captionTable);
 	}
 }

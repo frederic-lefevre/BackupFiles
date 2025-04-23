@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,20 +43,20 @@ public class BackUpPane extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private UiControl 	backUpControl ;
-	private JLabel	  	title ;
-	private JobTaskType jobTaskType ;
-	
-	private final static String NO_CONFIG = "Aucune" ;
-	private final static String SEPARATOR = " - Configuration actuellement sélectionnée: " ;
-	private final static String NO_TASKS = " aucune tâche à effectuer";
+	private final UiControl backUpControl;
+	private final JLabel title;
+	private final JobTaskType jobTaskType;
+
+	private static final String NO_CONFIG = "Aucune";
+	private static final String SEPARATOR = " - Configuration actuellement sélectionnée: ";
+	private static final String NO_TASKS = " aucune tâche à effectuer";
 	
 	public BackUpPane(JobTaskType jtt, BackUpJobInfoTableModel backUpJobInfoTableModel) {
-		super() ;
+		super();
 		
-		jobTaskType = jtt ;
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)) ;
-		setBorder(BorderFactory.createLineBorder(Color.BLACK,5,true)) ;
+		jobTaskType = jtt;
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		setBorder(BorderFactory.createLineBorder(Color.BLACK,5,true));
 		
 		BackUpItemList backUpItemList = new BackUpItemList();
 		BackUpTableModel backUpTableModel = new BackUpTableModel(backUpItemList);
@@ -64,30 +64,30 @@ public class BackUpPane extends JPanel {
 		BackUpJTable backUpItemTable = new BackUpJTable(backUpTableModel);
 
 		// Tables labels
-		title = new JLabel(jobTaskType.toString() + SEPARATOR + NO_CONFIG) ;
+		title = new JLabel(jobTaskType.toString() + SEPARATOR + NO_CONFIG);
 		Font font = new Font("Verdana", Font.BOLD, 18);
 		title.setFont(font);
 		title.setAlignmentX(CENTER_ALIGNMENT);
-		add(title) ;
+		add(title);
 		
 		// Status and progress information
-		ProgressInformationPanel pip = new ProgressInformationPanel() ;
+		ProgressInformationPanel pip = new ProgressInformationPanel();
 		pip.setAlignmentX(CENTER_ALIGNMENT);
 		add(pip) ;
-		pip.setProcessStatus("Initial") ;
-		pip.setStepInfos("Aucune action effectuée", 0) ;
+		pip.setProcessStatus("Initial");
+		pip.setStepInfos("Aucune action effectuée", 0);
 		
 		// Scan and Back up buttons
-		backUpControl = new UiControl(jobTaskType, backUpTableModel, pip, backUpJobInfoTableModel) ;
+		backUpControl = new UiControl(jobTaskType, backUpTableModel, pip, backUpJobInfoTableModel);
 		add(backUpControl) ;
 		
 		// Table headers
-		add(backUpItemTable.getTableHeader()) ;
+		add(backUpItemTable.getTableHeader());
 		
 		// Scroll pane to contain the tables
-		JScrollPane bufferScrollTable = new JScrollPane(backUpItemTable) ;
+		JScrollPane bufferScrollTable = new JScrollPane(backUpItemTable);
 		
-		add(bufferScrollTable) ;
+		add(bufferScrollTable);
 	}
 
 	public void setJobChoice(JobsChoice jobChoice) {
@@ -103,6 +103,4 @@ public class BackUpPane extends JPanel {
 		title.setText(buTitle.toString());
 		backUpControl.setJobChoice(jobChoice) ;
 	}
-
-
 }

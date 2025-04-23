@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,13 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
-import org.fl.backupFiles.BackUpItem.BackupAction;
-
 public class IllegalBackupActionException extends IllegalArgumentException {
 
 	private static final long serialVersionUID = 1L;
+	
+	public IllegalBackupActionException(Object value) {
+		super("\"Invalid value type. BackupAction was expected, received " + value.getClass().getName());
+	}
 	
 	public IllegalBackupActionException(String s, BackupAction backupAction) {
 		super(s + " Action=" + backupAction);

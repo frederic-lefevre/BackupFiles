@@ -42,9 +42,9 @@ import org.fl.backupFiles.BackUpCounters;
 import org.fl.backupFiles.BackUpItem;
 import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpTask;
+import org.fl.backupFiles.BackupAction;
+import org.fl.backupFiles.BackupStatus;
 import org.fl.backupFiles.Config;
-import org.fl.backupFiles.BackUpItem.BackupAction;
-import org.fl.backupFiles.BackUpItem.BackupStatus;
 import org.fl.util.file.FileComparator;
 
 public class BackUpScannerThread {
@@ -62,7 +62,7 @@ public class BackUpScannerThread {
 	private final BackUpTask backUpTask;
 
 	private final FileComparator fileComparator;
-	private final BackUpItem.BackupAction acionOnSameTargetContentButNewer;
+	private final BackupAction acionOnSameTargetContentButNewer;
 	
 	private Path currentFile;	
 	private String status;	

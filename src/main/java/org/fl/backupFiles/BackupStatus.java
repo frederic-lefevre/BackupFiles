@@ -22,21 +22,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package org.fl.backupFiles.directoryPermanence;
+package org.fl.backupFiles;
 
-public enum DirectoryPermanenceLevel {
+public enum BackupStatus {
+	DIFFERENT("Différent", "Les 2 éléments sont différents"), 
+	DIFF_BY_CONTENT("Contenu différent", "Les 2 éléments ont la même date de modification mais un contenu différent"), 
+	SAME_CONTENT("Même contenu", "Les 2 éléments ont un contenu identique mais la destination a une date de modification plus récente que l'origine"),
+	DONE("Fait", "L'opération de sauvegarde a réussi"), 
+	FAILED("Erreur", "L'opération de sauvegarde a échoué");
 	
-	HIGH ("1: Haut"), 
-	MEDIUM("2: Moyen"), 
-	LOW("3: Faible");
+	private final String statusName;
+	private final String statusDetail;
 	
-	private final String permanenceName;
-	
-	private DirectoryPermanenceLevel(String n) {
-		permanenceName  = n;
+	private BackupStatus(String statusName, String statusDetail) {
+		this.statusName = statusName;
+		this.statusDetail = statusDetail;
 	}
 
-	public String getPermanenceName() {
-		return permanenceName;
+	public String getStatusName() {
+		return statusName;
+	}
+
+	public String getStatusDetail() {
+		return statusDetail;
 	}
 }

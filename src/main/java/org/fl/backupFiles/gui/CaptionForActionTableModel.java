@@ -24,36 +24,51 @@ SOFTWARE.
 
 package org.fl.backupFiles.gui;
 
-import java.awt.Color;
-import java.awt.Font;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import javax.swing.SwingConstants;
+import javax.swing.table.AbstractTableModel;
 
-import org.fl.backupFiles.directoryPermanence.DirectoryPermanenceLevel;
-import org.fl.util.swing.CustomTableCellRenderer;
+import org.fl.backupFiles.BackupAction;
 
-public class PermanenceCellRenderer extends CustomTableCellRenderer {
+public class CaptionForActionTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
-
-	private static final Color HIGH_COLOR = Color.RED;
-	private static final Color MEDIUM_COLOR = Color.PINK;
-	private static final Font font = new Font("Dialog", Font.PLAIN, 12);
 	
-	public PermanenceCellRenderer() {
-		super(font, SwingConstants.CENTER);
+	private static final String[] entetes = {"Action", "Détail"};
+	
+	public static final int ACTION_COL_IDX = 0;
+	public static final int DETAIL_COL_IDX = 1;
+	
+	private static final List<BackupAction> actions = Stream.of(BackupAction.values()).collect(Collectors.toList());
+	
+	public CaptionForActionTableModel() {
+		super();
 	}
 
 	@Override
-	public void valueProcessor(Object value) {
+	public int getRowCount() {
+		return actions.size();
+	}
+
+	@Override
+	public int getColumnCount() {
+		return entetes.length;
+	}
+
+	@Override
+	public String getColumnName(int col) {
+	    return entetes[col];
+	}
+	
+	@Override
+	public Object getValueAt(int rowIndex, int columnIndex) {
 		
-		if (value instanceof DirectoryPermanenceLevel permanenceLevel) {
-			switch (permanenceLevel) {
-				case HIGH -> setBackground(HIGH_COLOR);
-				case MEDIUM -> setBackground(MEDIUM_COLOR);
-				case LOW -> setBackground(Color.WHITE);
-			}
-			setValue(permanenceLevel.getPermanenceName());
-		}		
+		return switch (columnIndex) {
+			case ACTION_COL_IDX -> actions.get(rowIndex);
+			case DETAIL_COL_IDX -> actions.get(rowIndex).getActionDetails();
+			default -> null;
+		};
 	}
 }

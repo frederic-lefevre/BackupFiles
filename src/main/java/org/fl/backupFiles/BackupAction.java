@@ -22,21 +22,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package org.fl.backupFiles.directoryPermanence;
+package org.fl.backupFiles;
 
-public enum DirectoryPermanenceLevel {
+public enum BackupAction {
+	COPY_NEW("Copier nouveau", "Copier le fichier source dans la destination"), 
+	COPY_REPLACE("Remplacer", "Remplacer le fichier destination par la source"), 
+	COPY_TREE("Copier arbre", "Copier l'arbre source dans la destination"), 
+	DELETE("Effacer", "Effacer le fichier destination"), 
+	DELETE_DIR("Effacer arbre", "Effacer l'arbre destination"), 
+	AMBIGUOUS("Ambigu", "Le fichier destination est plus récent, remplacer le fichier destination par la source"), 
+	COPY_TARGET("Copier cible", "Remplacer le fichier source par la destination (ils ont un contenu identique)"), 
+	ADJUST_TIME("Ajuster temps", "Remplacer le temps de modification du fichier destination avec celui de la source (ils ont un contenu identique)");
 	
-	HIGH ("1: Haut"), 
-	MEDIUM("2: Moyen"), 
-	LOW("3: Faible");
+	private final String actionName;
+	private final String actionDetails;
 	
-	private final String permanenceName;
-	
-	private DirectoryPermanenceLevel(String n) {
-		permanenceName  = n;
+	private BackupAction(String actionName, String actionDetails) {
+		this.actionName = actionName;
+		this.actionDetails = actionDetails;
 	}
-
-	public String getPermanenceName() {
-		return permanenceName;
+	
+	public String getActionName() {
+		return actionName;
+	}
+	
+	public String getActionDetails() {
+		return actionDetails;
 	}
 }

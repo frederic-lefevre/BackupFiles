@@ -57,9 +57,9 @@ public class BackUpJob {
 	private List<FullBackUpTask> fullBackUpTaskList;
 	
 	public enum JobTaskType { 
-		SOURCE_TO_BUFFER("Source vers buffer"), 
-		BUFFER_TO_TARGET("Buffer vers target"),
-		SOURCE_TO_TARGET("Source vers target");
+		SOURCE_TO_BUFFER("Source vers tampon"), 
+		BUFFER_TO_TARGET("Tampon vers cible"),
+		SOURCE_TO_TARGET("Source vers cible");
 		
 		private String jobName;
 		

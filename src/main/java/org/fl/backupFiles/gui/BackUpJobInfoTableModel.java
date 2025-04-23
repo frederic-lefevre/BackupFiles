@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,27 +35,27 @@ public class BackUpJobInfoTableModel extends AbstractTableModel {
 
 	private static final long serialVersionUID = 1L;
 	
-	private final static String[] entetes = {"Configuration", "Date", "Résultat", "Opération", "Type"};
+	private static final String[] entetes = {"Configuration", "Date", "Résultat", "Opération", "Type"};
 
-	private List<BackUpJobInformation> jobInfosList ;
-	
+	private final List<BackUpJobInformation> jobInfosList;
+
 	public BackUpJobInfoTableModel() {
-		super() ;
-		jobInfosList = new ArrayList<BackUpJobInformation>() ;
+		super();
+		jobInfosList = new ArrayList<BackUpJobInformation>();
 	}
 
 	public void add(BackUpJobInformation jobInfo) {
-		jobInfosList.add(jobInfo) ;
+		jobInfosList.add(jobInfo);
 	}
-	
+
 	@Override
 	public int getColumnCount() {
-		return entetes.length ;
+		return entetes.length;
 	}
 
 	@Override
 	public int getRowCount() {
-		return jobInfosList.size() ;
+		return jobInfosList.size();
 	}
 	
 	@Override
@@ -65,37 +65,26 @@ public class BackUpJobInfoTableModel extends AbstractTableModel {
 	
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		
-		switch(columnIndex){
-        case 0:
-        	return jobInfosList.get(rowIndex).getJobTitle() ;
-        case 1:
-        	return jobInfosList.get(rowIndex).getJobEnd() ;
-        case 2:
-        	return jobInfosList.get(rowIndex).getJobResult() ;
-        case 3:
-        	return jobInfosList.get(rowIndex).getJobOperation() ;
-        case 4:
-        	return jobInfosList.get(rowIndex).getJobDirection() ;
-        default:
-        	return null;
-		}
+
+		return switch (columnIndex) {
+			case 0 -> jobInfosList.get(rowIndex).getJobTitle();
+			case 1 -> jobInfosList.get(rowIndex).getJobEnd();
+			case 2 -> jobInfosList.get(rowIndex).getJobResult();
+			case 3 -> jobInfosList.get(rowIndex).getJobOperation();
+			case 4 -> jobInfosList.get(rowIndex).getJobDirection();
+			default -> null;
+		};
 	}
-	
+
 	public int getColumnPreferredWith(int columnIndex) {
-		switch(columnIndex){
-        case 0:
-        	return 460 ;
-        case 1:
-        	return 320 ;
-        case 2:
-        	return 700 ;
-        case 3:
-        	return 180 ;
-        case 4:
-        	return 180 ;
-        default: 
-        	return 0;
-		}
+		
+		return switch (columnIndex) {
+			case 0 -> 460;
+			case 1 -> 320;
+			case 2 -> 700;
+			case 3 -> 180;
+			case 4 -> 180;
+			default -> 0;
+		};
 	}
 }

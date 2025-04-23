@@ -25,56 +25,38 @@ SOFTWARE.
 package org.fl.backupFiles.gui;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 
-import javax.swing.JTable;
 import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
 
-import org.fl.backupFiles.BackUpItem.BackupAction;
+import org.fl.backupFiles.BackupAction;
 import org.fl.backupFiles.IllegalBackupActionException;
+import org.fl.util.swing.CustomTableCellRenderer;
 
-public class BackUpActionCellRenderer extends DefaultTableCellRenderer {
+public class BackUpActionCellRenderer extends CustomTableCellRenderer {
 
 	private static final long serialVersionUID = 1L;
 	private static final Font font = new Font("Dialog", Font.BOLD, 12);
-
+	
 	public BackUpActionCellRenderer() {
-		super();
-		setHorizontalAlignment(SwingConstants.CENTER);
+		
+		super(font, SwingConstants.CENTER);	
 	}
 	
 	@Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
- 
-        // DefaultTableCellRenderer.getTableCellRendererComponent sets the font at each call
-        // So it is ineffective to change the font in the constructor
-        setFont(font);
-        
-        BackupAction backupAction = (BackupAction) value;
- 
-		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
-			setBackground(Color.MAGENTA);
-		} else if (backupAction.equals(BackupAction.COPY_NEW)) {
-			setBackground(Color.GREEN);
-		} else if (backupAction.equals(BackupAction.DELETE)) {
-			setBackground(Color.ORANGE);
-		} else if (backupAction.equals(BackupAction.COPY_TREE)) {
-			setBackground(Color.GREEN);
-		} else if (backupAction.equals(BackupAction.DELETE_DIR)) {				
-			setBackground(Color.ORANGE);
-		} else if (backupAction.equals(BackupAction.AMBIGUOUS)) {
-			setBackground(Color.RED);
-		} else if (backupAction.equals(BackupAction.COPY_TARGET)) {
-			setBackground(Color.PINK);
-		} else if (backupAction.equals(BackupAction.ADJUST_TIME)) {
-			setBackground(Color.PINK);
+	public void valueProcessor(Object value) {
+		
+		if (value instanceof BackupAction backupAction) {
+			switch (backupAction) {
+				case COPY_REPLACE -> setBackground(Color.MAGENTA);
+				case COPY_NEW, COPY_TREE -> setBackground(Color.GREEN);
+				case DELETE, DELETE_DIR -> setBackground(Color.ORANGE);
+				case COPY_TARGET, ADJUST_TIME -> setBackground(Color.PINK);
+				case AMBIGUOUS -> setBackground(Color.RED);
+			}
+			setValue(backupAction.getActionName());
 		} else {
-			throw new IllegalBackupActionException("Invalid backup action: ", backupAction);
-		}
-        return this;
-    }
-
+			throw new IllegalBackupActionException(value);
+		}	
+	}
 }
