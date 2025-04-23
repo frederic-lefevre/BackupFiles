@@ -180,7 +180,7 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 		StringBuilder procInfo = new StringBuilder(1024);
 		procInfo.append(HTML_BEGIN);
 		backUpCounters.appendHtmlFragment(procInfo);
-		procInfo.append("<p>Durée sauvegarde (ms)= ").append(duration);
+		procInfo.append("<p>Durée de la sauvegarde (ms)= ").append(duration);
 		procInfo.append(jobsChoice.getTargetRemainigSpace(true));
 		procInfo.append(HTML_END);
 		return procInfo.toString();
