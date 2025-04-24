@@ -98,17 +98,18 @@ class FilesBackUpScannerTest {
 				fail("There should be only 1 BackUpJob");
 			}
 
-			BackUpJob backUpJob = backUpJobs.firstElement() ;
-			JobsChoice jobsChoice = new JobsChoice(Arrays.asList(backUpJob)) ;
+			BackUpJob backUpJob = backUpJobs.firstElement();
+			JobsChoice jobsChoice = new JobsChoice(Arrays.asList(backUpJob));
 
-			BackUpJobInfoTableModel  bujitm 	 	= new BackUpJobInfoTableModel() ;
-			ProgressInformationPanel pip    	 	= new ProgressInformationPanel() ;
-			BackUpItemList 			 backUpItems 	= new BackUpItemList() ;
-			BackUpTableModel         btm    	 	= new BackUpTableModel(backUpItems) ;
-			UiControl				 uicS2B		 	= new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm) ;
-			UiControl				 uicB2T		 	= new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm) ;
-			BackUpCounters           backUpCounters ;
-			// SOURCE_TO_BUFFER			
+			BackUpJobInfoTableModel bujitm = new BackUpJobInfoTableModel();
+			ProgressInformationPanel pip = new ProgressInformationPanel();
+			BackUpItemList backUpItems = new BackUpItemList();
+			BackUpTableModel btm = new BackUpTableModel(backUpItems);
+			UiControl uicS2B = new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm);
+			UiControl uicB2T = new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm);
+			BackUpCounters backUpCounters;
+			
+			// SOURCE_TO_BUFFER
 			FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm);
 			assertThat(backUpItems).isEmpty();
 

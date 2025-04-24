@@ -178,25 +178,25 @@ public class BackUpScannerThread {
 							PathPairBasicAttributes onlyTargetNotNull = new PathPairBasicAttributes(null, targetFile);
 							BackupAction action;
 							if (onlyTargetNotNull.targetIsDirectory()) {
-								action = BackupAction.DELETE_DIR ;
+								action = BackupAction.DELETE_DIR;
 							} else {
-								action = BackupAction.DELETE ;
+								action = BackupAction.DELETE;
 							}
 							backUpItemList.add(new BackUpItem(onlyTargetNotNull, action, sourceDirectory, backUpCounters, backUpTask.getSizeWarningLimit()));
 
 						} else {
 							pairFiles.setTargetPath(targetFile);
 						}
-						backUpCounters.nbTargetFilesProcessed++ ; 
+						backUpCounters.nbTargetFilesProcessed++; 
 					}
 				} catch (IOException e) {
-					backUpCounters.nbTargetFilesFailed++ ; 
-					filesVisitFailed.add(targetDirectory) ;
+					backUpCounters.nbTargetFilesFailed++; 
+					filesVisitFailed.add(targetDirectory);
 					pLog.log(Level.SEVERE, "Exception when scanning directory " + Objects.toString(targetDirectory), e);
 				}
 			} else {
 				
-				targetIsDirectory = false ;
+				targetIsDirectory = false;
 				if (pathPairBasicAttributes.targetExists()) {
 				// source is a directory but target is not : delete target and copy source tree
 					
@@ -229,28 +229,28 @@ public class BackUpScannerThread {
 							backUpItemList.add(new BackUpItem(pairBasicAttributes, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, backUpCounters, backUpTask.getSizeWarningLimit()));							
 						} else {
 							// source is a file						
-							backUpItemList.add(new BackUpItem(pairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, backUpCounters, backUpTask.getSizeWarningLimit())) ;						
+							backUpItemList.add(new BackUpItem(pairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, backUpCounters, backUpTask.getSizeWarningLimit()));						
 						}
 					} else {
 						
-						Path tgtPath = pairBasicAttributes.getTargetPath() ;
+						Path tgtPath = pairBasicAttributes.getTargetPath();
 						
 						if (sourceAttributes.isDirectory()) {
 							// source is a directory
 							
 							// recursively call directoryCompare
 							if (currDepth < maxDepth) {
-								currDepth++ ;
-								directoryCompare(pairBasicAttributes) ;
-								currDepth-- ;
+								currDepth++;
+								directoryCompare(pairBasicAttributes);
+								currDepth--;
 							} else {
-								pLog.severe("Directory max depth reached. Depth=" + currDepth + "\non source path " + srcPath) ;
+								pLog.severe("Directory max depth reached. Depth=" + currDepth + "\non source path " + srcPath);
 							}
 							
 						} else {
 							// source is a file
 							
-							BasicFileAttributes targetAttributes = pairBasicAttributes.getTargetBasicAttributes() ;
+							BasicFileAttributes targetAttributes = pairBasicAttributes.getTargetBasicAttributes();
 							
 							if (targetAttributes != null) {
 								if (targetAttributes.isDirectory()) {
@@ -259,18 +259,18 @@ public class BackUpScannerThread {
 									backUpItemList.add(new BackUpItem(pairBasicAttributes, BackupAction.DELETE_DIR, sourceDirectory, backUpCounters, backUpTask.getSizeWarningLimit()));
 									backUpItemList.add(new BackUpItem(pairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, backUpCounters, backUpTask.getSizeWarningLimit()));
 								} else {
-									compareFile(pairBasicAttributes) ;	
+									compareFile(pairBasicAttributes);	
 								}
 							} else {
-								pLog.severe("Failed to get target file attributes for " + Objects.toString(tgtPath)) ;
-								filesVisitFailed.add(tgtPath) ;
+								pLog.severe("Failed to get target file attributes for " + Objects.toString(tgtPath));
+								filesVisitFailed.add(tgtPath);
 							}
 						}
 					}
-					backUpCounters.nbSourceFilesProcessed++ ;
+					backUpCounters.nbSourceFilesProcessed++;
 				} else {
-					pLog.severe("Failed to get source file attributes for " + Objects.toString(srcPath)) ;
-					filesVisitFailed.add(srcPath) ;
+					pLog.severe("Failed to get source file attributes for " + Objects.toString(srcPath));
+					filesVisitFailed.add(srcPath);
 				}
 			}
 		}
@@ -366,7 +366,7 @@ public class BackUpScannerThread {
 						compareFile(pathPairBasicAttributes);
 					}
 				} else {
-					backUpItemList.add(new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, backUpCounters, backUpTask.getSizeWarningLimit())) ;
+					backUpItemList.add(new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, backUpCounters, backUpTask.getSizeWarningLimit()));
 				}
 			} else {
 				// Source path does not exist : delete target
