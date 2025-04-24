@@ -362,9 +362,7 @@ public class BackUpItem {
 						LinkOption.NOFOLLOW_LINKS);
 				backUpCounters.copyTargetNb++;
 			}
-			
-			
-			backUpCounters.nbSourceFilesProcessed++;
+			backUpCounters.nbSourceFilesProcessed++;			
 		} else {
 			throw new IllegalBackupActionException("Invalid backup action: ", backupAction);
 		}
