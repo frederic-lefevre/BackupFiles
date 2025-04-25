@@ -56,6 +56,8 @@ public class TargetFileStores {
 					TargetFileStore targetFileStore = new TargetFileStore(fileStore, mountPoint);
 					targetFileStores.put(fileStore, targetFileStore);
 					return targetFileStore;
+				} else {
+					return targetFileStores.get(fileStore);
 				}
 			} catch (Exception e) {	
 				tLog.log(Level.SEVERE, "Exception when getting filestore and mount point for " + path, e);
