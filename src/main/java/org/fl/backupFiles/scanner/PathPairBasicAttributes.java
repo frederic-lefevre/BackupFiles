@@ -32,7 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // The purpose of this class is to make one and only one access to the source and target paths attributes
-// (exists or not, size, last modified time... ect)
+// (exists or not, size, last modified time... etc)
 public class PathPairBasicAttributes {
 
 	private static final Logger pLog = Logger.getLogger(PathPairBasicAttributes.class.getName());
