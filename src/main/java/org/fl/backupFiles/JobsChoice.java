@@ -24,7 +24,6 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
-import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -51,7 +50,7 @@ public class JobsChoice {
 
 	private final Map<JobTaskType, ArrayList<BackUpTask>> backUpTasks;
 
-	private Map<FileStore, TargetFileStore> targetFileStores;
+	private final TargetFileStores targetFileStores;
 	
 	public JobsChoice(List<BackUpJob> bj) {
 
@@ -60,7 +59,7 @@ public class JobsChoice {
 		compareContent = false;
 		compareContentOnAmbiguous = true;
 
-		targetFileStores = new HashMap<FileStore, TargetFileStore>();
+		targetFileStores = new TargetFileStores();
 
 		StringBuilder titlesString = new StringBuilder();
 		StringBuilder titlesHtml = new StringBuilder("<html><body>");
@@ -81,9 +80,14 @@ public class JobsChoice {
 			for (BackUpJob backUpJob : backUpJobs) {
 				addAllTasks(tasksForJtt, backUpJob.getTasks(jtt));
 			}
+			initTargetFileStores(jtt);
 		}
 		jobsDetail = details.toString();
 
+	}
+
+	public TargetFileStores getTargetFileStores() {
+		return targetFileStores;
 	}
 
 	public String getTitleAsString() {
@@ -126,52 +130,13 @@ public class JobsChoice {
 		}
 	}
 	
-	public void initTargetFileStores(JobTaskType jobTaskType) {
+	private void initTargetFileStores(JobTaskType jobTaskType) {
 		for (BackUpTask backUpTask : getTasks(jobTaskType)) {
 			Path targetPath = backUpTask.getTarget();
 			if ((targetPath != null) && (Files.exists(targetPath))) {
-				TargetFileStore targetFileStore = new TargetFileStore(targetPath);
-				FileStore fs = targetFileStore.getFileStore();
-				if (fs != null) { 
-					if (! targetFileStores.containsKey(fs)) {
-						// put the new target file store in the map
-						targetFileStores.put(fs, targetFileStore);
-					} else {
-						// Target file store exists in the map
-						// just update remaining space
-						targetFileStores.get(fs).memorizeInitialRemainingSpace();
-					}
-				}
+				targetFileStores.addTargetFileStore(targetPath);
 			}			
 		}
-	}
-	
-	public String getTargetRemainigSpace(boolean inHtml) {
-		
-		StringBuilder spaceEvol = new StringBuilder() ;
-		if (inHtml) {
-			spaceEvol.append("<p>") ;
-		}
-		spaceEvol.append("Stockage de fichiers, espace restant utilisable:") ;
-		if (inHtml) {
-			spaceEvol.append("<ul>") ;
-		} else {
-			spaceEvol.append("\n") ;
-		}
-		for (TargetFileStore targetFileStore : targetFileStores.values()) {
-			if (inHtml) {
-				spaceEvol.append("<li>") ;
-			} else {
-				spaceEvol.append("- ") ;
-			}
-			targetFileStore.getSpaceEvolution(spaceEvol) ;
-			if (inHtml) {
-				spaceEvol.append("</li>") ;
-			} else {
-				spaceEvol.append("\n") ;
-			}
-		}
-		return spaceEvol.toString() ;
 	}
 
 	public boolean compareContent() {

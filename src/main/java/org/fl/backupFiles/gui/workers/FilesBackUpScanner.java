@@ -297,6 +297,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		scanInfo.append(HTML_BEGIN);
 		backUpCounters.appendHtmlFragment(scanInfo);
 		scanInfo.append("<p>Durée de la comparaison (ms)= ").append(duration);
+		scanInfo.append(jobsChoice.getTargetFileStores().getTargetRemainigSpace(true));
 		if ((filesVisitFailed != null) && (!filesVisitFailed.isEmpty())) {
 			scanInfo.append("<br>Fichiers visités en erreur:");
 			for (Path fileOnError : filesVisitFailed) {

@@ -93,7 +93,6 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 		pLog.info("Back up triggered for " + jobsChoice.getTitleAsString());
 
 		boolean backupSuccess = true;
-		jobsChoice.initTargetFileStores(jobTaskType);
 		backUpCounters.reset();
 		int nbActionDone = 0;
 		Iterator<BackUpItem> backupItemIterator = backUpItemList.iterator();
@@ -181,7 +180,7 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 		procInfo.append(HTML_BEGIN);
 		backUpCounters.appendHtmlFragment(procInfo);
 		procInfo.append("<p>Durée de la sauvegarde (ms)= ").append(duration);
-		procInfo.append(jobsChoice.getTargetRemainigSpace(true));
+		procInfo.append(jobsChoice.getTargetFileStores().getTargetRemainigSpace(true));
 		procInfo.append(HTML_END);
 		return procInfo.toString();
 	}
@@ -191,7 +190,7 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 		StringBuilder procInfo = new StringBuilder(1024);
 		procInfo.append(jobsChoice.getTitleAsString()).append(jobTaskType.toString()).append("\n");
 		procInfo.append(backUpCounters.toString()).append("\nProcess duration (ms)= ").append(duration).append("\n");
-		procInfo.append(jobsChoice.getTargetRemainigSpace(false));
+		procInfo.append(jobsChoice.getTargetFileStores().getTargetRemainigSpace(false));
 		return procInfo.toString();
 	}
 }

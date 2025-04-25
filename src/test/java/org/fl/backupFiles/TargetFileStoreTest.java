@@ -38,7 +38,8 @@ public class TargetFileStoreTest {
 	@Test
 	void shouldReturnSpaceEvolution() {
 		
-		TargetFileStore targetFileStore = new TargetFileStore(pathForTargetFileStore);
+		TargetFileStores targetFileStores = new TargetFileStores();
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore);
 		
 		assertThat(targetFileStore).isNotNull();
 		
