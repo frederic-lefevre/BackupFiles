@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,9 @@ import org.fl.backupFiles.scanner.ScannerThreadResponse;
 
 public class BackUpScannerResult {
 
-	private final List<ScannerThreadResponse> taskResults ;
-	private final long 					  	  duration ;
-	
+	private final List<ScannerThreadResponse> taskResults;
+	private final long duration;
+
 	public BackUpScannerResult(List<ScannerThreadResponse> tr, long d) {	
 		super();
 		taskResults = tr;
