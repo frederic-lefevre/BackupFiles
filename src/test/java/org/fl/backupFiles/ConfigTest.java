@@ -87,6 +87,11 @@ class ConfigTest {
 	}
 	
 	@Test
+	void fileStoreWarningThresholdTest() {
+		assertThat(Config.getFileStoreRemainingSpaceWarningThreshold()).isGreaterThan(100_000_000);
+	}
+	
+	@Test
 	void buildInformationTest() throws JsonProcessingException, URISyntaxException {
 		
 		RunningContext runningContext = Config.getRunningContext();
