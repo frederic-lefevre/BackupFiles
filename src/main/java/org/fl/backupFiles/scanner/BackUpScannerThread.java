@@ -314,22 +314,22 @@ public class BackUpScannerThread {
 				BasicFileAttributes targetAttributes = pathPairBasicAttributes.getTargetBasicAttributes();
 				FileTime f1t = sourceAttributes.lastModifiedTime();
 				FileTime f2t = targetAttributes.lastModifiedTime();
-				int compareFile = f1t.compareTo(f2t);
-				long sizeDiff = sourceAttributes.size() - targetAttributes.size();
+				int compareFileTime = f1t.compareTo(f2t);
+				long sizeDifference = sourceAttributes.size() - targetAttributes.size();
 
-				if (compareFile == 0) {
+				if (compareFileTime == 0) {
 					// Same last modified time
 
-					if (sizeDiff != 0) {
+					if (sizeDifference != 0) {
 						// different size
 						backUpItemList.add(new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, backUpCounters, backUpTask.getSizeWarningLimit()));
 					}					
-				} else if (compareFile > 0) {
+				} else if (compareFileTime > 0) {
 					// Source file is newer
 					
 					backUpItemList.add(new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, backUpCounters, backUpTask.getSizeWarningLimit()));
 					
-				} else if (compareFile < 0) {
+				} else if (compareFileTime < 0) {
 					// target file is newer
 					
 					if (backUpTask.compareContentOnAmbiguous()) {
