@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -272,6 +273,7 @@ public class BackUpItem {
 			}
 		} catch (AccessDeniedException e) {
 			// try to set the file writable
+			bLog.log(Level.FINE, e, () -> "AccessDeniedException on sourcePath=" + Objects.toString(sourcePath) + " targetPath=" + Objects.toString(targetPath));
 			try {
 				FilesSecurityUtils.setWritable(targetPath, sourceClosestExistingPath);
 				if (executeAction(backUpCounters)) {
@@ -357,7 +359,7 @@ public class BackUpItem {
 				// Fail to modify last modified time of target
 				// It is not possible on some external drive on windows
 				// Then copy target to source is the only solution
-				bLog.info("Fail to adjust time for " + targetPath.getFileName());
+				bLog.info(() -> "Fail to adjust time for " + targetPath.getFileName());
 				Files.copy(targetPath, sourcePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES,
 						LinkOption.NOFOLLOW_LINKS);
 				backUpCounters.copyTargetNb++;
