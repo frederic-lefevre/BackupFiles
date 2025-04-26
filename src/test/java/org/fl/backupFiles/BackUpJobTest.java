@@ -123,6 +123,8 @@ public class BackUpJobTest {
 		int nbBackUpTasks = bTt1.size() + bTt2.size();
 		
 		if (Files.exists(Path.of(URI.create("file:///S:/")))) {
+			assertThat(logCounter.getLogRecordCount()).isZero();
+		} else {
 			assertThat(logCounter.getLogRecordCount()).isEqualTo(nbBackUpTasks);
 			assertThat(logCounter.getLogRecordCount(Level.WARNING)).isEqualTo(nbBackUpTasks);
 		}
@@ -171,6 +173,8 @@ public class BackUpJobTest {
 		assertThat(bTt).hasSize((int) expectedNbTasks);
 
 		if (Files.exists(Path.of(URI.create("file:///S:/")))) {
+			assertThat(logCounter.getLogRecordCount()).isZero();
+		} else {
 			assertThat(logCounter.getLogRecordCount()).isEqualTo(expectedNbTasks*2);
 			assertThat(logCounter.getLogRecordCount(Level.WARNING)).isEqualTo(expectedNbTasks*2);
 		}
@@ -274,6 +278,8 @@ public class BackUpJobTest {
 		int nbBackUpTasks = bTt.size();
 		
 		if (Files.exists(Path.of(URI.create("file:///S:/")))) {
+			assertThat(logCounter.getLogRecordCount()).isZero();
+		} else {
 			assertThat(logCounter.getLogRecordCount()).isEqualTo(nbBackUpTasks);
 			assertThat(logCounter.getLogRecordCount(Level.WARNING)).isEqualTo(nbBackUpTasks);
 		}
