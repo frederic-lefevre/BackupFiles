@@ -182,7 +182,7 @@ public class BackUpScannerThread {
 							} else {
 								action = BackupAction.DELETE;
 							}
-							backUpItemList.add(new BackUpItem(onlyTargetNotNull, action, sourceDirectory, backUpCounters, backUpTask.getSizeWarningLimit()));
+							backUpItemList.add(new BackUpItem(onlyTargetNotNull, action, pathPairBasicAttributes, backUpCounters, backUpTask.getSizeWarningLimit()));
 
 						} else {
 							pairFiles.setTargetPath(targetFile);
@@ -201,7 +201,7 @@ public class BackUpScannerThread {
 				// source is a directory but target is not : delete target and copy source tree
 					
 					pLog.warning("Source " + sourceDirectory + " is a directory\n" + "but target is not " + targetDirectory);
-					backUpItemList.add(new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, sourceDirectory, backUpCounters, backUpTask.getSizeWarningLimit()));
+					backUpItemList.add(new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, pathPairBasicAttributes, backUpCounters, backUpTask.getSizeWarningLimit()));
 				} else {
 					// source is a directory but target does not exists : copy source tree				
 					pLog.warning("Source " + sourceDirectory + " is a directory\n" + "but target does not exists " + targetDirectory);
@@ -256,7 +256,7 @@ public class BackUpScannerThread {
 								if (targetAttributes.isDirectory()) {
 									// source is a file but target is a directory : delete target dir, copy source file 
 									pLog.warning("Source " + srcPath + " is a file\n" + "but target is a directory " + tgtPath);
-									backUpItemList.add(new BackUpItem(pairBasicAttributes, BackupAction.DELETE_DIR, sourceDirectory, backUpCounters, backUpTask.getSizeWarningLimit()));
+									backUpItemList.add(new BackUpItem(pairBasicAttributes, BackupAction.DELETE_DIR, pathPairBasicAttributes, backUpCounters, backUpTask.getSizeWarningLimit()));
 									backUpItemList.add(new BackUpItem(pairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, backUpCounters, backUpTask.getSizeWarningLimit()));
 								} else {
 									compareFile(pairBasicAttributes);	
@@ -293,8 +293,7 @@ public class BackUpScannerThread {
 			}
 		} else if (backupActionOnEqual != null) {
 			backUpItemList.add(new BackUpItem(pathPairBasicAttributes, backupActionOnEqual, BackupStatus.SAME_CONTENT, backUpCounters, backUpTask.getSizeWarningLimit()));
-		}
-		
+		}		
 	}
 	
 	private void compareFile(PathPairBasicAttributes pathPairBasicAttributes) {
@@ -343,7 +342,6 @@ public class BackUpScannerThread {
 			filesVisitFailed.add(pathPairBasicAttributes.getTargetPath());
 			backUpCounters.nbTargetFilesFailed++;
 			pLog.log(Level.SEVERE, "Exception when comparing file " + pathPairBasicAttributes.getSourcePath() + " and " + pathPairBasicAttributes.getTargetPath(), e);
-
 		}		
 	}
 	
@@ -360,7 +358,7 @@ public class BackUpScannerThread {
 					if (pathPairBasicAttributes.targetIsDirectory()) {
 						// source is a file but target is a directory : delete target dir, copy source file 
 						pLog.warning("Source " + srcPath + " is a file\n" + "but target is a directory " + tgtPath);
-						backUpItemList.add(new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE_DIR, srcPath, backUpCounters, backUpTask.getSizeWarningLimit()));
+						backUpItemList.add(new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE_DIR, pathPairBasicAttributes, backUpCounters, backUpTask.getSizeWarningLimit()));
 						backUpItemList.add(new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, backUpCounters, backUpTask.getSizeWarningLimit()));
 					}  else {
 						compareFile(pathPairBasicAttributes);
@@ -370,21 +368,22 @@ public class BackUpScannerThread {
 				}
 			} else {
 				// Source path does not exist : delete target
-				pLog.info("Source path does not exist: " + srcPath);
+				pLog.warning("Source path does not exist: " + srcPath);
 				if (pathPairBasicAttributes.targetExists()) {
+					pLog.warning("Target path will be deleted: " + tgtPath);
 					if (pathPairBasicAttributes.targetIsDirectory()) {
-						backUpItemList.add(new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE_DIR, srcPath.getParent(), backUpCounters, backUpTask.getSizeWarningLimit()));
+						backUpItemList.add(new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE_DIR, PathPairBasicAttributes.getClosestExistingParentBasicAttributes(srcPath), backUpCounters, backUpTask.getSizeWarningLimit()));
 					}  else {
-						backUpItemList.add(new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, srcPath.getParent(), backUpCounters, backUpTask.getSizeWarningLimit()));
+						backUpItemList.add(new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, PathPairBasicAttributes.getClosestExistingParentBasicAttributes(srcPath), backUpCounters, backUpTask.getSizeWarningLimit()));
 					}
-				} 
+				} else {
+					pLog.warning("Target path does not exist: " + tgtPath + "\nNo action done");
+				}
 			}
 		} catch (Exception e) {
 			filesVisitFailed.add(pathPairBasicAttributes.getTargetPath());
 			backUpCounters.nbTargetFilesFailed++;
 			pLog.log(Level.SEVERE, "Exception when comparing top level file " + srcPath + " and " + tgtPath, e);
-
 		}	
 	}
-	
 }

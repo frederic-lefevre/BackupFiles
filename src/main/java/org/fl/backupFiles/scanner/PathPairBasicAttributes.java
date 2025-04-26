@@ -132,4 +132,19 @@ public class PathPairBasicAttributes {
 	public void setTargetPath(Path targetPath) {
 		this.targetPath = targetPath;
 	}
+	
+	public static PathPairBasicAttributes getClosestExistingParentBasicAttributes(Path path) {
+		
+		Path parentPath = path.getParent();
+		if (parentPath == null) {
+			return null;
+		} else {
+			PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(parentPath, null);
+			if (pathPairBasicAttributes.sourceExists()) {
+				return pathPairBasicAttributes;
+			} else {
+				return getClosestExistingParentBasicAttributes(parentPath.getParent());
+			}
+		}
+	}
 }

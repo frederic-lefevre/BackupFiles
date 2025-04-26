@@ -103,7 +103,7 @@ public class BackUpItemTest {
 
 		counters.reset();
 		pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
-		backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, EXISTANT_SOURCE.getParent(), counters, 0);
+		backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, pathPairBasicAttributes, counters, 0);
 
 		assertThat(counters.copyNewNb).isZero();
 		assertThat(counters.nbSourceFilesProcessed).isZero();
@@ -127,17 +127,17 @@ public class BackUpItemTest {
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(null, UNEXISTANT_TARGET);
 		BackUpCounters counters = new BackUpCounters();
 
-		assertThatExceptionOfType(IllegalBackUpItemException.class)
+		assertThatNullPointerException()
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, 0));
-		assertThatExceptionOfType(IllegalBackUpItemException.class)
+		assertThatNullPointerException()
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, counters, 0));
-		assertThatExceptionOfType(IllegalBackUpItemException.class)
+		assertThatNullPointerException()
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, counters, 0));
-		assertThatExceptionOfType(IllegalBackUpItemException.class)
+		assertThatNullPointerException()
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.AMBIGUOUS, BackupStatus.SAME_CONTENT, counters, 0));
-		assertThatExceptionOfType(IllegalBackUpItemException.class)
+		assertThatNullPointerException()
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TARGET, BackupStatus.SAME_CONTENT, counters, 0));
-		assertThatExceptionOfType(IllegalBackUpItemException.class)
+		assertThatNullPointerException()
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.ADJUST_TIME, BackupStatus.SAME_CONTENT, counters, 0));
 	}
 
@@ -146,20 +146,21 @@ public class BackUpItemTest {
 	void illegalCopyShouldThrowException() {
 
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(null, EXISTANT_SOURCE);
+		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(EXISTANT_SOURCE_FOLDER, null);
 		BackUpCounters counters = new BackUpCounters();
 
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, EXISTANT_SOURCE_FOLDER, counters, 0));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, pathPairBasicAttributes2, counters, 0));
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_REPLACE, EXISTANT_SOURCE_FOLDER, counters, 0));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_REPLACE, pathPairBasicAttributes2, counters, 0));
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TREE, EXISTANT_SOURCE_FOLDER, counters, 0));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TREE, pathPairBasicAttributes2, counters, 0));
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.AMBIGUOUS, EXISTANT_SOURCE_FOLDER, counters, 0));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.AMBIGUOUS, pathPairBasicAttributes2, counters, 0));
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TARGET, EXISTANT_SOURCE_FOLDER, counters, 0));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TARGET, pathPairBasicAttributes2, counters, 0));
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.ADJUST_TIME, EXISTANT_SOURCE_FOLDER, counters, 0));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.ADJUST_TIME, pathPairBasicAttributes2, counters, 0));
 	}
 
 	@Test
@@ -197,15 +198,29 @@ public class BackUpItemTest {
 	@Test
 	void unexistantExistingSrcShouldThrowException() throws IOException {
 
-		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(null, UNEXISTANT_TARGET);
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(null, EXISTANT_SOURCE);
+		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(UNEXISTANT_FOLDER_PATH, null);
 		BackUpCounters counters = new BackUpCounters();
 		
 		assertThatExceptionOfType(IllegalBackUpItemException.class)
-			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, UNEXISTANT_FOLDER_PATH, counters, 0));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, pathPairBasicAttributes2, counters, 0));
 		assertThatExceptionOfType(IllegalBackUpItemException.class)
-			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE_DIR, UNEXISTANT_FOLDER_PATH, counters, 0));
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE_DIR, pathPairBasicAttributes2, counters, 0));
 	}
 
+	@Test
+	void unexistantTargetShouldThrowException() throws IOException {
+
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(null, UNEXISTANT_PATH);
+		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(EXISTANT_SOURCE_FOLDER, null);
+		BackUpCounters counters = new BackUpCounters();
+		
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, pathPairBasicAttributes2, counters, 0));
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
+			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE_DIR, pathPairBasicAttributes2, counters, 0));
+	}
+	
 	@Test
 	void existantTgtShouldThrowException() throws IOException {
 
