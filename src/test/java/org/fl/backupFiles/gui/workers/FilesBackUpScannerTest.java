@@ -136,8 +136,8 @@ class FilesBackUpScannerTest {
 			assertThat(backUpCounters.nbSourceFilesProcessed).isEqualTo(19800);
 			assertThat(backUpCounters.nbTargetFilesProcessed).isEqualTo(19700);
 			assertThat(backUpCounters.nbTargetFilesFailed).isZero();
-			assertThat(backUpCounters.totalSizeDifference).isZero();
 			assertThat(backUpCounters.copyTargetNb).isZero();
+			assertThat(backUpCounters.getSizeDifferencesPerFileStore()).isNotNull().isEmpty();
 
 			assertThat(backUpItems).isEmpty();
 			
@@ -167,8 +167,8 @@ class FilesBackUpScannerTest {
 			assertThat(backUpCounters.nbSourceFilesProcessed).isEqualTo(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION);
 			assertThat(backUpCounters.nbTargetFilesProcessed).isZero();		
 			assertThat(backUpCounters.nbTargetFilesFailed).isZero();
-			assertThat(backUpCounters.totalSizeDifference).isEqualTo(4997400);
 			assertThat(backUpCounters.copyTargetNb).isZero();
+			assertThat(backUpCounters.getSizeDifferencesPerFileStore()).isNotNull().hasSize(1).containsValue(4997400L);
 		
 			assertThat(backUpItems).hasSize(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION);
 			

@@ -26,6 +26,7 @@ package org.fl.backupFiles;
 
 import java.io.File;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -60,6 +61,7 @@ public class BackUpItem {
 	private BackupStatus backupStatus;
 	private final DirectoryPermanenceLevel permanenceLevel;
 	private final long fileSizeWarningThreshold;
+	private final FileStore targetFileStore;
 	
 	// A back up item is :
 	// * a source path (file or directory) to back up 
@@ -83,7 +85,7 @@ public class BackUpItem {
 			BackupAction bst, 
 			BackupStatus bStatus, 
 			BackUpCounters backUpCounters,
-			long fileSizeWarningThreshold) {
+			BackUpTask backUpTask) {
 		
 		this.pathPairBasicAttributes = pathPairBasicAttributes;
 		sourcePath = this.pathPairBasicAttributes.getSourcePath();
@@ -93,7 +95,8 @@ public class BackUpItem {
 		
 		backupAction = bst;
 		backupStatus = bStatus;
-		this.fileSizeWarningThreshold = fileSizeWarningThreshold;
+		fileSizeWarningThreshold = backUpTask.getSizeWarningLimit();
+		targetFileStore = backUpTask.getTargetFileStore();
 		permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(sourcePath);
 		
 		// Update counters		
@@ -132,7 +135,7 @@ public class BackUpItem {
 			BackupAction bst, 
 			PathPairBasicAttributes parentPathPairBasicAttributes, 
 			BackUpCounters backUpCounters,
-			long fileSizeWarningThreshold) {
+			BackUpTask backUpTask) {
 		
 		this.pathPairBasicAttributes = pathPairBasicAttributes;
 		sourcePath = pathPairBasicAttributes.getSourcePath();
@@ -143,7 +146,8 @@ public class BackUpItem {
 		
 		backupAction = bst;
 		backupStatus = BackupStatus.DIFFERENT;
-		this.fileSizeWarningThreshold = fileSizeWarningThreshold;
+		fileSizeWarningThreshold = backUpTask.getSizeWarningLimit();
+		targetFileStore = backUpTask.getTargetFileStore();
 		permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(targetPath);
 		
 		// Update counters
@@ -166,7 +170,7 @@ public class BackUpItem {
 	}
 
 	private void updateLimitsCounters(BackUpCounters backUpCounters) {
-		backUpCounters.totalSizeDifference = backUpCounters.totalSizeDifference + sizeDifference;
+		backUpCounters.updateSizeDifference(targetFileStore, sizeDifference);
 		if (sizeDifference > fileSizeWarningThreshold)
 			backUpCounters.backupWithSizeAboveThreshold++;
 		if (permanenceLevel.equals(DirectoryPermanenceLevel.HIGH)) {

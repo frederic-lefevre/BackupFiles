@@ -26,18 +26,21 @@ package org.fl.backupFiles;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.io.IOException;
+import java.nio.file.FileStore;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.fl.util.FilterCounter;
-import org.fl.util.FilterCounter.LogRecordCounter;
+import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.Test;
 
 class BackUpTaskTest {
 
+	private static final Logger logger = Logger.getLogger(BackUpTaskTest.class.getName());
+	
 	@Test
-	void test1() {
+	void test1() throws IOException {
 		
 		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
 		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
@@ -56,7 +59,7 @@ class BackUpTaskTest {
 	}
 
 	@Test
-	void test2() {
+	void test2() throws IOException {
 		
 		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
 		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
@@ -71,62 +74,31 @@ class BackUpTaskTest {
 	}	
 
 	@Test
-	void test3() {
+	void test3() throws IOException {
 		
 		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
-		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
-
 		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
-		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
 
-		BackUpTask backUpTask = new BackUpTask(src, null, 0);
-		BackUpTask backUpTask2 = new BackUpTask(src, tgt, 0);
-
-		assertThat(backUpTask).isNotEqualTo(backUpTask2);
+		assertThatIllegalArgumentException().isThrownBy(() -> new BackUpTask(src, null, 0));
 	}
 	
 	@Test
-	void test4() {
-		
-		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
-		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
+	void test4() throws IOException {
 
-		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
 		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
 
-		LogRecordCounter logRecordCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpTask.class.getName()));
-		
-		BackUpTask backUpTask = new BackUpTask(null, tgt, 0);
-		BackUpTask backUpTask2 = new BackUpTask(src, tgt, 0);
-
-		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
-		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
-		
-		assertThat(backUpTask).isNotEqualTo(backUpTask2);
+		assertThatIllegalArgumentException().isThrownBy(() -> new BackUpTask(null, tgt, 0));
 	}
 	
 	@Test
-	void test5() {
+	void test5() throws IOException {
 		
-		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
-		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
-
-		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
-		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
-
-		LogRecordCounter logRecordCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpTask.class.getName()));
-		
-		BackUpTask backUpTask = new BackUpTask(null, null, 0);
-		BackUpTask backUpTask2 = new BackUpTask(src, tgt, 0);
-
-		assertThat(logRecordCounter.getLogRecordCount()).isEqualTo(1);
-		assertThat(logRecordCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
-		
-		assertThat(backUpTask).isNotEqualTo(backUpTask2);
+		assertThatIllegalArgumentException().isThrownBy(() -> new BackUpTask(null, null, 0));
 	}
 	
 	@Test
-	void test6() {
+	void test6() throws IOException {
 		
 		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
 		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
@@ -144,7 +116,7 @@ class BackUpTaskTest {
 	
 	
 	@Test
-	void test7() {
+	void test7() throws IOException {
 		
 		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
 		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
@@ -158,5 +130,20 @@ class BackUpTaskTest {
 		BackUpTask backUpTask2 = new BackUpTask(src, tgt2, 0);
 
 		assertThat(backUpTask).isNotEqualTo(backUpTask2);
+	}
+	
+	@Test
+	void testFileStore() throws IOException {
+		
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
+
+		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+
+		BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
+		
+		FileStore fileStore = backUpTask.getTargetFileStore();
+		assertThat(fileStore).isNotNull().isEqualTo(Files.getFileStore(src)).isEqualTo(FilesUtils.findFileStore(tgt, logger));
 	}
 }

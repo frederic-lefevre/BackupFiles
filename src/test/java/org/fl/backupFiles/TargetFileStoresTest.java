@@ -24,7 +24,7 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 public class TargetFileStoresTest {
 
 	@Test
-	void nullPathShouldReturnNullTargetFileStoret() {
+	void nullPathShouldReturnNullTargetFileStore() {
 
 		TargetFileStores targetFileStores = new TargetFileStores();
 		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(null);
@@ -42,12 +42,14 @@ public class TargetFileStoresTest {
 	}
 
 	@Test
-	void unexistantPathShouldReturnNullTargetFileStoret() {
+	void unexistantPathShouldReturnTargetFileStore() {
 
 		Path path1 = TestUtils.getPathFromUriString( "file:///ForTests/BackUpFiles/doesNotExists");
+		Path path2 = TestUtils.getPathFromUriString( "file:///ForTests");
 		TargetFileStores targetFileStores = new TargetFileStores();
 		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(path1);
-		assertThat(targetFileStore).isNull();
+		TargetFileStore targetFileStore2 = targetFileStores.addTargetFileStore(path2);
+		assertThat(targetFileStore).isNotNull().isEqualTo(targetFileStore2);
 	}
 
 	

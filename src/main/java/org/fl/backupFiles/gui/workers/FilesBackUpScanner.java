@@ -215,10 +215,12 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		try {
 			BackUpScannerResult results = get();
 			List<ScannerThreadResponse> taskResults = results.getTaskResults();
+			long duration = results.getDuration();
+			
 			
 			if ((taskResults == null) || (taskResults.isEmpty())) {
 				pLog.warning("back up tasks is null");							
-				progressPanel.setStepInfos(backUpCounters.toHtmlString(), 0);
+				progressPanel.setStepInfos(getScanInfoHtml(duration), 0);
 				progressPanel.setProcessStatus("Aucune taches à effectuer");
 			} else {
 								
@@ -238,18 +240,17 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				}
 				
 				// Update progress info panel
+				String scannerInfoHtml = getScanInfoHtml(duration);
 				long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
-				StringBuilder finalStatus = new StringBuilder(1024);
+				StringBuilder finalStatus = new StringBuilder();
 				finalStatus.append("Comparaison de fichiers terminée (");
 				finalStatus.append(jobTaskType.toString());
 				finalStatus.append(" - ");
 				finalStatus.append(jobsChoice.getTitleAsString());
 				finalStatus.append(")");
-				progressPanel.setStepInfos(backUpCounters.toHtmlString(), nbFilesProcessed);
+				progressPanel.setStepInfos(scannerInfoHtml, nbFilesProcessed);
 				progressPanel.setProcessStatus(finalStatus.toString());
 				
-				long duration = results.getDuration();
-
 				// Log info
 				StringBuilder infoScanner = new StringBuilder(1024);
 				infoScanner.append(jobsChoice.getTitleAsString()).append("\n");
@@ -259,15 +260,13 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				pLog.info(getScanInfoText(infoScanner, duration));
 
 				// Update history tab
-				StringBuilder scanInfo = new StringBuilder(1024);
-				getScanInfoHtml(scanInfo, duration);
 				String compareType = "Comparaison";
 				if (jobsChoice.compareContent()) {
 					compareType = compareType + " avec comparaison du contenu";
 				} else if (jobsChoice.compareContentOnAmbiguous()) {
 					compareType = compareType + " avec comparaison du contenu pour les fichiers ambigues";
 				}
-				BackUpJobInformation jobInfo = new BackUpJobInformation( jobsChoice.getTitleAsHtml(), System.currentTimeMillis(), scanInfo.toString(), compareType, jobTaskType.toString()) ;
+				BackUpJobInformation jobInfo = new BackUpJobInformation( jobsChoice.getTitleAsHtml(), System.currentTimeMillis(), scannerInfoHtml, compareType, jobTaskType.toString()) ;
 				backUpJobInfoTableModel.add(jobInfo);
 			}
 		} catch (InterruptedException | ExecutionException e) {
@@ -292,8 +291,9 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 	private static final String HTML_BEGIN = "<html><body>\n";
 	private static final String HTML_END = "</body></html>\n";
 
-	private void getScanInfoHtml(StringBuilder scanInfo, long duration) {
+	private String getScanInfoHtml(long duration) {
 
+		StringBuilder scanInfo = new StringBuilder(1024);
 		scanInfo.append(HTML_BEGIN);
 		backUpCounters.appendHtmlFragment(scanInfo);
 		scanInfo.append("<p>Durée de la comparaison (ms)= ").append(duration);
@@ -305,6 +305,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 			}
 		}
 		scanInfo.append(HTML_END);
+		return scanInfo.toString();
 	}
 
 	private String getScanInfoText(StringBuilder scanInfo, long duration) {

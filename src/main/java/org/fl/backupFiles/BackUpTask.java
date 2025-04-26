@@ -24,17 +24,23 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
+import java.io.IOException;
+import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.logging.Logger;
 
-public class BackUpTask {
+import org.fl.util.file.FilesUtils;
 
+public class BackUpTask {
+	
 	private static final Logger bLog = Logger.getLogger(BackUpTask.class.getName());
 	
 	private final Path source;
 	private final Path target;
 	private final long sizeWarningLimit;
+	private final FileStore targetFileStore;
 	
 	private boolean compareContent;
 	private boolean compareContentOnAmbiguous;
@@ -45,15 +51,18 @@ public class BackUpTask {
 	private static final String noWarning = "" ;
 	
 	// A back up task is a source directory or file to back up to a destination directory or file
-	public BackUpTask(Path src, Path tgt, long sizeWarningLimit) {
+	public BackUpTask(Path src, Path tgt, long sizeWarningLimit) throws IOException {
 		
 		source = src;
 		target = tgt;
 		this.sizeWarningLimit = sizeWarningLimit;
 		
-		if (source == null) {
-			bLog.severe("source path null when creating back up task");
-		}		
+		if ((source == null) || (target == null)) {
+			throw new IllegalArgumentException("Null path argument when creating back up task. sourcePath=" + Objects.toString(source) + " targetPath="  + Objects.toString(source));
+		}
+
+		targetFileStore = FilesUtils.findFileStore(target, bLog);
+
 		compareContent = false;
 		compareContentOnAmbiguous = true;
 	}
@@ -68,6 +77,10 @@ public class BackUpTask {
 
 	public long getSizeWarningLimit() {
 		return sizeWarningLimit;
+	}
+
+	public FileStore getTargetFileStore() {
+		return targetFileStore;
 	}
 
 	public String toString() {
@@ -157,5 +170,4 @@ public class BackUpTask {
 		}
 		return true;
 	}
-
 }

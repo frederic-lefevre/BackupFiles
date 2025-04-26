@@ -107,16 +107,25 @@ public class BackUpJobTest {
 				"		]\r\n" + 
 				"	}" ;
 		
-		BackUpJob bupj = new BackUpJob(json) ;
+		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpTask.class.getName()));
 		
-		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
-		assertThat(bTt).isNotNull();
-		assertThat(bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER)).isNotNull();
+		BackUpJob bupj = new BackUpJob(json);
 		assertThat(bupj.toString())
 			.isNotNull()
 			.isEqualTo("FredericPersonnel sur USB S:");
-	
-		assertThat(bTt).hasSize(3);
+		
+		List<BackUpTask> bTt1 = bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER);
+		assertThat(bTt1).isNotNull().hasSize(3);
+		
+		List<BackUpTask> bTt2 = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
+		assertThat(bTt2).isNotNull().hasSize(3);
+		
+		int nbBackUpTasks = bTt1.size() + bTt2.size();
+		
+		if (Files.exists(Path.of(URI.create("file:///S:/")))) {
+			assertThat(logCounter.getLogRecordCount()).isEqualTo(nbBackUpTasks);
+			assertThat(logCounter.getLogRecordCount(Level.WARNING)).isEqualTo(nbBackUpTasks);
+		}
 	}
 	
 	@Test
@@ -145,6 +154,8 @@ public class BackUpJobTest {
 				"		]\r\n" + 
 				"	}";
 		
+		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpTask.class.getName()));
+		
 		BackUpJob bupj = new BackUpJob(json) ;
 		
 		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
@@ -159,6 +170,10 @@ public class BackUpJobTest {
 		assertThat(sTb).hasSize((int) expectedNbTasks);
 		assertThat(bTt).hasSize((int) expectedNbTasks);
 
+		if (Files.exists(Path.of(URI.create("file:///S:/")))) {
+			assertThat(logCounter.getLogRecordCount()).isEqualTo(expectedNbTasks*2);
+			assertThat(logCounter.getLogRecordCount(Level.WARNING)).isEqualTo(expectedNbTasks*2);
+		}
 	}
 	
 	@Test
@@ -247,12 +262,21 @@ public class BackUpJobTest {
 				"		]\r\n" + 
 				"	}" ;
 		
+		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpTask.class.getName()));
+		
 		BackUpJob bupj = new BackUpJob(json) ;
 		
 		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
 		assertThat(bTt)
 			.isNotNull()
 			.hasSize(3);
+		
+		int nbBackUpTasks = bTt.size();
+		
+		if (Files.exists(Path.of(URI.create("file:///S:/")))) {
+			assertThat(logCounter.getLogRecordCount()).isEqualTo(nbBackUpTasks);
+			assertThat(logCounter.getLogRecordCount(Level.WARNING)).isEqualTo(nbBackUpTasks);
+		}
 		
 		assertThatExceptionOfType(UnsupportedOperationException.class)
 			.isThrownBy(() -> bTt.clear());

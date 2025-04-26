@@ -24,8 +24,6 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -131,12 +129,7 @@ public class JobsChoice {
 	}
 	
 	private void initTargetFileStores(JobTaskType jobTaskType) {
-		for (BackUpTask backUpTask : getTasks(jobTaskType)) {
-			Path targetPath = backUpTask.getTarget();
-			if ((targetPath != null) && (Files.exists(targetPath))) {
-				targetFileStores.addTargetFileStore(targetPath);
-			}			
-		}
+		getTasks(jobTaskType).forEach(backUpTask -> targetFileStores.addTargetFileStore(backUpTask.getTarget()));
 	}
 
 	public boolean compareContent() {

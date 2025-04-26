@@ -147,14 +147,14 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 			finalStatus.append(jobsChoice.getTitleAsString());
 			finalStatus.append(")");
 			long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
-			progressPanel.setStepInfos(backUpCounters.toHtmlString(), nbFilesProcessed);
+			String scanResult = getProcessorInfoHtml(result.getDuration());
+			progressPanel.setStepInfos(scanResult, nbFilesProcessed);
 			progressPanel.setProcessStatus(finalStatus.toString());
 
 			// Log info
 			pLog.info(getProcessorInfoText(result.getDuration()));
 		
-			// Update history tab
-			String scanResult = getProcessorInfoHtml(result.getDuration());
+			// Update history tab			
 			BackUpJobInformation jobInfo = new BackUpJobInformation( jobsChoice.getTitleAsHtml(), System.currentTimeMillis(), scanResult, "Sauvegarde", jobTaskType.toString());
 			backUpJobInfoTableModel.add(jobInfo) ;
 			

@@ -24,8 +24,11 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
+import java.nio.file.FileStore;
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class BackUpCounters {
 
@@ -52,7 +55,8 @@ public class BackUpCounters {
 	public long backupWithSizeAboveThreshold;
 	public long nbHighPermanencePath;
 	public long nbMediumPermanencePath;
-	public long totalSizeDifference;
+	
+	private final Map<FileStore, Long> sizeDifferencesPerFileStore;
 	
 	private static final String COPY_NEW_LABEL = BackupAction.COPY_NEW.getActionName() + ": ";
 	private static final String COPY_REPLACE_LABEL = BackupAction.COPY_REPLACE.getActionName() + ": ";
@@ -75,6 +79,7 @@ public class BackUpCounters {
 	private static final String TOTAL_SIZE_DIFF_LABEL = "Différence totale de taille: ";
 	
 	public BackUpCounters() {
+		sizeDifferencesPerFileStore = new HashMap<>();
 		reset();
 	}
 
@@ -95,7 +100,21 @@ public class BackUpCounters {
 		backupWithSizeAboveThreshold = 0;
 		nbHighPermanencePath = 0;
 		nbMediumPermanencePath = 0;
-		totalSizeDifference = 0;
+		sizeDifferencesPerFileStore.clear();
+	}
+	
+	public Map<FileStore, Long> getSizeDifferencesPerFileStore() {
+		return sizeDifferencesPerFileStore;
+	}
+
+	public void updateSizeDifference(FileStore fileStore, long difference) {
+		
+		Long accumulatedDifferencce = sizeDifferencesPerFileStore.get(fileStore);
+		if (accumulatedDifferencce == null) {
+			sizeDifferencesPerFileStore.put(fileStore, difference);
+		} else {
+			sizeDifferencesPerFileStore.put(fileStore, accumulatedDifferencce + difference);
+		}
 	}
 	
 	@Override
@@ -120,7 +139,6 @@ public class BackUpCounters {
 		if (contentDifferentNb != 0) {
 			res.append(CONTENT_DIFFERENT_LABEL).append(contentDifferentNb).append("\n");
 		}
-		res.append(TOTAL_SIZE_DIFF_LABEL).append(numberFormat.format(totalSizeDifference)).append("\n");
 		return res.toString();
 	}
 	
@@ -147,7 +165,7 @@ public class BackUpCounters {
 		appendCellCouple(res, TARGET_KO_LABEL, nbTargetFilesFailed, "red");
 
 		res.append(NEW_ROW);
-		appendCellCouple(res, TOTAL_SIZE_DIFF_LABEL, totalSizeDifference, null);
+		appendCellCouple(res, TOTAL_SIZE_DIFF_LABEL, getTotalSizeDifference(), null);
 		appendCellCouple(res, SIZE_ABOVE_LIMIT_LABEL, backupWithSizeAboveThreshold, "red");
 
 		res.append(NEW_ROW);
@@ -159,12 +177,9 @@ public class BackUpCounters {
 			appendCellCouple(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, null);
 		}
 		res.append(TABLE_END);
-
 	}
 	
 	private static final String NEW_ROW    			  = "</tr><tr>" ;
-	private static final String HTML_BEGIN 			  = "<html><body>" ;
-	private static final String HTML_END   			  = "</body></html>" ;
 	private static final String TABLE_BEGIN 		  = "<table><tr>" ;
 	private static final String TABLE_END   		  = "</tr></table>" ;
 	private static final String TWO_EMPTY_CELLS 	  = "<td></td><td></td>" ;
@@ -174,15 +189,7 @@ public class BackUpCounters {
 	private static final String TAG_END 			  = ">" ;
 	private static final String CELL_WITH_COLOR_BEGIN = "<td bgcolor=" ;
 	private static final String CELL_WITH_COLOR_BREAK = "</td><td style=\"text-align:right\" bgcolor=" ;
-	
-	public String toHtmlString() {
-		StringBuilder res = new StringBuilder() ;
-		res.append(HTML_BEGIN) ;
-		appendHtmlFragment(res) ;
-		res.append(HTML_END) ;
-		return res.toString() ;
-	}
-	
+
 	private void appendCellCouple(StringBuilder res, String label, long value, String color) {
 		
 		boolean colorPresent = (color != null) && (! color.isEmpty()) && (value > 0);
@@ -226,6 +233,17 @@ public class BackUpCounters {
 		backupWithSizeAboveThreshold = backupWithSizeAboveThreshold + counters.backupWithSizeAboveThreshold;
 		nbHighPermanencePath = nbHighPermanencePath + counters.nbHighPermanencePath;
 		nbMediumPermanencePath = nbMediumPermanencePath + counters.nbMediumPermanencePath;
-		totalSizeDifference = totalSizeDifference + counters.totalSizeDifference;
+		addSizeDifferencesPerFileStore(counters.getSizeDifferencesPerFileStore());
+	}
+	
+	private void addSizeDifferencesPerFileStore(Map<FileStore, Long> sizeDifferencesPerFileStore2) {
+		
+		sizeDifferencesPerFileStore2.forEach((fs, l) -> {
+			updateSizeDifference(fs, l);
+		});
+	}
+	
+	private long getTotalSizeDifference() {
+		return sizeDifferencesPerFileStore.values().stream().mapToLong(Long::longValue).sum();
 	}
 }

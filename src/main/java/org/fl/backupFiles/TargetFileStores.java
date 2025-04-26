@@ -25,7 +25,6 @@ SOFTWARE.
 package org.fl.backupFiles;
 
 import java.nio.file.FileStore;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,12 +46,12 @@ public class TargetFileStores {
 	
 	public TargetFileStore addTargetFileStore(Path path) {
 		
-		if ((path != null) && (Files.exists(path))) {
+		if (path != null) {
 			try {
-				FileStore fileStore = Files.getFileStore(path);
+				FileStore fileStore = FilesUtils.findFileStore(path, tLog);
 
 				if (! targetFileStores.containsKey(fileStore)) {					
-					Path mountPoint = FilesUtils.getMountPoint(path, tLog);
+					Path mountPoint = FilesUtils.findMountPoint(path, tLog);
 					TargetFileStore targetFileStore = new TargetFileStore(fileStore, mountPoint);
 					targetFileStores.put(fileStore, targetFileStore);
 					return targetFileStore;

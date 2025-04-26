@@ -26,10 +26,23 @@ package org.fl.backupFiles;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.io.IOException;
+import java.nio.file.FileStore;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class BackUpCountersTest {
 
+	private static FileStore fileStore;
+	
+	@BeforeAll
+	static void init() throws IOException {
+		fileStore = Files.getFileStore(Paths.get("/"));
+	}
+	
 	@Test
 	void shouldBeZeroAtCreation() {
 
@@ -99,8 +112,12 @@ class BackUpCountersTest {
 		assertThat(bc.nbSourceFilesProcessed).isEqualTo(val);
 		assertThat(bc.nbTargetFilesFailed).isEqualTo(val);
 		assertThat(bc.nbTargetFilesProcessed).isEqualTo(val);
-		assertThat(bc.totalSizeDifference).isEqualTo(val);
 		assertThat(bc.copyTargetNb).isEqualTo(val);
+		if (val == 0) {
+			assertThat(bc.getSizeDifferencesPerFileStore().get(fileStore)).isNull();
+		} else {
+			assertThat(bc.getSizeDifferencesPerFileStore().get(fileStore)).isNotNull().isEqualTo(val);
+		}
 	}
 
 	private static void assertFieldValueWithIncrement(BackUpCounters bc, long val, long m) {
@@ -119,8 +136,8 @@ class BackUpCountersTest {
 		assertThat(bc.nbSourceFilesProcessed).isEqualTo(val+11*m);
 		assertThat(bc.nbTargetFilesFailed).isEqualTo(val+12*m);
 		assertThat(bc.nbTargetFilesProcessed).isEqualTo(val+13*m);
-		assertThat(bc.totalSizeDifference).isEqualTo(val+14*m);
-		assertThat(bc.copyTargetNb).isEqualTo(val+15*m);
+		assertThat(bc.copyTargetNb).isEqualTo(val+14*m);
+		assertThat(bc.getSizeDifferencesPerFileStore().get(fileStore)).isNotNull().isEqualTo(val + 15*m);
 	}
 	
 	private static void setFieldValue(BackUpCounters bc, long val) {
@@ -139,8 +156,8 @@ class BackUpCountersTest {
 		bc.nbSourceFilesProcessed = val;
 		bc.nbTargetFilesFailed = val;
 		bc.nbTargetFilesProcessed = val;
-		bc.totalSizeDifference = val;
 		bc.copyTargetNb = val;
+		bc.updateSizeDifference(fileStore, val);
 	}
 
 	private static void setFieldValueWithIncrement(BackUpCounters bc, long val) {
@@ -159,7 +176,7 @@ class BackUpCountersTest {
 		bc.nbSourceFilesProcessed = val + 11;
 		bc.nbTargetFilesFailed = val + 12;
 		bc.nbTargetFilesProcessed = val + 13;
-		bc.totalSizeDifference = val + 14;
-		bc.copyTargetNb = val + 15;
+		bc.copyTargetNb = val + 14;
+		bc.updateSizeDifference(fileStore, val + 15);
 	}
 }
