@@ -79,11 +79,11 @@ public class BackUpJobInfoTableModel extends AbstractTableModel {
 	public int getColumnPreferredWith(int columnIndex) {
 		
 		return switch (columnIndex) {
-			case 0 -> 460;
-			case 1 -> 320;
-			case 2 -> 700;
-			case 3 -> 180;
-			case 4 -> 180;
+			case 0 -> 300;
+			case 1 -> 200;
+			case 2 -> 980;
+			case 3 -> 240;
+			case 4 -> 120;
 			default -> 0;
 		};
 	}

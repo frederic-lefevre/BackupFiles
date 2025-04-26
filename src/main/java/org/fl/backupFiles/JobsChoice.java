@@ -36,15 +36,17 @@ public class JobsChoice {
 	private final List<BackUpJob> backUpJobs;
 	private final String jobsTitleString;
 	private final String jobsTitleHtml;
+	private final String compareOperationAsHtml;
 	private final String jobsDetail;
-	private final StringBuilder details;
 
 	private boolean compareContent;
 	private boolean compareContentOnAmbiguous;
 
-	private final static String jobSeparator = "\n__________________________\n";
-	private final static String taskJobSeparator = "\n\n";
-	private final static String taskSeparator = "\n";
+	private static final String HTML_BEGIN = "<html><body>";
+	private static final String HTML_END = "</body></html>";
+	private static final String jobSeparator = "\n__________________________\n";
+	private static final String taskJobSeparator = "\n\n";
+	private static final String taskSeparator = "\n";
 
 	private final Map<JobTaskType, ArrayList<BackUpTask>> backUpTasks;
 
@@ -60,23 +62,24 @@ public class JobsChoice {
 		targetFileStores = new TargetFileStores();
 
 		StringBuilder titlesString = new StringBuilder();
-		StringBuilder titlesHtml = new StringBuilder("<html><body>");
+		StringBuilder titlesHtml = new StringBuilder(HTML_BEGIN);
 		for (BackUpJob backUpJob : backUpJobs) {
 			titlesString.append(backUpJob.toString()).append("\n");
 			titlesHtml.append(backUpJob.toString()).append("<br/>");
 		}
-		titlesHtml.append("</body></html>");
+		titlesHtml.append(HTML_END);
 		jobsTitleString = titlesString.toString();
 		jobsTitleHtml = titlesHtml.toString();
+		compareOperationAsHtml = buildCompareOperationAsHtml();
 
-		details = new StringBuilder(1024);
+		StringBuilder details = new StringBuilder(1024);
 		backUpTasks = new HashMap<JobTaskType, ArrayList<BackUpTask>>();
 		for (JobTaskType jtt : JobTaskType.values()) {
 			ArrayList<BackUpTask> tasksForJtt = new ArrayList<BackUpTask>();
 			details.append(jobSeparator).append(jtt.toString()).append(taskJobSeparator);
 			backUpTasks.put(jtt, tasksForJtt);
 			for (BackUpJob backUpJob : backUpJobs) {
-				addAllTasks(tasksForJtt, backUpJob.getTasks(jtt));
+				addAllTasks(tasksForJtt, backUpJob.getTasks(jtt), details);
 			}
 			initTargetFileStores(jtt);
 		}
@@ -96,6 +99,10 @@ public class JobsChoice {
 		return jobsTitleHtml;
 	}
 
+	public String getCompareOperationAsHtml() {
+		return compareOperationAsHtml;
+	}
+	
 	public String printDetail() {
 		return jobsDetail;
 	}
@@ -119,7 +126,19 @@ public class JobsChoice {
 			.forEach(backUpTask -> backUpTask.setCompareContentOnAmbiguous(cc));
 	}
 	
-	private void addAllTasks(List<BackUpTask> tasks, List<BackUpTask> tasksToAdd) {
+	private String buildCompareOperationAsHtml() {
+		
+		StringBuilder compareType = new StringBuilder(HTML_BEGIN);
+		compareType.append("Comparaison");
+		if (compareContent()) {
+			compareType.append(" avec comparaison du contenu");
+		} else if (compareContentOnAmbiguous()) {
+			compareType.append(" avec comparaison du contenu pour les fichiers ambigues");
+		}
+		return compareType.toString();
+	}
+	
+	private void addAllTasks(List<BackUpTask> tasks, List<BackUpTask> tasksToAdd, StringBuilder details) {
 		for (BackUpTask taskToAdd : tasksToAdd) {
 			if (! tasks.contains(taskToAdd)) {
 				tasks.add(taskToAdd) ;

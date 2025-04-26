@@ -260,13 +260,8 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				pLog.info(getScanInfoText(infoScanner, duration));
 
 				// Update history tab
-				String compareType = "Comparaison";
-				if (jobsChoice.compareContent()) {
-					compareType = compareType + " avec comparaison du contenu";
-				} else if (jobsChoice.compareContentOnAmbiguous()) {
-					compareType = compareType + " avec comparaison du contenu pour les fichiers ambigues";
-				}
-				BackUpJobInformation jobInfo = new BackUpJobInformation( jobsChoice.getTitleAsHtml(), System.currentTimeMillis(), scannerInfoHtml, compareType, jobTaskType.toString()) ;
+				BackUpJobInformation jobInfo = 
+						new BackUpJobInformation( jobsChoice.getTitleAsHtml(), System.currentTimeMillis(), scannerInfoHtml, jobsChoice.getCompareOperationAsHtml(), jobTaskType.toString()) ;
 				backUpJobInfoTableModel.add(jobInfo);
 			}
 		} catch (InterruptedException | ExecutionException e) {
