@@ -43,7 +43,7 @@ public class TargetFileStoresTest {
 	void nullPathShouldReturnNullTargetFileStore() {
 
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(null);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(null, 5);
 		assertThat(targetFileStore).isNull();
 	}
 
@@ -53,8 +53,8 @@ public class TargetFileStoresTest {
 		Path path1 = TestUtils.getPathFromUriString( "file:///ForTests/BackUpFiles/doesNotExists");
 		Path path2 = TestUtils.getPathFromUriString( "file:///ForTests");
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(path1);
-		TargetFileStore targetFileStore2 = targetFileStores.addTargetFileStore(path2);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(path1, 5);
+		TargetFileStore targetFileStore2 = targetFileStores.addTargetFileStore(path2, 5);
 		assertThat(targetFileStore).isNotNull().isEqualTo(targetFileStore2);
 	}
 
@@ -66,8 +66,8 @@ public class TargetFileStoresTest {
 		Path path2 = TestUtils.getPathFromUriString("file:///ForTests/BackUpFiles/backupFiles.properties");
 		
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore1 = targetFileStores.addTargetFileStore(path1);
-		TargetFileStore targetFileStore2 = targetFileStores.addTargetFileStore(path2);
+		TargetFileStore targetFileStore1 = targetFileStores.addTargetFileStore(path1, 5);
+		TargetFileStore targetFileStore2 = targetFileStores.addTargetFileStore(path2, 5);
 		
 		assertThat(targetFileStore1).isNotNull().isEqualTo(targetFileStore2);
 	}
@@ -77,7 +77,7 @@ public class TargetFileStoresTest {
 		
 		Path pathForTargetFileStore = Paths.get("/");
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
 		
 		assertThat(targetFileStore).isNotNull();
 		
@@ -97,7 +97,7 @@ public class TargetFileStoresTest {
 		
 		Path pathForTargetFileStore = Paths.get("/");
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
 		
 		assertThat(targetFileStore.getFileStore()).isEqualTo(Files.getFileStore(pathForTargetFileStore));
 		assertThat(targetFileStores.getPotentialSizeChange(targetFileStore.getFileStore())).isZero();
@@ -120,7 +120,7 @@ public class TargetFileStoresTest {
 		
 		Path pathForTargetFileStore = Paths.get("/");
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
 		
 		assertThat(targetFileStores.getPotentialSizeChange(targetFileStore.getFileStore())).isZero();
 		assertThat(targetFileStores.getTotalPotentialSizeChange()).isZero();
@@ -140,10 +140,10 @@ public class TargetFileStoresTest {
 		
 		Path pathForTargetFileStore = Paths.get("/");
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
 		
 		TargetFileStores targetFileStores2 = new TargetFileStores();
-		TargetFileStore targetFileStore2 = targetFileStores2.addTargetFileStore(pathForTargetFileStore);
+		TargetFileStore targetFileStore2 = targetFileStores2.addTargetFileStore(pathForTargetFileStore, 5);
 		
 		assertThat(targetFileStore.getFileStore())
 			.isEqualTo(targetFileStore.getFileStore())
@@ -176,7 +176,7 @@ public class TargetFileStoresTest {
 		
 		Path pathForTargetFileStore = Paths.get("/");
 		TargetFileStores targetFileStores = new TargetFileStores();
-		targetFileStores.addTargetFileStore(pathForTargetFileStore);
+		targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
 		
 		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(TargetFileStores.class.getName()));
 		
@@ -191,7 +191,7 @@ public class TargetFileStoresTest {
 		
 		Path pathForTargetFileStore = Paths.get("/");
 		TargetFileStores targetFileStores = new TargetFileStores();
-		targetFileStores.addTargetFileStore(pathForTargetFileStore);
+		targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
 		
 		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(TargetFileStores.class.getName()));
 		

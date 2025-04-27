@@ -72,6 +72,7 @@ public class JobsChoice {
 		jobsTitleHtml = titlesHtml.toString();
 		compareOperationAsHtml = buildCompareOperationAsHtml();
 
+		long fileStoreRemainingSpaceWarningThreshold = Config.getFileStoreRemainingSpaceWarningThreshold();
 		StringBuilder details = new StringBuilder(1024);
 		backUpTasks = new HashMap<JobTaskType, ArrayList<BackUpTask>>();
 		for (JobTaskType jtt : JobTaskType.values()) {
@@ -81,7 +82,7 @@ public class JobsChoice {
 			for (BackUpJob backUpJob : backUpJobs) {
 				addAllTasks(tasksForJtt, backUpJob.getTasks(jtt), details);
 			}
-			initTargetFileStores(jtt);
+			initTargetFileStores(jtt, fileStoreRemainingSpaceWarningThreshold);
 		}
 		jobsDetail = details.toString();
 
@@ -147,8 +148,8 @@ public class JobsChoice {
 		}
 	}
 	
-	private void initTargetFileStores(JobTaskType jobTaskType) {
-		getTasks(jobTaskType).forEach(backUpTask -> targetFileStores.addTargetFileStore(backUpTask.getTarget()));
+	private void initTargetFileStores(JobTaskType jobTaskType, long warningThreshold) {
+		getTasks(jobTaskType).forEach(backUpTask -> targetFileStores.addTargetFileStore(backUpTask.getTarget(), warningThreshold));
 	}
 
 	public boolean compareContent() {

@@ -78,7 +78,7 @@ public class BackUpScannerThread {
 		maxDepth = Config.getMaxDepth();
 
 		TargetFileStores targetFileStores = new TargetFileStores();
-		targetFileStores.addTargetFileStore(backUpTask.getTarget());
+		targetFileStores.addTargetFileStore(backUpTask.getTarget(), Config.getFileStoreRemainingSpaceWarningThreshold());
 		backUpCounters = new BackUpCounters(targetFileStores);
 		done = false;
 

@@ -42,23 +42,21 @@ public class TargetFileStore {
 	private static final Locale localeForFormat = Locale.CANADA_FRENCH;
 	
 	private static final NumberFormat numberFormat = NumberFormat.getInstance(localeForFormat);
-	private static final int DEFAULT_THRESHOLD = 10;
 	
 	private final FileStore fileStore;
 	private final Path mountPoint;
 	private final long totalFileStoreSpace;
-	private long warningThrehold;
+	private final long warningThrehold;
 	private long remainingSpaceBeforeWarning;
 	private boolean sizeWarningRaised;
 	private long initialRemainingSpace;
 	private long potentialSizeChange;
 
-	public TargetFileStore(FileStore fileStore, Path mountPoint) throws IOException {
+	public TargetFileStore(FileStore fileStore, Path mountPoint, long warningThrehold) throws IOException {
 		this.fileStore = fileStore;
 		this.mountPoint = mountPoint;
 		totalFileStoreSpace = fileStore.getTotalSpace();
-		sizeWarningRaised = false;
-		warningThrehold = DEFAULT_THRESHOLD;
+		this.warningThrehold = warningThrehold;
 		reset();
 	}
 
@@ -79,18 +77,11 @@ public class TargetFileStore {
 		return potentialSizeChange;
 	}
 	
-	public void setWarningThresholdForRemainingSpace(long threshold) {
-		warningThrehold = threshold;
-		setRemainingSpaceBeforeWarning();
-	}
-	
 	public void reset() {
 		potentialSizeChange = 0;
 		initialRemainingSpace = getRemainingSpace();
-		setRemainingSpaceBeforeWarning();
-	}
-	
-	private void setRemainingSpaceBeforeWarning() {
+		sizeWarningRaised = false;
+
 		long warningThresholdForRemainingSpace = (totalFileStoreSpace / 100)*warningThrehold;
 		remainingSpaceBeforeWarning = initialRemainingSpace - warningThresholdForRemainingSpace;
 		if (remainingSpaceBeforeWarning < 0) {

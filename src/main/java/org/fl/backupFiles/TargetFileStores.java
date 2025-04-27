@@ -44,7 +44,7 @@ public class TargetFileStores {
 		targetFileStores = new HashMap<FileStore, TargetFileStore>();
 	}
 	
-	public TargetFileStore addTargetFileStore(Path path) {
+	public TargetFileStore addTargetFileStore(Path path, long sizeWarningThreshold) {
 		
 		if (path != null) {
 			try {
@@ -54,7 +54,7 @@ public class TargetFileStores {
 					return null;
 				} else if (! targetFileStores.containsKey(fileStore)) {
 					Path mountPoint = FilesUtils.findMountPoint(path, tLog);
-					TargetFileStore targetFileStore = new TargetFileStore(fileStore, mountPoint);
+					TargetFileStore targetFileStore = new TargetFileStore(fileStore, mountPoint, sizeWarningThreshold);
 					targetFileStores.put(fileStore, targetFileStore);
 					return targetFileStore;
 				} else {

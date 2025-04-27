@@ -45,7 +45,7 @@ public class TargetFileStoreTest {
 	void targetFileStoreCreationTest() throws IOException {
 		
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
 		
 		assertThat(targetFileStore).isNotNull();
 		
@@ -73,7 +73,7 @@ public class TargetFileStoreTest {
 	void targetFileStoreResetTest() throws IOException {
 		
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
 		
 		assertThat(targetFileStore.getPotentialSizeChange()).isZero();
 		
@@ -89,12 +89,10 @@ public class TargetFileStoreTest {
 	@Test
 	void warningThreholdTest() throws IOException {	
 		
-		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore);
-		
 		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(TargetFileStore.class.getName()));
 		
-		targetFileStore.setWarningThresholdForRemainingSpace(90);
+		TargetFileStores targetFileStores = new TargetFileStores();
+		targetFileStores.addTargetFileStore(pathForTargetFileStore, 90);
 		
 		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);

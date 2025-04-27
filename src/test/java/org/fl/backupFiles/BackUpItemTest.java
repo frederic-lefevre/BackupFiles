@@ -72,7 +72,7 @@ public class BackUpItemTest {
 
 	private static TargetFileStores newTargetFileStores() {
 		TargetFileStores targetFileStores = new TargetFileStores();
-		targetFileStores.addTargetFileStore(pathForTargetFileStore);
+		targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
 		return targetFileStores;
 	}
 	
