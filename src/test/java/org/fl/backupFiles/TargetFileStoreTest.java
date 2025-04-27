@@ -52,12 +52,6 @@ public class TargetFileStoreTest {
 		assertThat(targetFileStore.getPotentialSizeChange()).isZero();
 		assertThat(targetFileStore.getFileStore()).isEqualTo(Files.getFileStore(pathForTargetFileStore));
 		
-		StringBuilder spaceEvolutionString = new StringBuilder();
-		
-		targetFileStore.getSpaceEvolution(spaceEvolutionString);
-		
-		assertThat(spaceEvolutionString).isNotEmpty();
-		
 		final long sizeDifference = 100;
 		long newPotentialSizeChange = targetFileStore.recordPotentialSizeChange(sizeDifference);
 		

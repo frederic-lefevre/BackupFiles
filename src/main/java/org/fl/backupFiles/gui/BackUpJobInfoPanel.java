@@ -45,7 +45,7 @@ public class BackUpJobInfoPanel extends JPanel {
 		
 		JTable jobInfosTable = new JTable(tabModel);
 
-		jobInfosTable.setRowHeight(250);
+		jobInfosTable.setRowHeight(300);
 		
 		// Set column width
 		for (int colNum=0; colNum < tabModel.getColumnCount() ; colNum++) {

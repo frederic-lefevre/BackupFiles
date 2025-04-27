@@ -24,12 +24,17 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
+import java.io.IOException;
 import java.nio.file.FileStore;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class BackUpCounters {
 
+	private static final Logger logger = Logger.getLogger(BackUpCounters.class.getName());
+	
 	// Locale.FRANCE affiche le séparateur de milliers avec un "Narrow non-breaking space", ce qui pose des problèmes
 	// d'affichage avec beaucoup d'outils (console Eclipse, lorsqu'on édite les logs avec Notepad++ par exemple)
 	private static final Locale localeForFormat = Locale.CANADA_FRENCH;
@@ -109,10 +114,32 @@ public class BackUpCounters {
 		return targetFileStores.recordPotentialSizeChange(fileStore, difference);
 	}
 	
-	@Override
-	public String toString() {
+	public void add(BackUpCounters counters) {
 
-		StringBuilder res = new StringBuilder();
+		copyNewNb = copyNewNb + counters.copyNewNb;
+		copyReplaceNb = copyReplaceNb + counters.copyReplaceNb;
+		copyTreeNb = copyTreeNb + counters.copyTreeNb;
+		deleteNb = deleteNb + counters.deleteNb;
+		deleteDirNb = deleteDirNb + counters.deleteDirNb;
+		ambiguousNb = ambiguousNb + counters.ambiguousNb;
+		copyTargetNb = copyTargetNb + counters.copyTargetNb;
+		adjustTimeNb = adjustTimeNb + counters.adjustTimeNb;
+		contentDifferentNb = contentDifferentNb + counters.contentDifferentNb;
+		nbSourceFilesProcessed = nbSourceFilesProcessed + counters.nbSourceFilesProcessed;
+		nbTargetFilesProcessed = nbTargetFilesProcessed + counters.nbTargetFilesProcessed;
+		nbSourceFilesFailed = nbSourceFilesFailed + counters.nbSourceFilesFailed;
+		nbTargetFilesFailed = nbTargetFilesFailed + counters.nbTargetFilesFailed;
+		backupWithSizeAboveThreshold = backupWithSizeAboveThreshold + counters.backupWithSizeAboveThreshold;
+		nbHighPermanencePath = nbHighPermanencePath + counters.nbHighPermanencePath;
+		nbMediumPermanencePath = nbMediumPermanencePath + counters.nbMediumPermanencePath;
+		targetFileStores.mergeWith(counters.getTargetFileStores());
+	}
+		
+	private long getTotalPotentialSizeChange() {
+		return targetFileStores.getTotalPotentialSizeChange();
+	}
+	
+	public void appendInfoText(StringBuilder res) {
 
 		res.append(COPY_NEW_LABEL).append(copyNewNb).append("\n").append(DELETE_LABEL).append(deleteNb).append("\n");
 		res.append(COPY_REPLACE_LABEL).append(copyReplaceNb).append("\n").append(DELETE_DIR_LABEL).append(deleteDirNb).append("\n");
@@ -131,12 +158,14 @@ public class BackUpCounters {
 		if (contentDifferentNb != 0) {
 			res.append(CONTENT_DIFFERENT_LABEL).append(contentDifferentNb).append("\n");
 		}
-		return res.toString();
+		
+		res.append("Stockage de fichiers, espace restant utilisable:\n");
+		targetFileStores.getAllTargetFileStore().forEach(fileStore -> appendFileStoreInfo(res, fileStore, "", false));
 	}
 	
-	public void appendHtmlFragment(StringBuilder res) {
-
-		res.append(TABLE_BEGIN);
+	public void appendCounterInfoInHtml(StringBuilder res) {
+		
+		res.append(TABLE_AND_ROW_BEGIN);
 		appendCellCouple(res, COPY_TREE_LABEL, copyTreeNb, null);
 		appendCellCouple(res, COPY_NEW_LABEL, copyNewNb, null);
 		appendCellCouple(res, COPY_REPLACE_LABEL, copyReplaceNb, null);
@@ -168,19 +197,38 @@ public class BackUpCounters {
 			res.append(NEW_ROW);
 			appendCellCouple(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, null);
 		}
+		res.append(ROW_AND_TABLE_END);
+	}
+	
+	public void appendCounterAndFileStoreInfoInHtml(StringBuilder res) {
+
+		appendCounterInfoInHtml(res);
+		
+		res.append(TABLE_BEGIN);
+		appendFileStoreHeaderRow(res);
+		targetFileStores.getAllTargetFileStore().forEach(fileStore ->
+			appendFileStoreInfo(res, fileStore, "", true)
+		);
 		res.append(TABLE_END);
 	}
 	
-	private static final String NEW_ROW    			  = "</tr><tr>" ;
-	private static final String TABLE_BEGIN 		  = "<table><tr>" ;
-	private static final String TABLE_END   		  = "</tr></table>" ;
-	private static final String TWO_EMPTY_CELLS 	  = "<td></td><td></td>" ;
-	private static final String CELL_BEGIN 			  = "<td>" ;
-	private static final String CELL_END 			  = "</td>" ;
-	private static final String CELL_BREAK 			  = "</td><td style=\"text-align:right\">" ;
-	private static final String TAG_END 			  = ">" ;
-	private static final String CELL_WITH_COLOR_BEGIN = "<td bgcolor=" ;
-	private static final String CELL_WITH_COLOR_BREAK = "</td><td style=\"text-align:right\" bgcolor=" ;
+	private static final String TABLE_BEGIN = "<table border=1>";
+	private static final String TABLE_END = "</table>";
+	private static final String ROW_BEGIN = "<tr>";
+	private static final String ROW_END = "</tr>";
+	private static final String NEW_ROW = "</tr><tr>";
+	private static final String TABLE_AND_ROW_BEGIN = "<table><tr>";
+	private static final String ROW_AND_TABLE_END = "</tr></table>";
+	private static final String TWO_EMPTY_CELLS = "<td></td><td></td>";
+	private static final String CELL_BEGIN = "<td>";
+	private static final String RIGHT_ALIGNED_CELL_BEGIN = "<td style=\"text-align:right\">";
+	private static final String RIGHT_ALIGNED_RED_CELL_BEGIN = "<td style=\"text-align:right\" bgcolor=\"red\">";
+	private static final String CELL_END = "</td>";
+	private static final String CELL_BREAK = "</td><td style=\"text-align:right\">";
+	private static final String TAG_END = ">";
+	private static final String CELL_WITH_COLOR_BEGIN = "<td bgcolor=";
+	private static final String CELL_WITH_COLOR_BREAK = "</td><td style=\"text-align:right\" bgcolor=";
+	private static final String IN_ERROR = "En erreur!";
 
 	private void appendCellCouple(StringBuilder res, String label, long value, String color) {
 		
@@ -207,28 +255,87 @@ public class BackUpCounters {
 		}
 	}
 	
-	public void add(BackUpCounters counters) {
-
-		copyNewNb = copyNewNb + counters.copyNewNb;
-		copyReplaceNb = copyReplaceNb + counters.copyReplaceNb;
-		copyTreeNb = copyTreeNb + counters.copyTreeNb;
-		deleteNb = deleteNb + counters.deleteNb;
-		deleteDirNb = deleteDirNb + counters.deleteDirNb;
-		ambiguousNb = ambiguousNb + counters.ambiguousNb;
-		copyTargetNb = copyTargetNb + counters.copyTargetNb;
-		adjustTimeNb = adjustTimeNb + counters.adjustTimeNb;
-		contentDifferentNb = contentDifferentNb + counters.contentDifferentNb;
-		nbSourceFilesProcessed = nbSourceFilesProcessed + counters.nbSourceFilesProcessed;
-		nbTargetFilesProcessed = nbTargetFilesProcessed + counters.nbTargetFilesProcessed;
-		nbSourceFilesFailed = nbSourceFilesFailed + counters.nbSourceFilesFailed;
-		nbTargetFilesFailed = nbTargetFilesFailed + counters.nbTargetFilesFailed;
-		backupWithSizeAboveThreshold = backupWithSizeAboveThreshold + counters.backupWithSizeAboveThreshold;
-		nbHighPermanencePath = nbHighPermanencePath + counters.nbHighPermanencePath;
-		nbMediumPermanencePath = nbMediumPermanencePath + counters.nbMediumPermanencePath;
-		targetFileStores.mergeWith(counters.getTargetFileStores());
+	private void appendFileStoreHeaderRow(StringBuilder res) {
+		res.append(ROW_BEGIN)
+			.append(CELL_BEGIN)
+			.append("Unité de stockage")
+			.append(CELL_END)
+			.append(CELL_BEGIN)
+			.append("Espace total")
+			.append(CELL_END)
+			.append(CELL_BEGIN)
+			.append("Espace restant")
+			.append(CELL_END)
+			.append(CELL_BEGIN)
+			.append("Evolution<br/> de l'espace restant")
+			.append(CELL_END)
+			.append(CELL_BEGIN)
+			.append("Besoin d'espace<br/> pour la sauvegarde")
+			.append(CELL_END)
+			.append(ROW_END);
 	}
 	
-	private long getTotalPotentialSizeChange() {
-		return targetFileStores.getTotalPotentialSizeChange();
+	private void appendFileStoreInfo(StringBuilder res, TargetFileStore targetFileStore, String color, boolean complete) {
+		
+		String targetFileStoreName = targetFileStore.getName();
+		String usableSpace;
+		String spaceEvolution;
+		long usableSize;
+		
+		try {
+			usableSize = targetFileStore.getUsableSpace();
+			usableSpace = numberFormat.format(targetFileStore.getUsableSpace());
+			long difference = usableSize - targetFileStore.getInitialRemainingSpace();
+			if (difference > 0) {
+				spaceEvolution = "+" + numberFormat.format(difference);
+			} else {
+				spaceEvolution = numberFormat.format(difference);
+			}
+		} catch (IOException e) {
+			usableSize = 0;
+			usableSpace = IN_ERROR;
+			spaceEvolution = IN_ERROR;
+			logger.log(Level.SEVERE, "IOEXCEPTION getting usable space for " + targetFileStoreName, e);
+		}
+		if (complete) {
+			String totalSpace = numberFormat.format(targetFileStore.getTotalSpace());
+			long potentialChange = targetFileStore.getPotentialSizeChange();
+			String potentialSizeChange = numberFormat.format(potentialChange);
+			long warningThresholdForRemainingSpace = targetFileStore.getWarningThresholdForRemainingSpace();
+			String usableSpaceBeginCellTag;
+			if (usableSize < warningThresholdForRemainingSpace) {
+				usableSpaceBeginCellTag = RIGHT_ALIGNED_RED_CELL_BEGIN;
+			} else {
+				usableSpaceBeginCellTag = RIGHT_ALIGNED_CELL_BEGIN;
+			}
+			String potentialSizeChangeCellTag;
+			if (usableSize - potentialChange < warningThresholdForRemainingSpace) {
+				potentialSizeChangeCellTag = RIGHT_ALIGNED_RED_CELL_BEGIN;
+			} else {
+				potentialSizeChangeCellTag = RIGHT_ALIGNED_CELL_BEGIN;
+			}
+			res.append(ROW_BEGIN)
+				.append(CELL_BEGIN)
+				.append(targetFileStoreName)
+				.append(CELL_END)
+				.append(RIGHT_ALIGNED_CELL_BEGIN)
+				.append(totalSpace)
+				.append(CELL_END)
+				.append(usableSpaceBeginCellTag)
+				.append(usableSpace)
+				.append(CELL_END)
+				.append(RIGHT_ALIGNED_CELL_BEGIN)
+				.append(spaceEvolution)
+				.append(CELL_END)
+				.append(potentialSizeChangeCellTag)
+				.append(potentialSizeChange)
+				.append(CELL_END)
+				.append(ROW_END);
+		} else {
+			res.append("- ").append(targetFileStoreName).append(" = ")
+				.append(usableSpace).append(" ( ")
+				.append(spaceEvolution).append(" ) bytes")
+				.append("\n");
+		}
 	}
 }

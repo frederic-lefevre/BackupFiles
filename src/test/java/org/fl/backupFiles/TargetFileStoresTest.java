@@ -45,6 +45,8 @@ public class TargetFileStoresTest {
 		TargetFileStores targetFileStores = new TargetFileStores();
 		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(null, 5);
 		assertThat(targetFileStore).isNull();
+		
+		assertThat(targetFileStores.getAllTargetFileStore()).isEmpty();
 	}
 
 	@Test
@@ -56,6 +58,8 @@ public class TargetFileStoresTest {
 		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(path1, 5);
 		TargetFileStore targetFileStore2 = targetFileStores.addTargetFileStore(path2, 5);
 		assertThat(targetFileStore).isNotNull().isEqualTo(targetFileStore2);
+		
+		assertThat(targetFileStores.getAllTargetFileStore()).hasSize(1);
 	}
 
 	
@@ -70,6 +74,8 @@ public class TargetFileStoresTest {
 		TargetFileStore targetFileStore2 = targetFileStores.addTargetFileStore(path2, 5);
 		
 		assertThat(targetFileStore1).isNotNull().isEqualTo(targetFileStore2);
+		
+		assertThat(targetFileStores.getAllTargetFileStore()).hasSize(1);
 	}
 	
 	@Test
@@ -84,12 +90,6 @@ public class TargetFileStoresTest {
 		assertThat(targetFileStore.getFileStore()).isEqualTo(Files.getFileStore(pathForTargetFileStore));
 		assertThat(targetFileStores.getPotentialSizeChange(targetFileStore.getFileStore())).isZero();
 		assertThat(targetFileStores.getTotalPotentialSizeChange()).isZero();
-		
-		StringBuilder spaceEvolutionString = new StringBuilder();
-		
-		targetFileStore.getSpaceEvolution(spaceEvolutionString);
-		
-		assertThat(spaceEvolutionString).isNotEmpty();
 	}
 	
 	@Test

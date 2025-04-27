@@ -290,9 +290,8 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 		StringBuilder scanInfo = new StringBuilder(1024);
 		scanInfo.append(HTML_BEGIN);
-		backUpCounters.appendHtmlFragment(scanInfo);
+		backUpCounters.appendCounterAndFileStoreInfoInHtml(scanInfo);
 		scanInfo.append("<p>Durée de la comparaison (ms)= ").append(duration);
-		scanInfo.append(jobsChoice.getTargetFileStores().getTargetRemainigSpace(true));
 		if ((filesVisitFailed != null) && (!filesVisitFailed.isEmpty())) {
 			scanInfo.append("<br>Fichiers visités en erreur:");
 			for (Path fileOnError : filesVisitFailed) {
@@ -305,7 +304,8 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 	private String getScanInfoText(StringBuilder scanInfo, long duration) {
 
-		scanInfo.append(backUpCounters.toString()).append("\nScan duration (ms)= ").append(duration);
+		backUpCounters.appendInfoText(scanInfo);
+		scanInfo.append("\nScan duration (ms)= ").append(duration);
 		if ((filesVisitFailed != null) && (!filesVisitFailed.isEmpty())) {
 			scanInfo.append("\nFichiers visités en erreur:");
 			for (Path fileOnError : filesVisitFailed) {

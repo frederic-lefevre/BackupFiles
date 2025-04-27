@@ -124,7 +124,7 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 		infos.append(HTML_BEGIN);
 		infos.append(NB_ELEM).append(backUpItemList.size() - latestResult);
 		infos.append(PROCESSED_ELEM);
-		backUpCounters.appendHtmlFragment(infos);
+		backUpCounters.appendCounterInfoInHtml(infos);
 		infos.append(HTML_END);
 		progressPanel.setStepInfos(infos.toString(), latestResult);     
 	}
@@ -178,9 +178,8 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 
 		StringBuilder procInfo = new StringBuilder(1024);
 		procInfo.append(HTML_BEGIN);
-		backUpCounters.appendHtmlFragment(procInfo);
+		backUpCounters.appendCounterAndFileStoreInfoInHtml(procInfo);
 		procInfo.append("<p>Durée de la sauvegarde (ms)= ").append(duration);
-		procInfo.append(jobsChoice.getTargetFileStores().getTargetRemainigSpace(true));
 		procInfo.append(HTML_END);
 		return procInfo.toString();
 	}
@@ -189,8 +188,8 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 
 		StringBuilder procInfo = new StringBuilder(1024);
 		procInfo.append(jobsChoice.getTitleAsString()).append(jobTaskType.toString()).append("\n");
-		procInfo.append(backUpCounters.toString()).append("\nProcess duration (ms)= ").append(duration).append("\n");
-		procInfo.append(jobsChoice.getTargetFileStores().getTargetRemainigSpace(false));
+		backUpCounters.appendInfoText(procInfo);
+		procInfo.append("\nProcess duration (ms)= ").append(duration).append("\n");
 		return procInfo.toString();
 	}
 }

@@ -26,6 +26,7 @@ package org.fl.backupFiles;
 
 import java.nio.file.FileStore;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -65,6 +66,10 @@ public class TargetFileStores {
 			}
 		}
 		return  null;
+	}
+	
+	public Collection<TargetFileStore> getAllTargetFileStore() {
+		return targetFileStores.values();
 	}
 	
 	public TargetFileStore getTargetFileStore(FileStore fileStore) {
@@ -123,33 +128,5 @@ public class TargetFileStores {
 	
 	private Map<FileStore, TargetFileStore> getTargetFileStoresMap() {
 		return targetFileStores;
-	}
-	
-	public String getTargetRemainigSpace(boolean inHtml) {
-		
-		StringBuilder spaceEvol = new StringBuilder() ;
-		if (inHtml) {
-			spaceEvol.append("<p>") ;
-		}
-		spaceEvol.append("Stockage de fichiers, espace restant utilisable:") ;
-		if (inHtml) {
-			spaceEvol.append("<ul>") ;
-		} else {
-			spaceEvol.append("\n") ;
-		}
-		for (TargetFileStore targetFileStore : targetFileStores.values()) {
-			if (inHtml) {
-				spaceEvol.append("<li>") ;
-			} else {
-				spaceEvol.append("- ") ;
-			}
-			targetFileStore.getSpaceEvolution(spaceEvol) ;
-			if (inHtml) {
-				spaceEvol.append("</li>") ;
-			} else {
-				spaceEvol.append("\n") ;
-			}
-		}
-		return spaceEvol.toString() ;
 	}
 }

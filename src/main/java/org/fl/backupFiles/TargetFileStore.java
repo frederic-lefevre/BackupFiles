@@ -27,36 +27,29 @@ package org.fl.backupFiles;
 import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.Path;
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TargetFileStore {
 
 	private static final Logger tLog = Logger.getLogger(TargetFileStore.class.getName());
-	
-	// Locale.FRANCE affiche le séparateur de milliers avec un "Narrow non-breaking space", ce qui pose des problèmes
-	// d'affichage avec beaucoup d'outils (console Eclipse et lorsqu'on édite les logs avec Notepad++ par exemple)
-	// Par contre, aucun problème lorsqu'on affiche dans des composants java.swing
-	private static final Locale localeForFormat = Locale.CANADA_FRENCH;
-	
-	private static final NumberFormat numberFormat = NumberFormat.getInstance(localeForFormat);
-	
+
 	private final FileStore fileStore;
-	private final Path mountPoint;
+	private final String name;
+	private final String identification;
 	private final long totalFileStoreSpace;
-	private final long warningThrehold;
-	private long remainingSpaceBeforeWarning;
+	private final long warningThresholdForRemainingSpace;
+	private long remainingSpaceBeforeWarning;	
 	private boolean sizeWarningRaised;
 	private long initialRemainingSpace;
 	private long potentialSizeChange;
 
 	public TargetFileStore(FileStore fileStore, Path mountPoint, long warningThrehold) throws IOException {
 		this.fileStore = fileStore;
-		this.mountPoint = mountPoint;
 		totalFileStoreSpace = fileStore.getTotalSpace();
-		this.warningThrehold = warningThrehold;
+		warningThresholdForRemainingSpace = (totalFileStoreSpace / 100)*warningThrehold;
+		name = fileStore.name() + " " + mountPoint;
+		identification ="fileStore=" + fileStore.name() + ", root folder=" + mountPoint;
 		reset();
 	}
 
@@ -82,7 +75,6 @@ public class TargetFileStore {
 		initialRemainingSpace = getRemainingSpace();
 		sizeWarningRaised = false;
 
-		long warningThresholdForRemainingSpace = (totalFileStoreSpace / 100)*warningThrehold;
 		remainingSpaceBeforeWarning = initialRemainingSpace - warningThresholdForRemainingSpace;
 		if (remainingSpaceBeforeWarning < 0) {
 			tLog.warning("Remaing space for " + getFileStoreIdentification() + " is too low: " + initialRemainingSpace);
@@ -99,30 +91,27 @@ public class TargetFileStore {
 		}
 	}
 	
-	public void getSpaceEvolution(StringBuilder result) {
-
-		if (fileStore != null) {
-
-			result.append(fileStore.name()).append(" ").append(mountPoint).append(" = ");
-			try {
-				long currentSpace = fileStore.getUsableSpace();
-				long difference = currentSpace - initialRemainingSpace;
-
-				result.append(numberFormat.format(currentSpace)).append(" ( ");
-				if (difference > 0) {
-					result.append("+");
-				}
-				result.append(numberFormat.format(difference)).append(" ) bytes");
-
-			} catch (IOException e) {
-				String error = "IOException getting usable space for " + getFileStoreIdentification();
-				tLog.log(Level.SEVERE, error, e);
-				result.append(error);
-			}
-		}
+	public long getInitialRemainingSpace() {
+		return initialRemainingSpace;
 	}
 	
+	public long getWarningThresholdForRemainingSpace() {
+		return warningThresholdForRemainingSpace;
+	}
+
 	private String getFileStoreIdentification() {
-		return "fileStore=" + fileStore.name() + ", root folder=" + mountPoint;
+		return identification;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public long getUsableSpace() throws IOException {
+		return fileStore.getUsableSpace();
+	}
+	
+	public long getTotalSpace() {
+		return totalFileStoreSpace;
 	}
 }
