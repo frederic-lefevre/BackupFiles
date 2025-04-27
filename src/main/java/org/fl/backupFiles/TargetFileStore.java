@@ -42,15 +42,23 @@ public class TargetFileStore {
 	private static final Locale localeForFormat = Locale.CANADA_FRENCH;
 	
 	private static final NumberFormat numberFormat = NumberFormat.getInstance(localeForFormat);
+	private static final int DEFAULT_THRESHOLD = 10;
 	
 	private final FileStore fileStore;
 	private final Path mountPoint;
+	private final long totalFileStoreSpace;
+	private long warningThrehold;
+	private long remainingSpaceBeforeWarning;
+	private boolean sizeWarningRaised;
 	private long initialRemainingSpace;
 	private long potentialSizeChange;
 
-	public TargetFileStore(FileStore fileStore, Path mountPoint) {
+	public TargetFileStore(FileStore fileStore, Path mountPoint) throws IOException {
 		this.fileStore = fileStore;
 		this.mountPoint = mountPoint;
+		totalFileStoreSpace = fileStore.getTotalSpace();
+		sizeWarningRaised = false;
+		warningThrehold = DEFAULT_THRESHOLD;
 		reset();
 	}
 
@@ -64,15 +72,39 @@ public class TargetFileStore {
 	
 	public long recordPotentialSizeChange(long sizeDifference) {
 		potentialSizeChange = potentialSizeChange + sizeDifference;
+		if ((potentialSizeChange > remainingSpaceBeforeWarning) && (!sizeWarningRaised)) {
+			tLog.warning("Remaing space for " + getFileStoreIdentification() + " is too low: " + getRemainingSpace());
+			sizeWarningRaised = true;
+		}
 		return potentialSizeChange;
+	}
+	
+	public void setWarningThresholdForRemainingSpace(long threshold) {
+		warningThrehold = threshold;
+		setRemainingSpaceBeforeWarning();
 	}
 	
 	public void reset() {
 		potentialSizeChange = 0;
+		initialRemainingSpace = getRemainingSpace();
+		setRemainingSpaceBeforeWarning();
+	}
+	
+	private void setRemainingSpaceBeforeWarning() {
+		long warningThresholdForRemainingSpace = (totalFileStoreSpace / 100)*warningThrehold;
+		remainingSpaceBeforeWarning = initialRemainingSpace - warningThresholdForRemainingSpace;
+		if (remainingSpaceBeforeWarning < 0) {
+			tLog.warning("Remaing space for " + getFileStoreIdentification() + " is too low: " + initialRemainingSpace);
+			sizeWarningRaised = true;
+		}
+	}
+	
+	private long getRemainingSpace() {
 		try {
-			initialRemainingSpace = fileStore.getUsableSpace();
+			return fileStore.getUsableSpace();
 		} catch (IOException e) {	
-			tLog.log(Level.SEVERE, "IOException when getting remaining space for " + mountPoint, e);
+			tLog.log(Level.SEVERE, "IOException when getting remaining space for " + getFileStoreIdentification(), e);
+			return 0;
 		}
 	}
 	
@@ -92,10 +124,14 @@ public class TargetFileStore {
 				result.append(numberFormat.format(difference)).append(" ) bytes");
 
 			} catch (IOException e) {
-				String error = "IOException getting usable space of filestore " + fileStore.name();
+				String error = "IOException getting usable space for " + getFileStoreIdentification();
 				tLog.log(Level.SEVERE, error, e);
 				result.append(error);
 			}
 		}
+	}
+	
+	private String getFileStoreIdentification() {
+		return "fileStore=" + fileStore.name() + ", root folder=" + mountPoint;
 	}
 }

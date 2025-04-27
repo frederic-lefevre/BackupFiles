@@ -30,7 +30,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.fl.util.FilterCounter;
+import org.fl.util.FilterCounter.LogRecordCounter;
 import org.junit.jupiter.api.Test;
 
 public class TargetFileStoreTest {
@@ -80,5 +84,19 @@ public class TargetFileStoreTest {
 		
 		targetFileStore.reset();
 		assertThat(targetFileStore.getPotentialSizeChange()).isZero();
+	}
+	
+	@Test
+	void warningThreholdTest() throws IOException {	
+		
+		TargetFileStores targetFileStores = new TargetFileStores();
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore);
+		
+		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(TargetFileStore.class.getName()));
+		
+		targetFileStore.setWarningThresholdForRemainingSpace(90);
+		
+		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
 	}
 }
