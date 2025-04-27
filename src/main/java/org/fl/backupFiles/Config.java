@@ -53,6 +53,7 @@ public class Config {
 	private static Path configFileDir;
 	private static long scanRefreshRate;
 	private static long backUpMaxRefreshInterval;
+	private static long fileStoreRemainingSpaceWarningThreshold;
 	private static int backUpRefreshRate;
 	private static int maxDepth;
 	private static ExecutorService scanExecutorService;
@@ -89,6 +90,9 @@ public class Config {
 					Long.MAX_VALUE);
 			BackUpJob.setDefaultWarningSizeLimit(fileSizeWarningThreshold);
 
+			fileStoreRemainingSpaceWarningThreshold = 
+					backupProperty.getLong("backupFiles.fileStore.remainingSize.warningThreshold", 10);
+			
 			osActions = new ArrayList<OsAction>();
 			String osCmdPropBase = "backupFiles.command.";
 			List<String> osActionProperties = backupProperty.getKeysElements("backupFiles.command.");
@@ -178,6 +182,13 @@ public class Config {
 		return maxDepth;
 	}
 
+	public static long getFileStoreRemainingSpaceWarningThreshold() {
+		if (!initialized) {
+			initConfig(BackupFilesGui.getPropertyFile());
+		}
+		return fileStoreRemainingSpaceWarningThreshold;
+	}
+	
 	public static ExecutorService getScanExecutorService() {
 		if (!initialized) {
 			initConfig(BackupFilesGui.getPropertyFile());

@@ -24,6 +24,7 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -240,7 +241,7 @@ public class BackUpJob {
 		}
 	}
 	
-	private void addBackUpTask(Path srcPath, Path bufPath, Path tgtPath, long sizeWarningLimit) {
+	private void addBackUpTask(Path srcPath, Path bufPath, Path tgtPath, long sizeWarningLimit) throws IOException {
 		if ((srcPath != null)) {
 			if (bufPath != null) {
 				if (Files.isRegularFile(srcPath)) {
@@ -280,7 +281,11 @@ public class BackUpJob {
 			if (fullBackUpTask.isScanInParallel()) {
 				addParallelBackUpTasks(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath(), fullBackUpTask.getSizeWarningLimit());
 			} else {
-				addBackUpTask(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath(), fullBackUpTask.getSizeWarningLimit());
+				try {
+					addBackUpTask(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath(), fullBackUpTask.getSizeWarningLimit());
+				} catch (IOException e) {
+					bLog.log(Level.SEVERE, "Exception when creating backup task with target path" + fullBackUpTask.getTgtPath(), e);
+				}
 			}
 			
 		});

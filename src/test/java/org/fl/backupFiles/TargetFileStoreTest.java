@@ -26,9 +26,15 @@ package org.fl.backupFiles;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.fl.util.FilterCounter;
+import org.fl.util.FilterCounter.LogRecordCounter;
 import org.junit.jupiter.api.Test;
 
 public class TargetFileStoreTest {
@@ -36,21 +42,53 @@ public class TargetFileStoreTest {
 	private static final Path pathForTargetFileStore = Paths.get("/");
 	
 	@Test
-	void shouldReturnSpaceEvolution() {
+	void targetFileStoreCreationTest() throws IOException {
 		
-		TargetFileStore targetFileStore = new TargetFileStore(pathForTargetFileStore);
+		TargetFileStores targetFileStores = new TargetFileStores();
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
 		
 		assertThat(targetFileStore).isNotNull();
 		
-		StringBuilder spaceEvolutionString = new StringBuilder();
+		assertThat(targetFileStore.getPotentialSizeChange()).isZero();
+		assertThat(targetFileStore.getFileStore()).isEqualTo(Files.getFileStore(pathForTargetFileStore));
 		
-		targetFileStore.getSpaceEvolution(spaceEvolutionString);
+		final long sizeDifference = 100;
+		long newPotentialSizeChange = targetFileStore.recordPotentialSizeChange(sizeDifference);
 		
-		assertThat(spaceEvolutionString).isNotEmpty();
+		assertThat(newPotentialSizeChange).isEqualTo(sizeDifference);
 		
-		// Uncommented to display remaining space
-		//System.out.println(spaceEvolutionString);
-
+		final long sizeDifference2 = 105;
+		
+		assertThat(targetFileStore.recordPotentialSizeChange(sizeDifference2)).isEqualTo(sizeDifference + sizeDifference2);
 	}
 
+	
+	@Test
+	void targetFileStoreResetTest() throws IOException {
+		
+		TargetFileStores targetFileStores = new TargetFileStores();
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
+		
+		assertThat(targetFileStore.getPotentialSizeChange()).isZero();
+		
+		final long sizeDifference = 100;
+		long newPotentialSizeChange = targetFileStore.recordPotentialSizeChange(sizeDifference);
+		
+		assertThat(newPotentialSizeChange).isEqualTo(sizeDifference).isEqualTo(targetFileStore.getPotentialSizeChange());
+		
+		targetFileStore.reset();
+		assertThat(targetFileStore.getPotentialSizeChange()).isZero();
+	}
+	
+	@Test
+	void warningThreholdTest() throws IOException {	
+		
+		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(TargetFileStore.class.getName()));
+		
+		TargetFileStores targetFileStores = new TargetFileStores();
+		targetFileStores.addTargetFileStore(pathForTargetFileStore, 90);
+		
+		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);
+	}
 }
