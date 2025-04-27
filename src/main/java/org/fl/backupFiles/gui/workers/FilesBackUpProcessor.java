@@ -83,7 +83,7 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 
 		backUpJobInfoTableModel = bj;
 
-		backUpCounters = new BackUpCounters();
+		backUpCounters = new BackUpCounters(jobsChoice.getTargetFileStores());
 	}
 
 	@Override

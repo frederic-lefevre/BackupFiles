@@ -62,10 +62,23 @@ public class TargetFileStoreTest {
 		final long sizeDifference2 = 105;
 		
 		assertThat(targetFileStore.recordPotentialSizeChange(sizeDifference2)).isEqualTo(sizeDifference + sizeDifference2);
-		
-		// Uncommented to display remaining space
-		//System.out.println(spaceEvolutionString);
-
 	}
 
+	
+	@Test
+	void targetFileStoreResetTest() throws IOException {
+		
+		TargetFileStores targetFileStores = new TargetFileStores();
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore);
+		
+		assertThat(targetFileStore.getPotentialSizeChange()).isZero();
+		
+		final long sizeDifference = 100;
+		long newPotentialSizeChange = targetFileStore.recordPotentialSizeChange(sizeDifference);
+		
+		assertThat(newPotentialSizeChange).isEqualTo(sizeDifference).isEqualTo(targetFileStore.getPotentialSizeChange());
+		
+		targetFileStore.reset();
+		assertThat(targetFileStore.getPotentialSizeChange()).isZero();
+	}
 }

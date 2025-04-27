@@ -77,7 +77,6 @@ class FilesBackUpScannerTest {
 		if (!genearationSuccessful) {
 			fail("Fail to generate test data");
 		}
-
 	}
 	
 	@Test
@@ -90,7 +89,7 @@ class FilesBackUpScannerTest {
 			LogRecordCounter logCounterForscannerBackUpScannerThread = 
 					FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpScannerThread.class.getName()));
 			
-			BackUpJobList backUpJobs = new BackUpJobList(configFileDir) ;
+			BackUpJobList backUpJobs = new BackUpJobList(configFileDir);
 
 			if ((backUpJobs == null) || (backUpJobs.isEmpty())) {
 				fail("Null or empty BackUpJobList");
@@ -116,7 +115,7 @@ class FilesBackUpScannerTest {
 			filesBackUpScanner.execute();
 
 			// Wait for filesBackUpScanner end
-			filesBackUpScanner.get() ;
+			filesBackUpScanner.get();
 			
 			filesBackUpScanner.done();
 			backUpCounters = filesBackUpScanner.getBackUpCounters() ;
@@ -137,18 +136,19 @@ class FilesBackUpScannerTest {
 			assertThat(backUpCounters.nbTargetFilesProcessed).isEqualTo(19700);
 			assertThat(backUpCounters.nbTargetFilesFailed).isZero();
 			assertThat(backUpCounters.copyTargetNb).isZero();
-			assertThat(backUpCounters.getSizeDifferencesPerFileStore()).isNotNull().isEmpty();
+			assertThat(backUpCounters.getTargetFileStores()).isNotNull();
+			assertThat(backUpCounters.getTargetFileStores().getTotalPotentialSizeChange()).isZero();
 
 			assertThat(backUpItems).isEmpty();
 			
 			// BUFFER_TO_TARGET
-			filesBackUpScanner = new FilesBackUpScanner(uicB2T, JobTaskType.BUFFER_TO_TARGET, jobsChoice, btm, pip, bujitm) ;
+			filesBackUpScanner = new FilesBackUpScanner(uicB2T, JobTaskType.BUFFER_TO_TARGET, jobsChoice, btm, pip, bujitm);
 			assertThat(backUpItems).isEmpty();
 
 			filesBackUpScanner.execute();
 
 			// Wait for filesBackUpScanner end
-			filesBackUpScanner.get() ;
+			filesBackUpScanner.get();
 			filesBackUpScanner.done();
 			backUpCounters = filesBackUpScanner.getBackUpCounters();
 
@@ -168,7 +168,8 @@ class FilesBackUpScannerTest {
 			assertThat(backUpCounters.nbTargetFilesProcessed).isZero();		
 			assertThat(backUpCounters.nbTargetFilesFailed).isZero();
 			assertThat(backUpCounters.copyTargetNb).isZero();
-			assertThat(backUpCounters.getSizeDifferencesPerFileStore()).isNotNull().hasSize(1).containsValue(4997400L);
+			assertThat(backUpCounters.getTargetFileStores()).isNotNull();
+			assertThat(backUpCounters.getTargetFileStores().getTotalPotentialSizeChange()).isEqualTo(4997400L);
 		
 			assertThat(backUpItems).hasSize(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION);
 			
@@ -188,7 +189,7 @@ class FilesBackUpScannerTest {
 	@AfterAll
 	static void deleteTestData() {
 		// clean generated config, source files, buffer and target
-		testDataManager.deleteTestData() ;
+		testDataManager.deleteTestData();
 	}
 	
 }

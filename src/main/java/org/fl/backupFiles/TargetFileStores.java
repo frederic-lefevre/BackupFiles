@@ -50,7 +50,9 @@ public class TargetFileStores {
 			try {
 				FileStore fileStore = FilesUtils.findFileStore(path, tLog);
 
-				if (! targetFileStores.containsKey(fileStore)) {
+				if (fileStore == null) {
+					return null;
+				} else if (! targetFileStores.containsKey(fileStore)) {
 					Path mountPoint = FilesUtils.findMountPoint(path, tLog);
 					TargetFileStore targetFileStore = new TargetFileStore(fileStore, mountPoint);
 					targetFileStores.put(fileStore, targetFileStore);
@@ -89,12 +91,38 @@ public class TargetFileStores {
 		}
 	}
 	
+	public long getTotalPotentialSizeChange() {
+		return targetFileStores.values().stream()
+				.mapToLong(targetFileStore -> targetFileStore.getPotentialSizeChange())
+				.sum();
+	}
+	
 	private String getFileStoreNameAndType(FileStore fileStore) {
 		if (fileStore == null) {
 			return "null FileStore";
 		} else {
 			return "name=" + fileStore.name() + " type=" + fileStore.type();
 		}
+	}
+	
+	public void mergeWith(TargetFileStores otherTargetFileStores) {
+		
+		otherTargetFileStores.getTargetFileStoresMap().forEach((fileStore, otherTargetFileStore) -> {
+			TargetFileStore targetFileStore = targetFileStores.get(fileStore);
+			if (targetFileStore == null) {
+				targetFileStores.put(fileStore, otherTargetFileStore);
+			} else {
+				recordPotentialSizeChange(fileStore, otherTargetFileStore.getPotentialSizeChange());
+			}
+		});
+	}
+	
+	public void reset() {
+		targetFileStores.values().forEach(targetFileStore -> targetFileStore.reset());
+	}
+	
+	private Map<FileStore, TargetFileStore> getTargetFileStoresMap() {
+		return targetFileStores;
 	}
 	
 	public String getTargetRemainigSpace(boolean inHtml) {

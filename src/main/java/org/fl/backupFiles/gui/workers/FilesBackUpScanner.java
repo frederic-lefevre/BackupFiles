@@ -86,7 +86,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		jobTaskType = jtt;
 		backUpJobInfoTableModel = bj;
 
-		backUpCounters = new BackUpCounters();
+		backUpCounters = new BackUpCounters(jobsChoice.getTargetFileStores());
 	}
 
 	@Override

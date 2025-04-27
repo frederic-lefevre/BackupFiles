@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -36,24 +37,31 @@ import org.junit.jupiter.api.Test;
 
 class BackUpCountersTest {
 
+	private static final Path pathForTargetFileStore = Paths.get("/");
 	private static FileStore fileStore;
 	
 	@BeforeAll
 	static void init() throws IOException {
-		fileStore = Files.getFileStore(Paths.get("/"));
+		fileStore = Files.getFileStore(pathForTargetFileStore);
+	}
+	
+	private static TargetFileStores newTargetFileStores() {
+		TargetFileStores targetFileStores = new TargetFileStores();
+		targetFileStores.addTargetFileStore(pathForTargetFileStore);
+		return targetFileStores;
 	}
 	
 	@Test
 	void shouldBeZeroAtCreation() {
 
-		BackUpCounters bc = new BackUpCounters();
+		BackUpCounters bc = new BackUpCounters(newTargetFileStores());
 		assertFieldValue(bc, 0);
 	}
 
 	@Test
 	void shouldBeZeroAtReset() {
 
-		BackUpCounters bc = new BackUpCounters();
+		BackUpCounters bc = new BackUpCounters(newTargetFileStores());
 		bc.reset();
 		assertFieldValue(bc, 0);
 		setFieldValue(bc, 12);
@@ -65,8 +73,8 @@ class BackUpCountersTest {
 	@Test
 	void shouldAddCounters() {
 
-		BackUpCounters bc1 = new BackUpCounters();
-		BackUpCounters bc2 = new BackUpCounters();
+		BackUpCounters bc1 = new BackUpCounters(newTargetFileStores());
+		BackUpCounters bc2 = new BackUpCounters(newTargetFileStores());
 
 		setFieldValue(bc1, 12);
 		assertFieldValue(bc1, 12);
@@ -82,8 +90,8 @@ class BackUpCountersTest {
 	@Test
 	void shouldAddCountersWithIncrement() {
 
-		BackUpCounters bc1 = new BackUpCounters();
-		BackUpCounters bc2 = new BackUpCounters();
+		BackUpCounters bc1 = new BackUpCounters(newTargetFileStores());
+		BackUpCounters bc2 = new BackUpCounters(newTargetFileStores());
 
 		setFieldValueWithIncrement(bc1, 12);
 		assertFieldValueWithIncrement(bc1, 12, 1);
@@ -113,11 +121,7 @@ class BackUpCountersTest {
 		assertThat(bc.nbTargetFilesFailed).isEqualTo(val);
 		assertThat(bc.nbTargetFilesProcessed).isEqualTo(val);
 		assertThat(bc.copyTargetNb).isEqualTo(val);
-		if (val == 0) {
-			assertThat(bc.getSizeDifferencesPerFileStore().get(fileStore)).isNull();
-		} else {
-			assertThat(bc.getSizeDifferencesPerFileStore().get(fileStore)).isNotNull().isEqualTo(val);
-		}
+		assertThat(bc.getTargetFileStores().getPotentialSizeChange(fileStore)).isNotNull().isEqualTo(val);
 	}
 
 	private static void assertFieldValueWithIncrement(BackUpCounters bc, long val, long m) {
@@ -137,7 +141,7 @@ class BackUpCountersTest {
 		assertThat(bc.nbTargetFilesFailed).isEqualTo(val+12*m);
 		assertThat(bc.nbTargetFilesProcessed).isEqualTo(val+13*m);
 		assertThat(bc.copyTargetNb).isEqualTo(val+14*m);
-		assertThat(bc.getSizeDifferencesPerFileStore().get(fileStore)).isNotNull().isEqualTo(val + 15*m);
+		assertThat(bc.getTargetFileStores().getPotentialSizeChange(fileStore)).isNotNull().isEqualTo(val + 15*m);
 	}
 	
 	private static void setFieldValue(BackUpCounters bc, long val) {
@@ -157,7 +161,7 @@ class BackUpCountersTest {
 		bc.nbTargetFilesFailed = val;
 		bc.nbTargetFilesProcessed = val;
 		bc.copyTargetNb = val;
-		bc.updateSizeDifference(fileStore, val);
+		bc.recordPotentialSizeChange(fileStore, val);
 	}
 
 	private static void setFieldValueWithIncrement(BackUpCounters bc, long val) {
@@ -177,6 +181,6 @@ class BackUpCountersTest {
 		bc.nbTargetFilesFailed = val + 12;
 		bc.nbTargetFilesProcessed = val + 13;
 		bc.copyTargetNb = val + 14;
-		bc.updateSizeDifference(fileStore, val + 15);
+		bc.recordPotentialSizeChange(fileStore, val + 15);
 	}
 }

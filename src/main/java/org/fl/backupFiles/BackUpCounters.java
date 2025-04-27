@@ -26,9 +26,7 @@ package org.fl.backupFiles;
 
 import java.nio.file.FileStore;
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 public class BackUpCounters {
 
@@ -56,7 +54,7 @@ public class BackUpCounters {
 	public long nbHighPermanencePath;
 	public long nbMediumPermanencePath;
 	
-	private final Map<FileStore, Long> sizeDifferencesPerFileStore;
+	private final TargetFileStores targetFileStores;
 	
 	private static final String COPY_NEW_LABEL = BackupAction.COPY_NEW.getActionName() + ": ";
 	private static final String COPY_REPLACE_LABEL = BackupAction.COPY_REPLACE.getActionName() + ": ";
@@ -78,8 +76,8 @@ public class BackUpCounters {
 	private static final String MEDIUM_PERMANENCE_LABEL = "Fichiers à moyenne permanence: ";
 	private static final String TOTAL_SIZE_DIFF_LABEL = "Différence totale de taille: ";
 	
-	public BackUpCounters() {
-		sizeDifferencesPerFileStore = new HashMap<>();
+	public BackUpCounters(TargetFileStores targetFileStores) {
+		this.targetFileStores = targetFileStores;
 		reset();
 	}
 
@@ -100,21 +98,15 @@ public class BackUpCounters {
 		backupWithSizeAboveThreshold = 0;
 		nbHighPermanencePath = 0;
 		nbMediumPermanencePath = 0;
-		sizeDifferencesPerFileStore.clear();
+		targetFileStores.reset();
 	}
 	
-	public Map<FileStore, Long> getSizeDifferencesPerFileStore() {
-		return sizeDifferencesPerFileStore;
+	public TargetFileStores getTargetFileStores() {
+		return targetFileStores;
 	}
 
-	public void updateSizeDifference(FileStore fileStore, long difference) {
-		
-		Long accumulatedDifferencce = sizeDifferencesPerFileStore.get(fileStore);
-		if (accumulatedDifferencce == null) {
-			sizeDifferencesPerFileStore.put(fileStore, difference);
-		} else {
-			sizeDifferencesPerFileStore.put(fileStore, accumulatedDifferencce + difference);
-		}
+	public long recordPotentialSizeChange(FileStore fileStore, long difference) {	
+		return targetFileStores.recordPotentialSizeChange(fileStore, difference);
 	}
 	
 	@Override
@@ -165,7 +157,7 @@ public class BackUpCounters {
 		appendCellCouple(res, TARGET_KO_LABEL, nbTargetFilesFailed, "red");
 
 		res.append(NEW_ROW);
-		appendCellCouple(res, TOTAL_SIZE_DIFF_LABEL, getTotalSizeDifference(), null);
+		appendCellCouple(res, TOTAL_SIZE_DIFF_LABEL, getTotalPotentialSizeChange(), null);
 		appendCellCouple(res, SIZE_ABOVE_LIMIT_LABEL, backupWithSizeAboveThreshold, "red");
 
 		res.append(NEW_ROW);
@@ -233,17 +225,10 @@ public class BackUpCounters {
 		backupWithSizeAboveThreshold = backupWithSizeAboveThreshold + counters.backupWithSizeAboveThreshold;
 		nbHighPermanencePath = nbHighPermanencePath + counters.nbHighPermanencePath;
 		nbMediumPermanencePath = nbMediumPermanencePath + counters.nbMediumPermanencePath;
-		addSizeDifferencesPerFileStore(counters.getSizeDifferencesPerFileStore());
+		targetFileStores.mergeWith(counters.getTargetFileStores());
 	}
 	
-	private void addSizeDifferencesPerFileStore(Map<FileStore, Long> sizeDifferencesPerFileStore2) {
-		
-		sizeDifferencesPerFileStore2.forEach((fs, l) -> {
-			updateSizeDifference(fs, l);
-		});
-	}
-	
-	private long getTotalSizeDifference() {
-		return sizeDifferencesPerFileStore.values().stream().mapToLong(Long::longValue).sum();
+	private long getTotalPotentialSizeChange() {
+		return targetFileStores.getTotalPotentialSizeChange();
 	}
 }

@@ -45,6 +45,7 @@ import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.BackupAction;
 import org.fl.backupFiles.BackupStatus;
 import org.fl.backupFiles.Config;
+import org.fl.backupFiles.TargetFileStores;
 import org.fl.util.file.FileComparator;
 
 public class BackUpScannerThread {
@@ -76,7 +77,9 @@ public class BackUpScannerThread {
 		backUpTask = but;
 		maxDepth = Config.getMaxDepth();
 
-		backUpCounters = new BackUpCounters();
+		TargetFileStores targetFileStores = new TargetFileStores();
+		targetFileStores.addTargetFileStore(backUpTask.getTarget());
+		backUpCounters = new BackUpCounters(targetFileStores);
 		done = false;
 
 		status = backUpTask.toString() + " ";

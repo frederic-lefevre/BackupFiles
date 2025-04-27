@@ -44,6 +44,8 @@ public class BackUpItemTest {
 
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles.properties";
 
+	private static final Path pathForTargetFileStore = Paths.get("/");
+	
 	private static Logger log = Logger.getLogger(BackUpItemTest.class.getName());
 
 	private static final String SRC_FOLDER = "file:///ForTests/BackUpFiles/TestDir1/";
@@ -68,6 +70,12 @@ public class BackUpItemTest {
 		backUpTask = new BackUpTask(EXISTANT_SOURCE_FOLDER, EXISTANT_SOURCE_FOLDER, 0);
 	}
 
+	private static TargetFileStores newTargetFileStores() {
+		TargetFileStores targetFileStores = new TargetFileStores();
+		targetFileStores.addTargetFileStore(pathForTargetFileStore);
+		return targetFileStores;
+	}
+	
 	@Test
 	void test1() {
 
@@ -75,7 +83,7 @@ public class BackUpItemTest {
 		Path tgt = Paths.get("");
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(src, tgt);
 
-		BackUpCounters counters = new BackUpCounters();
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores());
 		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, counters, backUpTask);
 
 		BackupAction action = backUpItem.getBackupAction();
@@ -88,7 +96,7 @@ public class BackUpItemTest {
 
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
 		
-		BackUpCounters counters = new BackUpCounters();
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores());
 		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask);
 
 		assertThat(getTotalCounters(counters)).isEqualTo(1);
@@ -128,7 +136,7 @@ public class BackUpItemTest {
 	void nullSrcShouldThrowException() {
 
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(null, UNEXISTANT_TARGET);
-		BackUpCounters counters = new BackUpCounters();
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores());
 
 		assertThatNullPointerException()
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask));
@@ -150,7 +158,7 @@ public class BackUpItemTest {
 
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(null, EXISTANT_SOURCE);
 		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(EXISTANT_SOURCE_FOLDER, null);
-		BackUpCounters counters = new BackUpCounters();
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores());
 
 		assertThatExceptionOfType(IllegalBackupActionException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, pathPairBasicAttributes2, counters, backUpTask));
@@ -170,7 +178,7 @@ public class BackUpItemTest {
 	void illegalDeleteShouldThrowException() {
 
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
-		BackUpCounters counters = new BackUpCounters();
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores());
 
 		assertThatExceptionOfType(IllegalBackupActionException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, BackupStatus.DIFFERENT, counters, backUpTask));
@@ -182,7 +190,7 @@ public class BackUpItemTest {
 	void unexistantSrcShouldThrowException() {
 
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(UNEXISTANT_PATH, UNEXISTANT_TARGET);
-		BackUpCounters counters = new BackUpCounters();
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores());
 
 		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask));
@@ -203,7 +211,7 @@ public class BackUpItemTest {
 
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(null, EXISTANT_SOURCE);
 		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(UNEXISTANT_FOLDER_PATH, null);
-		BackUpCounters counters = new BackUpCounters();
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores());
 		
 		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, pathPairBasicAttributes2, counters, backUpTask));
@@ -216,7 +224,7 @@ public class BackUpItemTest {
 
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(null, UNEXISTANT_PATH);
 		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(EXISTANT_SOURCE_FOLDER, null);
-		BackUpCounters counters = new BackUpCounters();
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores());
 		
 		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, pathPairBasicAttributes2, counters, backUpTask));
@@ -235,7 +243,7 @@ public class BackUpItemTest {
 		assertThat(Files.exists(EXISTANT_SOURCE)).isTrue();
 		assertThat(Files.exists(nowExists)).isTrue();
 
-		BackUpCounters counters = new BackUpCounters();
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores());
 		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask));
 	}
@@ -250,7 +258,7 @@ public class BackUpItemTest {
 		assertThat(Files.exists(nowExists)).isTrue();
 
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, nowExists);
-		BackUpCounters counters = new BackUpCounters();
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores());
 
 		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TARGET, BackupStatus.SAME_CONTENT, counters, backUpTask);
 
@@ -310,7 +318,7 @@ public class BackUpItemTest {
 			System.out.println("2-FileTime now to millis=" + now.toMillis());
 		}
 		
-		BackUpCounters counters = new BackUpCounters();
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores());
 
 		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.ADJUST_TIME, BackupStatus.SAME_CONTENT, counters, backUpTask);
 

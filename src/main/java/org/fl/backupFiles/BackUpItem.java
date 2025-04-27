@@ -170,7 +170,7 @@ public class BackUpItem {
 	}
 
 	private void updateLimitsCounters(BackUpCounters backUpCounters) {
-		backUpCounters.updateSizeDifference(targetFileStore, sizeDifference);
+		backUpCounters.recordPotentialSizeChange(targetFileStore, sizeDifference);
 		if (sizeDifference > fileSizeWarningThreshold)
 			backUpCounters.backupWithSizeAboveThreshold++;
 		if (permanenceLevel.equals(DirectoryPermanenceLevel.HIGH)) {

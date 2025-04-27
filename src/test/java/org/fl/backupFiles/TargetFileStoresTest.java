@@ -83,6 +83,7 @@ public class TargetFileStoresTest {
 		
 		assertThat(targetFileStore.getFileStore()).isEqualTo(Files.getFileStore(pathForTargetFileStore));
 		assertThat(targetFileStores.getPotentialSizeChange(targetFileStore.getFileStore())).isZero();
+		assertThat(targetFileStores.getTotalPotentialSizeChange()).isZero();
 		
 		StringBuilder spaceEvolutionString = new StringBuilder();
 		
@@ -100,6 +101,7 @@ public class TargetFileStoresTest {
 		
 		assertThat(targetFileStore.getFileStore()).isEqualTo(Files.getFileStore(pathForTargetFileStore));
 		assertThat(targetFileStores.getPotentialSizeChange(targetFileStore.getFileStore())).isZero();
+		assertThat(targetFileStores.getTotalPotentialSizeChange()).isZero();
 		
 		final long sizeDifference = 100;
 		long newPotentialSizeChange = targetFileStores.recordPotentialSizeChange(targetFileStore.getFileStore(), sizeDifference);
@@ -109,6 +111,64 @@ public class TargetFileStoresTest {
 		final long sizeDifference2 = 105;
 		
 		assertThat(targetFileStores.recordPotentialSizeChange(targetFileStore.getFileStore(), sizeDifference2)).isEqualTo(sizeDifference + sizeDifference2);
+		
+		assertThat(targetFileStores.getTotalPotentialSizeChange()).isEqualTo(sizeDifference + sizeDifference2);
+	}
+	
+	@Test
+	void testReset() throws IOException {
+		
+		Path pathForTargetFileStore = Paths.get("/");
+		TargetFileStores targetFileStores = new TargetFileStores();
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore);
+		
+		assertThat(targetFileStores.getPotentialSizeChange(targetFileStore.getFileStore())).isZero();
+		assertThat(targetFileStores.getTotalPotentialSizeChange()).isZero();
+		
+		final long sizeDifference = 100;
+		long newPotentialSizeChange = targetFileStores.recordPotentialSizeChange(targetFileStore.getFileStore(), sizeDifference);	
+		assertThat(newPotentialSizeChange).isEqualTo(sizeDifference);	
+		assertThat(targetFileStores.getTotalPotentialSizeChange()).isEqualTo(sizeDifference );
+		
+		targetFileStores.reset();
+		assertThat(targetFileStores.getPotentialSizeChange(targetFileStore.getFileStore())).isZero();
+		assertThat(targetFileStores.getTotalPotentialSizeChange()).isZero();
+	}
+	
+	@Test
+	void testMergeTargetFileStores() throws IOException {
+		
+		Path pathForTargetFileStore = Paths.get("/");
+		TargetFileStores targetFileStores = new TargetFileStores();
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore);
+		
+		TargetFileStores targetFileStores2 = new TargetFileStores();
+		TargetFileStore targetFileStore2 = targetFileStores2.addTargetFileStore(pathForTargetFileStore);
+		
+		assertThat(targetFileStore.getFileStore())
+			.isEqualTo(targetFileStore.getFileStore())
+			.isEqualTo(Files.getFileStore(pathForTargetFileStore));
+		
+		assertThat(targetFileStores.getPotentialSizeChange(targetFileStore.getFileStore())).isZero();
+		assertThat(targetFileStores.getTotalPotentialSizeChange()).isZero();
+		assertThat(targetFileStores2.getPotentialSizeChange(targetFileStore2.getFileStore())).isZero();
+		assertThat(targetFileStores2.getTotalPotentialSizeChange()).isZero();
+		
+		final long sizeDifference = 100;
+		long newPotentialSizeChange = targetFileStores.recordPotentialSizeChange(targetFileStore.getFileStore(), sizeDifference);		
+		assertThat(newPotentialSizeChange).isEqualTo(sizeDifference);
+		assertThat(targetFileStores.getTotalPotentialSizeChange()).isEqualTo(sizeDifference);
+		
+		final long sizeDifference2 = 105;		
+		assertThat(targetFileStores2.recordPotentialSizeChange(targetFileStore2.getFileStore(), sizeDifference2)).isEqualTo(sizeDifference2);		
+		assertThat(targetFileStores2.getTotalPotentialSizeChange()).isEqualTo(sizeDifference2);
+		
+		targetFileStores.mergeWith(targetFileStores2);
+		assertThat(targetFileStores.getTotalPotentialSizeChange()).isEqualTo(sizeDifference + sizeDifference2);
+		assertThat(targetFileStores.getPotentialSizeChange(targetFileStore.getFileStore())).isEqualTo(sizeDifference + sizeDifference2);
+		
+		assertThat(targetFileStores2.getPotentialSizeChange(targetFileStore2.getFileStore())).isEqualTo(sizeDifference2);		
+		assertThat(targetFileStores2.getTotalPotentialSizeChange()).isEqualTo(sizeDifference2);
 	}
 	
 	@Test
