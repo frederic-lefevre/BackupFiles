@@ -46,10 +46,12 @@ public class TargetFileStore {
 	private final FileStore fileStore;
 	private final Path mountPoint;
 	private long initialRemainingSpace;
+	private long potentialSizeChange;
 
 	public TargetFileStore(FileStore fileStore, Path mountPoint) {
 		this.fileStore = fileStore;
 		this.mountPoint = mountPoint;
+		potentialSizeChange = 0;
 		try {
 			initialRemainingSpace = fileStore.getUsableSpace();
 		} catch (IOException e) {	
@@ -57,6 +59,19 @@ public class TargetFileStore {
 		}
 	}
 
+	public long getPotentialSizeChange() {
+		return potentialSizeChange;
+	}
+
+	public FileStore getFileStore() {
+		return fileStore;
+	}
+	
+	public long recordPotentialSizeChange(long sizeDifference) {
+		potentialSizeChange = potentialSizeChange + sizeDifference;
+		return potentialSizeChange;
+	}
+	
 	public void getSpaceEvolution(StringBuilder result) {
 
 		if (fileStore != null) {
@@ -78,9 +93,5 @@ public class TargetFileStore {
 				result.append(error);
 			}
 		}
-	}
-
-	public FileStore getFileStore() {
-		return fileStore;
 	}
 }

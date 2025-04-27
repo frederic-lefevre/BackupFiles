@@ -26,6 +26,8 @@ package org.fl.backupFiles;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -36,18 +38,30 @@ public class TargetFileStoreTest {
 	private static final Path pathForTargetFileStore = Paths.get("/");
 	
 	@Test
-	void shouldReturnSpaceEvolution() {
+	void targetFileStoreCreationTest() throws IOException {
 		
 		TargetFileStores targetFileStores = new TargetFileStores();
 		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore);
 		
 		assertThat(targetFileStore).isNotNull();
 		
+		assertThat(targetFileStore.getPotentialSizeChange()).isZero();
+		assertThat(targetFileStore.getFileStore()).isEqualTo(Files.getFileStore(pathForTargetFileStore));
+		
 		StringBuilder spaceEvolutionString = new StringBuilder();
 		
 		targetFileStore.getSpaceEvolution(spaceEvolutionString);
 		
 		assertThat(spaceEvolutionString).isNotEmpty();
+		
+		final long sizeDifference = 100;
+		long newPotentialSizeChange = targetFileStore.recordPotentialSizeChange(sizeDifference);
+		
+		assertThat(newPotentialSizeChange).isEqualTo(sizeDifference);
+		
+		final long sizeDifference2 = 105;
+		
+		assertThat(targetFileStore.recordPotentialSizeChange(sizeDifference2)).isEqualTo(sizeDifference + sizeDifference2);
 		
 		// Uncommented to display remaining space
 		//System.out.println(spaceEvolutionString);

@@ -50,7 +50,7 @@ public class TargetFileStores {
 			try {
 				FileStore fileStore = FilesUtils.findFileStore(path, tLog);
 
-				if (! targetFileStores.containsKey(fileStore)) {					
+				if (! targetFileStores.containsKey(fileStore)) {
 					Path mountPoint = FilesUtils.findMountPoint(path, tLog);
 					TargetFileStore targetFileStore = new TargetFileStore(fileStore, mountPoint);
 					targetFileStores.put(fileStore, targetFileStore);
@@ -67,6 +67,34 @@ public class TargetFileStores {
 	
 	public TargetFileStore getTargetFileStore(FileStore fileStore) {
 		return targetFileStores.get(fileStore);
+	}
+	
+	public long getPotentialSizeChange(FileStore fileStore) {
+		
+		if (targetFileStores.containsKey(fileStore)) {
+			return targetFileStores.get(fileStore).getPotentialSizeChange();
+		} else {
+			tLog.warning("Trying to record FileStore potential size change for an unrecorded FileStore: " + getFileStoreNameAndType(fileStore));
+			return 0;
+		}
+	}
+	
+	public long recordPotentialSizeChange(FileStore fileStore, long sizeDifference) {
+		
+		if (targetFileStores.containsKey(fileStore)) {
+			return targetFileStores.get(fileStore).recordPotentialSizeChange(sizeDifference);
+		} else {
+			tLog.warning("Trying to record FileStore potential size change for an unrecorded FileStore: " + getFileStoreNameAndType(fileStore));
+			return 0;
+		}
+	}
+	
+	private String getFileStoreNameAndType(FileStore fileStore) {
+		if (fileStore == null) {
+			return "null FileStore";
+		} else {
+			return "name=" + fileStore.name() + " type=" + fileStore.type();
+		}
 	}
 	
 	public String getTargetRemainigSpace(boolean inHtml) {
