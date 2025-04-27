@@ -279,10 +279,7 @@ public class BackUpItemTest {
 		} else {
 			SOURCE_FILE = EXISTANT_SOURCE;
 			TARGET_FILE = UNEXISTANT_TARGET;
-		}
-		
-//		Path SOURCE_FILE = Paths.get(new java.net.URI("file:///C:/FredericPersonnel/Pratique/Voitures/SkodaRoomster/Assurance/NoticeEssentiel.pdf"));
-//		Path TARGET_FILE = Paths.get(new java.net.URI("file:///C:/FP_BackUpBuffer/FredericPersonnel/Pratique/Voitures/SkodaRoomster/Assurance/NoticeEssentiel.pdf"));		
+		}		
 				
 		if (!Files.exists(TARGET_FILE)) {
 			Files.copy(SOURCE_FILE, TARGET_FILE);
@@ -349,7 +346,6 @@ public class BackUpItemTest {
 		if (Files.exists(UNEXISTANT_TARGET)) {
 			Files.delete(UNEXISTANT_TARGET);
 		}
-
 	}
 
 	private long getTotalCounters(BackUpCounters counters) {
