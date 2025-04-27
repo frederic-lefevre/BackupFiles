@@ -88,7 +88,9 @@ class ConfigTest {
 	
 	@Test
 	void fileStoreWarningThresholdTest() {
-		assertThat(Config.getFileStoreRemainingSpaceWarningThreshold()).isGreaterThan(100_000_000);
+		assertThat(Config.getFileStoreRemainingSpaceWarningThreshold())
+			.isGreaterThan(4)
+			.isLessThan(100);
 	}
 	
 	@Test

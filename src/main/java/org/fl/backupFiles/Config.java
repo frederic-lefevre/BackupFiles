@@ -91,7 +91,7 @@ public class Config {
 			BackUpJob.setDefaultWarningSizeLimit(fileSizeWarningThreshold);
 
 			fileStoreRemainingSpaceWarningThreshold = 
-					backupProperty.getLong("backupFiles.fileStore.remainingSize.warningThreshold", 10_000_000_000L);
+					backupProperty.getLong("backupFiles.fileStore.remainingSize.warningThreshold", 10);
 			
 			osActions = new ArrayList<OsAction>();
 			String osCmdPropBase = "backupFiles.command.";
