@@ -51,6 +51,7 @@ import org.fl.backupFiles.BackUpJobInformation;
 import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.JobsChoice;
+import org.fl.backupFiles.OperationType;
 
 public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupScannerInformation> {
 
@@ -86,7 +87,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		jobTaskType = jtt;
 		backUpJobInfoTableModel = bj;
 
-		backUpCounters = new BackUpCounters(jobsChoice.getTargetFileStores());
+		backUpCounters = new BackUpCounters(jobsChoice.getTargetFileStores(), OperationType.SCAN);
 	}
 
 	@Override

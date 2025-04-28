@@ -37,6 +37,7 @@ import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpJobInformation;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.JobsChoice;
+import org.fl.backupFiles.OperationType;
 import org.fl.backupFiles.BackUpJob.JobTaskType;
 import org.fl.backupFiles.gui.BackUpJobInfoTableModel;
 import org.fl.backupFiles.gui.BackUpTableModel;
@@ -83,7 +84,7 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 
 		backUpJobInfoTableModel = bj;
 
-		backUpCounters = new BackUpCounters(jobsChoice.getTargetFileStores());
+		backUpCounters = new BackUpCounters(jobsChoice.getTargetFileStores(), OperationType.BACKUP);
 	}
 
 	@Override

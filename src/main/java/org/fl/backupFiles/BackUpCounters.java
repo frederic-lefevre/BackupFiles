@@ -81,7 +81,7 @@ public class BackUpCounters {
 	private static final String MEDIUM_PERMANENCE_LABEL = "Fichiers à moyenne permanence: ";
 	private static final String TOTAL_SIZE_DIFF_LABEL = "Différence totale de taille: ";
 	
-	public BackUpCounters(TargetFileStores targetFileStores) {
+	public BackUpCounters(TargetFileStores targetFileStores, OperationType operationType) {
 		this.targetFileStores = targetFileStores;
 		reset();
 	}

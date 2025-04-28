@@ -54,14 +54,14 @@ class BackUpCountersTest {
 	@Test
 	void shouldBeZeroAtCreation() {
 
-		BackUpCounters bc = new BackUpCounters(newTargetFileStores());
+		BackUpCounters bc = new BackUpCounters(newTargetFileStores(), null);
 		assertFieldValue(bc, 0);
 	}
 
 	@Test
 	void shouldBeZeroAtReset() {
 
-		BackUpCounters bc = new BackUpCounters(newTargetFileStores());
+		BackUpCounters bc = new BackUpCounters(newTargetFileStores(), OperationType.SCAN);
 		bc.reset();
 		assertFieldValue(bc, 0);
 		setFieldValue(bc, 12);
@@ -73,8 +73,8 @@ class BackUpCountersTest {
 	@Test
 	void shouldAddCounters() {
 
-		BackUpCounters bc1 = new BackUpCounters(newTargetFileStores());
-		BackUpCounters bc2 = new BackUpCounters(newTargetFileStores());
+		BackUpCounters bc1 = new BackUpCounters(newTargetFileStores(), OperationType.SCAN);
+		BackUpCounters bc2 = new BackUpCounters(newTargetFileStores(), OperationType.SCAN);
 
 		setFieldValue(bc1, 12);
 		assertFieldValue(bc1, 12);
@@ -90,8 +90,8 @@ class BackUpCountersTest {
 	@Test
 	void shouldAddCountersWithIncrement() {
 
-		BackUpCounters bc1 = new BackUpCounters(newTargetFileStores());
-		BackUpCounters bc2 = new BackUpCounters(newTargetFileStores());
+		BackUpCounters bc1 = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpCounters bc2 = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
 
 		setFieldValueWithIncrement(bc1, 12);
 		assertFieldValueWithIncrement(bc1, 12, 1);
