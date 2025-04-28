@@ -60,6 +60,7 @@ public class BackUpCounters {
 	public long nbMediumPermanencePath;
 	
 	private final TargetFileStores targetFileStores;
+	private final OperationType operationType;
 	
 	private static final String COPY_NEW_LABEL = BackupAction.COPY_NEW.getActionName() + ": ";
 	private static final String COPY_REPLACE_LABEL = BackupAction.COPY_REPLACE.getActionName() + ": ";
@@ -81,8 +82,9 @@ public class BackUpCounters {
 	private static final String MEDIUM_PERMANENCE_LABEL = "Fichiers à moyenne permanence: ";
 	private static final String TOTAL_SIZE_DIFF_LABEL = "Différence totale de taille: ";
 	
-	public BackUpCounters(TargetFileStores targetFileStores) {
+	public BackUpCounters(TargetFileStores targetFileStores, OperationType operationType) {
 		this.targetFileStores = targetFileStores;
+		this.operationType = operationType;
 		reset();
 	}
 
@@ -229,6 +231,8 @@ public class BackUpCounters {
 	private static final String CELL_WITH_COLOR_BEGIN = "<td bgcolor=";
 	private static final String CELL_WITH_COLOR_BREAK = "</td><td style=\"text-align:right\" bgcolor=";
 	private static final String IN_ERROR = "En erreur!";
+	private static final String SPACE_NEEDED_FOR_BACKUP = "Besoin d'espace<br/> pour la sauvegarde";
+	private static final String SPACE_CONSUMED_BY_BACKUP = "Espace consommé<br/> par la sauvegarde";
 
 	private void appendCellCouple(StringBuilder res, String label, long value, String color) {
 		
@@ -270,7 +274,9 @@ public class BackUpCounters {
 			.append("Evolution<br/> de l'espace restant")
 			.append(CELL_END)
 			.append(CELL_BEGIN)
-			.append("Besoin d'espace<br/> pour la sauvegarde")
+			.append(switch (operationType) {
+						case SCAN -> SPACE_NEEDED_FOR_BACKUP;
+						case BACKUP -> SPACE_CONSUMED_BY_BACKUP; })
 			.append(CELL_END)
 			.append(ROW_END);
 	}

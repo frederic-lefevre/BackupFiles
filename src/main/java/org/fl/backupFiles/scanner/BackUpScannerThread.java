@@ -45,6 +45,7 @@ import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.BackupAction;
 import org.fl.backupFiles.BackupStatus;
 import org.fl.backupFiles.Config;
+import org.fl.backupFiles.OperationType;
 import org.fl.backupFiles.TargetFileStores;
 import org.fl.util.file.FileComparator;
 
@@ -79,7 +80,7 @@ public class BackUpScannerThread {
 
 		TargetFileStores targetFileStores = new TargetFileStores();
 		targetFileStores.addTargetFileStore(backUpTask.getTarget(), Config.getFileStoreRemainingSpaceWarningThreshold());
-		backUpCounters = new BackUpCounters(targetFileStores);
+		backUpCounters = new BackUpCounters(targetFileStores, OperationType.SCAN);
 		done = false;
 
 		status = backUpTask.toString() + " ";
