@@ -51,7 +51,7 @@ public class DirectoryPermanenceMap implements DirectoryPermanence {
 
 	public DirectoryPermanenceMap(String jsonConfig) {
 		super();
-		permanenceMap = new TreeMap<Path, DirectoryPermanenceLevel>(new PermanencePathComparator());
+		permanenceMap = new TreeMap<Path, DirectoryPermanenceLevel>(new DeeperPathComparator());
 
 		if (jsonConfig != null) {
 

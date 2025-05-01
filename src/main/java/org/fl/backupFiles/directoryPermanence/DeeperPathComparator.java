@@ -27,7 +27,7 @@ package org.fl.backupFiles.directoryPermanence;
 import java.nio.file.Path;
 import java.util.Comparator;
 
-public class PermanencePathComparator implements Comparator<Path> {
+public class DeeperPathComparator implements Comparator<Path> {
 
 	@Override
 	public int compare(Path path1, Path path2) {
