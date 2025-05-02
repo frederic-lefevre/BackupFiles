@@ -36,29 +36,107 @@ import org.junit.jupiter.api.Test;
 class DeeperPathComparatorTest {
 	
 	@Test
-	void test() {
+	void shouldOrderTreeMap() {
 
-		TreeMap<Path, String> permanenceMap = new TreeMap<Path, String>(new DeeperPathComparator());
+		TreeMap<Path, String> pathsMap = new TreeMap<Path, String>(new DeeperPathComparator());
 
-		permanenceMap.put(Paths.get("/Fred"), "f");
-		permanenceMap.put(Paths.get("/Fred/Pers"), "d");
-		permanenceMap.put(Paths.get("/Fred/tmp"), "e");
-		permanenceMap.put(Paths.get("/Fred/Pers/Photos"), "c");
-		permanenceMap.put(Paths.get("/Fred/Pers/Photos/tmp"), "b");
-		permanenceMap.put(Paths.get("/Fred/Pers/famille"), "a");
+		pathsMap.put(Paths.get("/Fred"), "f");
+		pathsMap.put(Paths.get("/Fred/Pers"), "d");
+		pathsMap.put(Paths.get("/Fred/tmp"), "e");
+		pathsMap.put(Paths.get("/Fred/Pers/Photos"), "c");
+		pathsMap.put(Paths.get("/Fred/Pers/Photos/tmp"), "b");
+		pathsMap.put(Paths.get("/Fred/Pers/famille"), "a");
 
-		Set<Path> pathKeys = permanenceMap.keySet();
+		Set<Path> pathKeys = pathsMap.keySet();
 		assertThat(pathKeys)
 			.hasToString("[\\Fred\\Pers\\famille, \\Fred\\Pers\\Photos\\tmp, \\Fred\\Pers\\Photos, \\Fred\\Pers, \\Fred\\tmp, \\Fred]");
 
 	}
 
 	@Test
-	void test2() {
+	void samePathsShouldBeEqual() {
 		
-		DeeperPathComparator permComp = new DeeperPathComparator();
+		DeeperPathComparator deeperPathComparator = new DeeperPathComparator();
 		
-		int comp = permComp.compare(Paths.get("/toto/titi/tata"), Paths.get("/toto/titi/tata"));
+		int comp = deeperPathComparator.compare(Paths.get("/toto/titi/tata"), Paths.get("/toto/titi/tata"));
 		assertThat(comp).isZero();
+	}
+	
+	@Test
+	void deeperPathShouldBeNegative() {
+		
+		DeeperPathComparator deeperPathComparator = new DeeperPathComparator();
+		
+		int comp = deeperPathComparator.compare(Paths.get("/toto/titi/tata"), Paths.get("/toto/titi"));
+		assertThat(comp).isNegative();
+	}
+	
+	@Test
+	void shorterPathShouldBePositive() {
+		
+		DeeperPathComparator deeperPathComparator = new DeeperPathComparator();
+		
+		int comp = deeperPathComparator.compare(Paths.get("/toto/titi"), Paths.get("/toto/titi/tata"));
+		assertThat(comp).isPositive();
+	}
+	
+	@Test
+	void sameLevelPathShouldBeOrderedLexicographically() {
+		
+		DeeperPathComparator deeperPathComparator = new DeeperPathComparator();
+		
+		int comp = deeperPathComparator.compare(Paths.get("/toto/titi/tutu"), Paths.get("/toto/titi/tata"));
+		assertThat(comp).isPositive();
+	}
+	
+	@Test
+	void separatedBranchPathShouldBeOrderedLexicographically() {
+		
+		DeeperPathComparator deeperPathComparator = new DeeperPathComparator();
+		
+		int comp = deeperPathComparator.compare(Paths.get("/toto/titi/tutu/tete"), Paths.get("/toto/titi/tata"));
+		assertThat(comp).isPositive();
+	}
+	
+	@Test
+	void emptyPathShouldBeNegative() {
+		
+		DeeperPathComparator deeperPathComparator = new DeeperPathComparator();
+		
+		int comp = deeperPathComparator.compare(Paths.get(""), Paths.get("/"));
+		assertThat(comp).isNegative();
+	}
+	
+	@Test
+	void rootPathShouldBePositive() {
+		
+		DeeperPathComparator deeperPathComparator = new DeeperPathComparator();
+		
+		int comp = deeperPathComparator.compare(Paths.get("/"), Paths.get("/t"));
+		assertThat(comp).isPositive();
+	}
+	
+	@Test
+	void nullArgumentShouldThrowNPE() {
+		
+		DeeperPathComparator deeperPathComparator = new DeeperPathComparator();
+		assertThatNullPointerException().isThrownBy(() ->
+			deeperPathComparator.compare(null, Paths.get("/t")));
+	}
+	
+	@Test
+	void nullArgument2ShouldThrowNPE() {
+		
+		DeeperPathComparator deeperPathComparator = new DeeperPathComparator();
+		assertThatNullPointerException().isThrownBy(() ->
+			deeperPathComparator.compare(Paths.get("/t"), null));
+	}
+	
+	@Test
+	void twoNullArgumentShouldThrowNPE() {
+		
+		DeeperPathComparator deeperPathComparator = new DeeperPathComparator();
+		assertThatNullPointerException().isThrownBy(() ->
+			deeperPathComparator.compare(Paths.get("/t"), null));
 	}
 }
