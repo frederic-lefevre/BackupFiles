@@ -36,8 +36,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.fl.backupFiles.directoryPermanence.DirectoryPermanence;
-import org.fl.backupFiles.directoryPermanence.DirectoryPermanenceMap;
+import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
+import org.fl.backupFiles.directoryGroup.DirectoryPermanence;
 import org.fl.backupFiles.gui.BackUpItemCustomActionListener;
 import org.fl.backupFiles.gui.BackUpItemCustomActionListener.CustomAction;
 import org.fl.backupFiles.gui.BackupFilesGui;
@@ -114,7 +114,7 @@ public class Config {
 
 			String permanenceConf = backupProperty.getFileContentFromURI("backupFiles.dirPermanenceFile",
 					StandardCharsets.UTF_8);
-			directoryPermanence = new DirectoryPermanenceMap(permanenceConf);
+			directoryPermanence = new DirectoryGroupMap(permanenceConf);
 
 			acionOnSameTargetContentButNewer = getBackUpAction("backupFiles.actionOnTargetWithSameContentButNewer", BackupAction.ADJUST_TIME);
 			

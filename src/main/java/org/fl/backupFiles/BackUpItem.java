@@ -37,7 +37,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.fl.backupFiles.directoryPermanence.DirectoryPermanenceLevel;
+import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 import org.fl.backupFiles.scanner.PathPairBasicAttributes;
 import org.fl.util.file.FileComparator;
 import org.fl.util.file.FilesSecurityUtils;

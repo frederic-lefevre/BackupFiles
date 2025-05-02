@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package org.fl.backupFiles.directoryPermanence;
+package org.fl.backupFiles.directoryGroup;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -30,7 +30,7 @@ import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
-class DirectoryPermanenceMapTest {
+class DirectoryGroupeMapTest {
 
 	private final static String JSON_CONF = 
 		"[{\"path\" : \"/FredericPersonnel/photos/\",\"permanence\" : \"HIGH\"}," +
@@ -40,7 +40,7 @@ class DirectoryPermanenceMapTest {
 	@Test
 	void test() {
 		
-		DirectoryPermanenceMap permMap = new DirectoryPermanenceMap(JSON_CONF);
+		DirectoryGroupMap permMap = new DirectoryGroupMap(JSON_CONF);
 		
 		DirectoryPermanenceLevel lvl1 = permMap.getPermanenceLevel(Paths.get("C:\\FredericPersonnel\\photos\\bidon"));
 		assertThat(lvl1).isEqualTo(DirectoryPermanenceLevel.HIGH);

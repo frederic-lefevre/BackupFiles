@@ -29,7 +29,7 @@ import java.awt.Font;
 
 import javax.swing.SwingConstants;
 
-import org.fl.backupFiles.directoryPermanence.DirectoryPermanenceLevel;
+import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 import org.fl.util.swing.CustomTableCellRenderer;
 
 public class PermanenceCellRenderer extends CustomTableCellRenderer {

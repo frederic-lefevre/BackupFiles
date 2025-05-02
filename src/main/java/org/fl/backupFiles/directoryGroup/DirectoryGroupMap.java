@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package org.fl.backupFiles.directoryPermanence;
+package org.fl.backupFiles.directoryGroup;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,9 +37,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-public class DirectoryPermanenceMap implements DirectoryPermanence {
+public class DirectoryGroupMap implements DirectoryPermanence {
 
-	private static final Logger bLog = Logger.getLogger(DirectoryPermanenceMap.class.getName());
+	private static final Logger bLog = Logger.getLogger(DirectoryGroupMap.class.getName());
 	
 	private static final ObjectMapper mapper = new ObjectMapper();
 	
@@ -49,7 +49,7 @@ public class DirectoryPermanenceMap implements DirectoryPermanence {
 	private final Map<Path, DirectoryPermanenceLevel> permanenceMap;
 	private final Set<Path> pathKeys;
 
-	public DirectoryPermanenceMap(String jsonConfig) {
+	public DirectoryGroupMap(String jsonConfig) {
 		super();
 		permanenceMap = new TreeMap<Path, DirectoryPermanenceLevel>(new DeeperPathComparator());
 
