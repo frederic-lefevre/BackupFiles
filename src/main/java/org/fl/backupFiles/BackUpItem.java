@@ -43,7 +43,7 @@ import org.fl.util.file.FileComparator;
 import org.fl.util.file.FilesSecurityUtils;
 import org.fl.util.file.FilesUtils;
 
-public class BackUpItem {
+public class BackUpItem extends AbstractBackUpItem {
 
 	private static final Logger bLog = Logger.getLogger(BackUpItem.class.getName());
 	
@@ -53,13 +53,7 @@ public class BackUpItem {
 	private static final String EXIST_SRC_NOT_EXISTS = "Closest existing source path parameter is null or the path does not exist";
 
 	private final PathPairBasicAttributes pathPairBasicAttributes;
-	private final Path sourcePath;
-	private final Path targetPath;
 	private final Path sourceClosestExistingPath;
-	private final BackupAction backupAction;
-	private final long sizeDifference;
-	private BackupStatus backupStatus;
-	private final DirectoryPermanenceLevel permanenceLevel;
 	private final long fileSizeWarningThreshold;
 	private final FileStore targetFileStore;
 	
@@ -82,22 +76,19 @@ public class BackUpItem {
 	//		FAILED	 	 	: the back up has failed
 	
 	public BackUpItem(PathPairBasicAttributes pathPairBasicAttributes, 
-			BackupAction bst, 
-			BackupStatus bStatus, 
+			BackupAction backUpAction, 
+			BackupStatus backUpStatus, 
 			BackUpCounters backUpCounters,
 			BackUpTask backUpTask) {
 		
+		super(pathPairBasicAttributes.getSourcePath(), pathPairBasicAttributes.getTargetPath(), backUpAction, backUpStatus);
+		backUpItemNumber = 1;
 		this.pathPairBasicAttributes = pathPairBasicAttributes;
-		sourcePath = this.pathPairBasicAttributes.getSourcePath();
-		targetPath = this.pathPairBasicAttributes.getTargetPath();
 		sourceClosestExistingPath = sourcePath;
 		checkPathExistenceCondition(pathPairBasicAttributes.sourceExists(), sourcePath, SRC_NOT_EXISTS);
 		
-		backupAction = bst;
-		backupStatus = bStatus;
 		fileSizeWarningThreshold = backUpTask.getSizeWarningLimit();
 		targetFileStore = backUpTask.getTargetFileStore();
-		permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(sourcePath);
 		
 		// Update counters		
 		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
@@ -132,23 +123,20 @@ public class BackUpItem {
 
 	// For delete actions
 	public BackUpItem(PathPairBasicAttributes pathPairBasicAttributes, 
-			BackupAction bst, 
+			BackupAction backUpAction, 
 			PathPairBasicAttributes parentPathPairBasicAttributes, 
 			BackUpCounters backUpCounters,
 			BackUpTask backUpTask) {
 		
+		super(pathPairBasicAttributes.getSourcePath(), pathPairBasicAttributes.getTargetPath(), backUpAction, BackupStatus.DIFFERENT);
+		backUpItemNumber = 1;
 		this.pathPairBasicAttributes = pathPairBasicAttributes;
-		sourcePath = pathPairBasicAttributes.getSourcePath();
-		targetPath = pathPairBasicAttributes.getTargetPath();
 		this.sourceClosestExistingPath = parentPathPairBasicAttributes.getSourcePath();
 		checkPathExistenceCondition(parentPathPairBasicAttributes.sourceExists(), sourceClosestExistingPath, EXIST_SRC_NOT_EXISTS);
 		checkPathExistenceCondition(pathPairBasicAttributes.targetExists(), targetPath, TGT_NOT_EXISTS);
 		
-		backupAction = bst;
-		backupStatus = BackupStatus.DIFFERENT;
 		fileSizeWarningThreshold = backUpTask.getSizeWarningLimit();
 		targetFileStore = backUpTask.getTargetFileStore();
-		permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(targetPath);
 		
 		// Update counters
 		if (backupAction.equals(BackupAction.DELETE)) {
@@ -183,15 +171,7 @@ public class BackUpItem {
 	public PathPairBasicAttributes getPathPairBasicAttributes() {
 		return pathPairBasicAttributes;
 	}
-
-	public Path getSourcePath() {
-		return sourcePath;
-	}
-
-	public Path getTargetPath() {
-		return targetPath;
-	}
-
+	
 	public File getSourceFile() {
 		if (sourcePath != null) {
 			return sourcePath.toFile();
@@ -208,22 +188,6 @@ public class BackUpItem {
 		}
 	}
 
-	public BackupAction getBackupAction() {
-		return backupAction;
-	}
-
-	public BackupStatus getBackupStatus() {
-		return backupStatus;
-	}
-
-	public DirectoryPermanenceLevel getPermanenceLevel() {
-		return permanenceLevel;
-	}
-
-	public long getSizeDifference() {
-		return sizeDifference;
-	}
-
 	public long getFileSizeWarningThreshold() {
 		return fileSizeWarningThreshold;
 	}
@@ -236,6 +200,7 @@ public class BackUpItem {
 		return pathPairBasicAttributes.targetExists();
 	}
 
+	@Override
 	public boolean execute(BackUpCounters backUpCounters) {
 		
 		try {

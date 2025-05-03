@@ -89,6 +89,7 @@ public class BackUpItemTest {
 		BackupAction action = backUpItem.getBackupAction();
 
 		assertThat(action).isEqualTo(BackupAction.COPY_REPLACE);
+		assertThat(backUpItem.getBackupStatus()).isEqualTo(BackupStatus.DIFFERENT);
 	}
 
 	@Test
