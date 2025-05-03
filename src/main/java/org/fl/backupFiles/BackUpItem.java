@@ -161,9 +161,9 @@ public class BackUpItem extends AbstractBackUpItem {
 		backUpCounters.recordPotentialSizeChange(targetFileStore, sizeDifference);
 		if (sizeDifference > fileSizeWarningThreshold)
 			backUpCounters.backupWithSizeAboveThreshold++;
-		if (permanenceLevel.equals(DirectoryPermanenceLevel.HIGH)) {
+		if (directoryGroup.getPermanenceLevel().equals(DirectoryPermanenceLevel.HIGH)) {
 			backUpCounters.nbHighPermanencePath++;
-		} else if (permanenceLevel.equals(DirectoryPermanenceLevel.MEDIUM)) {
+		} else if (directoryGroup.getPermanenceLevel().equals(DirectoryPermanenceLevel.MEDIUM)) {
 			backUpCounters.nbMediumPermanencePath++;
 		}
 	}

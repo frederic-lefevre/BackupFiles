@@ -37,7 +37,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
-import org.fl.backupFiles.directoryGroup.DirectoryPermanence;
 import org.fl.backupFiles.gui.BackUpItemCustomActionListener;
 import org.fl.backupFiles.gui.BackUpItemCustomActionListener.CustomAction;
 import org.fl.backupFiles.gui.BackupFilesGui;
@@ -59,7 +58,7 @@ public class Config {
 	private static ExecutorService scanExecutorService;
 	private static ScheduledExecutorService scheduler;
 	private static List<OsAction> osActions;
-	private static DirectoryPermanence directoryPermanence;
+	private static DirectoryGroupMap directoryGroupMap;
 	private static boolean initialized = false;
 	private static BackupAction acionOnSameTargetContentButNewer;
 
@@ -114,7 +113,7 @@ public class Config {
 
 			String backupGroupConfiguration = backupProperty.getFileContentFromURI("backupFiles.backupGroupFile",
 					StandardCharsets.UTF_8);
-			directoryPermanence = new DirectoryGroupMap(backupGroupConfiguration);
+			directoryGroupMap = new DirectoryGroupMap(backupGroupConfiguration);
 
 			acionOnSameTargetContentButNewer = getBackUpAction("backupFiles.actionOnTargetWithSameContentButNewer", BackupAction.ADJUST_TIME);
 			
@@ -210,11 +209,11 @@ public class Config {
 		return osActions;
 	}
 
-	public static DirectoryPermanence getDirectoryPermanence() {
+	public static DirectoryGroupMap getDirectoryPermanence() {
 		if (!initialized) {
 			initConfig(BackupFilesGui.getPropertyFile());
 		}
-		return directoryPermanence;
+		return directoryGroupMap;
 	}
 
 	public static BackupAction getAcionOnSameTargetContentButNewer() {

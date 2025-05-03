@@ -36,22 +36,27 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
-public class DirectoryGroupMap implements DirectoryPermanence {
+public class DirectoryGroupMap {
 
 	private static final Logger bLog = Logger.getLogger(DirectoryGroupMap.class.getName());
 	
 	private static final ObjectMapper mapper = new ObjectMapper();
 	
+	public final static DirectoryPermanenceLevel DEFAULT_PERMANENCE_LEVEL = DirectoryPermanenceLevel.HIGH;
+	public static final GroupPolicy DEFAULT_GROUP_POLICY = GroupPolicy.DO_NOT_GROUP;
+	
 	private static final String PATH = "path";
 	private static final String PERMANENCE = "permanence";
+	private static final String GROUP_POLICY = "groupPolicy";
 
-	private final Map<Path, DirectoryPermanenceLevel> permanenceMap;
+	private final Map<Path, DirectoryGroup> directoryGroupMap;
 	private final Set<Path> pathKeys;
+	private final DirectoryGroup defaultDirectoryGroup;
 
 	public DirectoryGroupMap(String jsonConfig) {
 		super();
-		permanenceMap = new TreeMap<Path, DirectoryPermanenceLevel>(new DeeperPathComparator());
+		defaultDirectoryGroup = new DirectoryGroup(Path.of("/"), DEFAULT_PERMANENCE_LEVEL, DEFAULT_GROUP_POLICY);
+		directoryGroupMap = new TreeMap<Path, DirectoryGroup>(new DeeperPathComparator());
 
 		if (jsonConfig != null) {
 
@@ -62,8 +67,9 @@ public class DirectoryGroupMap implements DirectoryPermanence {
 					for (JsonNode jPathPermanence : jPathsNode) {
 
 						Path sPath = Paths.get(jPathPermanence.get(PATH).asText());
-						DirectoryPermanenceLevel sPermanence = DirectoryPermanenceLevel.valueOf(jPathPermanence.get(PERMANENCE).asText());
-						permanenceMap.put(sPath, sPermanence);
+						DirectoryPermanenceLevel permanenceLevel = DirectoryPermanenceLevel.valueOf(jPathPermanence.get(PERMANENCE).asText());
+						GroupPolicy groupPolicy = GroupPolicy.valueOf(jPathPermanence.get(GROUP_POLICY).asText());
+						directoryGroupMap.put(sPath, new DirectoryGroup(sPath, permanenceLevel, groupPolicy));
 					}
 				} else {
 					bLog.severe("Json null or not an array:\n" + jsonConfig);
@@ -75,18 +81,17 @@ public class DirectoryGroupMap implements DirectoryPermanence {
 				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig, e);
 			}
 		}
-		pathKeys = permanenceMap.keySet();
+		pathKeys = directoryGroupMap.keySet();
 	}
 
-	@Override
-	public DirectoryPermanenceLevel getPermanenceLevel(Path dir) {
+	public DirectoryGroup getDirectoryGroup(Path dir) {
 
 		for (Path pathKey : pathKeys) {
 			if (intersectWith(dir, pathKey)) {
-				return permanenceMap.get(pathKey) ;
+				return directoryGroupMap.get(pathKey) ;
 			}
 		}
-		return DEFAULT_PERMANENCE_LEVEL;
+		return defaultDirectoryGroup;
 	}
 
 	// nativePath maybe a windows path. 

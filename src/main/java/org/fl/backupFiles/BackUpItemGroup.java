@@ -29,13 +29,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
-
 public class BackUpItemGroup extends AbstractBackUpItem {
 
 	private final List<BackUpItem> backUpItems;
 	
-	public BackUpItemGroup(Path sourcePath, Path targetPath, BackupAction backupAction, BackupStatus backupStatus, DirectoryPermanenceLevel permanenceLevel) {
+	public BackUpItemGroup(Path sourcePath, Path targetPath, BackupAction backupAction, BackupStatus backupStatus) {
 		
 		super(sourcePath, targetPath, backupAction, backupStatus);
 		this.sizeDifference = 0;
@@ -58,8 +56,8 @@ public class BackUpItemGroup extends AbstractBackUpItem {
 		if (backUpItem.getBackupStatus() != backupStatus) {
 			throw new IllegalArgumentException("backUpItem with status " + Objects.toString(backUpItem.getBackupStatus()) + " added to BackUpItemGroup with status " + backupStatus);
 		}
-		if (backUpItem.getPermanenceLevel() != permanenceLevel) {
-			throw new IllegalArgumentException("backUpItem with permanance level " + Objects.toString(backUpItem.getPermanenceLevel()) + " added to BackUpItemGroup with permanance level " + permanenceLevel);
+		if (backUpItem.getDirectoryGroup() != directoryGroup) {
+			throw new IllegalArgumentException("backUpItem with permanance level " + Objects.toString(backUpItem.getPermanenceLevel()) + " added to BackUpItemGroup with permanance level " + directoryGroup.getPermanenceLevel());
 		}
 		// Check all params => Paths
 		

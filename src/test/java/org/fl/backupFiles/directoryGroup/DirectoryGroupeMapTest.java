@@ -32,27 +32,36 @@ import org.junit.jupiter.api.Test;
 
 class DirectoryGroupeMapTest {
 
-	private final static String JSON_CONF = 
-		"[{\"path\" : \"/FredericPersonnel/photos/\",\"permanence\" : \"HIGH\"}," +
-		" {\"path\" : \"/FredericPersonnel/tmp/\",   \"permanence\" : \"MEDIUM\"}," +
-		" {\"path\" : \"/FredericPersonnel/tmp/low/insideMedium\",   \"permanence\" : \"LOW\"}]";
+	private final static String JSON_CONF = """
+		[{\"path\" : \"/FredericPersonnel/photos/\",\"permanence\" : \"HIGH\", \"groupPolicy\" : \"DO_NOT_GROUP\"},
+		 {\"path\" : \"/FredericPersonnel/tmp/\",   \"permanence\" : \"MEDIUM\", \"groupPolicy\" : \"GROUP_SUB_ITEMS\"},
+		 {\"path\" : \"/FredericPersonnel/tmp/low/insideMedium\",   \"permanence\" : \"LOW\", \"groupPolicy\" : \"GROUP_ALL\"}]
+		 """;
 	
 	@Test
 	void test() {
 		
-		DirectoryGroupMap permMap = new DirectoryGroupMap(JSON_CONF);
+		DirectoryGroupMap directoryGroupmMap = new DirectoryGroupMap(JSON_CONF);
 		
-		DirectoryPermanenceLevel lvl1 = permMap.getPermanenceLevel(Paths.get("C:\\FredericPersonnel\\photos\\bidon"));
-		assertThat(lvl1).isEqualTo(DirectoryPermanenceLevel.HIGH);
+		DirectoryGroup group1 = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\photos\\bidon"));
+		assertThat(group1.getPath()).isEqualTo(Paths.get("/FredericPersonnel/photos"));
+		assertThat(group1.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.HIGH);
+		assertThat(group1.getGroupPolicy()).isEqualTo(GroupPolicy.DO_NOT_GROUP);
 		
-		DirectoryPermanenceLevel lvl2 = permMap.getPermanenceLevel(Paths.get("C:\\FredericPersonnel\\tmp\\bidon"));
-		assertThat(lvl2).isEqualTo(DirectoryPermanenceLevel.MEDIUM);
+		DirectoryGroup group2 = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\tmp\\bidon"));
+		assertThat(group2.getPath()).isEqualTo(Paths.get("/FredericPersonnel/tmp"));
+		assertThat(group2.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.MEDIUM);
+		assertThat(group2.getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_SUB_ITEMS);
 
-		DirectoryPermanenceLevel lvl3 = permMap.getPermanenceLevel(Paths.get("C:\\FredericPersonnel\\tmp\\low\\insideMedium\\bidon"));
-		assertThat(lvl3).isEqualTo(DirectoryPermanenceLevel.LOW);
+		DirectoryGroup group3 = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\tmp\\low\\insideMedium\\bidon"));
+		assertThat(group3.getPath()).isEqualTo(Paths.get("/FredericPersonnel/tmp/low/insideMedium"));
+		assertThat(group3.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.LOW);
+		assertThat(group3.getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_ALL);
 
-		DirectoryPermanenceLevel lvl4 = permMap.getPermanenceLevel(Paths.get("C:\\FredericPersonnel\\default"));
-		assertThat(lvl4).isEqualTo(DirectoryPermanence.DEFAULT_PERMANENCE_LEVEL);
+		DirectoryGroup group4 = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\default"));
+		assertThat(group4.getPath()).isEqualTo(Paths.get("/"));
+		assertThat(group4.getPermanenceLevel()).isEqualTo(DirectoryGroupMap.DEFAULT_PERMANENCE_LEVEL);
+		assertThat(group4.getGroupPolicy()).isEqualTo(DirectoryGroupMap.DEFAULT_GROUP_POLICY);
 		
 	}
 

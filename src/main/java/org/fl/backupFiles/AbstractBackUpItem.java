@@ -26,16 +26,20 @@ package org.fl.backupFiles;
 
 import java.nio.file.Path;
 
+import org.fl.backupFiles.directoryGroup.DirectoryGroup;
+import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 
 public abstract class AbstractBackUpItem {
 
+	private static final DirectoryGroupMap directoryGroupMap = Config.getDirectoryPermanence();
+	
 	protected final Path sourcePath;
 	protected final Path targetPath;
 	protected final BackupAction backupAction;
 	protected long sizeDifference;
 	protected BackupStatus backupStatus;
-	protected final DirectoryPermanenceLevel permanenceLevel;
+	protected final DirectoryGroup directoryGroup;
 	protected long backUpItemNumber;
 	
 	protected AbstractBackUpItem(Path sourcePath, Path targetPath, BackupAction backupAction, BackupStatus backupStatus) {
@@ -54,9 +58,9 @@ public abstract class AbstractBackUpItem {
 		this.backupStatus = backupStatus;
 		
 		if (sourcePath != null) {
-			permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(sourcePath);
+			directoryGroup = directoryGroupMap.getDirectoryGroup(sourcePath);
 		} else {
-			permanenceLevel = Config.getDirectoryPermanence().getPermanenceLevel(targetPath);
+			directoryGroup = directoryGroupMap.getDirectoryGroup(targetPath);
 		}
 	}
 	
@@ -78,8 +82,12 @@ public abstract class AbstractBackUpItem {
 		return backupStatus;
 	}
 
+	public DirectoryGroup getDirectoryGroup() {
+		return directoryGroup;
+	}
+
 	public DirectoryPermanenceLevel getPermanenceLevel() {
-		return permanenceLevel;
+		return directoryGroup.getPermanenceLevel();
 	}
 
 	public long getSizeDifference() {

@@ -24,12 +24,6 @@ SOFTWARE.
 
 package org.fl.backupFiles.directoryGroup;
 
-import java.nio.file.Path;
-
-public interface DirectoryPermanence {
-
-	public final static DirectoryPermanenceLevel DEFAULT_PERMANENCE_LEVEL = DirectoryPermanenceLevel.HIGH;
-	
-	public DirectoryPermanenceLevel getPermanenceLevel(Path dir);
-	
+public enum GroupPolicy {
+	DO_NOT_GROUP, GROUP_SUB_ITEMS, GROUP_ALL
 }

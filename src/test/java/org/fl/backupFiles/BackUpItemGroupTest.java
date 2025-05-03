@@ -48,6 +48,7 @@ class BackUpItemGroupTest {
 	private static final Path UNEXISTANT_FOLDER_PATH = TestUtils.getPathFromUriString(UNEXISTANT_FOLDER);
 	private static final Path EXISTANT_SOURCE = TestUtils.getPathFromUriString(SRC_FILE1);
 	private static final Path UNEXISTANT_TARGET = TestUtils.getPathFromUriString(TGT_FILE1);
+	private static final Path FOLDER_PATH_FROM_A_DIFFERENT_GROUP = TestUtils.getPathFromUriString("file:///FredericPersonnel/ecrins/");
 	
 	private static BackUpTask backUpTask;
 	
@@ -67,20 +68,20 @@ class BackUpItemGroupTest {
 	@Test
 	void nullBackupActionShouldThrowException() {
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-			.isThrownBy(() -> new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, null, BackupStatus.DIFFERENT, DirectoryPermanenceLevel.HIGH));
+			.isThrownBy(() -> new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, null, BackupStatus.DIFFERENT));
 	}
 	
 	@Test
 	void nullBackupStatusShouldThrowException() {
 		assertThatIllegalArgumentException()
-			.isThrownBy(() -> new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, null, DirectoryPermanenceLevel.HIGH));
+			.isThrownBy(() -> new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, null));
 	}
 	
 	@Test
 	void testNewBackUpItemGroup() {
 		
 		BackUpItemGroup backUpItemGroup =
-				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, DirectoryPermanenceLevel.HIGH);
+				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT);
 		
 		assertThat(backUpItemGroup).isNotNull();
 		assertThat(backUpItemGroup.getSourcePath()).isEqualTo(EXISTANT_FOLDER_PATH);
@@ -97,7 +98,7 @@ class BackUpItemGroupTest {
 	void testAddBackUpItem() {
 		
 		BackUpItemGroup backUpItemGroup =
-				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, DirectoryPermanenceLevel.MEDIUM);
+				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT);
 		
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
 		
@@ -116,7 +117,7 @@ class BackUpItemGroupTest {
 	void addBackUpItemWithDifferentStatusShouldThrowException() {
 		
 		BackUpItemGroup backUpItemGroup =
-				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, DirectoryPermanenceLevel.MEDIUM);
+				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT);
 		
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
 		
@@ -130,7 +131,7 @@ class BackUpItemGroupTest {
 	void addBackUpItemWithDifferentActionShouldThrowException() {
 		
 		BackUpItemGroup backUpItemGroup =
-				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, DirectoryPermanenceLevel.MEDIUM);
+				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT);
 		
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
 		
@@ -140,12 +141,11 @@ class BackUpItemGroupTest {
 		assertThatIllegalArgumentException().isThrownBy(() -> backUpItemGroup.addBackUpItem(backUpItem)).withMessageContaining("action");			
 	}
 	
-	/*
 	@Test
 	void addBackUpItemWithDifferentPermanenceLevelShouldThrowException() {
 		
 		BackUpItemGroup backUpItemGroup =
-				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, DirectoryPermanenceLevel.HIGH);
+				new BackUpItemGroup(FOLDER_PATH_FROM_A_DIFFERENT_GROUP, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT);
 		
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
 		
@@ -154,5 +154,5 @@ class BackUpItemGroupTest {
 		
 		assertThatIllegalArgumentException().isThrownBy(() -> backUpItemGroup.addBackUpItem(backUpItem)).withMessageContaining("permanance level");		
 	}
-	*/
+
 }
