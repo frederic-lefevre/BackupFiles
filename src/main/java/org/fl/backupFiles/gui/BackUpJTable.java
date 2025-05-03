@@ -33,7 +33,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import org.fl.backupFiles.BackUpItem ;
+import org.fl.backupFiles.AbstractBackUpItem;
 import org.fl.backupFiles.Config;
 
 public class BackUpJTable extends JTable {
@@ -77,7 +77,7 @@ public class BackUpJTable extends JTable {
 	}
 	
 	// Get the selected BackUpItem
-	public BackUpItem getSelectedBackUpItem() {
+	public AbstractBackUpItem getSelectedBackUpItem() {
 		
 		int[] rowIdxs = getSelectedRows();
 		if (rowIdxs.length == 0) {
@@ -88,10 +88,10 @@ public class BackUpJTable extends JTable {
 		return ((BackUpTableModel)getModel()).getBackUpItemAt(convertRowIndexToModel(rowIdxs[0]));
 	}
 	
-	private class BackupItemSizeComparator implements Comparator<BackUpItem> {
+	private class BackupItemSizeComparator implements Comparator<AbstractBackUpItem> {
 
 		@Override
-		public int compare(BackUpItem o1, BackUpItem o2) {
+		public int compare(AbstractBackUpItem o1, AbstractBackUpItem o2) {
 			
 			if (o1.getSizeDifference() < o2.getSizeDifference() ) {
 				return 1;

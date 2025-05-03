@@ -34,6 +34,7 @@ import java.util.List;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import org.fl.backupFiles.AbstractBackUpItem;
 import org.fl.backupFiles.BackUpItem;
 import org.fl.backupFiles.OsAction;
 import org.fl.backupFiles.gui.BackUpItemCustomActionListener.CustomAction;
@@ -129,21 +130,21 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 	
 	private void enableMenuItems() {
 		
-		BackUpItem selectedEntry = backUpJTable.getSelectedBackUpItem() ;
+		AbstractBackUpItem selectedEntry = backUpJTable.getSelectedBackUpItem() ;
 		
-		if (selectedEntry != null) {
+		if ((selectedEntry != null)  && (selectedEntry instanceof BackUpItem backUpItem)) {
 	
 			sourceMenuItems
-				.forEach(menuItem -> menuItem.setEnabled(selectedEntry.isSourcePresent()));
+				.forEach(menuItem -> menuItem.setEnabled(backUpItem.isSourcePresent()));
 
 			targetMenuItems
-				.forEach(menuItem -> menuItem.setEnabled(selectedEntry.isTargetPresent()));
+				.forEach(menuItem -> menuItem.setEnabled(backUpItem.isTargetPresent()));
 
 			bothMenuItems
-				.forEach(menuItem -> menuItem.setEnabled(selectedEntry.isSourcePresent() && selectedEntry.isTargetPresent()));
+				.forEach(menuItem -> menuItem.setEnabled(backUpItem.isSourcePresent() && backUpItem.isTargetPresent()));
 			
 			anyMenuItems
-				.forEach(menuItem -> menuItem.setEnabled(selectedEntry.isSourcePresent() || selectedEntry.isTargetPresent()));
+				.forEach(menuItem -> menuItem.setEnabled(backUpItem.isSourcePresent() || backUpItem.isTargetPresent()));
 		}
 	}
 	

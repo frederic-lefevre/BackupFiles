@@ -31,8 +31,8 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingWorker;
 
+import org.fl.backupFiles.AbstractBackUpItem;
 import org.fl.backupFiles.BackUpCounters;
-import org.fl.backupFiles.BackUpItem;
 import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpJobInformation;
 import org.fl.backupFiles.Config;
@@ -96,7 +96,7 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 		boolean backupSuccess = true;
 		backUpCounters.reset();
 		int nbActionDone = 0;
-		Iterator<BackUpItem> backupItemIterator = backUpItemList.iterator();
+		Iterator<AbstractBackUpItem> backupItemIterator = backUpItemList.iterator();
 		long lastRefreshTime = System.currentTimeMillis();
 
 		while ((backupItemIterator.hasNext()) && (!uiControl.isStopAsked())) {

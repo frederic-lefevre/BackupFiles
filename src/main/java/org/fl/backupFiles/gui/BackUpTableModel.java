@@ -26,7 +26,7 @@ package org.fl.backupFiles.gui;
 
 import javax.swing.table.AbstractTableModel;
 
-import org.fl.backupFiles.BackUpItem;
+import org.fl.backupFiles.AbstractBackUpItem;
 import org.fl.backupFiles.BackUpItemList;
 
 public class BackUpTableModel extends AbstractTableModel {
@@ -100,7 +100,7 @@ public class BackUpTableModel extends AbstractTableModel {
 		};
 	}
 
-	public BackUpItem getBackUpItemAt(int rowIndex) {
+	public AbstractBackUpItem getBackUpItemAt(int rowIndex) {
 		return backUpItems.get(rowIndex);
 	}
 }

@@ -39,8 +39,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.AbstractBackUpItem;
 import org.fl.backupFiles.BackUpCounters;
-import org.fl.backupFiles.BackUpItem;
 import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.BackupAction;
@@ -55,15 +55,15 @@ class BackUpScannerProcessorTest {
 
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles.properties";
 	
-	private final static String SOURCE_DATA_DIR1 = "file:///C:/FredericPersonnel/tmp" ;
-	private final static String SOURCE_DATA_DIR2 = "file:///C:/FredericPersonnel/Loisirs/sports" ;
+	private static final String SOURCE_DATA_DIR1 = "file:///C:/FredericPersonnel/tmp";
+	private static final String SOURCE_DATA_DIR2 = "file:///C:/FredericPersonnel/Loisirs/sports";
 	
-	private final static String BUFFER_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer/";
-	private final static String BUFFER_DATA_DIR1 = BUFFER_DATA_DIR + "dir1/" ;
-	private final static String BUFFER_DATA_DIR2 = BUFFER_DATA_DIR + "dir2/" ;
-	private final static String TARGET_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Target/";
+	private static final String BUFFER_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer/";
+	private static final String BUFFER_DATA_DIR1 = BUFFER_DATA_DIR + "dir1/";
+	private static final String BUFFER_DATA_DIR2 = BUFFER_DATA_DIR + "dir2/";
+	private static final String TARGET_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Target/";
 	
-	private static final Logger log = Logger.getLogger(BackUpScannerProcessorTest.class.getName()) ;
+	private static final Logger log = Logger.getLogger(BackUpScannerProcessorTest.class.getName());
 	
 	@BeforeAll
 	static void generateTestData() {
@@ -133,7 +133,7 @@ class BackUpScannerProcessorTest {
 
 			// Execute backup
 			backUpCounters.reset() ;
-			for (BackUpItem backUpItem : backUpItemList) {
+			for (AbstractBackUpItem backUpItem : backUpItemList) {
 				backUpItem.execute(backUpCounters);
 			}
 			assertThat(backUpCounters.ambiguousNb).isZero();
@@ -212,7 +212,7 @@ class BackUpScannerProcessorTest {
 				.isNotNull()
 				.hasSize(1);
 
-			BackUpItem backUpItem = backUpItemList.get(0);
+			AbstractBackUpItem backUpItem = backUpItemList.get(0);
 			assertThat(backUpItem).isNotNull();
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.COPY_TREE);
 
@@ -250,7 +250,7 @@ class BackUpScannerProcessorTest {
 				.isNotNull()
 				.hasSize(1);
 
-			BackUpItem backUpItem = backUpItemList.get(0);
+			AbstractBackUpItem backUpItem = backUpItemList.get(0);
 			assertThat(backUpItem).isNotNull();
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.COPY_REPLACE);
 
@@ -289,7 +289,7 @@ class BackUpScannerProcessorTest {
 				.isNotNull()
 				.hasSize(1);
 			
-			BackUpItem backUpItem = backUpItemList.get(0);
+			AbstractBackUpItem backUpItem = backUpItemList.get(0);
 			assertThat(backUpItem).isNotNull();
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.COPY_NEW);
 
@@ -328,7 +328,7 @@ class BackUpScannerProcessorTest {
 				.isNotNull()
 				.hasSize(1);
 			
-			BackUpItem backUpItem = backUpItemList.get(0);
+			AbstractBackUpItem backUpItem = backUpItemList.get(0);
 			assertThat(backUpItem).isNotNull();
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.DELETE);
 
@@ -367,7 +367,7 @@ class BackUpScannerProcessorTest {
 				.isNotNull()
 				.hasSize(1);
 			
-			BackUpItem backUpItem = backUpItemList.get(0);
+			AbstractBackUpItem backUpItem = backUpItemList.get(0);
 			assertThat(backUpItem).isNotNull();
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.DELETE_DIR);
 

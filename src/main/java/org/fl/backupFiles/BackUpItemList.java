@@ -26,7 +26,7 @@ package org.fl.backupFiles;
 
 import java.util.LinkedList;
 
-public class BackUpItemList extends LinkedList<BackUpItem> {
+public class BackUpItemList extends LinkedList<AbstractBackUpItem> {
 
 	private static final long serialVersionUID = 1L;
 	

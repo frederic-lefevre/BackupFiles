@@ -28,6 +28,7 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.AbstractBackUpItem;
 import org.fl.backupFiles.BackUpItem;
 import org.fl.util.os.OScommand;
 
@@ -48,18 +49,18 @@ public class BackUpItemCommandListener implements java.awt.event.ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 
-		BackUpItem selectedEntry = backUpJTable.getSelectedBackUpItem();
+		AbstractBackUpItem selectedEntry = backUpJTable.getSelectedBackUpItem();
 
-		if (selectedEntry != null) {
+		if ((selectedEntry != null) && (selectedEntry instanceof BackUpItem backUpItem))  {
 			// Command defined in the property file, passed for execution to the OS (maybe an external binary editor for instance)
 
 			List<String> filePaths;
 			if (fileElement.equals(FileElement.Source)) {
-				filePaths = List.of(selectedEntry.getSourcePath().toAbsolutePath().toString());
+				filePaths = List.of(backUpItem.getSourcePath().toAbsolutePath().toString());
 			} else if (fileElement.equals(FileElement.Cible)) {
-				filePaths = List.of(selectedEntry.getTargetPath().toAbsolutePath().toString());
+				filePaths = List.of(backUpItem.getTargetPath().toAbsolutePath().toString());
 			} else if (fileElement.equals(FileElement.Both)) {
-				filePaths = List.of(selectedEntry.getSourcePath().toAbsolutePath().toString(), selectedEntry.getTargetPath().toAbsolutePath().toString());
+				filePaths = List.of(backUpItem.getSourcePath().toAbsolutePath().toString(), backUpItem.getTargetPath().toAbsolutePath().toString());
 			} else {
 				filePaths = null;
 			}
