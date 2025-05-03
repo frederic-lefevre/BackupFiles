@@ -26,7 +26,6 @@ package org.fl.backupFiles;
 
 import java.io.File;
 import java.nio.file.AccessDeniedException;
-import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -54,8 +53,6 @@ public class BackUpItem extends AbstractBackUpItem {
 
 	private final PathPairBasicAttributes pathPairBasicAttributes;
 	private final Path sourceClosestExistingPath;
-	private final long fileSizeWarningThreshold;
-	private final FileStore targetFileStore;
 	
 	// A back up item is :
 	// * a source path (file or directory) to back up 
@@ -81,14 +78,11 @@ public class BackUpItem extends AbstractBackUpItem {
 			BackUpCounters backUpCounters,
 			BackUpTask backUpTask) {
 		
-		super(pathPairBasicAttributes.getSourcePath(), pathPairBasicAttributes.getTargetPath(), backUpAction, backUpStatus);
+		super(pathPairBasicAttributes.getSourcePath(), pathPairBasicAttributes.getTargetPath(), backUpAction, backUpStatus, backUpTask);
 		backUpItemNumber = 1;
 		this.pathPairBasicAttributes = pathPairBasicAttributes;
 		sourceClosestExistingPath = sourcePath;
 		checkPathExistenceCondition(pathPairBasicAttributes.sourceExists(), sourcePath, SRC_NOT_EXISTS);
-		
-		fileSizeWarningThreshold = backUpTask.getSizeWarningLimit();
-		targetFileStore = backUpTask.getTargetFileStore();
 		
 		// Update counters		
 		if (backupAction.equals(BackupAction.COPY_REPLACE)) {
@@ -128,15 +122,12 @@ public class BackUpItem extends AbstractBackUpItem {
 			BackUpCounters backUpCounters,
 			BackUpTask backUpTask) {
 		
-		super(pathPairBasicAttributes.getSourcePath(), pathPairBasicAttributes.getTargetPath(), backUpAction, BackupStatus.DIFFERENT);
+		super(pathPairBasicAttributes.getSourcePath(), pathPairBasicAttributes.getTargetPath(), backUpAction, BackupStatus.DIFFERENT, backUpTask);
 		backUpItemNumber = 1;
 		this.pathPairBasicAttributes = pathPairBasicAttributes;
 		this.sourceClosestExistingPath = parentPathPairBasicAttributes.getSourcePath();
 		checkPathExistenceCondition(parentPathPairBasicAttributes.sourceExists(), sourceClosestExistingPath, EXIST_SRC_NOT_EXISTS);
 		checkPathExistenceCondition(pathPairBasicAttributes.targetExists(), targetPath, TGT_NOT_EXISTS);
-		
-		fileSizeWarningThreshold = backUpTask.getSizeWarningLimit();
-		targetFileStore = backUpTask.getTargetFileStore();
 		
 		// Update counters
 		if (backupAction.equals(BackupAction.DELETE)) {
@@ -186,10 +177,6 @@ public class BackUpItem extends AbstractBackUpItem {
 		} else {
 			return null;
 		}
-	}
-
-	public long getFileSizeWarningThreshold() {
-		return fileSizeWarningThreshold;
 	}
 
 	public boolean isSourcePresent() {
@@ -339,6 +326,11 @@ public class BackUpItem extends AbstractBackUpItem {
 			bLog.log(Level.SEVERE, "Exception when getting information on backup item.\nSource Path=" + sourcePath
 					+ "\nTargetpath=" + targetPath, e);
 		}
+	}
+
+	@Override
+	public boolean isAboveFileSizeLimitThreshold() {
+		return sizeDifference > fileSizeWarningThreshold;
 	}
 
 }

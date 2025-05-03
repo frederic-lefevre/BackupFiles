@@ -32,16 +32,16 @@ import java.util.Objects;
 public class BackUpItemGroup extends AbstractBackUpItem {
 
 	private final List<BackUpItem> backUpItems;
+	private boolean isAboveFileSizeLimitThreshold;
 	
-	public BackUpItemGroup(Path sourcePath, Path targetPath, BackupAction backupAction, BackupStatus backupStatus) {
+	public BackUpItemGroup(Path sourcePath, Path targetPath, BackupAction backupAction, BackupStatus backupStatus, BackUpTask backUpTask) {
 		
-		super(sourcePath, targetPath, backupAction, backupStatus);
+		super(sourcePath, targetPath, backupAction, backupStatus, backUpTask);
 		this.sizeDifference = 0;
 		this.backUpItemNumber = 0;
 
 		this.backUpItems = new ArrayList<>();
-		
-		// check params
+		isAboveFileSizeLimitThreshold = false;
 	}
 	
 	public List<BackUpItem> getBackUpItems() {
@@ -59,11 +59,13 @@ public class BackUpItemGroup extends AbstractBackUpItem {
 		if (backUpItem.getDirectoryGroup() != directoryGroup) {
 			throw new IllegalArgumentException("backUpItem with permanance level " + Objects.toString(backUpItem.getPermanenceLevel()) + " added to BackUpItemGroup with permanance level " + directoryGroup.getPermanenceLevel());
 		}
-		// Check all params => Paths
 		
 		sizeDifference = sizeDifference + backUpItem.getSizeDifference();
 		backUpItemNumber++;
 		backUpItems.add(backUpItem);
+		if (backUpItem.isAboveFileSizeLimitThreshold()) {
+			isAboveFileSizeLimitThreshold = true;
+		}
 		return this;
 	}
 
@@ -75,5 +77,10 @@ public class BackUpItemGroup extends AbstractBackUpItem {
 			result &= backUpItem.execute(backUpCounters);
 		}
 		return result;
+	}
+
+	@Override
+	public boolean isAboveFileSizeLimitThreshold() {
+		return isAboveFileSizeLimitThreshold;
 	}
 }

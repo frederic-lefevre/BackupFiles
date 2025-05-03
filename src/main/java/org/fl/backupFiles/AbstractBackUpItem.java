@@ -24,25 +24,25 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
+import java.nio.file.FileStore;
 import java.nio.file.Path;
 
 import org.fl.backupFiles.directoryGroup.DirectoryGroup;
-import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 
 public abstract class AbstractBackUpItem {
-
-	private static final DirectoryGroupMap directoryGroupMap = Config.getDirectoryPermanence();
 	
 	protected final Path sourcePath;
 	protected final Path targetPath;
 	protected final BackupAction backupAction;
 	protected long sizeDifference;
 	protected BackupStatus backupStatus;
+	protected final long fileSizeWarningThreshold;
+	protected final FileStore targetFileStore;
 	protected final DirectoryGroup directoryGroup;
 	protected long backUpItemNumber;
 	
-	protected AbstractBackUpItem(Path sourcePath, Path targetPath, BackupAction backupAction, BackupStatus backupStatus) {
+	protected AbstractBackUpItem(Path sourcePath, Path targetPath, BackupAction backupAction, BackupStatus backupStatus, BackUpTask backUpTask) {
 		
 		super();
 		
@@ -57,21 +57,26 @@ public abstract class AbstractBackUpItem {
 		this.backupAction = backupAction;
 		this.backupStatus = backupStatus;
 		
+		fileSizeWarningThreshold = backUpTask.getSizeWarningLimit();
+		targetFileStore = backUpTask.getTargetFileStore();
+		
 		if (sourcePath != null) {
-			directoryGroup = directoryGroupMap.getDirectoryGroup(sourcePath);
+			directoryGroup = backUpTask.getDirectoryGroupMap().getDirectoryGroup(sourcePath);
 		} else {
-			directoryGroup = directoryGroupMap.getDirectoryGroup(targetPath);
+			directoryGroup = backUpTask.getDirectoryGroupMap().getDirectoryGroup(targetPath);
 		}
 	}
 	
 	public abstract boolean execute(BackUpCounters backUpCounters);
+	
+	public abstract boolean isAboveFileSizeLimitThreshold();
 	
 	public Path getSourcePath() {
 		return sourcePath;
 	}
 
 	public Path getTargetPath() {
-		return targetPath;
+		return targetPath; 
 	}
 	
 	public BackupAction getBackupAction() {
@@ -85,7 +90,7 @@ public abstract class AbstractBackUpItem {
 	public DirectoryGroup getDirectoryGroup() {
 		return directoryGroup;
 	}
-
+	
 	public DirectoryPermanenceLevel getPermanenceLevel() {
 		return directoryGroup.getPermanenceLevel();
 	}

@@ -68,20 +68,20 @@ class BackUpItemGroupTest {
 	@Test
 	void nullBackupActionShouldThrowException() {
 		assertThatExceptionOfType(IllegalBackupActionException.class)
-			.isThrownBy(() -> new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, null, BackupStatus.DIFFERENT));
+			.isThrownBy(() -> new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, null, BackupStatus.DIFFERENT, backUpTask));
 	}
 	
 	@Test
 	void nullBackupStatusShouldThrowException() {
 		assertThatIllegalArgumentException()
-			.isThrownBy(() -> new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, null));
+			.isThrownBy(() -> new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, null, backUpTask));
 	}
 	
 	@Test
 	void testNewBackUpItemGroup() {
 		
 		BackUpItemGroup backUpItemGroup =
-				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT);
+				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, backUpTask);
 		
 		assertThat(backUpItemGroup).isNotNull();
 		assertThat(backUpItemGroup.getSourcePath()).isEqualTo(EXISTANT_FOLDER_PATH);
@@ -98,7 +98,7 @@ class BackUpItemGroupTest {
 	void testAddBackUpItem() {
 		
 		BackUpItemGroup backUpItemGroup =
-				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT);
+				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, backUpTask);
 		
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
 		
@@ -117,7 +117,7 @@ class BackUpItemGroupTest {
 	void addBackUpItemWithDifferentStatusShouldThrowException() {
 		
 		BackUpItemGroup backUpItemGroup =
-				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT);
+				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, backUpTask);
 		
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
 		
@@ -131,7 +131,7 @@ class BackUpItemGroupTest {
 	void addBackUpItemWithDifferentActionShouldThrowException() {
 		
 		BackUpItemGroup backUpItemGroup =
-				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT);
+				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, backUpTask);
 		
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
 		
@@ -145,7 +145,7 @@ class BackUpItemGroupTest {
 	void addBackUpItemWithDifferentPermanenceLevelShouldThrowException() {
 		
 		BackUpItemGroup backUpItemGroup =
-				new BackUpItemGroup(FOLDER_PATH_FROM_A_DIFFERENT_GROUP, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT);
+				new BackUpItemGroup(FOLDER_PATH_FROM_A_DIFFERENT_GROUP, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, backUpTask);
 		
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
 		

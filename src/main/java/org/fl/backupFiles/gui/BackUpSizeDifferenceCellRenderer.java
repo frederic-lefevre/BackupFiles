@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingConstants;
 
-import org.fl.backupFiles.BackUpItem;
+import org.fl.backupFiles.AbstractBackUpItem;
 import org.fl.util.swing.CustomTableCellRenderer;
 
 public class BackUpSizeDifferenceCellRenderer extends CustomTableCellRenderer {
@@ -54,13 +54,14 @@ public class BackUpSizeDifferenceCellRenderer extends CustomTableCellRenderer {
 	@Override
 	public void valueProcessor(Object value) {
 		
-		if (value instanceof BackUpItem backUpItem) {
+		if (AbstractBackUpItem.class.isAssignableFrom(value.getClass())) {
 			
+			AbstractBackUpItem backUpItem = (AbstractBackUpItem)value;
 			long sizeDifference = backUpItem.getSizeDifference();			
 			setValue(Long.toString(sizeDifference));
 			setToolTipText(numberFormat.format(sizeDifference));
 
-			if (sizeDifference > backUpItem.getFileSizeWarningThreshold()) {
+			if (backUpItem.isAboveFileSizeLimitThreshold()) {
 				setBackground(ABOVE_LIMIT_COLOR);
 			} else {
 				setBackground(BELOW_LIMIT_COLOR);

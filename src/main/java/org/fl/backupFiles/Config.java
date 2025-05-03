@@ -36,7 +36,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.backupFiles.gui.BackUpItemCustomActionListener;
 import org.fl.backupFiles.gui.BackUpItemCustomActionListener.CustomAction;
 import org.fl.backupFiles.gui.BackupFilesGui;
@@ -58,7 +57,7 @@ public class Config {
 	private static ExecutorService scanExecutorService;
 	private static ScheduledExecutorService scheduler;
 	private static List<OsAction> osActions;
-	private static DirectoryGroupMap directoryGroupMap;
+	private static String backupGroupConfiguration;
 	private static boolean initialized = false;
 	private static BackupAction acionOnSameTargetContentButNewer;
 
@@ -111,9 +110,7 @@ public class Config {
 			}
 			BackUpItemCustomActionListener.setCustomActionCommands(customActionMap);
 
-			String backupGroupConfiguration = backupProperty.getFileContentFromURI("backupFiles.backupGroupFile",
-					StandardCharsets.UTF_8);
-			directoryGroupMap = new DirectoryGroupMap(backupGroupConfiguration);
+			backupGroupConfiguration = backupProperty.getFileContentFromURI("backupFiles.backupGroupFile", StandardCharsets.UTF_8);
 
 			acionOnSameTargetContentButNewer = getBackUpAction("backupFiles.actionOnTargetWithSameContentButNewer", BackupAction.ADJUST_TIME);
 			
@@ -209,11 +206,11 @@ public class Config {
 		return osActions;
 	}
 
-	public static DirectoryGroupMap getDirectoryPermanence() {
+	public static String getBackupGroupConfiguration() {
 		if (!initialized) {
 			initConfig(BackupFilesGui.getPropertyFile());
 		}
-		return directoryGroupMap;
+		return backupGroupConfiguration;
 	}
 
 	public static BackupAction getAcionOnSameTargetContentButNewer() {
