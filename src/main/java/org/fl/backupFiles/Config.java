@@ -112,9 +112,9 @@ public class Config {
 			}
 			BackUpItemCustomActionListener.setCustomActionCommands(customActionMap);
 
-			String permanenceConf = backupProperty.getFileContentFromURI("backupFiles.dirPermanenceFile",
+			String backupGroupConfiguration = backupProperty.getFileContentFromURI("backupFiles.backupGroupFile",
 					StandardCharsets.UTF_8);
-			directoryPermanence = new DirectoryGroupMap(permanenceConf);
+			directoryPermanence = new DirectoryGroupMap(backupGroupConfiguration);
 
 			acionOnSameTargetContentButNewer = getBackUpAction("backupFiles.actionOnTargetWithSameContentButNewer", BackupAction.ADJUST_TIME);
 			
