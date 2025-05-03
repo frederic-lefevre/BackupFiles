@@ -58,7 +58,7 @@ public class DirectoryGroupMap {
 		defaultDirectoryGroup = new DirectoryGroup(Path.of("/"), DEFAULT_PERMANENCE_LEVEL, DEFAULT_GROUP_POLICY);
 		directoryGroupMap = new TreeMap<Path, DirectoryGroup>(new DeeperPathComparator());
 
-		if (jsonConfig != null) {
+		if ((jsonConfig != null) && !jsonConfig.isEmpty()) {
 
 			try {
 				JsonNode jPathsNode = mapper.readTree(jsonConfig);
@@ -80,6 +80,8 @@ public class DirectoryGroupMap {
 			} catch (Exception e) {
 				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig, e);
 			}
+		} else {
+			bLog.severe("DirectoryGroup configuration is null or empty");
 		}
 		pathKeys = directoryGroupMap.keySet();
 	}
