@@ -26,7 +26,7 @@ package org.fl.backupFiles.directoryGroup.core;
 
 import java.nio.file.Path;
 
-import org.fl.backupFiles.BackUpItemList;
+import org.fl.backupFiles.BackUpItemGroup;
 import org.fl.backupFiles.BackupAction;
 import org.fl.backupFiles.BackupStatus;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
@@ -34,11 +34,11 @@ import org.fl.backupFiles.directoryGroup.GroupPolicy;
 
 public class DirectoryGroupAll extends DirectoryGroup {
 
-	private final BackUpItemList[][] backUpItemLists;
+	private final BackUpItemGroup[][] backUpItemLists;
 	
 	protected DirectoryGroupAll(Path path, DirectoryPermanenceLevel permanenceLevel, GroupPolicy groupPolicy) {
 		super(path, permanenceLevel, groupPolicy);
-		backUpItemLists = new BackUpItemList[BackupAction.values().length][BackupStatus.values().length];
+		backUpItemLists = new BackUpItemGroup[BackupAction.values().length][BackupStatus.values().length];
 	}
 
 }
