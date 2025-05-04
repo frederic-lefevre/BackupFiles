@@ -41,8 +41,10 @@ public abstract class AbstractBackUpItem {
 	protected final FileStore targetFileStore;
 	protected final DirectoryGroup directoryGroup;
 	protected long backUpItemNumber;
+	protected final BackUpTask backUpTask;
+	protected final Path sourceClosestExistingPath;
 	
-	protected AbstractBackUpItem(Path sourcePath, Path targetPath, BackupAction backupAction, BackupStatus backupStatus, BackUpTask backUpTask) {
+	protected AbstractBackUpItem(Path sourcePath, Path targetPath, Path sourceClosestExistingPath, BackupAction backupAction, BackupStatus backupStatus, BackUpTask backUpTask) {
 		
 		super();
 		
@@ -54,6 +56,7 @@ public abstract class AbstractBackUpItem {
 		}
 		this.sourcePath = sourcePath;
 		this.targetPath = targetPath;
+		this.sourceClosestExistingPath = sourceClosestExistingPath;
 		this.backupAction = backupAction;
 		this.backupStatus = backupStatus;
 		
@@ -63,8 +66,9 @@ public abstract class AbstractBackUpItem {
 		if (sourcePath != null) {
 			directoryGroup = backUpTask.getDirectoryGroupMap().getDirectoryGroup(sourcePath);
 		} else {
-			directoryGroup = backUpTask.getDirectoryGroupMap().getDirectoryGroup(targetPath);
+			directoryGroup = backUpTask.getDirectoryGroupMap().getDirectoryGroup(sourceClosestExistingPath);
 		}
+		this.backUpTask = backUpTask;
 	}
 	
 	public abstract boolean execute(BackUpCounters backUpCounters);
@@ -101,6 +105,10 @@ public abstract class AbstractBackUpItem {
 
 	public long getBackUpItemNumber() {
 		return backUpItemNumber;
+	}
+
+	public BackUpTask getBackUpTask() {
+		return backUpTask;
 	}
 
 }

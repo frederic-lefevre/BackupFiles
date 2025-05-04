@@ -33,6 +33,9 @@ import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
+import org.fl.backupFiles.directoryGroup.GroupPolicy;
+import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
 import org.fl.backupFiles.scanner.PathPairBasicAttributes;
 import org.fl.util.file.FileComparator;
 import org.junit.jupiter.api.AfterEach;
@@ -137,6 +140,23 @@ public class BackUpItemTest {
 		assertThat(getTotalCounters(counters)).isEqualTo(2);
 	}
 
+
+	@Test
+	void testItemDirectoryGroup() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
+		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask);
+		
+		DirectoryGroup directoryGroup = backUpItem.getDirectoryGroup();
+		
+		assertThat(directoryGroup).isNotNull();
+		assertThat(directoryGroup.getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_ALL);
+		assertThat(directoryGroup.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.MEDIUM);
+		assertThat(backUpItem.getSourcePath().startsWith(directoryGroup.getPath()));
+	}
+	
 	@Test
 	void nullSrcShouldThrowException() {
 

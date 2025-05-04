@@ -52,7 +52,6 @@ public class BackUpItem extends AbstractBackUpItem {
 	private static final String EXIST_SRC_NOT_EXISTS = "Closest existing source path parameter is null or the path does not exist";
 
 	private final PathPairBasicAttributes pathPairBasicAttributes;
-	private final Path sourceClosestExistingPath;
 	
 	// A back up item is :
 	// * a source path (file or directory) to back up 
@@ -78,10 +77,9 @@ public class BackUpItem extends AbstractBackUpItem {
 			BackUpCounters backUpCounters,
 			BackUpTask backUpTask) {
 		
-		super(pathPairBasicAttributes.getSourcePath(), pathPairBasicAttributes.getTargetPath(), backUpAction, backUpStatus, backUpTask);
+		super(pathPairBasicAttributes.getSourcePath(), pathPairBasicAttributes.getTargetPath(), pathPairBasicAttributes.getSourcePath(), backUpAction, backUpStatus, backUpTask);
 		backUpItemNumber = 1;
 		this.pathPairBasicAttributes = pathPairBasicAttributes;
-		sourceClosestExistingPath = sourcePath;
 		checkPathExistenceCondition(pathPairBasicAttributes.sourceExists(), sourcePath, SRC_NOT_EXISTS);
 		
 		// Update counters		
@@ -122,10 +120,9 @@ public class BackUpItem extends AbstractBackUpItem {
 			BackUpCounters backUpCounters,
 			BackUpTask backUpTask) {
 		
-		super(pathPairBasicAttributes.getSourcePath(), pathPairBasicAttributes.getTargetPath(), backUpAction, BackupStatus.DIFFERENT, backUpTask);
+		super(pathPairBasicAttributes.getSourcePath(), pathPairBasicAttributes.getTargetPath(), parentPathPairBasicAttributes.getSourcePath(), backUpAction, BackupStatus.DIFFERENT, backUpTask);
 		backUpItemNumber = 1;
 		this.pathPairBasicAttributes = pathPairBasicAttributes;
-		this.sourceClosestExistingPath = parentPathPairBasicAttributes.getSourcePath();
 		checkPathExistenceCondition(parentPathPairBasicAttributes.sourceExists(), sourceClosestExistingPath, EXIST_SRC_NOT_EXISTS);
 		checkPathExistenceCondition(pathPairBasicAttributes.targetExists(), targetPath, TGT_NOT_EXISTS);
 		

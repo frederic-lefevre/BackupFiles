@@ -25,28 +25,32 @@ SOFTWARE.
 package org.fl.backupFiles;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class BackUpItemGroup extends AbstractBackUpItem {
 
-	private final BackUpItemList backUpItems;
+	private final List<BackUpItem> backUpItems;
 	private boolean isAboveFileSizeLimitThreshold;
 	
-	public BackUpItemGroup(Path sourcePath, Path targetPath, BackupAction backupAction, BackupStatus backupStatus, BackUpTask backUpTask) {
+	public BackUpItemGroup(Path sourcePath, Path targetPath, Path sourceClosestExistingPath, BackupAction backupAction, BackupStatus backupStatus, BackUpTask backUpTask) {
 		
-		super(sourcePath, targetPath, backupAction, backupStatus, backUpTask);
+		super(sourcePath, targetPath, sourceClosestExistingPath, backupAction, backupStatus, backUpTask);
 		this.sizeDifference = 0;
 		this.backUpItemNumber = 0;
 
-		this.backUpItems = BackUpItemList.build();
+		this.backUpItems = new ArrayList<>();
 		isAboveFileSizeLimitThreshold = false;
 	}
 	
 	public BackUpItemList getBackUpItems() {
-		return backUpItems;
+		BackUpItemList backUpItemList = BackUpItemList.build();
+		backUpItemList.addAll(backUpItems);
+		return backUpItemList;
 	}
 
-	public BackUpItemGroup addBackUpItem(BackUpItem backUpItem) {
+	public boolean addBackUpItem(BackUpItem backUpItem) {
 		
 		if (backUpItem.getBackupAction() != backupAction) {
 			throw new IllegalArgumentException("backUpItem with action " + Objects.toString(backUpItem.getBackupAction()) + " added to BackUpItemGroup with action " + backupAction);
@@ -60,11 +64,10 @@ public class BackUpItemGroup extends AbstractBackUpItem {
 		
 		sizeDifference = sizeDifference + backUpItem.getSizeDifference();
 		backUpItemNumber++;
-		backUpItems.add(backUpItem);
 		if (backUpItem.isAboveFileSizeLimitThreshold()) {
 			isAboveFileSizeLimitThreshold = true;
 		}
-		return this;
+		return backUpItems.add(backUpItem);
 	}
 
 	@Override

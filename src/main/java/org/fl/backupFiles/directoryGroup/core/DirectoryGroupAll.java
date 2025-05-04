@@ -25,7 +25,9 @@ SOFTWARE.
 package org.fl.backupFiles.directoryGroup.core;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
+import org.fl.backupFiles.BackUpItem;
 import org.fl.backupFiles.BackUpItemGroup;
 import org.fl.backupFiles.BackupAction;
 import org.fl.backupFiles.BackupStatus;
@@ -34,11 +36,34 @@ import org.fl.backupFiles.directoryGroup.GroupPolicy;
 
 public class DirectoryGroupAll extends DirectoryGroup {
 
-	private final BackUpItemGroup[][] backUpItemLists;
+	private BackUpItemGroup[][] backUpItemGroupLists;
 	
 	protected DirectoryGroupAll(Path path, DirectoryPermanenceLevel permanenceLevel, GroupPolicy groupPolicy) {
 		super(path, permanenceLevel, groupPolicy);
-		backUpItemLists = new BackUpItemGroup[BackupAction.values().length][BackupStatus.values().length];
+		if (groupPolicy != GroupPolicy.GROUP_ALL) {
+			throw new IllegalArgumentException(DirectoryGroupAll.class.getName() + " must be called with a GROUP_ALL group policy. It was called with " + Objects.toString(groupPolicy));
+		}
+		backUpItemGroupLists = new BackUpItemGroup[BackupAction.values().length][BackupStatus.values().length];
 	}
 
+	// Return the BackUpItemGroup if a new one has been created. Null otherwise
+	@Override
+	public BackUpItemGroup addBackUpItem(BackUpItem item) {
+		
+		BackUpItemGroup backupItemGroup = backUpItemGroupLists[item.getBackupAction().ordinal()][item.getBackupStatus().ordinal()];
+		if (backupItemGroup == null) {
+			backupItemGroup = new BackUpItemGroup(getPath(), getPath(), getPath(), item.getBackupAction(), item.getBackupStatus(), item.getBackUpTask());
+			backUpItemGroupLists[item.getBackupAction().ordinal()][item.getBackupStatus().ordinal()] = backupItemGroup;
+			backupItemGroup.addBackUpItem(item);
+			return backupItemGroup;
+		} else {
+			backupItemGroup.addBackUpItem(item);
+			return null;
+		}
+	}
+	
+	@Override
+	public void clear() {
+		backUpItemGroupLists = new BackUpItemGroup[BackupAction.values().length][BackupStatus.values().length];
+	}
 }

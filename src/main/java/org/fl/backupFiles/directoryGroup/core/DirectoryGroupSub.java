@@ -27,7 +27,10 @@ package org.fl.backupFiles.directoryGroup.core;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
+import org.fl.backupFiles.BackUpItem;
+import org.fl.backupFiles.BackUpItemGroup;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 import org.fl.backupFiles.directoryGroup.GroupPolicy;
 
@@ -37,7 +40,21 @@ public class DirectoryGroupSub extends DirectoryGroup {
 	
 	protected DirectoryGroupSub(Path path, DirectoryPermanenceLevel permanenceLevel, GroupPolicy groupPolicy) {
 		super(path, permanenceLevel, groupPolicy);
+		if (groupPolicy != GroupPolicy.GROUP_SUB_ITEMS) {
+			throw new IllegalArgumentException(DirectoryGroupSub.class.getName() + " must be called with a GROUP_SUB_ITEMS group policy. It was called with " + Objects.toString(groupPolicy));
+		}
 		subDirectoryGroupMap = new HashMap<>();
 	}
 
+	// Return the BackUpItemGroup if a new one has been created. Null otherwise
+	@Override
+	public BackUpItemGroup addBackUpItem(BackUpItem item) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public void clear() {
+		subDirectoryGroupMap.clear();
+	}
 }

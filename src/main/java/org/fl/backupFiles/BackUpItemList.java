@@ -27,6 +27,7 @@ package org.fl.backupFiles;
 import java.util.LinkedList;
 
 import org.fl.backupFiles.directoryGroup.GroupPolicy;
+import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
 
 public class BackUpItemList extends LinkedList<AbstractBackUpItem> {
 
@@ -42,13 +43,26 @@ public class BackUpItemList extends LinkedList<AbstractBackUpItem> {
 	
 	@Override
 	public boolean add(AbstractBackUpItem item) {
-		
-//		GroupPolicy groupPolicy = item.getDirectoryGroup().getGroupPolicy();
-//		switch (groupPolicy) {
-//		case DO_NOT_GROUP -> super.add(item);
-//		}
-		
-		return super.add(item);
+
+		if (item instanceof BackUpItem backUpItem) {
+			DirectoryGroup directoryGroup = backUpItem.getDirectoryGroup();
+			GroupPolicy groupPolicy = directoryGroup.getGroupPolicy();
+			return switch (groupPolicy) {
+				   	case DO_NOT_GROUP -> super.add(backUpItem);
+					case GROUP_SUB_ITEMS -> super.add(backUpItem);
+					case GROUP_ALL -> {
+						BackUpItemGroup backUpItemGroup = directoryGroup.addBackUpItem(backUpItem);
+						if (backUpItemGroup != null) {
+							// new BackUpItemGroup created, so not yet in the BackUpItemList
+							super.add(backUpItemGroup);
+						}
+						yield true;
+					}
+			};
+		} else {
+			throw new IllegalArgumentException("Trying to call BackUpItemList.add with a BackUpItemGroup argument");
+		}
+
 	}
 	
 	public void removeItemsDone() {

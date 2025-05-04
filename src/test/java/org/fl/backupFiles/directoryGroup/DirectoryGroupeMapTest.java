@@ -42,32 +42,62 @@ class DirectoryGroupeMapTest {
 		 """;
 	
 	@Test
-	void test() {
+	void testDoNotGroup() {
 		
 		DirectoryGroupMap directoryGroupmMap = new DirectoryGroupMap(JSON_CONF);
 		
-		DirectoryGroup group1 = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\photos\\bidon"));
-		assertThat(group1.getPath()).isEqualTo(Paths.get("/FredericPersonnel/photos"));
-		assertThat(group1.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.HIGH);
-		assertThat(group1.getGroupPolicy()).isEqualTo(GroupPolicy.DO_NOT_GROUP);
-		assertThat(group1).isInstanceOf(DirectoryGroup.class);
+		DirectoryGroup group = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\photos\\bidon"));
+		assertThat(group.getPath()).isEqualTo(Paths.get("/FredericPersonnel/photos"));
+		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.HIGH);
+		assertThat(group.getGroupPolicy()).isEqualTo(GroupPolicy.DO_NOT_GROUP);
+		assertThat(group).isInstanceOf(DirectoryGroup.class);
+	}
+	
+	@Test
+	void testGroupSub() {
 		
-		DirectoryGroup group2 = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\tmp\\bidon"));
-		assertThat(group2.getPath()).isEqualTo(Paths.get("/FredericPersonnel/tmp"));
-		assertThat(group2.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.MEDIUM);
-		assertThat(group2.getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_SUB_ITEMS);
-		assertThat(group2).isInstanceOf(DirectoryGroupSub.class);
-
-		DirectoryGroup group3 = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\tmp\\low\\insideMedium\\bidon"));
-		assertThat(group3.getPath()).isEqualTo(Paths.get("/FredericPersonnel/tmp/low/insideMedium"));
-		assertThat(group3.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.LOW);
-		assertThat(group3.getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_ALL);
-		assertThat(group3).isInstanceOf(DirectoryGroupAll.class);
-
-		DirectoryGroup group4 = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\default"));
-		assertThat(group4.getPath()).isEqualTo(Paths.get("/"));
-		assertThat(group4.getPermanenceLevel()).isEqualTo(DirectoryGroupMap.DEFAULT_PERMANENCE_LEVEL);
-		assertThat(group4.getGroupPolicy()).isEqualTo(DirectoryGroupMap.DEFAULT_GROUP_POLICY);		
+		DirectoryGroupMap directoryGroupmMap = new DirectoryGroupMap(JSON_CONF);
+		
+		DirectoryGroup group = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\tmp\\bidon"));
+		assertThat(group.getPath()).isEqualTo(Paths.get("/FredericPersonnel/tmp"));
+		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.MEDIUM);
+		assertThat(group.getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_SUB_ITEMS);
+		assertThat(group).isInstanceOf(DirectoryGroupSub.class);
 	}
 
+	@Test
+	void testGroupAll() {
+		
+		DirectoryGroupMap directoryGroupmMap = new DirectoryGroupMap(JSON_CONF);
+		
+		DirectoryGroup group = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\tmp\\low\\insideMedium\\bidon"));
+		assertThat(group.getPath()).isEqualTo(Paths.get("/FredericPersonnel/tmp/low/insideMedium"));
+		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.LOW);
+		assertThat(group.getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_ALL);
+		assertThat(group).isInstanceOf(DirectoryGroupAll.class);
+
+	}
+	
+	@Test
+	void testGroupDefault() {
+		
+		DirectoryGroupMap directoryGroupmMap = new DirectoryGroupMap(JSON_CONF);
+		
+		DirectoryGroup group = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\default"));
+		assertThat(group.getPath()).isEqualTo(Paths.get("/"));
+		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryGroupMap.DEFAULT_PERMANENCE_LEVEL);
+		assertThat(group.getGroupPolicy()).isEqualTo(DirectoryGroupMap.DEFAULT_GROUP_POLICY);	
+	}
+	
+	@Test
+	void testGroupRoot() {
+		
+		DirectoryGroupMap directoryGroupmMap = new DirectoryGroupMap(JSON_CONF);
+		
+		DirectoryGroup group = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\photos"));
+		assertThat(group.getPath()).isEqualTo(Paths.get("/FredericPersonnel/photos"));
+		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.HIGH);
+		assertThat(group.getGroupPolicy()).isEqualTo(GroupPolicy.DO_NOT_GROUP);
+		assertThat(group).isInstanceOf(DirectoryGroup.class);
+	}
 }

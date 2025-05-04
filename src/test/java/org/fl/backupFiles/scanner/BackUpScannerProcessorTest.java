@@ -39,13 +39,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.fl.backupFiles.AbstractBackUpItem;
 import org.fl.backupFiles.BackUpCounters;
+import org.fl.backupFiles.BackUpItemGroup;
 import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.BackupAction;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.TestUtils;
+import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
+import org.fl.backupFiles.directoryGroup.GroupPolicy;
 import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -129,7 +133,14 @@ class BackUpScannerProcessorTest {
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
 			assertThat(backUpItemList)
 				.isNotNull()
-				.hasSize(2);
+				.singleElement()
+				.isInstanceOf(BackUpItemGroup.class)
+				.asInstanceOf(InstanceOfAssertFactories.type(BackUpItemGroup.class))
+				.satisfies(backUpItemGroup -> {
+					assertThat(backUpItemGroup.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.MEDIUM);
+					assertThat(backUpItemGroup.getDirectoryGroup().getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_ALL);
+					assertThat(backUpItemGroup.getBackUpItemNumber()).isEqualTo(2);
+				});
 
 			// Execute backup
 			backUpCounters.reset() ;

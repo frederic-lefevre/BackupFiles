@@ -26,6 +26,8 @@ package org.fl.backupFiles.directoryGroup.core;
 
 import java.nio.file.Path;
 
+import org.fl.backupFiles.BackUpItem;
+import org.fl.backupFiles.BackUpItemGroup;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 import org.fl.backupFiles.directoryGroup.GroupPolicy;
 
@@ -41,6 +43,15 @@ public class DirectoryGroup {
 		this.groupPolicy = groupPolicy;
 	}
 
+	// Implemented by subclasses that memorize BackUpItem
+	public BackUpItemGroup addBackUpItem(BackUpItem item) {
+		if (item == null) {
+			throw new IllegalStateException("DirectoryGroup.addBackUpItem should not be called. Trying to add a null BackUpItem");
+		} else {
+			throw new IllegalStateException("DirectoryGroup.addBackUpItem should not be called. Trying to add a BackUpItem");
+		}
+	}
+	
 	public Path getPath() {
 		return path;
 	}
@@ -51,5 +62,9 @@ public class DirectoryGroup {
 
 	public GroupPolicy getGroupPolicy() {
 		return groupPolicy;
+	}
+	
+	public void clear() {
+		// Nothing to clear
 	}
 }

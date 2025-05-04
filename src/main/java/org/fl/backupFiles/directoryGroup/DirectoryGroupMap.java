@@ -104,4 +104,8 @@ public class DirectoryGroupMap {
 	private boolean intersectWith(Path nativePath, Path stdPath) {
 		return nativePath.toString().contains(stdPath.toString()) ;
 	}
+	
+	public void clearBackUpItemsInDirectoryGroup() {
+		directoryGroupMap.values().forEach(DirectoryGroup::clear);
+	}
 }
