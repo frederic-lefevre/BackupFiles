@@ -134,7 +134,6 @@ class BackUpScannerProcessorTest {
 			assertThat(backUpItemList)
 				.isNotNull()
 				.singleElement()
-				.isInstanceOf(BackUpItemGroup.class)
 				.asInstanceOf(InstanceOfAssertFactories.type(BackUpItemGroup.class))
 				.satisfies(backUpItemGroup -> {
 					assertThat(backUpItemGroup.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.MEDIUM);
