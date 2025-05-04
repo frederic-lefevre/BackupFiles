@@ -72,11 +72,16 @@ public class BackUpItemGroup extends AbstractBackUpItem {
 	@Override
 	public boolean execute(BackUpCounters backUpCounters) {
 		
-		boolean result = true;
+		boolean success = true;
 		for (BackUpItem backUpItem : backUpItems) {
-			result &= backUpItem.execute(backUpCounters);
+			success &= backUpItem.execute(backUpCounters);
 		}
-		return result;
+		if (success) {
+			backupStatus = BackupStatus.DONE;
+		} else {
+			backupStatus = BackupStatus.FAILED;
+		}
+		return success;
 	}
 
 	@Override
