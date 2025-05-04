@@ -32,6 +32,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.directoryGroup.DirectoryGroup;
+import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
+import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.Test;
 
@@ -114,7 +117,6 @@ class BackUpTaskTest {
 		assertThat(backUpTask).isNotEqualTo(backUpTask2);
 	}
 	
-	
 	@Test
 	void test7() throws IOException {
 		
@@ -145,5 +147,23 @@ class BackUpTaskTest {
 		
 		FileStore fileStore = backUpTask.getTargetFileStore();
 		assertThat(fileStore).isNotNull().isEqualTo(Files.getFileStore(src)).isEqualTo(FilesUtils.findFileStore(tgt, logger));
+	}
+	
+	@Test
+	void testDirectoryGroupMap() throws IOException {
+		
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
+
+		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+
+		BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
+		
+		DirectoryGroupMap directoryGroupmMap = backUpTask.getDirectoryGroupMap();
+		assertThat(directoryGroupmMap).isNotNull();
+		DirectoryGroup directoryGroup = directoryGroupmMap.getDirectoryGroup(src);
+		assertThat(directoryGroup).isNotNull();
+		assertThat(directoryGroup.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.MEDIUM);
 	}
 }
