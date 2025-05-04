@@ -27,16 +27,22 @@ package org.fl.backupFiles;
 import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 import org.fl.backupFiles.scanner.PathPairBasicAttributes;
+import org.fl.util.file.FileComparator;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class BackUpItemGroupTest {
 
+	private static Logger log = Logger.getLogger(BackUpItemGroupTest.class.getName());
+	
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles.properties";
 	
 	private static final String EXISTANT_FOLDER = "file:///ForTests/BackUpFiles/TestDir1/";
@@ -105,12 +111,36 @@ class BackUpItemGroupTest {
 		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
 		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask);
 		
-		BackUpItemGroup backUpItemGroupReturned =backUpItemGroup.addBackUpItem(backUpItem);
+		BackUpItemGroup backUpItemGroupReturned = backUpItemGroup.addBackUpItem(backUpItem);
 		
 		assertThat(backUpItemGroupReturned).isEqualTo(backUpItemGroup);
 		assertThat(backUpItemGroup.getBackUpItemNumber()).isEqualTo(1);
 		assertThat(backUpItemGroup.getBackUpItems()).isNotNull().singleElement().isEqualTo(backUpItem);
 		assertThat(backUpItemGroup.getSizeDifference()).isEqualTo(backUpItem.getSizeDifference());		
+	}
+	
+	@Test
+	void testExecuteBackUpItemGroup() {
+		
+		BackUpItemGroup backUpItemGroup =
+				new BackUpItemGroup(EXISTANT_FOLDER_PATH, UNEXISTANT_FOLDER_PATH, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, backUpTask);
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
+		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask);
+		
+		backUpItemGroup.addBackUpItem(backUpItem);
+		counters.reset();
+		boolean result = backUpItemGroup.execute(counters);
+
+		assertThat(result).isTrue();
+		assertThat(backUpItem.getBackupStatus()).isEqualTo(BackupStatus.DONE);
+		assertThat(backUpItemGroup.getBackupStatus()).isEqualTo(BackupStatus.DONE);
+		
+		FileComparator fileComparator = new FileComparator(log);
+
+		assertThat(fileComparator.haveSameContent(EXISTANT_SOURCE, UNEXISTANT_TARGET)).isTrue();
 	}
 	
 	@Test
@@ -154,5 +184,12 @@ class BackUpItemGroupTest {
 		
 		assertThatIllegalArgumentException().isThrownBy(() -> backUpItemGroup.addBackUpItem(backUpItem)).withMessageContaining("permanance level");		
 	}
+	
+	@AfterEach
+	void clean() throws IOException {
 
+		if (Files.exists(UNEXISTANT_TARGET)) {
+			Files.delete(UNEXISTANT_TARGET);
+		}
+	}
 }

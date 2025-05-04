@@ -103,7 +103,9 @@ public class BackUpItemTest {
 		assertThat(getTotalCounters(counters)).isEqualTo(1);
 
 		counters.reset();
-		backUpItem.execute(counters);
+		boolean result1 = backUpItem.execute(counters);
+		assertThat(result1).isTrue();
+		assertThat(backUpItem.getBackupStatus()).isEqualTo(BackupStatus.DONE);
 
 		FileComparator fileComparator = new FileComparator(log);
 
@@ -124,7 +126,9 @@ public class BackUpItemTest {
 		assertThat(getTotalCounters(counters)).isEqualTo(1);
 
 		counters.reset();
-		backUpItem.execute(counters);
+		boolean result2 = backUpItem.execute(counters);
+		assertThat(result2).isTrue();
+		assertThat(backUpItem.getBackupStatus()).isEqualTo(BackupStatus.DONE);
 
 		assertThat(Files.exists(UNEXISTANT_TARGET)).isFalse();
 		assertThat(counters.nbSourceFilesProcessed).isZero();
@@ -266,7 +270,8 @@ public class BackUpItemTest {
 		assertThat(counters.copyTargetNb).isEqualTo(1);
 
 		counters.reset();
-		backUpItem.execute(counters);
+		boolean result = backUpItem.execute(counters);
+		assertThat(result).isTrue();
 
 		assertThat(counters.copyTargetNb).isEqualTo(1);
 		assertThat(getTotalCounters(counters)).isEqualTo(2);
@@ -326,7 +331,8 @@ public class BackUpItemTest {
 		assertThat(counters.adjustTimeNb).isEqualTo(1);
 
 		counters.reset();
-		backUpItem.execute(counters);
+		boolean result = backUpItem.execute(counters);
+		assertThat(result).isTrue();
 
 		// Check with Files.getLastModifiedTime
 		assertThat(Files.getLastModifiedTime(TARGET_FILE)
