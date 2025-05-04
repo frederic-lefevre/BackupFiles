@@ -25,13 +25,11 @@ SOFTWARE.
 package org.fl.backupFiles;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class BackUpItemGroup extends AbstractBackUpItem {
 
-	private final List<BackUpItem> backUpItems;
+	private final BackUpItemList backUpItems;
 	private boolean isAboveFileSizeLimitThreshold;
 	
 	public BackUpItemGroup(Path sourcePath, Path targetPath, BackupAction backupAction, BackupStatus backupStatus, BackUpTask backUpTask) {
@@ -40,11 +38,11 @@ public class BackUpItemGroup extends AbstractBackUpItem {
 		this.sizeDifference = 0;
 		this.backUpItemNumber = 0;
 
-		this.backUpItems = new ArrayList<>();
+		this.backUpItems = BackUpItemList.build();
 		isAboveFileSizeLimitThreshold = false;
 	}
 	
-	public List<BackUpItem> getBackUpItems() {
+	public BackUpItemList getBackUpItems() {
 		return backUpItems;
 	}
 
@@ -73,7 +71,7 @@ public class BackUpItemGroup extends AbstractBackUpItem {
 	public boolean execute(BackUpCounters backUpCounters) {
 		
 		boolean success = true;
-		for (BackUpItem backUpItem : backUpItems) {
+		for (AbstractBackUpItem backUpItem : backUpItems) {
 			success &= backUpItem.execute(backUpCounters);
 		}
 		if (success) {
