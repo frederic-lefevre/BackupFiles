@@ -26,16 +26,33 @@ package org.fl.backupFiles;
 
 import java.util.LinkedList;
 
+import org.fl.backupFiles.directoryGroup.GroupPolicy;
+
 public class BackUpItemList extends LinkedList<AbstractBackUpItem> {
 
 	private static final long serialVersionUID = 1L;
 	
-	public BackUpItemList() {
+	private BackUpItemList() {
 		super();
+	}
+	
+	public static BackUpItemList build() {
+		return new BackUpItemList();
+	}
+	
+	@Override
+	public boolean add(AbstractBackUpItem item) {
+		
+//		GroupPolicy groupPolicy = item.getDirectoryGroup().getGroupPolicy();
+//		switch (groupPolicy) {
+//		case DO_NOT_GROUP -> super.add(item);
+//		}
+		
+		return super.add(item);
 	}
 	
 	public void removeItemsDone() {
 		removeIf(i -> i.getBackupStatus().equals(BackupStatus.DONE));
 	}
-	
+
 }

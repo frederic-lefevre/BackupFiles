@@ -113,7 +113,7 @@ public class BackUpScannerThread {
 
 		filesVisitFailed = new ArrayList<Path>();
 
-		backUpItemList = new BackUpItemList();
+		backUpItemList = BackUpItemList.build();
 		
 		try {
 			PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(sourcePath, targetPath);

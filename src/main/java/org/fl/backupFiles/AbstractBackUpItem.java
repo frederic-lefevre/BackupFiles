@@ -27,8 +27,8 @@ package org.fl.backupFiles;
 import java.nio.file.FileStore;
 import java.nio.file.Path;
 
-import org.fl.backupFiles.directoryGroup.DirectoryGroup;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
+import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
 
 public abstract class AbstractBackUpItem {
 	

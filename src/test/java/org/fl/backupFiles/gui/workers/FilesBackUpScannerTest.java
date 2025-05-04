@@ -102,7 +102,7 @@ class FilesBackUpScannerTest {
 
 			BackUpJobInfoTableModel bujitm = new BackUpJobInfoTableModel();
 			ProgressInformationPanel pip = new ProgressInformationPanel();
-			BackUpItemList backUpItems = new BackUpItemList();
+			BackUpItemList backUpItems = BackUpItemList.build();
 			BackUpTableModel btm = new BackUpTableModel(backUpItems);
 			UiControl uicS2B = new UiControl(JobTaskType.SOURCE_TO_BUFFER, btm, pip, bujitm);
 			UiControl uicB2T = new UiControl(JobTaskType.BUFFER_TO_TARGET, btm, pip, bujitm);

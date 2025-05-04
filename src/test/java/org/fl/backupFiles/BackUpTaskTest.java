@@ -32,9 +32,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Logger;
 
-import org.fl.backupFiles.directoryGroup.DirectoryGroup;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
+import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
 import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.Test;
 

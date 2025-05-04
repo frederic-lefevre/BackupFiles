@@ -58,7 +58,7 @@ public class BackUpPane extends JPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createLineBorder(Color.BLACK,5,true));
 		
-		BackUpItemList backUpItemList = new BackUpItemList();
+		BackUpItemList backUpItemList = BackUpItemList.build();
 		BackUpTableModel backUpTableModel = new BackUpTableModel(backUpItemList);
 		
 		BackUpJTable backUpItemTable = new BackUpJTable(backUpTableModel);

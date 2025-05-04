@@ -32,6 +32,9 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
+import org.fl.backupFiles.directoryGroup.core.DirectoryGroupBuilder;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,7 +58,7 @@ public class DirectoryGroupMap {
 
 	public DirectoryGroupMap(String jsonConfig) {
 		super();
-		defaultDirectoryGroup = new DirectoryGroup(Path.of("/"), DEFAULT_PERMANENCE_LEVEL, DEFAULT_GROUP_POLICY);
+		defaultDirectoryGroup = DirectoryGroupBuilder.build(Path.of("/"), DEFAULT_PERMANENCE_LEVEL, DEFAULT_GROUP_POLICY);
 		directoryGroupMap = new TreeMap<Path, DirectoryGroup>(new DeeperPathComparator());
 
 		if ((jsonConfig != null) && !jsonConfig.isEmpty()) {
@@ -69,7 +72,7 @@ public class DirectoryGroupMap {
 						Path sPath = Paths.get(jPathPermanence.get(PATH).asText());
 						DirectoryPermanenceLevel permanenceLevel = DirectoryPermanenceLevel.valueOf(jPathPermanence.get(PERMANENCE).asText());
 						GroupPolicy groupPolicy = GroupPolicy.valueOf(jPathPermanence.get(GROUP_POLICY).asText());
-						directoryGroupMap.put(sPath, new DirectoryGroup(sPath, permanenceLevel, groupPolicy));
+						directoryGroupMap.put(sPath, DirectoryGroupBuilder.build(sPath, permanenceLevel, groupPolicy));
 					}
 				} else {
 					bLog.severe("Json null or not an array:\n" + jsonConfig);

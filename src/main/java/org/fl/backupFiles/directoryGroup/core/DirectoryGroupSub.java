@@ -22,31 +22,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package org.fl.backupFiles.directoryGroup;
+package org.fl.backupFiles.directoryGroup.core;
 
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
-public class DirectoryGroup {
+import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
+import org.fl.backupFiles.directoryGroup.GroupPolicy;
 
-	private final Path path;
-	private final DirectoryPermanenceLevel permanenceLevel;
-	private final GroupPolicy groupPolicy;
+public class DirectoryGroupSub extends DirectoryGroup {
+
+	private final Map<Path, DirectoryGroupAll> subDirectoryGroupMap;
 	
-	protected DirectoryGroup(Path path, DirectoryPermanenceLevel permanenceLevel, GroupPolicy groupPolicy) {
-		this.path = path;
-		this.permanenceLevel = permanenceLevel;
-		this.groupPolicy = groupPolicy;
+	protected DirectoryGroupSub(Path path, DirectoryPermanenceLevel permanenceLevel, GroupPolicy groupPolicy) {
+		super(path, permanenceLevel, groupPolicy);
+		subDirectoryGroupMap = new HashMap<>();
 	}
 
-	public Path getPath() {
-		return path;
-	}
-
-	public DirectoryPermanenceLevel getPermanenceLevel() {
-		return permanenceLevel;
-	}
-
-	public GroupPolicy getGroupPolicy() {
-		return groupPolicy;
-	}
 }
