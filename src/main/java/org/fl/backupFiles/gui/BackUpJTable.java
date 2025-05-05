@@ -52,6 +52,7 @@ public class BackUpJTable extends JTable {
 		getColumnModel().getColumn(BackUpTableModel.SIZE_DIFF_COL_IDX).setCellRenderer(new BackUpSizeDifferenceCellRenderer());
 		getColumnModel().getColumn(BackUpTableModel.PERMANENCE_COL_IDX).setCellRenderer(new PermanenceCellRenderer());
 		getColumnModel().getColumn(BackUpTableModel.SOURCE_PATH_COL_IDX).setPreferredWidth(805);
+		getColumnModel().getColumn(BackUpTableModel.GROUP_COL_IDX).setPreferredWidth(70);
 		getColumnModel().getColumn(BackUpTableModel.SIZE_DIFF_COL_IDX).setPreferredWidth(70);
 		getColumnModel().getColumn(BackUpTableModel.PERMANENCE_COL_IDX).setPreferredWidth(85);
 		getColumnModel().getColumn(BackUpTableModel.ACTION_COL_IDX).setPreferredWidth(120);

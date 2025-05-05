@@ -32,15 +32,16 @@ import org.fl.backupFiles.BackUpItemList;
 public class BackUpTableModel extends AbstractTableModel {
 
 	public static final int SOURCE_PATH_COL_IDX = 0;
-	public static final int SIZE_DIFF_COL_IDX = 1;
-	public static final int PERMANENCE_COL_IDX = 2;
-	public static final int ACTION_COL_IDX = 3;
-	public static final int STATUS_COL_IDX = 4;
-	public static final int TARGET_PATH_COL_IDX = 5;
+	public static final int GROUP_COL_IDX = 1;
+	public static final int SIZE_DIFF_COL_IDX = 2;
+	public static final int PERMANENCE_COL_IDX = 3;
+	public static final int ACTION_COL_IDX = 4;
+	public static final int STATUS_COL_IDX = 5;
+	public static final int TARGET_PATH_COL_IDX = 6;
 	
 	private static final long serialVersionUID = 1L;
 	
-	private final static String[] entetes = {"Chemin origine", "Taille", "Permanence", "Action", "Etat", "Chemin destination"};
+	private final static String[] entetes = {"Chemin origine", "Groupé", "Taille", "Permanence", "Action", "Etat", "Chemin destination"};
 	
 	// Underlying data
 	private BackUpItemList backUpItems;
@@ -91,6 +92,7 @@ public class BackUpTableModel extends AbstractTableModel {
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		return switch(columnIndex){
         	case SOURCE_PATH_COL_IDX -> backUpItems.get(rowIndex).getSourcePath();
+        	case GROUP_COL_IDX -> backUpItems.get(rowIndex).getBackUpItemNumber();
         	case SIZE_DIFF_COL_IDX -> backUpItems.get(rowIndex);
         	case PERMANENCE_COL_IDX -> backUpItems.get(rowIndex).getPermanenceLevel();
         	case ACTION_COL_IDX -> backUpItems.get(rowIndex).getBackupAction();
