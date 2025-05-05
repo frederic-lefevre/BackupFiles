@@ -77,8 +77,8 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 		if (desktop.isSupported(Desktop.Action.PRINT)) {
 			ActionListener printSourceListener = new BackUpItemActionListener(bkt, Desktop.Action.PRINT, FileElement.Source);
 			ActionListener printCibleListener  = new BackUpItemActionListener(bkt, Desktop.Action.PRINT, FileElement.Cible);
-			sourceMenuItems.add(addMenuItem("Print source", printSourceListener)) ;
-			targetMenuItems.add(addMenuItem("Print cible",  printCibleListener)) ;
+			sourceMenuItems.add(addMenuItem("Imprimer la source", printSourceListener)) ;
+			targetMenuItems.add(addMenuItem("Imprimer la cible",  printCibleListener)) ;
 		}
 
 		for (OsAction osAction : osActions) {
