@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,92 +41,91 @@ import org.fl.backupFiles.gui.BackUpItemCustomActionListener.CustomAction;
 
 public class BackupItemMouseAdapter extends MouseAdapter {
 
-	private JPopupMenu   localJPopupMenu ;
-	private BackUpJTable backUpJTable ;
-	
+	private JPopupMenu localJPopupMenu;
+	private BackUpJTable backUpJTable;
+
 	// Menu items
-	private List<JMenuItem> sourceMenuItems ;
-	private List<JMenuItem> targetMenuItems ;
-	private List<JMenuItem> bothMenuItems ;
-	private List<JMenuItem> anyMenuItems ;
+	private List<JMenuItem> sourceMenuItems;
+	private List<JMenuItem> targetMenuItems;
+	private List<JMenuItem> bothMenuItems;
+	private List<JMenuItem> anyMenuItems;
 	
 	public BackupItemMouseAdapter(BackUpJTable bkt, List<OsAction> osActions) {
-		super() ;
-		backUpJTable 	= bkt ;
+		super();
+		backUpJTable = bkt;
 		localJPopupMenu = new JPopupMenu();
 
-		sourceMenuItems = new ArrayList<JMenuItem>() ;
-		targetMenuItems = new ArrayList<JMenuItem>() ;
-		bothMenuItems   = new ArrayList<JMenuItem>() ;
-		anyMenuItems    = new ArrayList<JMenuItem>() ;
+		sourceMenuItems = new ArrayList<JMenuItem>();
+		targetMenuItems = new ArrayList<JMenuItem>();
+		bothMenuItems = new ArrayList<JMenuItem>();
+		anyMenuItems = new ArrayList<JMenuItem>();
 		
-		// Actions 
-		Desktop desktop = Desktop.getDesktop() ;
+		// Actions
+		Desktop desktop = Desktop.getDesktop();
 		if (desktop.isSupported(Desktop.Action.EDIT)) {
-			ActionListener editSourceListener  = new BackUpItemActionListener(bkt, Desktop.Action.EDIT, FileElement.Source);
-			ActionListener editCibleListener   = new BackUpItemActionListener(bkt, Desktop.Action.EDIT, FileElement.Cible);
-			sourceMenuItems.add(addMenuItem("Editer la source",  editSourceListener)) ;
-			targetMenuItems.add(addMenuItem("Editer la cible",   editCibleListener)) ;
+			ActionListener editSourceListener = new BackUpItemActionListener(bkt, Desktop.Action.EDIT, FileElement.Source);
+			ActionListener editCibleListener = new BackUpItemActionListener(bkt, Desktop.Action.EDIT, FileElement.Cible);
+			sourceMenuItems.add(addMenuItem("Editer la source", editSourceListener));
+			targetMenuItems.add(addMenuItem("Editer la cible", editCibleListener));
 		}
 		if (desktop.isSupported(Desktop.Action.OPEN)) {
-			ActionListener openSourceListener  = new BackUpItemActionListener(bkt, Desktop.Action.OPEN, FileElement.Source);
-			ActionListener openCibleListener   = new BackUpItemActionListener(bkt, Desktop.Action.OPEN, FileElement.Cible);
-			sourceMenuItems.add(addMenuItem("Ouvrir la source",  openSourceListener)) ;
-			targetMenuItems.add(addMenuItem("Ouvrir la cible",   openCibleListener)) ;
+			ActionListener openSourceListener = new BackUpItemActionListener(bkt, Desktop.Action.OPEN, FileElement.Source);
+			ActionListener openCibleListener = new BackUpItemActionListener(bkt, Desktop.Action.OPEN, FileElement.Cible);
+			sourceMenuItems.add(addMenuItem("Ouvrir la source", openSourceListener));
+			targetMenuItems.add(addMenuItem("Ouvrir la cible", openCibleListener));
 		}
 		if (desktop.isSupported(Desktop.Action.PRINT)) {
 			ActionListener printSourceListener = new BackUpItemActionListener(bkt, Desktop.Action.PRINT, FileElement.Source);
-			ActionListener printCibleListener  = new BackUpItemActionListener(bkt, Desktop.Action.PRINT, FileElement.Cible);
-			sourceMenuItems.add(addMenuItem("Imprimer la source", printSourceListener)) ;
-			targetMenuItems.add(addMenuItem("Imprimer la cible",  printCibleListener)) ;
+			ActionListener printCibleListener = new BackUpItemActionListener(bkt, Desktop.Action.PRINT, FileElement.Cible);
+			sourceMenuItems.add(addMenuItem("Imprimer la source", printSourceListener));
+			targetMenuItems.add(addMenuItem("Imprimer la cible", printCibleListener));
 		}
 
 		for (OsAction osAction : osActions) {
 
 			if (osAction.paramSeparated()) {
-				ActionListener actionSourceListener  = new BackUpItemCommandListener(bkt, osAction.getActionCommand(), FileElement.Source);
-				ActionListener actionCibleListener   = new BackUpItemCommandListener(bkt, osAction.getActionCommand(), FileElement.Cible);
+				ActionListener actionSourceListener = new BackUpItemCommandListener(bkt, osAction.getActionCommand(), FileElement.Source);
+				ActionListener actionCibleListener = new BackUpItemCommandListener(bkt, osAction.getActionCommand(), FileElement.Cible);
 
-				sourceMenuItems.add(addMenuItem(osAction.getActionTitle() + " source",  actionSourceListener));
-				targetMenuItems.add(addMenuItem(osAction.getActionTitle() + " cible",   actionCibleListener));
+				sourceMenuItems.add(addMenuItem(osAction.getActionTitle() + " source", actionSourceListener));
+				targetMenuItems.add(addMenuItem(osAction.getActionTitle() + " cible", actionCibleListener));
 			} else {
-				ActionListener actionBothListener   = new BackUpItemCommandListener(bkt, osAction.getActionCommand(), FileElement.Both);
+				ActionListener actionBothListener = new BackUpItemCommandListener(bkt, osAction.getActionCommand(), FileElement.Both);
 
-				bothMenuItems.add(addMenuItem(osAction.getActionTitle(),  actionBothListener)) ;
+				bothMenuItems.add(addMenuItem(osAction.getActionTitle(), actionBothListener));
 			}
 		}
-		
-		ActionListener infosActionListener = new BackUpItemCustomActionListener(bkt, CustomAction.Compare, FileElement.Both) ;
-		JMenuItem infosMenuItem = addMenuItem("Afficher des informations sur la source et la cible dont le résultat de la comparaison binaire", infosActionListener) ;
-		anyMenuItems.add(infosMenuItem) ;
-		
-		ActionListener srcParentActionListener = new BackUpItemCustomActionListener(bkt, CustomAction.ShowParentDir, FileElement.Source) ;
-		sourceMenuItems.add(addMenuItem("Afficher le dossier parent de la source", srcParentActionListener)) ;
-		ActionListener tgtParentActionListener = new BackUpItemCustomActionListener(bkt, CustomAction.ShowParentDir, FileElement.Cible) ;
-		targetMenuItems.add(addMenuItem("Afficher le dossier parent de la cible", tgtParentActionListener)) ;
 
+		ActionListener infosActionListener = new BackUpItemCustomActionListener(bkt, CustomAction.Compare, FileElement.Both);
+		JMenuItem infosMenuItem = addMenuItem("Afficher des informations sur la source et la cible dont le résultat de la comparaison binaire", infosActionListener);
+		anyMenuItems.add(infosMenuItem);
+
+		ActionListener srcParentActionListener = new BackUpItemCustomActionListener(bkt, CustomAction.ShowParentDir, FileElement.Source);
+		sourceMenuItems.add(addMenuItem("Afficher le dossier parent de la source", srcParentActionListener));
+		ActionListener tgtParentActionListener = new BackUpItemCustomActionListener(bkt, CustomAction.ShowParentDir, FileElement.Cible);
+		targetMenuItems.add(addMenuItem("Afficher le dossier parent de la cible", tgtParentActionListener));
 	}
 
-    public void mousePressed(MouseEvent evt)  {
-      if (evt.isPopupTrigger()) {
-    	  enableMenuItems() ;
-    	  localJPopupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
-      }
-    }
-    
-    public void mouseReleased(MouseEvent evt)  {
-      if (evt.isPopupTrigger()) {
-    	  enableMenuItems() ;
-        localJPopupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
-      }
-    }
-    
+	public void mousePressed(MouseEvent evt) {
+		if (evt.isPopupTrigger()) {
+			enableMenuItems();
+			localJPopupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
+		}
+	}
+
+	public void mouseReleased(MouseEvent evt) {
+		if (evt.isPopupTrigger()) {
+			enableMenuItems();
+			localJPopupMenu.show(evt.getComponent(), evt.getX(), evt.getY());
+		}
+	}
+
 	private JMenuItem addMenuItem(String title, ActionListener act) {
 		JMenuItem localJMenuItem = new JMenuItem(title);
-	     localJMenuItem.addActionListener(act);
-	     localJPopupMenu.add(localJMenuItem);
-	     return localJMenuItem ;
-	}	
+		localJMenuItem.addActionListener(act);
+		localJPopupMenu.add(localJMenuItem);
+		return localJMenuItem;
+	}
 	
 	private void enableMenuItems() {
 		
