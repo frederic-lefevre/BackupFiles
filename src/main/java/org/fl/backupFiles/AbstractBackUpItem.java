@@ -111,4 +111,8 @@ public abstract class AbstractBackUpItem {
 		return backUpTask;
 	}
 
+	public Path getSourceClosestExistingPath() {
+		return sourceClosestExistingPath;
+	}
+
 }

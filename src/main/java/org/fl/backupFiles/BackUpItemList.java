@@ -24,6 +24,7 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
+import java.nio.file.Path;
 import java.util.LinkedList;
 
 import org.fl.backupFiles.directoryGroup.GroupPolicy;
@@ -49,7 +50,19 @@ public class BackUpItemList extends LinkedList<AbstractBackUpItem> {
 			GroupPolicy groupPolicy = directoryGroup.getGroupPolicy();
 			return switch (groupPolicy) {
 				   	case DO_NOT_GROUP -> super.add(backUpItem);
-					case GROUP_SUB_ITEMS -> super.add(backUpItem);
+					case GROUP_SUB_ITEMS -> {
+						if (getBackUpItemPathLength(backUpItem) < directoryGroup.getDirectoryGroupPathNameCount() + 2) {
+							// the item path is directly under the DirectoryGroup path. It does not belong to a subpath
+							super.add(backUpItem);
+						} else {
+							BackUpItemGroup backUpItemGroup = directoryGroup.addBackUpItem(backUpItem);
+							if (backUpItemGroup != null) {
+								// new BackUpItemGroup created, so not yet in the BackUpItemList
+								super.add(backUpItemGroup);
+							}
+						}					
+						yield true;
+						}
 					case GROUP_ALL -> {
 						BackUpItemGroup backUpItemGroup = directoryGroup.addBackUpItem(backUpItem);
 						if (backUpItemGroup != null) {
@@ -67,6 +80,15 @@ public class BackUpItemList extends LinkedList<AbstractBackUpItem> {
 	
 	public void removeItemsDone() {
 		removeIf(i -> i.getBackupStatus().equals(BackupStatus.DONE));
+	}
+	
+	private int getBackUpItemPathLength(BackUpItem item) {
+		
+		Path itemPath = item.getSourcePath();
+		if (itemPath == null) {
+			itemPath = item.getSourceClosestExistingPath();
+		}
+		return itemPath.getNameCount();
 	}
 
 }

@@ -36,7 +36,7 @@ import org.fl.backupFiles.directoryGroup.GroupPolicy;
 
 public class DirectoryGroupSub extends DirectoryGroup {
 
-	private final Map<Path, DirectoryGroupAll> subDirectoryGroupMap;
+	private final Map<Path, DirectoryGroup> subDirectoryGroupMap;
 	
 	protected DirectoryGroupSub(Path path, DirectoryPermanenceLevel permanenceLevel, GroupPolicy groupPolicy) {
 		super(path, permanenceLevel, groupPolicy);
@@ -50,11 +50,38 @@ public class DirectoryGroupSub extends DirectoryGroup {
 	@Override
 	public BackUpItemGroup addBackUpItem(BackUpItem item) {
 		// TODO Auto-generated method stub
-		return null;
+		
+		Path subDirectoryOfItem = getSubDirectoryPath(item);
+		DirectoryGroup directoryGroupOfSubDir = subDirectoryGroupMap.get(subDirectoryOfItem);
+		if (directoryGroupOfSubDir == null) {
+			// no directory group yet. Create one to group all the BackupItems of this sub directory
+			DirectoryGroup directoryGroupAll = DirectoryGroupBuilder.build(subDirectoryOfItem, getPermanenceLevel(), GroupPolicy.GROUP_ALL);
+			subDirectoryGroupMap.put(subDirectoryOfItem, directoryGroupAll);
+			return directoryGroupAll.addBackUpItem(item);
+
+		} else {
+			return directoryGroupOfSubDir.addBackUpItem(item);
+		}
 	}
 	
 	@Override
 	public void clear() {
 		subDirectoryGroupMap.clear();
+	}
+	
+	private Path getSubDirectoryPath(BackUpItem item) {
+		
+		Path itemPath = item.getSourcePath();
+		if (itemPath == null) {
+			itemPath = item.getSourceClosestExistingPath();
+		}
+		
+		if (itemPath.getNameCount() < getDirectoryGroupPathNameCount() + 2) {
+			// the item path is directly under the DirectoryGroup path. It does not belong to a subpath
+			// this case should not happen as it is checked before calling addBackUpItem to avoid creating a group
+			return getPath();
+		} else {
+			return getPath().resolve(itemPath.getName(getDirectoryGroupPathNameCount()));
+		}
 	}
 }

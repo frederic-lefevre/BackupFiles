@@ -36,11 +36,13 @@ public class DirectoryGroup {
 	private final Path path;
 	private final DirectoryPermanenceLevel permanenceLevel;
 	private final GroupPolicy groupPolicy;
+	private final int directoryGroupPathNameCount;
 	
 	protected DirectoryGroup(Path path, DirectoryPermanenceLevel permanenceLevel, GroupPolicy groupPolicy) {
 		this.path = path;
 		this.permanenceLevel = permanenceLevel;
 		this.groupPolicy = groupPolicy;
+		directoryGroupPathNameCount = path.getNameCount();
 	}
 
 	// Implemented by subclasses that memorize BackUpItem
@@ -64,6 +66,10 @@ public class DirectoryGroup {
 		return groupPolicy;
 	}
 	
+	public int getDirectoryGroupPathNameCount() {
+		return directoryGroupPathNameCount;
+	}
+
 	public void clear() {
 		// Nothing to clear
 	}
