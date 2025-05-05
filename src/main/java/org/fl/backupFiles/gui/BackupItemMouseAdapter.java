@@ -30,25 +30,28 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import org.fl.backupFiles.AbstractBackUpItem;
 import org.fl.backupFiles.BackUpItem;
+import org.fl.backupFiles.BackUpItemGroup;
 import org.fl.backupFiles.OsAction;
 import org.fl.backupFiles.gui.BackUpItemCustomActionListener.CustomAction;
 
 public class BackupItemMouseAdapter extends MouseAdapter {
 
-	private JPopupMenu localJPopupMenu;
-	private BackUpJTable backUpJTable;
+	private final JPopupMenu localJPopupMenu;
+	private final BackUpJTable backUpJTable;
 
 	// Menu items
-	private List<JMenuItem> sourceMenuItems;
-	private List<JMenuItem> targetMenuItems;
-	private List<JMenuItem> bothMenuItems;
-	private List<JMenuItem> anyMenuItems;
+	private final List<JMenuItem> sourceMenuItems;
+	private final List<JMenuItem> targetMenuItems;
+	private final List<JMenuItem> bothMenuItems;
+	private final List<JMenuItem> anyMenuItems;
+	private final JMenuItem showBackUpItemsOfGroup;
 	
 	public BackupItemMouseAdapter(BackUpJTable bkt, List<OsAction> osActions) {
 		super();
@@ -59,6 +62,7 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 		targetMenuItems = new ArrayList<JMenuItem>();
 		bothMenuItems = new ArrayList<JMenuItem>();
 		anyMenuItems = new ArrayList<JMenuItem>();
+		showBackUpItemsOfGroup = addMenuItem("Afficher les éléments individuels de ce groupe", null);
 		
 		// Actions
 		Desktop desktop = Desktop.getDesktop();
@@ -135,25 +139,30 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 			
 			if (selectedEntry instanceof BackUpItem backUpItem) {
 		
-				sourceMenuItems
-					.forEach(menuItem -> menuItem.setEnabled(backUpItem.isSourcePresent()));
-	
-				targetMenuItems
-					.forEach(menuItem -> menuItem.setEnabled(backUpItem.isTargetPresent()));
-	
-				bothMenuItems
-					.forEach(menuItem -> menuItem.setEnabled(backUpItem.isSourcePresent() && backUpItem.isTargetPresent()));
-				
-				anyMenuItems
-					.forEach(menuItem -> menuItem.setEnabled(backUpItem.isSourcePresent() || backUpItem.isTargetPresent()));
+				sourceMenuItems.forEach(setVisibleEnabled(true, backUpItem.isSourcePresent()));	
+				targetMenuItems.forEach(setVisibleEnabled(true, backUpItem.isTargetPresent()));	
+				bothMenuItems.forEach(setVisibleEnabled(true, backUpItem.isSourcePresent() && backUpItem.isTargetPresent()));				
+				anyMenuItems.forEach(setVisibleEnabled(true, backUpItem.isSourcePresent() || backUpItem.isTargetPresent()));
 			
-			} else {
-				sourceMenuItems.forEach(menuItem -> menuItem.setEnabled(false));
-				targetMenuItems.forEach(menuItem -> menuItem.setEnabled(false));
-				bothMenuItems.forEach(menuItem -> menuItem.setEnabled(false));		
-				anyMenuItems.forEach(menuItem -> menuItem.setEnabled(false));
+				setVisibleEnabled(false, false).accept(showBackUpItemsOfGroup);
+				
+			} else if (selectedEntry instanceof BackUpItemGroup) {
+				
+				sourceMenuItems.forEach(setVisibleEnabled(false, false));
+				targetMenuItems.forEach(setVisibleEnabled(false, false));
+				bothMenuItems.forEach(setVisibleEnabled(false, false));		
+				anyMenuItems.forEach(setVisibleEnabled(false, false));
+				
+				setVisibleEnabled(true, true).accept(showBackUpItemsOfGroup);				
 			}
 		}
 	}
 	
+	private Consumer<JMenuItem> setVisibleEnabled(boolean visible, boolean enable) {
+		return (menuItem) ->  { 
+			menuItem.setVisible(visible);
+			menuItem.setEnabled(enable);
+		};
+	}
+
 }

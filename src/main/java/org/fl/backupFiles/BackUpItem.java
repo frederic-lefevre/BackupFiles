@@ -177,11 +177,11 @@ public class BackUpItem extends AbstractBackUpItem {
 	}
 
 	public boolean isSourcePresent() {
-		return pathPairBasicAttributes.sourceExists();
+		return (sourcePath != null) && pathPairBasicAttributes.sourceExists();
 	}
 
 	public boolean isTargetPresent() {
-		return pathPairBasicAttributes.targetExists();
+		return (targetPath != null) && pathPairBasicAttributes.targetExists();
 	}
 
 	@Override

@@ -158,6 +158,89 @@ public class BackUpItemTest {
 	}
 	
 	@Test
+	void testSourcePresentTargetNot() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
+		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask);
+		
+		assertThat(backUpItem.isSourcePresent()).isTrue();
+		assertThat(pathPairBasicAttributes.sourceExists()).isTrue();
+		
+		assertThat(backUpItem.isTargetPresent()).isFalse();
+		assertThat(pathPairBasicAttributes.targetExists()).isFalse();
+		assertThat(pathPairBasicAttributes.noTargetPath()).isFalse();
+	}
+	
+	@Test
+	void testSourcePresentTargetNull() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, null);
+		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask);
+		
+		assertThat(backUpItem.isSourcePresent()).isTrue();
+		assertThat(pathPairBasicAttributes.sourceExists()).isTrue();
+		
+		assertThat(backUpItem.isTargetPresent()).isFalse();
+		assertThat(pathPairBasicAttributes.targetExists()).isFalse();
+		assertThat(pathPairBasicAttributes.noTargetPath()).isTrue();
+	}
+	
+	@Test
+	void testTargetPresentSourceNot() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(UNEXISTANT_TARGET, EXISTANT_SOURCE);
+		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(EXISTANT_SOURCE_FOLDER, null);
+		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, pathPairBasicAttributes2, counters, backUpTask);
+		
+		assertThat(backUpItem.isSourcePresent()).isFalse();
+		assertThat(pathPairBasicAttributes.sourceExists()).isFalse();
+		
+		assertThat(backUpItem.isTargetPresent()).isTrue();
+		assertThat(pathPairBasicAttributes.targetExists()).isTrue();
+		assertThat(pathPairBasicAttributes.noTargetPath()).isFalse();
+	}
+	
+	@Test
+	void testTargetPresentSourceNull() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(null, EXISTANT_SOURCE);
+		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(EXISTANT_SOURCE_FOLDER, null);
+		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, pathPairBasicAttributes2, counters, backUpTask);
+		
+		assertThat(backUpItem.isSourcePresent()).isFalse();
+		assertThat(pathPairBasicAttributes.sourceExists()).isFalse();
+		
+		assertThat(backUpItem.isTargetPresent()).isTrue();
+		assertThat(pathPairBasicAttributes.targetExists()).isTrue();
+		assertThat(pathPairBasicAttributes.noTargetPath()).isFalse();
+	}
+	
+	@Test
+	void testTargetAndSourcePresent() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, EXISTANT_SOURCE);
+		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(EXISTANT_SOURCE_FOLDER, null);
+		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, pathPairBasicAttributes2, counters, backUpTask);
+		
+		assertThat(backUpItem.isSourcePresent()).isTrue();
+		assertThat(pathPairBasicAttributes.sourceExists()).isTrue();
+		
+		assertThat(backUpItem.isTargetPresent()).isTrue();
+		assertThat(pathPairBasicAttributes.targetExists()).isTrue();
+		assertThat(pathPairBasicAttributes.noTargetPath()).isFalse();
+	}
+	
+	@Test
 	void nullSrcShouldThrowException() {
 
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(null, UNEXISTANT_TARGET);

@@ -41,21 +41,21 @@ public class PathPairBasicAttributesTest {
 		
 		assertThat(pathPairBasicAttributes).isNotNull();
 		
+		assertThat(pathPairBasicAttributes.noSourcePath()).isTrue();
 		assertThat(pathPairBasicAttributes.noTargetPath()).isTrue();
 		
 		assertThat(pathPairBasicAttributes.getSourcePath()).isNull();
 		assertThat(pathPairBasicAttributes.getTargetPath()).isNull();
 		
-		// All other operation should raise a NPE
-		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.getSourceBasicAttributes());
-		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.getTargetBasicAttributes());
+		assertThat(pathPairBasicAttributes.getSourceBasicAttributes()).isNull();
+		assertThat(pathPairBasicAttributes.getTargetBasicAttributes()).isNull();
+		assertThat(pathPairBasicAttributes.sourceExists()).isFalse();
+		assertThat(pathPairBasicAttributes.sourceIsDirectory()).isFalse();
+		assertThat(pathPairBasicAttributes.targetExists()).isFalse();
+		assertThat(pathPairBasicAttributes.targetIsDirectory()).isFalse();
 		
 		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.getSourceSize());
-		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.sourceExists());
-		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.sourceIsDirectory());
 		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.getTargetSize());
-		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.targetExists());
-		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.targetIsDirectory());
 	}
 	
 	@Test
@@ -66,19 +66,20 @@ public class PathPairBasicAttributesTest {
 		
 		assertThat(pathPairBasicAttributes).isNotNull();
 		assertThat(pathPairBasicAttributes.getSourcePath()).isNull();
+		assertThat(pathPairBasicAttributes.noSourcePath()).isTrue();
 		
 		assertThat(pathPairBasicAttributes.noTargetPath()).isFalse();
 		
 		assertThat(pathPairBasicAttributes.getSourcePath()).isNull();
 		assertThat(pathPairBasicAttributes.getTargetPath()).isEqualTo(targetPath);
 		
-		// All other operation on source should raise a NPE
-		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.getSourceBasicAttributes());
+		assertThat(pathPairBasicAttributes.getSourceBasicAttributes()).isNull();
 		assertThat(pathPairBasicAttributes.getTargetBasicAttributes()).isNotNull();
+		assertThat(pathPairBasicAttributes.sourceExists()).isFalse();
+		assertThat(pathPairBasicAttributes.sourceIsDirectory()).isFalse();
 		
 		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.getSourceSize());
-		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.sourceExists());
-		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.sourceIsDirectory());
+
 		assertThat(pathPairBasicAttributes.getTargetSize()).isPositive();
 		assertThat(pathPairBasicAttributes.targetExists()).isTrue();
 		assertThat(pathPairBasicAttributes.targetIsDirectory()).isTrue();
@@ -99,14 +100,15 @@ public class PathPairBasicAttributesTest {
 		
 		// All other operation on target should raise a NPE
 		assertThat(pathPairBasicAttributes.getSourceBasicAttributes()).isNotNull();
-		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.getTargetBasicAttributes());
+		assertThat(pathPairBasicAttributes.getTargetBasicAttributes()).isNull();
 		
 		assertThat(pathPairBasicAttributes.getSourceSize()).isPositive();
 		assertThat(pathPairBasicAttributes.sourceExists()).isTrue();
 		assertThat(pathPairBasicAttributes.sourceIsDirectory()).isTrue();
+		
+		assertThat(pathPairBasicAttributes.targetExists()).isFalse();
+		assertThat(pathPairBasicAttributes.targetIsDirectory()).isFalse();
 		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.getTargetSize());
-		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.targetExists());
-		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.targetIsDirectory());
 	}
 	
 	@Test
