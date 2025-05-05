@@ -53,34 +53,34 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 	private final List<JMenuItem> anyMenuItems;
 	private final JMenuItem showBackUpItemsOfGroup;
 	
-	public BackupItemMouseAdapter(BackUpJTable bkt, List<OsAction> osActions) {
+	public BackupItemMouseAdapter(BackUpJTable backupItemTablet, List<OsAction> osActions) {
 		super();
-		backUpJTable = bkt;
+		this.backUpJTable = backupItemTablet;
 		localJPopupMenu = new JPopupMenu();
 
 		sourceMenuItems = new ArrayList<JMenuItem>();
 		targetMenuItems = new ArrayList<JMenuItem>();
 		bothMenuItems = new ArrayList<JMenuItem>();
 		anyMenuItems = new ArrayList<JMenuItem>();
-		showBackUpItemsOfGroup = addMenuItem("Afficher les éléments individuels de ce groupe", null);
+		showBackUpItemsOfGroup = addMenuItem("Afficher les éléments individuels de ce groupe", new BackUpItemGroupActionListener(backupItemTablet));
 		
 		// Actions
 		Desktop desktop = Desktop.getDesktop();
 		if (desktop.isSupported(Desktop.Action.EDIT)) {
-			ActionListener editSourceListener = new BackUpItemActionListener(bkt, Desktop.Action.EDIT, FileElement.Source);
-			ActionListener editCibleListener = new BackUpItemActionListener(bkt, Desktop.Action.EDIT, FileElement.Cible);
+			ActionListener editSourceListener = new BackUpItemActionListener(backupItemTablet, Desktop.Action.EDIT, FileElement.Source);
+			ActionListener editCibleListener = new BackUpItemActionListener(backupItemTablet, Desktop.Action.EDIT, FileElement.Cible);
 			sourceMenuItems.add(addMenuItem("Editer la source", editSourceListener));
 			targetMenuItems.add(addMenuItem("Editer la cible", editCibleListener));
 		}
 		if (desktop.isSupported(Desktop.Action.OPEN)) {
-			ActionListener openSourceListener = new BackUpItemActionListener(bkt, Desktop.Action.OPEN, FileElement.Source);
-			ActionListener openCibleListener = new BackUpItemActionListener(bkt, Desktop.Action.OPEN, FileElement.Cible);
+			ActionListener openSourceListener = new BackUpItemActionListener(backupItemTablet, Desktop.Action.OPEN, FileElement.Source);
+			ActionListener openCibleListener = new BackUpItemActionListener(backupItemTablet, Desktop.Action.OPEN, FileElement.Cible);
 			sourceMenuItems.add(addMenuItem("Ouvrir la source", openSourceListener));
 			targetMenuItems.add(addMenuItem("Ouvrir la cible", openCibleListener));
 		}
 		if (desktop.isSupported(Desktop.Action.PRINT)) {
-			ActionListener printSourceListener = new BackUpItemActionListener(bkt, Desktop.Action.PRINT, FileElement.Source);
-			ActionListener printCibleListener = new BackUpItemActionListener(bkt, Desktop.Action.PRINT, FileElement.Cible);
+			ActionListener printSourceListener = new BackUpItemActionListener(backupItemTablet, Desktop.Action.PRINT, FileElement.Source);
+			ActionListener printCibleListener = new BackUpItemActionListener(backupItemTablet, Desktop.Action.PRINT, FileElement.Cible);
 			sourceMenuItems.add(addMenuItem("Imprimer la source", printSourceListener));
 			targetMenuItems.add(addMenuItem("Imprimer la cible", printCibleListener));
 		}
@@ -88,25 +88,25 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 		for (OsAction osAction : osActions) {
 
 			if (osAction.paramSeparated()) {
-				ActionListener actionSourceListener = new BackUpItemCommandListener(bkt, osAction.getActionCommand(), FileElement.Source);
-				ActionListener actionCibleListener = new BackUpItemCommandListener(bkt, osAction.getActionCommand(), FileElement.Cible);
+				ActionListener actionSourceListener = new BackUpItemCommandListener(backupItemTablet, osAction.getActionCommand(), FileElement.Source);
+				ActionListener actionCibleListener = new BackUpItemCommandListener(backupItemTablet, osAction.getActionCommand(), FileElement.Cible);
 
 				sourceMenuItems.add(addMenuItem(osAction.getActionTitle() + " source", actionSourceListener));
 				targetMenuItems.add(addMenuItem(osAction.getActionTitle() + " cible", actionCibleListener));
 			} else {
-				ActionListener actionBothListener = new BackUpItemCommandListener(bkt, osAction.getActionCommand(), FileElement.Both);
+				ActionListener actionBothListener = new BackUpItemCommandListener(backupItemTablet, osAction.getActionCommand(), FileElement.Both);
 
 				bothMenuItems.add(addMenuItem(osAction.getActionTitle(), actionBothListener));
 			}
 		}
 
-		ActionListener infosActionListener = new BackUpItemCustomActionListener(bkt, CustomAction.Compare, FileElement.Both);
+		ActionListener infosActionListener = new BackUpItemCustomActionListener(backupItemTablet, CustomAction.Compare, FileElement.Both);
 		JMenuItem infosMenuItem = addMenuItem("Afficher des informations sur la source et la cible dont le résultat de la comparaison binaire", infosActionListener);
 		anyMenuItems.add(infosMenuItem);
 
-		ActionListener srcParentActionListener = new BackUpItemCustomActionListener(bkt, CustomAction.ShowParentDir, FileElement.Source);
+		ActionListener srcParentActionListener = new BackUpItemCustomActionListener(backupItemTablet, CustomAction.ShowParentDir, FileElement.Source);
 		sourceMenuItems.add(addMenuItem("Afficher le dossier parent de la source", srcParentActionListener));
-		ActionListener tgtParentActionListener = new BackUpItemCustomActionListener(bkt, CustomAction.ShowParentDir, FileElement.Cible);
+		ActionListener tgtParentActionListener = new BackUpItemCustomActionListener(backupItemTablet, CustomAction.ShowParentDir, FileElement.Cible);
 		targetMenuItems.add(addMenuItem("Afficher le dossier parent de la cible", tgtParentActionListener));
 	}
 
