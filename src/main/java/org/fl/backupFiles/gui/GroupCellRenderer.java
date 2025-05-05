@@ -26,48 +26,42 @@ package org.fl.backupFiles.gui;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.text.NumberFormat;
-import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.swing.SwingConstants;
 
-import org.fl.backupFiles.AbstractBackUpItem;
+import org.fl.backupFiles.BackUpItem;
+import org.fl.backupFiles.BackUpItemGroup;
 import org.fl.util.swing.CustomTableCellRenderer;
 
-public class BackUpSizeDifferenceCellRenderer extends CustomTableCellRenderer {
+public class GroupCellRenderer extends CustomTableCellRenderer  {
 
-	private static final Logger logger = Logger.getLogger(BackUpSizeDifferenceCellRenderer.class.getName());
+	private static final long serialVersionUID = 1L;
+
+	private static final Logger logger = Logger.getLogger(GroupCellRenderer.class.getName());
 	
-	private static final Locale localeForFormat = Locale.FRANCE;
-	private static final NumberFormat numberFormat = NumberFormat.getInstance(localeForFormat);
 	private static final Font font = new Font("Dialog", Font.PLAIN, 12);
 	
-	private static final long serialVersionUID = 1L;
-	private static final Color ABOVE_LIMIT_COLOR = new Color(255, 100, 100);
-	private static final Color BELOW_LIMIT_COLOR = Color.WHITE;
-
-	public BackUpSizeDifferenceCellRenderer() {
-		super(font, SwingConstants.CENTER);
+	public GroupCellRenderer() {
+		super(font, SwingConstants.RIGHT);
 	}
+
+	private static final Color BACKUP_ITEM_GROUP_COLOR = new Color(180, 220, 255);
+	private static final Color BACKUP_ITEM_COLOR = Color.WHITE;
 
 	@Override
 	public void valueProcessor(Object value) {
 		
-		if (AbstractBackUpItem.class.isAssignableFrom(value.getClass())) {
-			
-			AbstractBackUpItem backUpItem = (AbstractBackUpItem)value;
-			long sizeDifference = backUpItem.getSizeDifference();			
-			setValue(Long.toString(sizeDifference));
-			setToolTipText(numberFormat.format(sizeDifference));
-
-			if (backUpItem.isAboveFileSizeLimitThreshold()) {
-				setBackground(ABOVE_LIMIT_COLOR);
-			} else {
-				setBackground(BELOW_LIMIT_COLOR);
-			}
+		if (value instanceof BackUpItem backUpItem) {
+			setValue(backUpItem.getBackUpItemNumber()); // should always be 1
+			setBackground(BACKUP_ITEM_COLOR);
+		} else if (value instanceof BackUpItemGroup backUpItemGroup) {
+			setValue(backUpItemGroup.getBackUpItemNumber()); // may be 1 if there is a single element in the group
+			setBackground(BACKUP_ITEM_GROUP_COLOR);
 		} else {
-			logger.severe("Invalid value type in Size Difference cell. Should be a AbstractBackUpItem subclass but is " + value.getClass().getName());
-		}		
+			logger.severe("Invalid value type in Groupé cell. Should be a AbstractBackUpItem subclass but is " + value.getClass().getName());
+		}
+		
 	}
+
 }
