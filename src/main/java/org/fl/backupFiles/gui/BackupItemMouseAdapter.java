@@ -132,19 +132,28 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 		
 		AbstractBackUpItem selectedEntry = backUpJTable.getSelectedBackUpItem() ;
 		
-		if ((selectedEntry != null)  && (selectedEntry instanceof BackUpItem backUpItem)) {
-	
-			sourceMenuItems
-				.forEach(menuItem -> menuItem.setEnabled(backUpItem.isSourcePresent()));
-
-			targetMenuItems
-				.forEach(menuItem -> menuItem.setEnabled(backUpItem.isTargetPresent()));
-
-			bothMenuItems
-				.forEach(menuItem -> menuItem.setEnabled(backUpItem.isSourcePresent() && backUpItem.isTargetPresent()));
+		if (selectedEntry != null)  {
 			
-			anyMenuItems
-				.forEach(menuItem -> menuItem.setEnabled(backUpItem.isSourcePresent() || backUpItem.isTargetPresent()));
+			if (selectedEntry instanceof BackUpItem backUpItem) {
+		
+				sourceMenuItems
+					.forEach(menuItem -> menuItem.setEnabled(backUpItem.isSourcePresent()));
+	
+				targetMenuItems
+					.forEach(menuItem -> menuItem.setEnabled(backUpItem.isTargetPresent()));
+	
+				bothMenuItems
+					.forEach(menuItem -> menuItem.setEnabled(backUpItem.isSourcePresent() && backUpItem.isTargetPresent()));
+				
+				anyMenuItems
+					.forEach(menuItem -> menuItem.setEnabled(backUpItem.isSourcePresent() || backUpItem.isTargetPresent()));
+			
+			} else {
+				sourceMenuItems.forEach(menuItem -> menuItem.setEnabled(false));
+				targetMenuItems.forEach(menuItem -> menuItem.setEnabled(false));
+				bothMenuItems.forEach(menuItem -> menuItem.setEnabled(false));		
+				anyMenuItems.forEach(menuItem -> menuItem.setEnabled(false));
+			}
 		}
 	}
 	
