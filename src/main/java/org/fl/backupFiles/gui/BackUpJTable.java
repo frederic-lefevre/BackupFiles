@@ -34,6 +34,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import org.fl.backupFiles.AbstractBackUpItem;
+import org.fl.backupFiles.BackUpItemGroup;
 import org.fl.backupFiles.Config;
 
 public class BackUpJTable extends JTable {
@@ -73,9 +74,9 @@ public class BackUpJTable extends JTable {
 		// Row sorter
 		TableRowSorter<TableModel> sorter = new TableRowSorter<>(getModel());
 		setRowSorter(sorter);
-		sorter.sort();
 		
 		sorter.setComparator(BackUpTableModel.SIZE_DIFF_COL_IDX, new BackupItemSizeComparator());
+		sorter.setComparator(BackUpTableModel.GROUP_COL_IDX, new BackupItemGroupComparator());
 	}
 	
 	// Get the selected BackUpItem
@@ -95,10 +96,31 @@ public class BackUpJTable extends JTable {
 		@Override
 		public int compare(AbstractBackUpItem o1, AbstractBackUpItem o2) {
 			
-			if (o1.getSizeDifference() < o2.getSizeDifference() ) {
+			if (o1.getSizeDifference() < o2.getSizeDifference()) {
 				return 1;
-			} else if (o1.getSizeDifference() > o2.getSizeDifference() ) {
+			} else if (o1.getSizeDifference() > o2.getSizeDifference()) {
 				return -1;
+			} else {
+				return 0;
+			}
+		}
+		
+	}
+	
+	private class BackupItemGroupComparator implements Comparator<AbstractBackUpItem> {
+
+		// Put Group first if the group has a single element
+		@Override
+		public int compare(AbstractBackUpItem o1, AbstractBackUpItem o2) {
+			
+			if (o1.getBackUpItemNumber() < o2.getBackUpItemNumber()) {
+				return 1;
+			} else if (o1.getBackUpItemNumber() > o2.getBackUpItemNumber()) {
+				return -1;
+			} else if (o1 instanceof BackUpItemGroup) {
+				return -1;
+			} else if (o2 instanceof BackUpItemGroup) {
+				return 1;
 			} else {
 				return 0;
 			}

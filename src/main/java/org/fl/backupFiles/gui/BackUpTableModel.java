@@ -24,10 +24,15 @@ SOFTWARE.
 
 package org.fl.backupFiles.gui;
 
+import java.nio.file.Path;
+
 import javax.swing.table.AbstractTableModel;
 
 import org.fl.backupFiles.AbstractBackUpItem;
 import org.fl.backupFiles.BackUpItemList;
+import org.fl.backupFiles.BackupAction;
+import org.fl.backupFiles.BackupStatus;
+import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 
 public class BackUpTableModel extends AbstractTableModel {
 
@@ -75,17 +80,16 @@ public class BackUpTableModel extends AbstractTableModel {
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
 
-		if ((backUpItems == null) || (backUpItems.isEmpty())) {
-			return super.getColumnClass(columnIndex);
-		} else {
-			Object val = getValueAt(0, columnIndex);
-			if (val == null) {
-				// Source or target path maybe null
-				return super.getColumnClass(columnIndex);
-			} else {
-				return getValueAt(0, columnIndex).getClass();
-			}
-		}
+		return switch(columnIndex){
+    		case SOURCE_PATH_COL_IDX -> Path.class;
+    		case GROUP_COL_IDX -> AbstractBackUpItem.class;
+    		case SIZE_DIFF_COL_IDX -> AbstractBackUpItem.class;
+    		case PERMANENCE_COL_IDX -> DirectoryPermanenceLevel.class;
+    		case ACTION_COL_IDX -> BackupAction.class;
+    		case STATUS_COL_IDX -> BackupStatus.class;
+    		case TARGET_PATH_COL_IDX -> Path.class;
+    		default -> super.getColumnClass(columnIndex);
+		};
 	}
 	 
 	@Override
