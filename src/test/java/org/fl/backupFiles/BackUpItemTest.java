@@ -158,6 +158,42 @@ public class BackUpItemTest {
 	}
 	
 	@Test
+	void sumIndivualCounterTest() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask);
+		
+		BackUpCounters sumCounters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		
+		backUpItem.sumIndividualCounters(sumCounters);
+		
+		assertThat(sumCounters.equalsIndividualCounters(counters)).isTrue();
+	}
+	
+	@Test
+	void sumIndivualCounterTest2() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask);
+		
+		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(EXISTANT_SOURCE, EXISTANT_SOURCE);
+		BackUpCounters counters2 = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem2 = new BackUpItem(pathPairBasicAttributes2, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, counters2, backUpTask);
+		
+		BackUpCounters sumCounters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		
+		backUpItem.sumIndividualCounters(sumCounters);
+		backUpItem2.sumIndividualCounters(sumCounters);
+		
+		assertThat(sumCounters.equalsIndividualCounters(counters)).isFalse();
+		
+		counters.add(counters2);
+		assertThat(sumCounters.equalsIndividualCounters(counters)).isTrue();
+	}
+	
+	@Test
 	void testSourcePresentTargetNot() {
 		
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
