@@ -89,4 +89,9 @@ public class BackUpItemGroup extends AbstractBackUpItem {
 	public boolean isAboveFileSizeLimitThreshold() {
 		return isAboveFileSizeLimitThreshold;
 	}
+
+	@Override
+	public void sumIndividualCounters(BackUpCounters backUpCounters) {	
+		backUpItems.forEach(backUpItem -> backUpItem.sumIndividualCounters(backUpCounters));
+	}
 }

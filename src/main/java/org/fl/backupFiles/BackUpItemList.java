@@ -75,7 +75,6 @@ public class BackUpItemList extends LinkedList<AbstractBackUpItem> {
 		} else {
 			throw new IllegalArgumentException("Trying to call BackUpItemList.add with a BackUpItemGroup argument");
 		}
-
 	}
 	
 	public void removeItemsDone() {
@@ -91,4 +90,9 @@ public class BackUpItemList extends LinkedList<AbstractBackUpItem> {
 		return itemPath.getNameCount();
 	}
 
+	public BackUpCounters sumIndividualCounters() {
+		BackUpCounters backUpCounters = new BackUpCounters(new TargetFileStores(), OperationType.SCAN);
+		forEach(backUpItem -> backUpItem.sumIndividualCounters(backUpCounters));
+		return backUpCounters;
+	}
 }

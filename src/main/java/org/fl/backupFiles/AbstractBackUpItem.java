@@ -75,6 +75,8 @@ public abstract class AbstractBackUpItem {
 	
 	public abstract boolean isAboveFileSizeLimitThreshold();
 	
+	public abstract void sumIndividualCounters(BackUpCounters backUpCounters);
+	 
 	public Path getSourcePath() {
 		return sourcePath;
 	}

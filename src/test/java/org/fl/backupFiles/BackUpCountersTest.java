@@ -85,6 +85,8 @@ class BackUpCountersTest {
 		bc1.add(bc2);
 		assertFieldValue(bc1, 23);
 		assertFieldValue(bc2, 11);
+		
+		assertThat(bc1.equalsIndividualCounters(bc2)).isFalse();
 	}
 
 	@Test
@@ -102,6 +104,27 @@ class BackUpCountersTest {
 		bc1.add(bc2);
 		assertFieldValueWithIncrement(bc1, 23, 2);
 		assertFieldValueWithIncrement(bc2, 11, 1);
+		
+		assertThat(bc1.equalsIndividualCounters(bc2)).isFalse();
+	}
+	
+	@Test
+	void initialIndividualCountersShouldBeEquals() {
+		assertThat(new BackUpCounters(newTargetFileStores(), OperationType.BACKUP).equalsIndividualCounters( new BackUpCounters(newTargetFileStores(), OperationType.BACKUP))).isTrue();
+	}
+	
+	@Test
+	void individualCountersShouldBeEquals() {
+		
+		BackUpCounters bc1 = new BackUpCounters(newTargetFileStores(), OperationType.SCAN);
+		BackUpCounters bc2 = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+
+		setFieldValueWithIncrement(bc1, 12);
+		setFieldValueWithIncrement(bc2, 12);
+		
+		assertThat(bc1.equalsIndividualCounters(bc2)).isTrue();
+		assertThat(bc2.equalsIndividualCounters(bc1)).isTrue();
+		assertThat(bc1.equalsIndividualCounters(bc1)).isTrue();
 	}
 	
 	private static void assertFieldValue(BackUpCounters bc, long val) {

@@ -330,4 +330,27 @@ public class BackUpItem extends AbstractBackUpItem {
 		return sizeDifference > fileSizeWarningThreshold;
 	}
 
+	@Override
+	public void sumIndividualCounters(BackUpCounters backUpCounters) {
+		
+		switch (backupAction) {
+			case COPY_REPLACE -> backUpCounters.copyReplaceNb++;
+			case COPY_NEW -> backUpCounters.copyNewNb++;
+			case DELETE -> backUpCounters.deleteNb++;
+			case COPY_TREE -> backUpCounters.copyTreeNb++;
+			case DELETE_DIR -> backUpCounters.deleteDirNb++;
+			case ADJUST_TIME -> backUpCounters.adjustTimeNb++;
+			case COPY_TARGET -> backUpCounters.copyTargetNb++;
+			case AMBIGUOUS -> backUpCounters.ambiguousNb++;
+		}
+		
+		if (backupStatus == BackupStatus.DIFF_BY_CONTENT) {
+			backUpCounters.contentDifferentNb++;
+		}
+		
+		if (sizeDifference > fileSizeWarningThreshold) {
+			backUpCounters.backupWithSizeAboveThreshold++;
+		}
+	}
+
 }
