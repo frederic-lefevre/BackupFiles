@@ -55,6 +55,7 @@ class FilesBackUpScannerTest {
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles3.properties";
 	
 	private static final int THREAD_TO_NB_DIR_CORRELATION = 2;
+	private static final int NB_SUB_DIR_UNDER_CONCERT = 21;
 
 	private static final Logger log = Logger.getLogger(FilesBackUpScannerTest.class.getName());
 	private static TestDataManager testDataManager;
@@ -67,6 +68,7 @@ class FilesBackUpScannerTest {
 		// Get the different config path
 		configFileDir = TestUtils.getPathFromUriString(TestDataManager.CONFIG_FILE_FOLDER_URI);
 
+		// Number of backup thread (defined in property file, but it cannot be loaded before data generation)
 		threadPoolSize = 25;
 
 		testDataManager = new TestDataManager(log);
@@ -154,15 +156,15 @@ class FilesBackUpScannerTest {
 			assertThat(backUpCounters.ambiguousNb).isZero();
 			assertThat(backUpCounters.copyNewNb).isZero();
 			assertThat(backUpCounters.copyReplaceNb).isZero();
-			assertThat(backUpCounters.copyTreeNb).isEqualTo(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION*21);
+			assertThat(backUpCounters.copyTreeNb).isEqualTo(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION*NB_SUB_DIR_UNDER_CONCERT);
 			assertThat(backUpCounters.deleteDirNb).isZero();
 			assertThat(backUpCounters.deleteNb).isZero();
 			assertThat(backUpCounters.backupWithSizeAboveThreshold).isZero();
 			assertThat(backUpCounters.contentDifferentNb).isZero();
-			assertThat(backUpCounters.nbHighPermanencePath).isEqualTo(357);
-			assertThat(backUpCounters.nbMediumPermanencePath).isEqualTo(336);
+			assertThat(backUpCounters.nbHighPermanencePath).isEqualTo(NB_SUB_DIR_UNDER_CONCERT*testDataManager.getNbHighPermanenceGenerated());
+			assertThat(backUpCounters.nbMediumPermanencePath).isEqualTo(NB_SUB_DIR_UNDER_CONCERT*testDataManager.getNbMediumPermanenceGenerated());
 			assertThat(backUpCounters.nbSourceFilesFailed).isZero();
-			assertThat(backUpCounters.nbSourceFilesProcessed).isEqualTo(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION*21 + 100);
+			assertThat(backUpCounters.nbSourceFilesProcessed).isEqualTo(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION*NB_SUB_DIR_UNDER_CONCERT + 100);
 			assertThat(backUpCounters.nbTargetFilesProcessed).isEqualTo(threadPoolSize*THREAD_TO_NB_DIR_CORRELATION);	
 			assertThat(backUpCounters.nbTargetFilesFailed).isZero();
 			assertThat(backUpCounters.copyTargetNb).isZero();

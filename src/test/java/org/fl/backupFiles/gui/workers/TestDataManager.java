@@ -49,6 +49,9 @@ public class TestDataManager {
 	private final Logger bLog;
 	private final Path configFilesDir;
 	private final Path directoryGroupFileDir;
+	private long nbHighPermanenceGenerated;
+	private long nbMediumPermanenceGenerated;
+	private long nbLowPermanenceGenerated;
 
 	// Json property name for config
 	private final static String TITLE = "titre";
@@ -85,6 +88,9 @@ public class TestDataManager {
 
 	public boolean generateTestData(int nbDirToGenerate) {
 
+		nbHighPermanenceGenerated = 0;
+		nbMediumPermanenceGenerated = 0;
+		nbLowPermanenceGenerated = 0;
 		try {
 			Path testDataDir = Paths.get(new URI(TESTDATA_URI));
 
@@ -116,12 +122,15 @@ public class TestDataManager {
 				if (i % 3 == 0) {
 					permanence = DirectoryPermanenceLevel.HIGH.name();
 					groupPolicy = GroupPolicy.DO_NOT_GROUP.name();
+					nbHighPermanenceGenerated++;
 				} else if (i % 3 == 2) {
 					permanence = DirectoryPermanenceLevel.MEDIUM.name();
 					groupPolicy = GroupPolicy.GROUP_SUB_ITEMS.name();
+					nbMediumPermanenceGenerated++;
 				} else {
 					permanence = DirectoryPermanenceLevel.LOW.name();
 					groupPolicy = GroupPolicy.GROUP_ALL.name();
+					nbLowPermanenceGenerated++;
 				}
 				ObjectNode oneDirectoryGroup = JsonNodeFactory.instance.objectNode();
 				oneDirectoryGroup.put(PATH, SOURCE_BASE_DIR + dirName + SUB_DIRECTORY_FOR_GROUP);
@@ -185,6 +194,18 @@ public class TestDataManager {
 
 	}
 	
+	public long getNbHighPermanenceGenerated() {
+		return nbHighPermanenceGenerated;
+	}
+
+	public long getNbMediumPermanenceGenerated() {
+		return nbMediumPermanenceGenerated;
+	}
+
+	public long getNbLowPermanenceGenerated() {
+		return nbLowPermanenceGenerated;
+	}
+
 	private boolean deteleOneDirContent(String uri) throws IOException, URISyntaxException {
 		return Files.list(Paths.get(new URI(uri)))
 				 .map(path -> {
