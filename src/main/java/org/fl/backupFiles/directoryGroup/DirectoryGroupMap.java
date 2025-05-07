@@ -95,18 +95,11 @@ public class DirectoryGroupMap {
 	public DirectoryGroup getDirectoryGroup(Path dir) {
 
 		for (Path pathKey : pathKeys) {
-	//		if (dir.startsWith(pathKey)) {
-			if (intersectWith(dir, pathKey)) {
-				return directoryGroupMap.get(pathKey) ;
+			if (dir.startsWith(pathKey)) {
+				return directoryGroupMap.get(pathKey);
 			}
 		}
 		return defaultDirectoryGroup;
-	}
-
-	// nativePath maybe a windows path. 
-	// stdPath has "/" as separator
-	private boolean intersectWith(Path nativePath, Path stdPath) {
-		return nativePath.toString().contains(stdPath.toString()) ;
 	}
 	
 	public void clearBackUpItemsInDirectoryGroup() {

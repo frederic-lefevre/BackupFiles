@@ -69,15 +69,9 @@ public class DirectoryGroupSub extends DirectoryGroup {
 	}
 	
 	private Path getSubDirectoryPath(BackUpItem item) {
+		// The BackUpItem is supposed to have a path longer than the DirectoryGroup path
 		
 		Path itemPath = item.getSourceClosestExistingPath();
-		
-		if (itemPath.getNameCount() < getDirectoryGroupPathNameCount() + 2) {
-			// the item path is directly under the DirectoryGroup path. It does not belong to a subpath
-			// this case should not happen as it is checked before calling addBackUpItem to avoid creating a group
-			return getPath();
-		} else {
-			return getPath().resolve(itemPath.getName(getDirectoryGroupPathNameCount()));
-		}
+		return getPath().resolve(itemPath.getName(getDirectoryGroupPathNameCount()));		
 	}
 }
