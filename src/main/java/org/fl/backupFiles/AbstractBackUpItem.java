@@ -65,8 +65,10 @@ public abstract class AbstractBackUpItem {
 		
 		if (sourcePath != null) {
 			directoryGroup = backUpTask.getDirectoryGroupMap().getDirectoryGroup(sourcePath);
-		} else {
+		} else if (sourceClosestExistingPath != null) {
 			directoryGroup = backUpTask.getDirectoryGroupMap().getDirectoryGroup(sourceClosestExistingPath);
+		} else {
+			throw new IllegalBackUpItemException("Either source path or source closest existing path should not be null", sourceClosestExistingPath);
 		}
 		this.backUpTask = backUpTask;
 	}
