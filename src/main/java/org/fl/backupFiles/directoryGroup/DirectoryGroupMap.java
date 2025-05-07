@@ -24,6 +24,7 @@ SOFTWARE.
 
 package org.fl.backupFiles.directoryGroup;
 
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -56,7 +57,7 @@ public class DirectoryGroupMap {
 	private final Set<Path> pathKeys;
 	private final DirectoryGroup defaultDirectoryGroup;
 
-	public DirectoryGroupMap(String jsonConfig) {
+	public DirectoryGroupMap(Path originSourcePath, Path actualSourcePath, String jsonConfig) {
 		super();
 		defaultDirectoryGroup = DirectoryGroupBuilder.build(Path.of("/"), DEFAULT_PERMANENCE_LEVEL, DEFAULT_GROUP_POLICY);
 		directoryGroupMap = new TreeMap<Path, DirectoryGroup>(new DeeperPathComparator());
@@ -69,10 +70,14 @@ public class DirectoryGroupMap {
 
 					for (JsonNode jPathPermanence : jPathsNode) {
 
-						Path sPath = Paths.get(jPathPermanence.get(PATH).asText());
-						DirectoryPermanenceLevel permanenceLevel = DirectoryPermanenceLevel.valueOf(jPathPermanence.get(PERMANENCE).asText());
-						GroupPolicy groupPolicy = GroupPolicy.valueOf(jPathPermanence.get(GROUP_POLICY).asText());
-						directoryGroupMap.put(sPath, DirectoryGroupBuilder.build(sPath, permanenceLevel, groupPolicy));
+						Path sPath = Paths.get(URI.create("file:///C:" + jPathPermanence.get(PATH).asText()));
+						if (sPath.startsWith(originSourcePath)) {
+							DirectoryPermanenceLevel permanenceLevel = DirectoryPermanenceLevel.valueOf(jPathPermanence.get(PERMANENCE).asText());
+							GroupPolicy groupPolicy = GroupPolicy.valueOf(jPathPermanence.get(GROUP_POLICY).asText());
+						
+							Path directoryGroupPathRelativeToActualSource = actualSourcePath.resolve(originSourcePath.relativize(sPath));
+							directoryGroupMap.put(directoryGroupPathRelativeToActualSource, DirectoryGroupBuilder.build(directoryGroupPathRelativeToActualSource, permanenceLevel, groupPolicy));
+						}
 					}
 				} else {
 					bLog.severe("Json null or not an array:\n" + jsonConfig);
@@ -83,8 +88,6 @@ public class DirectoryGroupMap {
 			} catch (Exception e) {
 				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig, e);
 			}
-		} else {
-			bLog.severe("DirectoryGroup configuration is null or empty");
 		}
 		pathKeys = directoryGroupMap.keySet();
 	}
@@ -92,6 +95,7 @@ public class DirectoryGroupMap {
 	public DirectoryGroup getDirectoryGroup(Path dir) {
 
 		for (Path pathKey : pathKeys) {
+	//		if (dir.startsWith(pathKey)) {
 			if (intersectWith(dir, pathKey)) {
 				return directoryGroupMap.get(pathKey) ;
 			}

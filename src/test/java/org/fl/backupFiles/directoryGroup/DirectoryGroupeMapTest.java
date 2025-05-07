@@ -26,11 +26,14 @@ package org.fl.backupFiles.directoryGroup;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
 import org.fl.backupFiles.directoryGroup.core.DirectoryGroupAll;
 import org.fl.backupFiles.directoryGroup.core.DirectoryGroupSub;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class DirectoryGroupeMapTest {
@@ -41,13 +44,19 @@ class DirectoryGroupeMapTest {
 		 {\"path\" : \"/FredericPersonnel/tmp/low/insideMedium\",   \"permanence\" : \"LOW\", \"groupPolicy\" : \"GROUP_ALL\"}]
 		 """;
 	
+	private static DirectoryGroupMap directoryGroupmMap;
+	
+	@BeforeAll
+	static void init() {
+		Path sourcePath = Paths.get(URI.create("file:///C:/FredericPersonnel/"));
+		directoryGroupmMap = new DirectoryGroupMap(sourcePath, sourcePath, JSON_CONF);
+	}
+	
 	@Test
 	void testDoNotGroup() {
 		
-		DirectoryGroupMap directoryGroupmMap = new DirectoryGroupMap(JSON_CONF);
-		
 		DirectoryGroup group = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\photos\\bidon"));
-		assertThat(group.getPath()).isEqualTo(Paths.get("/FredericPersonnel/photos"));
+		assertThat(group.getPath()).isEqualTo(Paths.get("C:\\FredericPersonnel\\photos"));
 		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.HIGH);
 		assertThat(group.getGroupPolicy()).isEqualTo(GroupPolicy.DO_NOT_GROUP);
 		assertThat(group).isInstanceOf(DirectoryGroup.class);
@@ -56,10 +65,8 @@ class DirectoryGroupeMapTest {
 	@Test
 	void testGroupSub() {
 		
-		DirectoryGroupMap directoryGroupmMap = new DirectoryGroupMap(JSON_CONF);
-		
 		DirectoryGroup group = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\tmp\\bidon"));
-		assertThat(group.getPath()).isEqualTo(Paths.get("/FredericPersonnel/tmp"));
+		assertThat(group.getPath()).isEqualTo(Paths.get("C:\\FredericPersonnel\\tmp"));
 		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.MEDIUM);
 		assertThat(group.getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_SUB_ITEMS);
 		assertThat(group).isInstanceOf(DirectoryGroupSub.class);
@@ -68,10 +75,8 @@ class DirectoryGroupeMapTest {
 	@Test
 	void testGroupAll() {
 		
-		DirectoryGroupMap directoryGroupmMap = new DirectoryGroupMap(JSON_CONF);
-		
 		DirectoryGroup group = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\tmp\\low\\insideMedium\\bidon"));
-		assertThat(group.getPath()).isEqualTo(Paths.get("/FredericPersonnel/tmp/low/insideMedium"));
+		assertThat(group.getPath()).isEqualTo(Paths.get("C:\\FredericPersonnel\\tmp\\low\\insideMedium"));
 		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.LOW);
 		assertThat(group.getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_ALL);
 		assertThat(group).isInstanceOf(DirectoryGroupAll.class);
@@ -80,8 +85,6 @@ class DirectoryGroupeMapTest {
 	
 	@Test
 	void testGroupDefault() {
-		
-		DirectoryGroupMap directoryGroupmMap = new DirectoryGroupMap(JSON_CONF);
 		
 		DirectoryGroup group = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\default"));
 		assertThat(group.getPath()).isEqualTo(Paths.get("/"));
@@ -92,10 +95,8 @@ class DirectoryGroupeMapTest {
 	@Test
 	void testGroupRoot() {
 		
-		DirectoryGroupMap directoryGroupmMap = new DirectoryGroupMap(JSON_CONF);
-		
 		DirectoryGroup group = directoryGroupmMap.getDirectoryGroup(Paths.get("C:\\FredericPersonnel\\photos"));
-		assertThat(group.getPath()).isEqualTo(Paths.get("/FredericPersonnel/photos"));
+		assertThat(group.getPath()).isEqualTo(Paths.get("C:\\FredericPersonnel\\photos"));
 		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.HIGH);
 		assertThat(group.getGroupPolicy()).isEqualTo(GroupPolicy.DO_NOT_GROUP);
 		assertThat(group).isInstanceOf(DirectoryGroup.class);

@@ -49,7 +49,6 @@ public class DirectoryGroupSub extends DirectoryGroup {
 	// Return the BackUpItemGroup if a new one has been created. Null otherwise
 	@Override
 	public BackUpItemGroup addBackUpItem(BackUpItem item) {
-		// TODO Auto-generated method stub
 		
 		Path subDirectoryOfItem = getSubDirectoryPath(item);
 		DirectoryGroup directoryGroupOfSubDir = subDirectoryGroupMap.get(subDirectoryOfItem);
@@ -71,10 +70,7 @@ public class DirectoryGroupSub extends DirectoryGroup {
 	
 	private Path getSubDirectoryPath(BackUpItem item) {
 		
-		Path itemPath = item.getSourcePath();
-		if (itemPath == null) {
-			itemPath = item.getSourceClosestExistingPath();
-		}
+		Path itemPath = item.getSourceClosestExistingPath();
 		
 		if (itemPath.getNameCount() < getDirectoryGroupPathNameCount() + 2) {
 			// the item path is directly under the DirectoryGroup path. It does not belong to a subpath

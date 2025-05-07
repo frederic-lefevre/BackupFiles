@@ -40,6 +40,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -246,15 +248,19 @@ public class BackUpJob {
 			if (bufPath != null) {
 				if (Files.isRegularFile(srcPath)) {
 					Path bufFile = bufPath.resolve(srcPath.getFileName());
-					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile, sizeWarningLimit));
+					DirectoryGroupMap directoryGroupMap = new DirectoryGroupMap(srcPath, srcPath, Config.getBackupGroupConfiguration());
+					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile, directoryGroupMap, sizeWarningLimit));
 				} else {
-					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath, sizeWarningLimit));
+					DirectoryGroupMap directoryGroupMap = new DirectoryGroupMap(srcPath, srcPath, Config.getBackupGroupConfiguration());
+					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath, directoryGroupMap, sizeWarningLimit));
 				}
 				if (tgtPath != null) {
-					backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath, sizeWarningLimit));
+					DirectoryGroupMap directoryGroupMap = new DirectoryGroupMap(srcPath, bufPath, Config.getBackupGroupConfiguration());
+					backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath, directoryGroupMap, sizeWarningLimit));
 				}
 			} else if (tgtPath != null) {
-				backUpTasks.get(JobTaskType.SOURCE_TO_TARGET).add(new BackUpTask(srcPath, tgtPath, sizeWarningLimit));
+				DirectoryGroupMap directoryGroupMap = new DirectoryGroupMap(srcPath, srcPath, Config.getBackupGroupConfiguration());
+				backUpTasks.get(JobTaskType.SOURCE_TO_TARGET).add(new BackUpTask(srcPath, tgtPath, directoryGroupMap, sizeWarningLimit));
 			} else {
 				bLog.severe("No buffer and target element definition for back up job " + title);
 			}

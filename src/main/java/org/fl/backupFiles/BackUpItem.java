@@ -352,5 +352,4 @@ public class BackUpItem extends AbstractBackUpItem {
 			backUpCounters.backupWithSizeAboveThreshold++;
 		}
 	}
-
 }

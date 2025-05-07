@@ -33,6 +33,7 @@ import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 import org.fl.backupFiles.directoryGroup.GroupPolicy;
 import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
@@ -51,17 +52,17 @@ public class BackUpItemTest {
 	
 	private static Logger log = Logger.getLogger(BackUpItemTest.class.getName());
 
-	private static final String SRC_FOLDER = "file:///ForTests/BackUpFiles/TestDir1/";
+	private static final String SRC_FOLDER = "file:///C:/ForTests/BackUpFiles/TestDir1/";
 	private static final String SRC_FILE1 = SRC_FOLDER + "File1.pdf";
-	private static final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
-	private static final String UNEXISTANT_FILE = "file:///ForTests/BackUpFiles/TestDir1/doesNotExists.pdf";
+	private static final String TGT_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir2/File1.pdf";
+	private static final String UNEXISTANT_FILE = "file:///C:/ForTests/BackUpFiles/TestDir1/doesNotExists.pdf";
 
 	private static final Path EXISTANT_SOURCE_FOLDER = TestUtils.getPathFromUriString(SRC_FOLDER);
 	private static final Path EXISTANT_SOURCE = TestUtils.getPathFromUriString(SRC_FILE1);
 	private static final Path UNEXISTANT_TARGET = TestUtils.getPathFromUriString(TGT_FILE1);
 	private static final Path UNEXISTANT_PATH = TestUtils.getPathFromUriString(UNEXISTANT_FILE);
 
-	private static final String UNEXISTANT_FOLDER = "file:///ForTests/BackUpFiles/doesNotExists";
+	private static final String UNEXISTANT_FOLDER = "file:///C:/ForTests/BackUpFiles/doesNotExists";
 	private static final Path UNEXISTANT_FOLDER_PATH = TestUtils.getPathFromUriString(UNEXISTANT_FOLDER);
 
 	private static BackUpTask backUpTask;
@@ -69,8 +70,10 @@ public class BackUpItemTest {
 	@BeforeAll
 	static void initConfig() throws IOException {
 
+		Path sourcePathForDirectoryMap = TestUtils.getPathFromUriString("file:///C:/ForTests/BackUpFiles/TestDir1/");
 		Config.initConfig(DEFAULT_PROP_FILE);
-		backUpTask = new BackUpTask(EXISTANT_SOURCE_FOLDER, EXISTANT_SOURCE_FOLDER, 0);
+		backUpTask = new BackUpTask(EXISTANT_SOURCE_FOLDER, EXISTANT_SOURCE_FOLDER, 
+				new DirectoryGroupMap(sourcePathForDirectoryMap, sourcePathForDirectoryMap, Config.getBackupGroupConfiguration()), 0);
 	}
 
 	private static TargetFileStores newTargetFileStores() {
@@ -282,17 +285,17 @@ public class BackUpItemTest {
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(null, UNEXISTANT_TARGET);
 		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.SCAN);
 
-		assertThatNullPointerException()
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask));
-		assertThatNullPointerException()
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, counters, backUpTask));
-		assertThatNullPointerException()
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, counters, backUpTask));
-		assertThatNullPointerException()
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.AMBIGUOUS, BackupStatus.SAME_CONTENT, counters, backUpTask));
-		assertThatNullPointerException()
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TARGET, BackupStatus.SAME_CONTENT, counters, backUpTask));
-		assertThatNullPointerException()
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.ADJUST_TIME, BackupStatus.SAME_CONTENT, counters, backUpTask));
 	}
 

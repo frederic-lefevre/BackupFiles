@@ -53,7 +53,7 @@ public class BackUpTask {
 	private static final String noWarning = "" ;
 	
 	// A back up task is a source directory or file to back up to a destination directory or file
-	public BackUpTask(Path src, Path tgt, long sizeWarningLimit) throws IOException {
+	public BackUpTask(Path src, Path tgt, DirectoryGroupMap directoryGroupMap, long sizeWarningLimit) throws IOException {
 		
 		source = src;
 		target = tgt;
@@ -64,7 +64,7 @@ public class BackUpTask {
 		}
 
 		targetFileStore = FilesUtils.findFileStore(target, bLog);
-		directoryGroupMap = new DirectoryGroupMap(Config.getBackupGroupConfiguration());
+		this.directoryGroupMap = directoryGroupMap;
 
 		compareContent = false;
 		compareContentOnAmbiguous = true;

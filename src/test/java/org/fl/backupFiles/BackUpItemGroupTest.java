@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 import org.fl.backupFiles.scanner.PathPairBasicAttributes;
 import org.fl.util.file.FileComparator;
@@ -45,16 +46,16 @@ class BackUpItemGroupTest {
 	
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles.properties";
 	
-	private static final String EXISTANT_FOLDER = "file:///ForTests/BackUpFiles/TestDir1/";
-	private static final String UNEXISTANT_FOLDER = "file:///ForTests/BackUpFiles/doesNotExists";
+	private static final String EXISTANT_FOLDER = "file:///C:/ForTests/BackUpFiles/TestDir1/";
+	private static final String UNEXISTANT_FOLDER = "file:///C:/ForTests/BackUpFiles/doesNotExists";
 	private static final String SRC_FILE1 = EXISTANT_FOLDER + "File1.pdf";
-	private static final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
+	private static final String TGT_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir2/File1.pdf";
 	
 	private static final Path EXISTANT_FOLDER_PATH = TestUtils.getPathFromUriString(EXISTANT_FOLDER);
 	private static final Path UNEXISTANT_FOLDER_PATH = TestUtils.getPathFromUriString(UNEXISTANT_FOLDER);
 	private static final Path EXISTANT_SOURCE = TestUtils.getPathFromUriString(SRC_FILE1);
 	private static final Path UNEXISTANT_TARGET = TestUtils.getPathFromUriString(TGT_FILE1);
-	private static final Path FOLDER_PATH_FROM_A_DIFFERENT_GROUP = TestUtils.getPathFromUriString("file:///FredericPersonnel/ecrins/");
+	private static final Path FOLDER_PATH_FROM_A_DIFFERENT_GROUP = TestUtils.getPathFromUriString("file:///C:/FredericPersonnel/ecrins/");
 	
 	private static BackUpTask backUpTask;
 	
@@ -67,8 +68,9 @@ class BackUpItemGroupTest {
 	@BeforeAll
 	static void initConfig() throws IOException {
 
+		Path sourcePathForDirectoryMap = TestUtils.getPathFromUriString("file:///C:/ForTests/BackUpFiles/TestDir1/");
 		Config.initConfig(DEFAULT_PROP_FILE);
-		backUpTask = new BackUpTask(EXISTANT_FOLDER_PATH, EXISTANT_FOLDER_PATH, 0);
+		backUpTask = new BackUpTask(EXISTANT_FOLDER_PATH, EXISTANT_FOLDER_PATH, new DirectoryGroupMap(sourcePathForDirectoryMap, sourcePathForDirectoryMap, Config.getBackupGroupConfiguration()), 0);
 	}
 	
 	@Test
@@ -180,7 +182,7 @@ class BackUpItemGroupTest {
 		
 		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
 		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask);
-		
+
 		assertThatIllegalArgumentException().isThrownBy(() -> backUpItemGroup.addBackUpItem(backUpItem)).withMessageContaining("permanance level");		
 	}
 	
