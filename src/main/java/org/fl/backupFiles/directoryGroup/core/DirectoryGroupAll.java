@@ -52,7 +52,7 @@ public class DirectoryGroupAll extends DirectoryGroup {
 		
 		BackUpItemGroup backupItemGroup = backUpItemGroupLists[item.getBackupAction().ordinal()][item.getBackupStatus().ordinal()];
 		if (backupItemGroup == null) {
-			backupItemGroup = new BackUpItemGroup(getPath(), getPath(), getPath(), item.getBackupAction(), item.getBackupStatus(), item.getBackUpTask());
+			backupItemGroup = new BackUpItemGroup(getPath(), item.getTargetPath(), getPath(), item.getBackupAction(), item.getBackupStatus(), item.getBackUpTask());
 			backUpItemGroupLists[item.getBackupAction().ordinal()][item.getBackupStatus().ordinal()] = backupItemGroup;
 			backupItemGroup.addBackUpItem(item);
 			return backupItemGroup;
