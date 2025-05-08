@@ -24,9 +24,7 @@ SOFTWARE.
 
 package org.fl.backupFiles.directoryGroup;
 
-import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -35,6 +33,7 @@ import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
 import org.fl.backupFiles.directoryGroup.core.DirectoryGroupBuilder;
+import org.fl.util.file.FilesUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -46,12 +45,13 @@ public class DirectoryGroupMap {
 	
 	private static final ObjectMapper mapper = new ObjectMapper();
 	
-	public final static DirectoryPermanenceLevel DEFAULT_PERMANENCE_LEVEL = DirectoryPermanenceLevel.HIGH;
+	public static final DirectoryPermanenceLevel DEFAULT_PERMANENCE_LEVEL = DirectoryPermanenceLevel.HIGH;
 	public static final GroupPolicy DEFAULT_GROUP_POLICY = GroupPolicy.DO_NOT_GROUP;
 	
 	private static final String PATH = "path";
 	private static final String PERMANENCE = "permanence";
 	private static final String GROUP_POLICY = "groupPolicy";
+	private static final String URI_FILE_SCHEME = "file://";
 
 	private final Map<Path, DirectoryGroup> directoryGroupMap;
 	private final Set<Path> pathKeys;
@@ -70,7 +70,7 @@ public class DirectoryGroupMap {
 
 					for (JsonNode jPathPermanence : jPathsNode) {
 
-						Path sPath = Paths.get(URI.create("file:///C:" + jPathPermanence.get(PATH).asText()));
+						Path sPath = FilesUtils.uriStringToAbsolutePath(URI_FILE_SCHEME + jPathPermanence.get(PATH).asText());
 						if (sPath.startsWith(originSourcePath)) {
 							DirectoryPermanenceLevel permanenceLevel = DirectoryPermanenceLevel.valueOf(jPathPermanence.get(PERMANENCE).asText());
 							GroupPolicy groupPolicy = GroupPolicy.valueOf(jPathPermanence.get(GROUP_POLICY).asText());
