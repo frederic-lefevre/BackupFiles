@@ -29,6 +29,7 @@ import java.util.Objects;
 
 import org.fl.backupFiles.BackUpItem;
 import org.fl.backupFiles.BackUpItemGroup;
+import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.BackupAction;
 import org.fl.backupFiles.BackupStatus;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
@@ -52,7 +53,9 @@ public class DirectoryGroupAll extends DirectoryGroup {
 		
 		BackUpItemGroup backupItemGroup = backUpItemGroupLists[item.getBackupAction().ordinal()][item.getBackupStatus().ordinal()];
 		if (backupItemGroup == null) {
-			backupItemGroup = new BackUpItemGroup(getPath(), item.getTargetPath(), getPath(), item.getBackupAction(), item.getBackupStatus(), item.getBackUpTask());
+			BackUpTask backUpTask = item.getBackUpTask();
+			Path targetPathForGroup = backUpTask.getTarget().resolve(backUpTask.getSource().relativize(getPath()));
+			backupItemGroup = new BackUpItemGroup(getPath(),targetPathForGroup, getPath(), item.getBackupAction(), item.getBackupStatus(), backUpTask);
 			backUpItemGroupLists[item.getBackupAction().ordinal()][item.getBackupStatus().ordinal()] = backupItemGroup;
 			backupItemGroup.addBackUpItem(item);
 			return backupItemGroup;
