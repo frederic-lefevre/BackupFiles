@@ -26,6 +26,7 @@ package org.fl.backupFiles.directoryGroup;
 
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -86,7 +87,9 @@ public class DirectoryGroupMap {
 			} catch (JsonProcessingException e) {
 				bLog.log(Level.SEVERE, "Invalid JSON configuration: " + jsonConfig, e);
 			} catch (Exception e) {
-				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig, e);
+				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig + 
+						"\nwith originalSourcePath " + Objects.toString(originSourcePath) +
+						"\nand actualSourcePath " + Objects.toString(actualSourcePath), e);
 			}
 		}
 		pathKeys = directoryGroupMap.keySet();
