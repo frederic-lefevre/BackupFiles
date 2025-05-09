@@ -344,4 +344,19 @@ public class BackUpCounters {
 				.append("\n");
 		}
 	}
+	
+	public boolean equalsIndividualCounters(BackUpCounters counters) {
+		
+		return
+				counters.copyReplaceNb == copyReplaceNb &&
+				counters.copyNewNb == copyNewNb &&
+				counters.copyTreeNb == copyTreeNb &&
+				counters.deleteNb == deleteNb &&
+				counters.deleteDirNb == deleteDirNb &&
+				counters.ambiguousNb == ambiguousNb &&
+				counters.copyTargetNb == copyTargetNb &&
+				counters.adjustTimeNb == adjustTimeNb &&
+				counters.contentDifferentNb == contentDifferentNb &&
+				counters.backupWithSizeAboveThreshold == backupWithSizeAboveThreshold;
+	}
 }

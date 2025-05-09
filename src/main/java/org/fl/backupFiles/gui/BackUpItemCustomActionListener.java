@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import org.fl.backupFiles.AbstractBackUpItem;
 import org.fl.backupFiles.BackUpItem;
 import org.fl.util.os.OScommand;
 
@@ -64,9 +65,9 @@ public class BackUpItemCustomActionListener implements java.awt.event.ActionList
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 
-		BackUpItem selectedEntry = backUpJTable.getSelectedBackUpItem();
+		AbstractBackUpItem selectedEntry = backUpJTable.getSelectedBackUpItem();
 
-		if (selectedEntry != null) {
+		if ((selectedEntry != null) && (selectedEntry instanceof BackUpItem backUpItem)) {
 
 			if (customAction.equals(CustomAction.Compare)) {
 				// Display all possible informations on the source and target files 
@@ -74,7 +75,7 @@ public class BackUpItemCustomActionListener implements java.awt.event.ActionList
 
 				StringBuilder compareInfos = new StringBuilder();
 
-				selectedEntry.getInformation(compareInfos);
+				backUpItem.getInformation(compareInfos);
 				compareInfos.append("- - - - - - - - - - - - - - -\n");
 
 
@@ -95,9 +96,9 @@ public class BackUpItemCustomActionListener implements java.awt.event.ActionList
 
 					Path filePath ;
 					if (fileElement.equals(FileElement.Source)) {
-						filePath = selectedEntry.getSourcePath();
+						filePath = backUpItem.getSourcePath();
 					} else {
-						filePath = selectedEntry.getTargetPath();
+						filePath = backUpItem.getTargetPath();
 					}
 
 					if (filePath != null) {

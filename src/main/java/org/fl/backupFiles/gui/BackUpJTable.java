@@ -33,7 +33,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import org.fl.backupFiles.BackUpItem ;
+import org.fl.backupFiles.AbstractBackUpItem;
+import org.fl.backupFiles.BackUpItemGroup;
 import org.fl.backupFiles.Config;
 
 public class BackUpJTable extends JTable {
@@ -49,9 +50,11 @@ public class BackUpJTable extends JTable {
 		setAutoCreateRowSorter(true) ;
 		getColumnModel().getColumn(BackUpTableModel.ACTION_COL_IDX).setCellRenderer(new BackUpActionCellRenderer());
 		getColumnModel().getColumn(BackUpTableModel.STATUS_COL_IDX).setCellRenderer(new BackUpStatusCellRenderer());
+		getColumnModel().getColumn(BackUpTableModel.GROUP_COL_IDX).setCellRenderer(new GroupCellRenderer());
 		getColumnModel().getColumn(BackUpTableModel.SIZE_DIFF_COL_IDX).setCellRenderer(new BackUpSizeDifferenceCellRenderer());
 		getColumnModel().getColumn(BackUpTableModel.PERMANENCE_COL_IDX).setCellRenderer(new PermanenceCellRenderer());
 		getColumnModel().getColumn(BackUpTableModel.SOURCE_PATH_COL_IDX).setPreferredWidth(805);
+		getColumnModel().getColumn(BackUpTableModel.GROUP_COL_IDX).setPreferredWidth(70);
 		getColumnModel().getColumn(BackUpTableModel.SIZE_DIFF_COL_IDX).setPreferredWidth(70);
 		getColumnModel().getColumn(BackUpTableModel.PERMANENCE_COL_IDX).setPreferredWidth(85);
 		getColumnModel().getColumn(BackUpTableModel.ACTION_COL_IDX).setPreferredWidth(120);
@@ -71,13 +74,13 @@ public class BackUpJTable extends JTable {
 		// Row sorter
 		TableRowSorter<TableModel> sorter = new TableRowSorter<>(getModel());
 		setRowSorter(sorter);
-		sorter.sort();
 		
 		sorter.setComparator(BackUpTableModel.SIZE_DIFF_COL_IDX, new BackupItemSizeComparator());
+		sorter.setComparator(BackUpTableModel.GROUP_COL_IDX, new BackupItemGroupComparator());
 	}
 	
 	// Get the selected BackUpItem
-	public BackUpItem getSelectedBackUpItem() {
+	public AbstractBackUpItem getSelectedBackUpItem() {
 		
 		int[] rowIdxs = getSelectedRows();
 		if (rowIdxs.length == 0) {
@@ -88,15 +91,36 @@ public class BackUpJTable extends JTable {
 		return ((BackUpTableModel)getModel()).getBackUpItemAt(convertRowIndexToModel(rowIdxs[0]));
 	}
 	
-	private class BackupItemSizeComparator implements Comparator<BackUpItem> {
+	private class BackupItemSizeComparator implements Comparator<AbstractBackUpItem> {
 
 		@Override
-		public int compare(BackUpItem o1, BackUpItem o2) {
+		public int compare(AbstractBackUpItem o1, AbstractBackUpItem o2) {
 			
-			if (o1.getSizeDifference() < o2.getSizeDifference() ) {
+			if (o1.getSizeDifference() < o2.getSizeDifference()) {
 				return 1;
-			} else if (o1.getSizeDifference() > o2.getSizeDifference() ) {
+			} else if (o1.getSizeDifference() > o2.getSizeDifference()) {
 				return -1;
+			} else {
+				return 0;
+			}
+		}
+		
+	}
+	
+	private class BackupItemGroupComparator implements Comparator<AbstractBackUpItem> {
+
+		// Put Group first if the group has a single element
+		@Override
+		public int compare(AbstractBackUpItem o1, AbstractBackUpItem o2) {
+			
+			if (o1.getBackUpItemNumber() < o2.getBackUpItemNumber()) {
+				return 1;
+			} else if (o1.getBackUpItemNumber() > o2.getBackUpItemNumber()) {
+				return -1;
+			} else if (o1 instanceof BackUpItemGroup) {
+				return -1;
+			} else if (o2 instanceof BackUpItemGroup) {
+				return 1;
 			} else {
 				return 0;
 			}

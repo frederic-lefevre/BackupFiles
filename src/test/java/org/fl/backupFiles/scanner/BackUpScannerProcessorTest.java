@@ -39,13 +39,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
+import org.fl.backupFiles.AbstractBackUpItem;
 import org.fl.backupFiles.BackUpCounters;
-import org.fl.backupFiles.BackUpItem;
+import org.fl.backupFiles.BackUpItemGroup;
 import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.BackupAction;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.TestUtils;
+import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
+import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
+import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
+import org.fl.backupFiles.directoryGroup.GroupPolicy;
 import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -55,15 +61,17 @@ class BackUpScannerProcessorTest {
 
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles.properties";
 	
-	private final static String SOURCE_DATA_DIR1 = "file:///C:/FredericPersonnel/tmp" ;
-	private final static String SOURCE_DATA_DIR2 = "file:///C:/FredericPersonnel/Loisirs/sports" ;
+	private static final String SOURCE_DATA_DIR1 = "file:///C:/FredericPersonnel/tmp";
+	private static final String SOURCE_DATA_DIR2 = "file:///C:/FredericPersonnel/Loisirs/sports/Ski";
 	
-	private final static String BUFFER_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer/";
-	private final static String BUFFER_DATA_DIR1 = BUFFER_DATA_DIR + "dir1/" ;
-	private final static String BUFFER_DATA_DIR2 = BUFFER_DATA_DIR + "dir2/" ;
-	private final static String TARGET_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Target/";
+	private static final String BUFFER_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer/";
+	private static final String BUFFER_DATA_DIR1 = BUFFER_DATA_DIR + "dir1/";
+	private static final String BUFFER_DATA_DIR2 = BUFFER_DATA_DIR + "dir2/";
+	private static final String TARGET_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Target/";
 	
-	private static final Logger log = Logger.getLogger(BackUpScannerProcessorTest.class.getName()) ;
+	private static final Logger log = Logger.getLogger(BackUpScannerProcessorTest.class.getName());
+	
+	private static DirectoryGroupMap directoryGroupMap;
 	
 	@BeforeAll
 	static void generateTestData() {
@@ -84,6 +92,10 @@ class BackUpScannerProcessorTest {
 			Path targetDataDir = Paths.get(new URI(TARGET_DATA_DIR));
 			Files.createDirectory(targetDataDir);
 			
+			DirectoryGroupConfiguration directoryGroupConfiguration = new DirectoryGroupConfiguration(Config.getBackupGroupConfiguration());
+			Path srcDirForDirectoryGroupMap =  Paths.get(new URI(BUFFER_DATA_DIR));
+			directoryGroupMap = new DirectoryGroupMap(srcDirForDirectoryGroupMap, srcDirForDirectoryGroupMap, directoryGroupConfiguration);
+			
 		} catch (URISyntaxException e) {
 			Logger.getGlobal().log(Level.SEVERE, "URI exception writing test data", e);
 			fail("URI exception writing test data (BeforeAll method)");
@@ -103,7 +115,7 @@ class BackUpScannerProcessorTest {
 			Path src = TestUtils.getPathFromUriString(BUFFER_DATA_DIR);
 			Path tgt = TestUtils.getPathFromUriString(TARGET_DATA_DIR);
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
+			BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
@@ -129,11 +141,17 @@ class BackUpScannerProcessorTest {
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
 			assertThat(backUpItemList)
 				.isNotNull()
-				.hasSize(2);
+				.singleElement()
+				.asInstanceOf(InstanceOfAssertFactories.type(BackUpItemGroup.class))
+				.satisfies(backUpItemGroup -> {
+					assertThat(backUpItemGroup.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.MEDIUM);
+					assertThat(backUpItemGroup.getDirectoryGroup().getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_ALL);
+					assertThat(backUpItemGroup.getBackUpItemNumber()).isEqualTo(2);
+				});
 
 			// Execute backup
 			backUpCounters.reset() ;
-			for (BackUpItem backUpItem : backUpItemList) {
+			for (AbstractBackUpItem backUpItem : backUpItemList) {
 				backUpItem.execute(backUpCounters);
 			}
 			assertThat(backUpCounters.ambiguousNb).isZero();
@@ -184,7 +202,7 @@ class BackUpScannerProcessorTest {
 			Path src  = TestUtils.getPathFromUriString(BUFFER_DATA_DIR);
 			Path tgt  = TestUtils.getPathFromUriString(TARGET_DATA_DIR  + "doesNotExists/");
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt, 0) ;
+			BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0) ;
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
@@ -212,7 +230,7 @@ class BackUpScannerProcessorTest {
 				.isNotNull()
 				.hasSize(1);
 
-			BackUpItem backUpItem = backUpItemList.get(0);
+			AbstractBackUpItem backUpItem = backUpItemList.get(0);
 			assertThat(backUpItem).isNotNull();
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.COPY_TREE);
 
@@ -239,7 +257,7 @@ class BackUpScannerProcessorTest {
 			Files.write(src, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne")));
 			assertThat(src).exists();
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
+			BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
@@ -250,7 +268,7 @@ class BackUpScannerProcessorTest {
 				.isNotNull()
 				.hasSize(1);
 
-			BackUpItem backUpItem = backUpItemList.get(0);
+			AbstractBackUpItem backUpItem = backUpItemList.get(0);
 			assertThat(backUpItem).isNotNull();
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.COPY_REPLACE);
 
@@ -278,7 +296,7 @@ class BackUpScannerProcessorTest {
 			assertThat(src).exists();
 			assertThat(tgt).doesNotExist();
 			
-			BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
+			BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 			
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
@@ -289,7 +307,7 @@ class BackUpScannerProcessorTest {
 				.isNotNull()
 				.hasSize(1);
 			
-			BackUpItem backUpItem = backUpItemList.get(0);
+			AbstractBackUpItem backUpItem = backUpItemList.get(0);
 			assertThat(backUpItem).isNotNull();
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.COPY_NEW);
 
@@ -317,7 +335,7 @@ class BackUpScannerProcessorTest {
 			assertThat(src).doesNotExist();
 			assertThat(tgt).exists();
 
-			BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
+			BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
@@ -328,7 +346,7 @@ class BackUpScannerProcessorTest {
 				.isNotNull()
 				.hasSize(1);
 			
-			BackUpItem backUpItem = backUpItemList.get(0);
+			AbstractBackUpItem backUpItem = backUpItemList.get(0);
 			assertThat(backUpItem).isNotNull();
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.DELETE);
 
@@ -356,7 +374,7 @@ class BackUpScannerProcessorTest {
 			assertThat(src).doesNotExist();
 			assertThat(tgt).exists().isDirectory();
 
-			BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
+			BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);
@@ -367,7 +385,7 @@ class BackUpScannerProcessorTest {
 				.isNotNull()
 				.hasSize(1);
 			
-			BackUpItem backUpItem = backUpItemList.get(0);
+			AbstractBackUpItem backUpItem = backUpItemList.get(0);
 			assertThat(backUpItem).isNotNull();
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.DELETE_DIR);
 
@@ -393,7 +411,7 @@ class BackUpScannerProcessorTest {
 			Path src = TestUtils.getPathFromUriString(SRC_FILE1);
 			Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
 
-			BackUpTask backUpTask = new BackUpTask(src, tgt, 0);
+			BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 
 			BackUpScannerThread backUpScannerThread = new BackUpScannerThread(backUpTask);
 			CompletableFuture<ScannerThreadResponse> backUpRes = CompletableFuture.supplyAsync(backUpScannerThread::scan, scannerExecutor);

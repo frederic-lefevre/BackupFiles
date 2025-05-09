@@ -26,16 +26,67 @@ package org.fl.backupFiles;
 
 import java.util.LinkedList;
 
-public class BackUpItemList extends LinkedList<BackUpItem> {
+import org.fl.backupFiles.directoryGroup.GroupPolicy;
+import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
+
+public class BackUpItemList extends LinkedList<AbstractBackUpItem> {
 
 	private static final long serialVersionUID = 1L;
 	
-	public BackUpItemList() {
+	private BackUpItemList() {
 		super();
+	}
+	
+	public static BackUpItemList build() {
+		return new BackUpItemList();
+	}
+	
+	@Override
+	public boolean add(AbstractBackUpItem item) {
+
+		if (item instanceof BackUpItem backUpItem) {
+			DirectoryGroup directoryGroup = backUpItem.getDirectoryGroup();
+			GroupPolicy groupPolicy = directoryGroup.getGroupPolicy();
+			return switch (groupPolicy) {
+				   	case DO_NOT_GROUP -> super.add(backUpItem);
+					case GROUP_SUB_ITEMS -> {
+						if (getBackUpItemSourceClosestExistingPathLength(backUpItem) < directoryGroup.getDirectoryGroupPathNameCount() + 2) {
+							// the item path (reported to DirectoryGroup) is directly under the DirectoryGroup path. It does not belong to a subpath
+							super.add(backUpItem);
+						} else {
+							BackUpItemGroup backUpItemGroup = directoryGroup.addBackUpItem(backUpItem);
+							if (backUpItemGroup != null) {
+								// new BackUpItemGroup created, so not yet in the BackUpItemList
+								super.add(backUpItemGroup);
+							}
+						}					
+						yield true;
+					}
+					case GROUP_ALL -> {
+						BackUpItemGroup backUpItemGroup = directoryGroup.addBackUpItem(backUpItem);
+						if (backUpItemGroup != null) {
+							// new BackUpItemGroup created, so not yet in the BackUpItemList
+							super.add(backUpItemGroup);
+						}
+						yield true;
+					}
+			};
+		} else {
+			throw new IllegalArgumentException("Trying to call BackUpItemList.add with a BackUpItemGroup argument");
+		}
 	}
 	
 	public void removeItemsDone() {
 		removeIf(i -> i.getBackupStatus().equals(BackupStatus.DONE));
 	}
 	
+	private int getBackUpItemSourceClosestExistingPathLength(BackUpItem item) {
+		return item.getSourceClosestExistingPath().getNameCount();
+	}
+
+	public BackUpCounters sumIndividualCounters() {
+		BackUpCounters backUpCounters = new BackUpCounters(new TargetFileStores(), OperationType.SCAN);
+		forEach(backUpItem -> backUpItem.sumIndividualCounters(backUpCounters));
+		return backUpCounters;
+	}
 }

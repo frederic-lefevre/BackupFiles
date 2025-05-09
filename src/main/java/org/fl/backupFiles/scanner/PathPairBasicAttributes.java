@@ -24,7 +24,6 @@ SOFTWARE.
 
 package org.fl.backupFiles.scanner;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
@@ -67,12 +66,18 @@ public class PathPairBasicAttributes {
 		// Lazy get, to avoid to access file system if it is not needed
 		
 		if (!sourcePathAttributesKnown) {
-			try {
-				sourceBasicAttributes = sourcePath.getFileSystem().provider().readAttributesIfExists(sourcePath, BasicFileAttributes.class);
+			if (sourcePath == null) {
 				sourcePathAttributesKnown = true;
-				sourceExists = sourceBasicAttributes != null;
-			} catch (IOException e) {
-				pLog.log(Level.SEVERE, "IOException when getting basic file attributes of " + Objects.toString(sourcePath), e);
+				sourceBasicAttributes = null;
+				sourceExists = false;
+			} else {
+				try {
+					sourceBasicAttributes = sourcePath.getFileSystem().provider().readAttributesIfExists(sourcePath, BasicFileAttributes.class);
+					sourcePathAttributesKnown = true;
+					sourceExists = sourceBasicAttributes != null;
+				} catch (Exception e) {
+					pLog.log(Level.SEVERE, "Exception when getting basic file attributes of " + Objects.toString(sourcePath), e);
+				}
 			}
 		}
 		return sourceBasicAttributes;
@@ -82,12 +87,18 @@ public class PathPairBasicAttributes {
 		// Lazy get, to avoid to access file system if it is not needed
 		
 		if (!targetPathAttributesKnown) {
-			try {
-				targetBasicAttributes = targetPath.getFileSystem().provider().readAttributesIfExists(targetPath, BasicFileAttributes.class);
+			if (targetPath == null) {
 				targetPathAttributesKnown = true;
-				targetExists = targetBasicAttributes != null;
-			} catch (IOException e) {
-				pLog.log(Level.SEVERE, "IOException when getting basic file attributes of " + Objects.toString(targetPath), e);
+				targetBasicAttributes = null;
+				targetExists = false;
+			} else {
+				try {
+					targetBasicAttributes = targetPath.getFileSystem().provider().readAttributesIfExists(targetPath, BasicFileAttributes.class);
+					targetPathAttributesKnown = true;
+					targetExists = targetBasicAttributes != null;
+				} catch (Exception e) {
+					pLog.log(Level.SEVERE, "Exception when getting basic file attributes of " + Objects.toString(targetPath), e);
+				}
 			}
 		}
 		return targetBasicAttributes;
@@ -129,8 +140,13 @@ public class PathPairBasicAttributes {
 		return (targetPath == null) ;
 	}
 
+	public boolean noSourcePath() {
+		return (sourcePath == null) ;
+	}
+	
 	public void setTargetPath(Path targetPath) {
 		this.targetPath = targetPath;
+		targetPathAttributesKnown = false;
 	}
 	
 	public static PathPairBasicAttributes getClosestExistingParentBasicAttributes(Path path) {

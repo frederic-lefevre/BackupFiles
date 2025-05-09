@@ -33,6 +33,11 @@ import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
+import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
+import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
+import org.fl.backupFiles.directoryGroup.GroupPolicy;
+import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
 import org.fl.backupFiles.scanner.PathPairBasicAttributes;
 import org.fl.util.file.FileComparator;
 import org.junit.jupiter.api.AfterEach;
@@ -48,17 +53,17 @@ public class BackUpItemTest {
 	
 	private static Logger log = Logger.getLogger(BackUpItemTest.class.getName());
 
-	private static final String SRC_FOLDER = "file:///ForTests/BackUpFiles/TestDir1/";
+	private static final String SRC_FOLDER = "file:///C:/ForTests/BackUpFiles/TestDir1/";
 	private static final String SRC_FILE1 = SRC_FOLDER + "File1.pdf";
-	private static final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
-	private static final String UNEXISTANT_FILE = "file:///ForTests/BackUpFiles/TestDir1/doesNotExists.pdf";
+	private static final String TGT_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir2/File1.pdf";
+	private static final String UNEXISTANT_FILE = "file:///C:/ForTests/BackUpFiles/TestDir1/doesNotExists.pdf";
 
 	private static final Path EXISTANT_SOURCE_FOLDER = TestUtils.getPathFromUriString(SRC_FOLDER);
 	private static final Path EXISTANT_SOURCE = TestUtils.getPathFromUriString(SRC_FILE1);
 	private static final Path UNEXISTANT_TARGET = TestUtils.getPathFromUriString(TGT_FILE1);
 	private static final Path UNEXISTANT_PATH = TestUtils.getPathFromUriString(UNEXISTANT_FILE);
 
-	private static final String UNEXISTANT_FOLDER = "file:///ForTests/BackUpFiles/doesNotExists";
+	private static final String UNEXISTANT_FOLDER = "file:///C:/ForTests/BackUpFiles/doesNotExists";
 	private static final Path UNEXISTANT_FOLDER_PATH = TestUtils.getPathFromUriString(UNEXISTANT_FOLDER);
 
 	private static BackUpTask backUpTask;
@@ -66,8 +71,11 @@ public class BackUpItemTest {
 	@BeforeAll
 	static void initConfig() throws IOException {
 
+		Path sourcePathForDirectoryMap = TestUtils.getPathFromUriString("file:///C:/ForTests/BackUpFiles/TestDir1/");
 		Config.initConfig(DEFAULT_PROP_FILE);
-		backUpTask = new BackUpTask(EXISTANT_SOURCE_FOLDER, EXISTANT_SOURCE_FOLDER, 0);
+		DirectoryGroupConfiguration directoryGroupConfiguration = new DirectoryGroupConfiguration(Config.getBackupGroupConfiguration());
+		backUpTask = new BackUpTask(EXISTANT_SOURCE_FOLDER, EXISTANT_SOURCE_FOLDER, 
+				new DirectoryGroupMap(sourcePathForDirectoryMap, sourcePathForDirectoryMap, directoryGroupConfiguration), 0);
 	}
 
 	private static TargetFileStores newTargetFileStores() {
@@ -89,6 +97,7 @@ public class BackUpItemTest {
 		BackupAction action = backUpItem.getBackupAction();
 
 		assertThat(action).isEqualTo(BackupAction.COPY_REPLACE);
+		assertThat(backUpItem.getBackupStatus()).isEqualTo(BackupStatus.DIFFERENT);
 	}
 
 	@Test
@@ -102,7 +111,9 @@ public class BackUpItemTest {
 		assertThat(getTotalCounters(counters)).isEqualTo(1);
 
 		counters.reset();
-		backUpItem.execute(counters);
+		boolean result1 = backUpItem.execute(counters);
+		assertThat(result1).isTrue();
+		assertThat(backUpItem.getBackupStatus()).isEqualTo(BackupStatus.DONE);
 
 		FileComparator fileComparator = new FileComparator(log);
 
@@ -123,7 +134,9 @@ public class BackUpItemTest {
 		assertThat(getTotalCounters(counters)).isEqualTo(1);
 
 		counters.reset();
-		backUpItem.execute(counters);
+		boolean result2 = backUpItem.execute(counters);
+		assertThat(result2).isTrue();
+		assertThat(backUpItem.getBackupStatus()).isEqualTo(BackupStatus.DONE);
 
 		assertThat(Files.exists(UNEXISTANT_TARGET)).isFalse();
 		assertThat(counters.nbSourceFilesProcessed).isZero();
@@ -132,23 +145,159 @@ public class BackUpItemTest {
 		assertThat(getTotalCounters(counters)).isEqualTo(2);
 	}
 
+
+	@Test
+	void testItemDirectoryGroup() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
+		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask);
+		
+		DirectoryGroup directoryGroup = backUpItem.getDirectoryGroup();
+		
+		assertThat(directoryGroup).isNotNull();
+		assertThat(directoryGroup.getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_ALL);
+		assertThat(directoryGroup.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.MEDIUM);
+		assertThat(backUpItem.getSourcePath().startsWith(directoryGroup.getPath()));
+	}
+	
+	@Test
+	void sumIndivualCounterTest() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask);
+		
+		BackUpCounters sumCounters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		
+		backUpItem.sumIndividualCounters(sumCounters);
+		
+		assertThat(sumCounters.equalsIndividualCounters(counters)).isTrue();
+	}
+	
+	@Test
+	void sumIndivualCounterTest2() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask);
+		
+		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(EXISTANT_SOURCE, EXISTANT_SOURCE);
+		BackUpCounters counters2 = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem2 = new BackUpItem(pathPairBasicAttributes2, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, counters2, backUpTask);
+		
+		BackUpCounters sumCounters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		
+		backUpItem.sumIndividualCounters(sumCounters);
+		backUpItem2.sumIndividualCounters(sumCounters);
+		
+		assertThat(sumCounters.equalsIndividualCounters(counters)).isFalse();
+		
+		counters.add(counters2);
+		assertThat(sumCounters.equalsIndividualCounters(counters)).isTrue();
+	}
+	
+	@Test
+	void testSourcePresentTargetNot() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, UNEXISTANT_TARGET);
+		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask);
+		
+		assertThat(backUpItem.isSourcePresent()).isTrue();
+		assertThat(pathPairBasicAttributes.sourceExists()).isTrue();
+		
+		assertThat(backUpItem.isTargetPresent()).isFalse();
+		assertThat(pathPairBasicAttributes.targetExists()).isFalse();
+		assertThat(pathPairBasicAttributes.noTargetPath()).isFalse();
+	}
+	
+	@Test
+	void testSourcePresentTargetNull() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, null);
+		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask);
+		
+		assertThat(backUpItem.isSourcePresent()).isTrue();
+		assertThat(pathPairBasicAttributes.sourceExists()).isTrue();
+		
+		assertThat(backUpItem.isTargetPresent()).isFalse();
+		assertThat(pathPairBasicAttributes.targetExists()).isFalse();
+		assertThat(pathPairBasicAttributes.noTargetPath()).isTrue();
+	}
+	
+	@Test
+	void testTargetPresentSourceNot() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(UNEXISTANT_TARGET, EXISTANT_SOURCE);
+		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(EXISTANT_SOURCE_FOLDER, null);
+		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, pathPairBasicAttributes2, counters, backUpTask);
+		
+		assertThat(backUpItem.isSourcePresent()).isFalse();
+		assertThat(pathPairBasicAttributes.sourceExists()).isFalse();
+		
+		assertThat(backUpItem.isTargetPresent()).isTrue();
+		assertThat(pathPairBasicAttributes.targetExists()).isTrue();
+		assertThat(pathPairBasicAttributes.noTargetPath()).isFalse();
+	}
+	
+	@Test
+	void testTargetPresentSourceNull() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(null, EXISTANT_SOURCE);
+		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(EXISTANT_SOURCE_FOLDER, null);
+		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, pathPairBasicAttributes2, counters, backUpTask);
+		
+		assertThat(backUpItem.isSourcePresent()).isFalse();
+		assertThat(pathPairBasicAttributes.sourceExists()).isFalse();
+		
+		assertThat(backUpItem.isTargetPresent()).isTrue();
+		assertThat(pathPairBasicAttributes.targetExists()).isTrue();
+		assertThat(pathPairBasicAttributes.noTargetPath()).isFalse();
+	}
+	
+	@Test
+	void testTargetAndSourcePresent() {
+		
+		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(EXISTANT_SOURCE, EXISTANT_SOURCE);
+		PathPairBasicAttributes pathPairBasicAttributes2 = new PathPairBasicAttributes(EXISTANT_SOURCE_FOLDER, null);
+		
+		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+		BackUpItem backUpItem = new BackUpItem(pathPairBasicAttributes, BackupAction.DELETE, pathPairBasicAttributes2, counters, backUpTask);
+		
+		assertThat(backUpItem.isSourcePresent()).isTrue();
+		assertThat(pathPairBasicAttributes.sourceExists()).isTrue();
+		
+		assertThat(backUpItem.isTargetPresent()).isTrue();
+		assertThat(pathPairBasicAttributes.targetExists()).isTrue();
+		assertThat(pathPairBasicAttributes.noTargetPath()).isFalse();
+	}
+	
 	@Test
 	void nullSrcShouldThrowException() {
 
 		PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(null, UNEXISTANT_TARGET);
 		BackUpCounters counters = new BackUpCounters(newTargetFileStores(), OperationType.SCAN);
 
-		assertThatNullPointerException()
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_NEW, BackupStatus.DIFFERENT, counters, backUpTask));
-		assertThatNullPointerException()
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_REPLACE, BackupStatus.DIFFERENT, counters, backUpTask));
-		assertThatNullPointerException()
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TREE, BackupStatus.DIFFERENT, counters, backUpTask));
-		assertThatNullPointerException()
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.AMBIGUOUS, BackupStatus.SAME_CONTENT, counters, backUpTask));
-		assertThatNullPointerException()
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.COPY_TARGET, BackupStatus.SAME_CONTENT, counters, backUpTask));
-		assertThatNullPointerException()
+		assertThatExceptionOfType(IllegalBackUpItemException.class)
 			.isThrownBy(() -> new BackUpItem(pathPairBasicAttributes, BackupAction.ADJUST_TIME, BackupStatus.SAME_CONTENT, counters, backUpTask));
 	}
 
@@ -265,7 +414,8 @@ public class BackUpItemTest {
 		assertThat(counters.copyTargetNb).isEqualTo(1);
 
 		counters.reset();
-		backUpItem.execute(counters);
+		boolean result = backUpItem.execute(counters);
+		assertThat(result).isTrue();
 
 		assertThat(counters.copyTargetNb).isEqualTo(1);
 		assertThat(getTotalCounters(counters)).isEqualTo(2);
@@ -325,7 +475,8 @@ public class BackUpItemTest {
 		assertThat(counters.adjustTimeNb).isEqualTo(1);
 
 		counters.reset();
-		backUpItem.execute(counters);
+		boolean result = backUpItem.execute(counters);
+		assertThat(result).isTrue();
 
 		// Check with Files.getLastModifiedTime
 		assertThat(Files.getLastModifiedTime(TARGET_FILE)

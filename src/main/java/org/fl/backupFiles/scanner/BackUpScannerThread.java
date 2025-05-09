@@ -110,10 +110,11 @@ public class BackUpScannerThread {
 		currentFile = sourcePath;
 		
 		backUpCounters.reset();
+		backUpTask.getDirectoryGroupMap().clearBackUpItemsInDirectoryGroup();
 
 		filesVisitFailed = new ArrayList<Path>();
 
-		backUpItemList = new BackUpItemList();
+		backUpItemList = BackUpItemList.build();
 		
 		try {
 			PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(sourcePath, targetPath);

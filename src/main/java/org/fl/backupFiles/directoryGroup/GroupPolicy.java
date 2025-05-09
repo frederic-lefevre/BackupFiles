@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2025 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,18 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package org.fl.backupFiles.directoryPermanence;
+package org.fl.backupFiles.directoryGroup;
 
-import java.nio.file.Path;
-
-public class DummyDirectoryPermanence implements DirectoryPermanence {
-	
-	public DummyDirectoryPermanence() {
-		super();
-	}
-
-	@Override
-	public DirectoryPermanenceLevel getPermanenceLevel(Path dir) {		
-		return DirectoryPermanenceLevel.MEDIUM;
-	}
+public enum GroupPolicy {
+	DO_NOT_GROUP, GROUP_SUB_ITEMS, GROUP_ALL
 }

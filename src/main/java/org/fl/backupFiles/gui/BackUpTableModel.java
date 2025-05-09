@@ -24,23 +24,29 @@ SOFTWARE.
 
 package org.fl.backupFiles.gui;
 
+import java.nio.file.Path;
+
 import javax.swing.table.AbstractTableModel;
 
-import org.fl.backupFiles.BackUpItem;
+import org.fl.backupFiles.AbstractBackUpItem;
 import org.fl.backupFiles.BackUpItemList;
+import org.fl.backupFiles.BackupAction;
+import org.fl.backupFiles.BackupStatus;
+import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 
 public class BackUpTableModel extends AbstractTableModel {
 
 	public static final int SOURCE_PATH_COL_IDX = 0;
-	public static final int SIZE_DIFF_COL_IDX = 1;
-	public static final int PERMANENCE_COL_IDX = 2;
-	public static final int ACTION_COL_IDX = 3;
-	public static final int STATUS_COL_IDX = 4;
-	public static final int TARGET_PATH_COL_IDX = 5;
+	public static final int GROUP_COL_IDX = 1;
+	public static final int SIZE_DIFF_COL_IDX = 2;
+	public static final int PERMANENCE_COL_IDX = 3;
+	public static final int ACTION_COL_IDX = 4;
+	public static final int STATUS_COL_IDX = 5;
+	public static final int TARGET_PATH_COL_IDX = 6;
 	
 	private static final long serialVersionUID = 1L;
 	
-	private final static String[] entetes = {"Chemin origine", "Taille", "Permanence", "Action", "Etat", "Chemin destination"};
+	private final static String[] entetes = {"Chemin origine", "Groupé", "Taille", "Permanence", "Action", "Etat", "Chemin destination"};
 	
 	// Underlying data
 	private BackUpItemList backUpItems;
@@ -74,23 +80,23 @@ public class BackUpTableModel extends AbstractTableModel {
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
 
-		if ((backUpItems == null) || (backUpItems.isEmpty())) {
-			return super.getColumnClass(columnIndex);
-		} else {
-			Object val = getValueAt(0, columnIndex);
-			if (val == null) {
-				// Source or target path maybe null
-				return super.getColumnClass(columnIndex);
-			} else {
-				return getValueAt(0, columnIndex).getClass();
-			}
-		}
+		return switch(columnIndex){
+    		case SOURCE_PATH_COL_IDX -> Path.class;
+    		case GROUP_COL_IDX -> AbstractBackUpItem.class;
+    		case SIZE_DIFF_COL_IDX -> AbstractBackUpItem.class;
+    		case PERMANENCE_COL_IDX -> DirectoryPermanenceLevel.class;
+    		case ACTION_COL_IDX -> BackupAction.class;
+    		case STATUS_COL_IDX -> BackupStatus.class;
+    		case TARGET_PATH_COL_IDX -> Path.class;
+    		default -> super.getColumnClass(columnIndex);
+		};
 	}
 	 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		return switch(columnIndex){
         	case SOURCE_PATH_COL_IDX -> backUpItems.get(rowIndex).getSourcePath();
+        	case GROUP_COL_IDX -> backUpItems.get(rowIndex);
         	case SIZE_DIFF_COL_IDX -> backUpItems.get(rowIndex);
         	case PERMANENCE_COL_IDX -> backUpItems.get(rowIndex).getPermanenceLevel();
         	case ACTION_COL_IDX -> backUpItems.get(rowIndex).getBackupAction();
@@ -100,7 +106,7 @@ public class BackUpTableModel extends AbstractTableModel {
 		};
 	}
 
-	public BackUpItem getBackUpItemAt(int rowIndex) {
+	public AbstractBackUpItem getBackUpItemAt(int rowIndex) {
 		return backUpItems.get(rowIndex);
 	}
 }

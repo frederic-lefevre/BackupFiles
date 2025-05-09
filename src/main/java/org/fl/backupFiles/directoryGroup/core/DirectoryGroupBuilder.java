@@ -22,25 +22,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package org.fl.backupFiles.directoryPermanence;
+package org.fl.backupFiles.directoryGroup.core;
 
 import java.nio.file.Path;
-import java.util.Comparator;
 
-public class PermanencePathComparator implements Comparator<Path> {
+import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
+import org.fl.backupFiles.directoryGroup.GroupPolicy;
 
-	@Override
-	public int compare(Path path1, Path path2) {
+public class DirectoryGroupBuilder {
+
+	public static DirectoryGroup build(Path path, DirectoryPermanenceLevel permanenceLevel, GroupPolicy groupPolicy) {
 		
-		if (path1.equals(path2)) {
-			return 0;
-		} else if (path1.startsWith(path2)) {
-			return -1;
-		} else if (path2.startsWith(path1)) {
-			return 1;
-		} else {
-			return path1.compareTo(path2);
-		}
+		return switch (groupPolicy) {
+			case DO_NOT_GROUP -> new DirectoryGroup(path, permanenceLevel, groupPolicy);
+			case GROUP_ALL ->  new DirectoryGroupAll(path, permanenceLevel, groupPolicy);
+			case GROUP_SUB_ITEMS ->  new DirectoryGroupSub(path, permanenceLevel, groupPolicy);
+		};	
 	}
-
 }

@@ -26,34 +26,42 @@ package org.fl.backupFiles.gui;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.logging.Logger;
 
 import javax.swing.SwingConstants;
 
-import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
+import org.fl.backupFiles.BackUpItem;
+import org.fl.backupFiles.BackUpItemGroup;
 import org.fl.util.swing.CustomTableCellRenderer;
 
-public class PermanenceCellRenderer extends CustomTableCellRenderer {
+public class GroupCellRenderer extends CustomTableCellRenderer  {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Color HIGH_COLOR = Color.RED;
-	private static final Color MEDIUM_COLOR = Color.PINK;
+	private static final Logger logger = Logger.getLogger(GroupCellRenderer.class.getName());
+	
 	private static final Font font = new Font("Dialog", Font.PLAIN, 12);
 	
-	public PermanenceCellRenderer() {
-		super(font, SwingConstants.CENTER);
+	public GroupCellRenderer() {
+		super(font, SwingConstants.RIGHT);
 	}
+
+	private static final Color BACKUP_ITEM_GROUP_COLOR = new Color(180, 220, 255);
+	private static final Color BACKUP_ITEM_COLOR = Color.WHITE;
 
 	@Override
 	public void valueProcessor(Object value) {
 		
-		if (value instanceof DirectoryPermanenceLevel permanenceLevel) {
-			switch (permanenceLevel) {
-				case HIGH -> setBackground(HIGH_COLOR);
-				case MEDIUM -> setBackground(MEDIUM_COLOR);
-				case LOW -> setBackground(Color.WHITE);
-			}
-			setValue(permanenceLevel.getPermanenceName());
-		}		
+		if (value instanceof BackUpItem backUpItem) {
+			setValue(backUpItem.getBackUpItemNumber()); // should always be 1
+			setBackground(BACKUP_ITEM_COLOR);
+		} else if (value instanceof BackUpItemGroup backUpItemGroup) {
+			setValue(backUpItemGroup.getBackUpItemNumber()); // may be 1 if there is a single element in the group
+			setBackground(BACKUP_ITEM_GROUP_COLOR);
+		} else {
+			logger.severe("Invalid value type in Groupé cell. Should be a AbstractBackUpItem subclass but is " + value.getClass().getName());
+		}
+		
 	}
+
 }

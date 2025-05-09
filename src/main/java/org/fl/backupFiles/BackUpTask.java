@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.util.file.FilesUtils;
 
 public class BackUpTask {
@@ -41,6 +42,7 @@ public class BackUpTask {
 	private final Path target;
 	private final long sizeWarningLimit;
 	private final FileStore targetFileStore;
+	private final DirectoryGroupMap directoryGroupMap;
 	
 	private boolean compareContent;
 	private boolean compareContentOnAmbiguous;
@@ -51,7 +53,7 @@ public class BackUpTask {
 	private static final String noWarning = "" ;
 	
 	// A back up task is a source directory or file to back up to a destination directory or file
-	public BackUpTask(Path src, Path tgt, long sizeWarningLimit) throws IOException {
+	public BackUpTask(Path src, Path tgt, DirectoryGroupMap directoryGroupMap, long sizeWarningLimit) throws IOException {
 		
 		source = src;
 		target = tgt;
@@ -62,6 +64,7 @@ public class BackUpTask {
 		}
 
 		targetFileStore = FilesUtils.findFileStore(target, bLog);
+		this.directoryGroupMap = directoryGroupMap;
 
 		compareContent = false;
 		compareContentOnAmbiguous = true;
@@ -77,6 +80,10 @@ public class BackUpTask {
 
 	public long getSizeWarningLimit() {
 		return sizeWarningLimit;
+	}
+
+	public DirectoryGroupMap getDirectoryGroupMap() {
+		return directoryGroupMap;
 	}
 
 	public FileStore getTargetFileStore() {

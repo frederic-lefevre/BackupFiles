@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingConstants;
 
-import org.fl.backupFiles.BackUpItem;
+import org.fl.backupFiles.AbstractBackUpItem;
 import org.fl.util.swing.CustomTableCellRenderer;
 
 public class BackUpSizeDifferenceCellRenderer extends CustomTableCellRenderer {
@@ -45,7 +45,7 @@ public class BackUpSizeDifferenceCellRenderer extends CustomTableCellRenderer {
 	
 	private static final long serialVersionUID = 1L;
 	private static final Color ABOVE_LIMIT_COLOR = new Color(255, 100, 100);
-	private static final Color BELOW_LIMIT_COLOR = new Color(255, 255, 255);
+	private static final Color BELOW_LIMIT_COLOR = Color.WHITE;
 
 	public BackUpSizeDifferenceCellRenderer() {
 		super(font, SwingConstants.CENTER);
@@ -54,19 +54,20 @@ public class BackUpSizeDifferenceCellRenderer extends CustomTableCellRenderer {
 	@Override
 	public void valueProcessor(Object value) {
 		
-		if (value instanceof BackUpItem backUpItem) {
+		if (AbstractBackUpItem.class.isAssignableFrom(value.getClass())) {
 			
+			AbstractBackUpItem backUpItem = (AbstractBackUpItem)value;
 			long sizeDifference = backUpItem.getSizeDifference();			
 			setValue(Long.toString(sizeDifference));
 			setToolTipText(numberFormat.format(sizeDifference));
 
-			if (sizeDifference > backUpItem.getFileSizeWarningThreshold()) {
+			if (backUpItem.isAboveFileSizeLimitThreshold()) {
 				setBackground(ABOVE_LIMIT_COLOR);
 			} else {
 				setBackground(BELOW_LIMIT_COLOR);
 			}
 		} else {
-			logger.severe("Invalid value type in Size Difference cell. Should be BackUpItem but is " + value.getClass().getName());
+			logger.severe("Invalid value type in Size Difference cell. Should be a AbstractBackUpItem subclass but is " + value.getClass().getName());
 		}		
 	}
 }

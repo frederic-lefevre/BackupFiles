@@ -32,6 +32,8 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
+
 public class BackUpJobList extends Vector<BackUpJob> {
 
 	private static final Logger bLog = Logger.getLogger(BackUpJobList.class.getName());
@@ -46,12 +48,14 @@ public class BackUpJobList extends Vector<BackUpJob> {
 
 		super();
 
+		DirectoryGroupConfiguration directoryGroupConfiguration = new DirectoryGroupConfiguration(Config.getBackupGroupConfiguration());
+		
 		try (DirectoryStream<Path> paths = Files.newDirectoryStream(configFilesDir, "*.json")) {
 			for (Path configFile : paths) {
 				bLog.fine(() -> "Find config file " + configFile.toString());
 				String jsonConfig = new String(Files.readAllBytes(configFile), StandardCharsets.UTF_8);
 				bLog.finest(() -> "New configuration : " + jsonConfig);
-				addElement(new BackUpJob(jsonConfig));
+				addElement(new BackUpJob(jsonConfig, directoryGroupConfiguration));
 			}
 			if (size() == 0) {
 				bLog.warning("No back up job config file found in " + configFilesDir.toString());

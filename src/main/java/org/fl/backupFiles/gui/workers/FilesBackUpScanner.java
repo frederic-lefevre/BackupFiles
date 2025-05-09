@@ -240,6 +240,12 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 					pLog.severe("Erreur, nombre de résultats de scan recalculé =" + sumOfRes + " différent du nombre stocké =" + backUpItemList.size());
 				}
 				
+				// Check backUpCounters against backUpItemList (if they are not equals there is a suspicion that a BackUpItem is not part of the BackUpItemList)
+				BackUpCounters sumIndividualCounters = backUpItemList.sumIndividualCounters();
+				if (! sumIndividualCounters.equalsIndividualCounters(backUpCounters)) {
+					pLog.severe("Erreur, la somme des compteurs individuels depuis la liste des BackUpItems est différente des compteurs individuels du Scanner");
+				}
+				
 				// Update progress info panel
 				String scannerInfoHtml = getScanInfoHtml(duration);
 				long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;

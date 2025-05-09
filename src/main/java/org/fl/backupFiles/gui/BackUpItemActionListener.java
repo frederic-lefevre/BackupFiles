@@ -29,6 +29,7 @@ import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
+import org.fl.backupFiles.AbstractBackUpItem;
 import org.fl.backupFiles.BackUpItem;
 import org.fl.util.swing.FileActions;
 
@@ -47,16 +48,16 @@ public class BackUpItemActionListener implements java.awt.event.ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 
-		BackUpItem selectedEntry = backUpJTable.getSelectedBackUpItem() ;
+		AbstractBackUpItem selectedEntry = backUpJTable.getSelectedBackUpItem() ;
 
-		if (selectedEntry != null) {
+		if ((selectedEntry != null) && (selectedEntry instanceof BackUpItem backUpItem)) {
 			// OS command (Java Desktop class OS action on File object: Edit, Open, Print)
 
 			File file = null;
 			if (fileElement.equals(FileElement.Source)) {
-				file = selectedEntry.getSourceFile();
+				file = backUpItem.getSourceFile();
 			} else if (fileElement.equals(FileElement.Cible)) {
-				file = selectedEntry.getTargetFile();
+				file = backUpItem.getTargetFile();
 			}
 			if (file != null) {
 				FileActions.launchAction(file, action);
