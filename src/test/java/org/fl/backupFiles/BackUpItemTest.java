@@ -33,6 +33,7 @@ import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 import org.fl.backupFiles.directoryGroup.GroupPolicy;
@@ -72,8 +73,9 @@ public class BackUpItemTest {
 
 		Path sourcePathForDirectoryMap = TestUtils.getPathFromUriString("file:///C:/ForTests/BackUpFiles/TestDir1/");
 		Config.initConfig(DEFAULT_PROP_FILE);
+		DirectoryGroupConfiguration directoryGroupConfiguration = new DirectoryGroupConfiguration(Config.getBackupGroupConfiguration());
 		backUpTask = new BackUpTask(EXISTANT_SOURCE_FOLDER, EXISTANT_SOURCE_FOLDER, 
-				new DirectoryGroupMap(sourcePathForDirectoryMap, sourcePathForDirectoryMap, Config.getBackupGroupConfiguration()), 0);
+				new DirectoryGroupMap(sourcePathForDirectoryMap, sourcePathForDirectoryMap, directoryGroupConfiguration), 0);
 	}
 
 	private static TargetFileStores newTargetFileStores() {

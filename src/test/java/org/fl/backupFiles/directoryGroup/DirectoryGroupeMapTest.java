@@ -28,14 +28,10 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
 import org.fl.backupFiles.directoryGroup.core.DirectoryGroupAll;
 import org.fl.backupFiles.directoryGroup.core.DirectoryGroupSub;
-import org.fl.util.FilterCounter;
-import org.fl.util.FilterCounter.LogRecordCounter;
 import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -49,11 +45,13 @@ class DirectoryGroupeMapTest {
 		 """;
 	
 	private static DirectoryGroupMap directoryGroupmMap;
+	private static DirectoryGroupConfiguration directoryGroupConfiguration;
 	
 	@BeforeAll
 	static void init() throws Exception {
 		Path sourcePath = FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/");
-		directoryGroupmMap = new DirectoryGroupMap(sourcePath, sourcePath, JSON_CONF);
+		directoryGroupConfiguration = new DirectoryGroupConfiguration(JSON_CONF);
+		directoryGroupmMap = new DirectoryGroupMap(sourcePath, sourcePath, directoryGroupConfiguration);
 	}
 	
 	@Test
@@ -64,63 +62,25 @@ class DirectoryGroupeMapTest {
 	@Test
 	void testNullJson() throws URISyntaxException {
 		
-		// that is just creating a map with a defaulf DirectoryGroup
-		DirectoryGroupMap groupmMap = new DirectoryGroupMap(Path.of("/"), Path.of("/"), null);
-		assertThat(groupmMap).isNotNull();
-		
-		DirectoryGroup group = groupmMap.getDirectoryGroup(FilesUtils.uriStringToAbsolutePath("file:///any/folder"));
-		assertThat(group.getPath()).isEqualTo(Path.of("/"));
-		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryGroupMap.DEFAULT_PERMANENCE_LEVEL);
-		assertThat(group.getGroupPolicy()).isEqualTo(DirectoryGroupMap.DEFAULT_GROUP_POLICY);
+		assertThatNullPointerException().isThrownBy(() -> new DirectoryGroupMap(Path.of("/"), Path.of("/"), null));
 	}
 	
 	@Test
 	void testAllNull() throws URISyntaxException {
 		
-		// that is just creating a map with a defaulf DirectoryGroup
-		DirectoryGroupMap groupmMap = new DirectoryGroupMap(null, null, null);
-		assertThat(groupmMap).isNotNull();
-		
-		DirectoryGroup group = groupmMap.getDirectoryGroup(FilesUtils.uriStringToAbsolutePath("file:///any/folder"));
-		assertThat(group.getPath()).isEqualTo(Path.of("/"));
-		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryGroupMap.DEFAULT_PERMANENCE_LEVEL);
-		assertThat(group.getGroupPolicy()).isEqualTo(DirectoryGroupMap.DEFAULT_GROUP_POLICY);
+		assertThatNullPointerException().isThrownBy(() ->  new DirectoryGroupMap(null, null, null));
 	}
 	
 	@Test
 	void originalSourcePathNullShouldRaiseError() throws URISyntaxException {
 		
-		LogRecordCounter logCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(DirectoryGroupMap.class.getName()));
-		
-		DirectoryGroupMap groupmMap = new DirectoryGroupMap(null, Path.of("/"), JSON_CONF);
-		assertThat(groupmMap).isNotNull();
-		
-		DirectoryGroup group = groupmMap.getDirectoryGroup(FilesUtils.uriStringToAbsolutePath("file:///any/folder"));
-		assertThat(group.getPath()).isEqualTo(Path.of("/"));
-		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryGroupMap.DEFAULT_PERMANENCE_LEVEL);
-		assertThat(group.getGroupPolicy()).isEqualTo(DirectoryGroupMap.DEFAULT_GROUP_POLICY);
-		
-		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
-		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThatNullPointerException().isThrownBy(() -> new DirectoryGroupMap(null, Path.of("/"), directoryGroupConfiguration));
 	}
 	
 	@Test
 	void originalActualPathNullShouldRaiseError() throws URISyntaxException {
 		
-		LogRecordCounter logCounter = 
-				FilterCounter.getLogRecordCounter(Logger.getLogger(DirectoryGroupMap.class.getName()));
-		
-		DirectoryGroupMap groupmMap = new DirectoryGroupMap(FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/photos/"), null, JSON_CONF);
-		assertThat(groupmMap).isNotNull();
-		
-		DirectoryGroup group = groupmMap.getDirectoryGroup(FilesUtils.uriStringToAbsolutePath("file:///any/folder"));
-		assertThat(group.getPath()).isEqualTo(Path.of("/"));
-		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryGroupMap.DEFAULT_PERMANENCE_LEVEL);
-		assertThat(group.getGroupPolicy()).isEqualTo(DirectoryGroupMap.DEFAULT_GROUP_POLICY);
-		
-		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
-		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThatNullPointerException().isThrownBy(() -> new DirectoryGroupMap(FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/photos/"), null, directoryGroupConfiguration));
 	}
 	
 	@Test

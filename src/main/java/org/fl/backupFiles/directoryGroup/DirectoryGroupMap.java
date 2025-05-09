@@ -26,72 +26,35 @@ package org.fl.backupFiles.directoryGroup;
 
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
 import org.fl.backupFiles.directoryGroup.core.DirectoryGroupBuilder;
-import org.fl.util.file.FilesUtils;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DirectoryGroupMap {
-
-	private static final Logger bLog = Logger.getLogger(DirectoryGroupMap.class.getName());
-	
-	private static final ObjectMapper mapper = new ObjectMapper();
 	
 	public static final DirectoryPermanenceLevel DEFAULT_PERMANENCE_LEVEL = DirectoryPermanenceLevel.HIGH;
 	public static final GroupPolicy DEFAULT_GROUP_POLICY = GroupPolicy.DO_NOT_GROUP;
-	
-	private static final String PATH = "path";
-	private static final String PERMANENCE = "permanence";
-	private static final String GROUP_POLICY = "groupPolicy";
-	private static final String URI_FILE_SCHEME = "file://";
 
 	private final Map<Path, DirectoryGroup> directoryGroupMap;
 	private final Set<Path> pathKeys;
 	private final DirectoryGroup defaultDirectoryGroup;
 
-	public DirectoryGroupMap(Path originSourcePath, Path actualSourcePath, String jsonConfig) {
+	public DirectoryGroupMap(Path originSourcePath, Path actualSourcePath, DirectoryGroupConfiguration directoryGroupConfiguration) {
 		super();
 		defaultDirectoryGroup = DirectoryGroupBuilder.build(Path.of("/"), DEFAULT_PERMANENCE_LEVEL, DEFAULT_GROUP_POLICY);
 		directoryGroupMap = new TreeMap<Path, DirectoryGroup>(new DeeperPathComparator());
 
-		if ((jsonConfig != null) && !jsonConfig.isEmpty()) {
-
-			try {
-				JsonNode jPathsNode = mapper.readTree(jsonConfig);
-				if ((jPathsNode != null) && (jPathsNode.isArray())) {
-
-					for (JsonNode jPathPermanence : jPathsNode) {
-
-						Path sPath = FilesUtils.uriStringToAbsolutePath(URI_FILE_SCHEME + jPathPermanence.get(PATH).asText());
-						if (sPath.startsWith(originSourcePath)) {
-							DirectoryPermanenceLevel permanenceLevel = DirectoryPermanenceLevel.valueOf(jPathPermanence.get(PERMANENCE).asText());
-							GroupPolicy groupPolicy = GroupPolicy.valueOf(jPathPermanence.get(GROUP_POLICY).asText());
-						
-							Path directoryGroupPathRelativeToActualSource = actualSourcePath.resolve(originSourcePath.relativize(sPath));
-							directoryGroupMap.put(directoryGroupPathRelativeToActualSource, DirectoryGroupBuilder.build(directoryGroupPathRelativeToActualSource, permanenceLevel, groupPolicy));
-						}
-					}
-				} else {
-					bLog.severe("Json null or not an array:\n" + jsonConfig);
-				}
-
-			} catch (JsonProcessingException e) {
-				bLog.log(Level.SEVERE, "Invalid JSON configuration: " + jsonConfig, e);
-			} catch (Exception e) {
-				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig + 
-						"\nwith originalSourcePath " + Objects.toString(originSourcePath) +
-						"\nand actualSourcePath " + Objects.toString(actualSourcePath), e);
+		directoryGroupConfiguration.getDirectoryGroupList().forEach(directoryGroup -> {
+			Path sPath = directoryGroup.getPath();
+			if (sPath.startsWith(originSourcePath)) {
+				Path directoryGroupPathRelativeToActualSource = actualSourcePath.resolve(originSourcePath.relativize(sPath));
+				directoryGroupMap.put(directoryGroupPathRelativeToActualSource, 
+						DirectoryGroupBuilder.build(directoryGroupPathRelativeToActualSource, directoryGroup.getPermanenceLevel(), directoryGroup.getGroupPolicy()));
 			}
-		}
+			
+		});
 		pathKeys = directoryGroupMap.keySet();
 	}
 

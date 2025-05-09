@@ -48,6 +48,7 @@ import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.BackupAction;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.TestUtils;
+import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 import org.fl.backupFiles.directoryGroup.GroupPolicy;
@@ -91,8 +92,9 @@ class BackUpScannerProcessorTest {
 			Path targetDataDir = Paths.get(new URI(TARGET_DATA_DIR));
 			Files.createDirectory(targetDataDir);
 			
+			DirectoryGroupConfiguration directoryGroupConfiguration = new DirectoryGroupConfiguration(Config.getBackupGroupConfiguration());
 			Path srcDirForDirectoryGroupMap =  Paths.get(new URI(BUFFER_DATA_DIR));
-			directoryGroupMap = new DirectoryGroupMap(srcDirForDirectoryGroupMap, srcDirForDirectoryGroupMap, Config.getBackupGroupConfiguration());
+			directoryGroupMap = new DirectoryGroupMap(srcDirForDirectoryGroupMap, srcDirForDirectoryGroupMap, directoryGroupConfiguration);
 			
 		} catch (URISyntaxException e) {
 			Logger.getGlobal().log(Level.SEVERE, "URI exception writing test data", e);
