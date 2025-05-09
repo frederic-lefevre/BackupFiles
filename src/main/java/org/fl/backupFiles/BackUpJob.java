@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -92,7 +93,7 @@ public class BackUpJob {
 	//  - a list of back up task from buffer directories to target directories
 	// or a single list of back up task from source directories to target directories
 	// A back up task is a source directory to back up and a destination directory to back up
-	public BackUpJob(String jsonConfig) {
+	public BackUpJob(String jsonConfig, DirectoryGroupConfiguration directoryGroupConfiguration) {
 
 		fullBackUpTaskList = new ArrayList<FullBackUpTask>();
 		
@@ -248,19 +249,19 @@ public class BackUpJob {
 			if (bufPath != null) {
 				if (Files.isRegularFile(srcPath)) {
 					Path bufFile = bufPath.resolve(srcPath.getFileName());
-					DirectoryGroupMap directoryGroupMap = new DirectoryGroupMap(srcPath, srcPath, Config.getBackupGroupConfiguration());
-					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile, directoryGroupMap, sizeWarningLimit));
+					DirectoryGroupMap directoryGroupMapForThisBackUpTask = new DirectoryGroupMap(srcPath, srcPath, Config.getBackupGroupConfiguration());
+					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile, directoryGroupMapForThisBackUpTask, sizeWarningLimit));
 				} else {
-					DirectoryGroupMap directoryGroupMap = new DirectoryGroupMap(srcPath, srcPath, Config.getBackupGroupConfiguration());
-					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath, directoryGroupMap, sizeWarningLimit));
+					DirectoryGroupMap directoryGroupMapForThisBackUpTask = new DirectoryGroupMap(srcPath, srcPath, Config.getBackupGroupConfiguration());
+					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath, directoryGroupMapForThisBackUpTask, sizeWarningLimit));
 				}
 				if (tgtPath != null) {
-					DirectoryGroupMap directoryGroupMap = new DirectoryGroupMap(srcPath, bufPath, Config.getBackupGroupConfiguration());
-					backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath, directoryGroupMap, sizeWarningLimit));
+					DirectoryGroupMap directoryGroupMapForThisBackUpTask = new DirectoryGroupMap(srcPath, bufPath, Config.getBackupGroupConfiguration());
+					backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath, directoryGroupMapForThisBackUpTask, sizeWarningLimit));
 				}
 			} else if (tgtPath != null) {
-				DirectoryGroupMap directoryGroupMap = new DirectoryGroupMap(srcPath, srcPath, Config.getBackupGroupConfiguration());
-				backUpTasks.get(JobTaskType.SOURCE_TO_TARGET).add(new BackUpTask(srcPath, tgtPath, directoryGroupMap, sizeWarningLimit));
+				DirectoryGroupMap directoryGroupMapForThisBackUpTask = new DirectoryGroupMap(srcPath, srcPath, Config.getBackupGroupConfiguration());
+				backUpTasks.get(JobTaskType.SOURCE_TO_TARGET).add(new BackUpTask(srcPath, tgtPath, directoryGroupMapForThisBackUpTask, sizeWarningLimit));
 			} else {
 				bLog.severe("No buffer and target element definition for back up job " + title);
 			}

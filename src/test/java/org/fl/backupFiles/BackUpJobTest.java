@@ -37,18 +37,27 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import org.fl.backupFiles.BackUpJob.JobTaskType;
+import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.util.FilterCounter;
 import org.fl.util.FilterCounter.LogRecordCounter;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class BackUpJobTest {
+	
+	private static DirectoryGroupConfiguration directoryGroupConfiguration;
+	
+	@BeforeAll
+	static void init() {
+		directoryGroupConfiguration = new DirectoryGroupConfiguration("");
+	}
 	
 	@Test
 	void testNullJson() {
 
 		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpJob.class.getName()));
 		
-		BackUpJob bupj = new BackUpJob(null);
+		BackUpJob bupj = new BackUpJob(null, directoryGroupConfiguration);
 		
 		Stream.of(JobTaskType.values())
 			.forEach(jobTaskType -> 
@@ -68,7 +77,7 @@ public class BackUpJobTest {
 		
 		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpJob.class.getName()));
 		
-		BackUpJob bupj = new BackUpJob("");
+		BackUpJob bupj = new BackUpJob("", directoryGroupConfiguration);
 		
 		Stream.of(JobTaskType.values())
 			.forEach(jobTaskType -> 
@@ -109,7 +118,7 @@ public class BackUpJobTest {
 		
 		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpTask.class.getName()));
 		
-		BackUpJob bupj = new BackUpJob(json);
+		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration);
 		assertThat(bupj.toString())
 			.isNotNull()
 			.isEqualTo("FredericPersonnel sur USB S:");
@@ -158,7 +167,7 @@ public class BackUpJobTest {
 		
 		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpTask.class.getName()));
 		
-		BackUpJob bupj = new BackUpJob(json) ;
+		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration) ;
 		
 		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
 		assertThat(bTt).isNotNull();
@@ -195,7 +204,7 @@ public class BackUpJobTest {
 				"		]\r\n" + 
 				"	}";
 		
-		BackUpJob bupj = new BackUpJob(json) ;
+		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration) ;
 		
 		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
 		assertThat(bTt).isNotNull();
@@ -268,7 +277,7 @@ public class BackUpJobTest {
 		
 		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpTask.class.getName()));
 		
-		BackUpJob bupj = new BackUpJob(json) ;
+		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration) ;
 		
 		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
 		assertThat(bTt)
