@@ -55,6 +55,51 @@ class DirectoryGroupeMapTest {
 	}
 	
 	@Test
+	void testGroupPathStartsWithSourcePath() throws URISyntaxException {
+		
+		Path sourcePath = FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/photos/tmp");
+		DirectoryGroupMap directoryGroupmMap =  new DirectoryGroupMap(sourcePath, sourcePath, directoryGroupConfiguration);
+		
+		DirectoryGroup group = directoryGroupmMap.getDirectoryGroup(FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/photos/tmp/bidon"));
+		assertThat(group.getPath()).isEqualTo(sourcePath);
+		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.HIGH);
+		assertThat(group.getGroupPolicy()).isEqualTo(GroupPolicy.DO_NOT_GROUP);
+		assertThat(group).isInstanceOf(DirectoryGroup.class);
+	}
+	
+	@Test
+	void testGroupPathStartsWithSourcePath2() throws URISyntaxException {
+		
+		Path sourcePath = FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/tmp/tmp");
+		DirectoryGroupMap directoryGroupmMap =  new DirectoryGroupMap(sourcePath, sourcePath, directoryGroupConfiguration);
+		
+		DirectoryGroup group = directoryGroupmMap.getDirectoryGroup(FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/tmp/tmp/bidon"));
+		assertThat(group.getPath()).isEqualTo(sourcePath);
+		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.MEDIUM);
+		assertThat(group.getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_SUB_ITEMS);
+		assertThat(group).isInstanceOf(DirectoryGroupSub.class);
+	}
+	
+	@Test
+	void testGroupPathStartsWithSourcePath3() throws URISyntaxException {
+		
+		Path sourcePath = FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/tmp/low");
+		DirectoryGroupMap directoryGroupmMap =  new DirectoryGroupMap(sourcePath, sourcePath, directoryGroupConfiguration);
+		
+		DirectoryGroup group = directoryGroupmMap.getDirectoryGroup(FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/tmp/low/bidon"));
+		assertThat(group.getPath()).isEqualTo(sourcePath);
+		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.MEDIUM);
+		assertThat(group.getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_SUB_ITEMS);
+		assertThat(group).isInstanceOf(DirectoryGroupSub.class);
+		
+		DirectoryGroup groupLow = directoryGroupmMap.getDirectoryGroup(FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/tmp/low/insideMedium/bidon"));
+		assertThat(groupLow.getPath()).isEqualTo(FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/tmp/low/insideMedium"));
+		assertThat(groupLow.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.LOW);
+		assertThat(groupLow.getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_ALL);
+		assertThat(groupLow).isInstanceOf(DirectoryGroupAll.class);
+	}
+	
+	@Test
 	void testMap() {
 		assertThat(directoryGroupmMap).isNotNull();
 	}

@@ -52,6 +52,9 @@ public class DirectoryGroupMap {
 				Path directoryGroupPathRelativeToActualSource = actualSourcePath.resolve(originSourcePath.relativize(sPath));
 				directoryGroupMap.put(directoryGroupPathRelativeToActualSource, 
 						DirectoryGroupBuilder.build(directoryGroupPathRelativeToActualSource, directoryGroup.getPermanenceLevel(), directoryGroup.getGroupPolicy()));
+			} else if (originSourcePath.startsWith(sPath)) {
+				directoryGroupMap.put(actualSourcePath, 
+						DirectoryGroupBuilder.build(actualSourcePath, directoryGroup.getPermanenceLevel(), directoryGroup.getGroupPolicy()));
 			}
 			
 		});
