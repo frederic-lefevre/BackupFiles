@@ -90,7 +90,7 @@ class DirectoryGroupeMapTest {
 	@Test
 	void originalSourcePathNullShouldRaiseError() throws URISyntaxException {
 		
-		LogRecordCounter logCounterForFilesBackUpScanner = 
+		LogRecordCounter logCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(DirectoryGroupMap.class.getName()));
 		
 		DirectoryGroupMap groupmMap = new DirectoryGroupMap(null, Path.of("/"), JSON_CONF);
@@ -101,14 +101,14 @@ class DirectoryGroupeMapTest {
 		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryGroupMap.DEFAULT_PERMANENCE_LEVEL);
 		assertThat(group.getGroupPolicy()).isEqualTo(DirectoryGroupMap.DEFAULT_GROUP_POLICY);
 		
-		assertThat(logCounterForFilesBackUpScanner.getLogRecordCount()).isEqualTo(1);
-		assertThat(logCounterForFilesBackUpScanner.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	@Test
 	void originalActualPathNullShouldRaiseError() throws URISyntaxException {
 		
-		LogRecordCounter logCounterForFilesBackUpScanner = 
+		LogRecordCounter logCounter = 
 				FilterCounter.getLogRecordCounter(Logger.getLogger(DirectoryGroupMap.class.getName()));
 		
 		DirectoryGroupMap groupmMap = new DirectoryGroupMap(FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/photos/"), null, JSON_CONF);
@@ -119,8 +119,8 @@ class DirectoryGroupeMapTest {
 		assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryGroupMap.DEFAULT_PERMANENCE_LEVEL);
 		assertThat(group.getGroupPolicy()).isEqualTo(DirectoryGroupMap.DEFAULT_GROUP_POLICY);
 		
-		assertThat(logCounterForFilesBackUpScanner.getLogRecordCount()).isEqualTo(1);
-		assertThat(logCounterForFilesBackUpScanner.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	@Test
