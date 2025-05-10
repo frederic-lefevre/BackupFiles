@@ -27,11 +27,9 @@ package org.fl.backupFiles.scanner;
 import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
@@ -47,7 +45,6 @@ import org.fl.backupFiles.BackUpItemList;
 import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.BackupAction;
 import org.fl.backupFiles.Config;
-import org.fl.backupFiles.TestUtils;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
@@ -61,13 +58,13 @@ class BackUpScannerProcessorTest {
 
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles.properties";
 	
-	private static final String SOURCE_DATA_DIR1 = "file:///C:/FredericPersonnel/tmp";
-	private static final String SOURCE_DATA_DIR2 = "file:///C:/FredericPersonnel/Loisirs/sports/Ski";
+	private static final String SOURCE_DATA_DIR1 = "file:///FredericPersonnel/tmp";
+	private static final String SOURCE_DATA_DIR2 = "file:///FredericPersonnel/Loisirs/sports/Ski";
 	
-	private static final String BUFFER_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer/";
+	private static final String BUFFER_DATA_DIR  = "file:///ForTests/BackUpFiles/FP_Test_Buffer/";
 	private static final String BUFFER_DATA_DIR1 = BUFFER_DATA_DIR + "dir1/";
 	private static final String BUFFER_DATA_DIR2 = BUFFER_DATA_DIR + "dir2/";
-	private static final String TARGET_DATA_DIR  = "file:///C:/ForTests/BackUpFiles/FP_Test_Target/";
+	private static final String TARGET_DATA_DIR  = "file:///ForTests/BackUpFiles/FP_Test_Target/";
 	
 	private static final Logger log = Logger.getLogger(BackUpScannerProcessorTest.class.getName());
 	
@@ -80,20 +77,20 @@ class BackUpScannerProcessorTest {
 			Config.initConfig(DEFAULT_PROP_FILE);
 
 			// Copy test data
-			Path srcPath1 = Paths.get(new URI(SOURCE_DATA_DIR1));
-			Path srcPath2 = Paths.get(new URI(SOURCE_DATA_DIR2));
-			Path testDataDir1 = Paths.get(new URI(BUFFER_DATA_DIR1));
-			Path testDataDir2 = Paths.get(new URI(BUFFER_DATA_DIR2));
+			Path srcPath1 = FilesUtils.uriStringToAbsolutePath(SOURCE_DATA_DIR1);
+			Path srcPath2 = FilesUtils.uriStringToAbsolutePath(SOURCE_DATA_DIR2);
+			Path testDataDir1 = FilesUtils.uriStringToAbsolutePath(BUFFER_DATA_DIR1);
+			Path testDataDir2 = FilesUtils.uriStringToAbsolutePath(BUFFER_DATA_DIR2);
 			boolean b1 = FilesUtils.copyDirectoryTree(srcPath1, testDataDir1, log);
 			boolean b2 = FilesUtils.copyDirectoryTree(srcPath2, testDataDir2, log);
 			if (! (b1 && b2)) {
 				fail("Errors writing test data (BeforeAll method)");
 			}
-			Path targetDataDir = Paths.get(new URI(TARGET_DATA_DIR));
+			Path targetDataDir = FilesUtils.uriStringToAbsolutePath(TARGET_DATA_DIR);
 			Files.createDirectory(targetDataDir);
 			
 			DirectoryGroupConfiguration directoryGroupConfiguration = new DirectoryGroupConfiguration(Config.getBackupGroupConfiguration());
-			Path srcDirForDirectoryGroupMap =  Paths.get(new URI(BUFFER_DATA_DIR));
+			Path srcDirForDirectoryGroupMap = FilesUtils.uriStringToAbsolutePath(BUFFER_DATA_DIR);
 			directoryGroupMap = new DirectoryGroupMap(srcDirForDirectoryGroupMap, srcDirForDirectoryGroupMap, directoryGroupConfiguration);
 			
 		} catch (URISyntaxException e) {
@@ -112,8 +109,8 @@ class BackUpScannerProcessorTest {
 								
 			ExecutorService scannerExecutor = Config.getScanExecutorService();
 			
-			Path src = TestUtils.getPathFromUriString(BUFFER_DATA_DIR);
-			Path tgt = TestUtils.getPathFromUriString(TARGET_DATA_DIR);
+			Path src = FilesUtils.uriStringToAbsolutePath(BUFFER_DATA_DIR);
+			Path tgt = FilesUtils.uriStringToAbsolutePath(TARGET_DATA_DIR);
 			
 			BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 			
@@ -199,8 +196,8 @@ class BackUpScannerProcessorTest {
 								
 			ExecutorService scannerExecutor = Config.getScanExecutorService();
 			
-			Path src  = TestUtils.getPathFromUriString(BUFFER_DATA_DIR);
-			Path tgt  = TestUtils.getPathFromUriString(TARGET_DATA_DIR  + "doesNotExists/");
+			Path src  = FilesUtils.uriStringToAbsolutePath(BUFFER_DATA_DIR);
+			Path tgt  = FilesUtils.uriStringToAbsolutePath(TARGET_DATA_DIR  + "doesNotExists/");
 			
 			BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0) ;
 			
@@ -246,14 +243,14 @@ class BackUpScannerProcessorTest {
 		try {
 			
 			final String TGT_FILE1 =  TARGET_DATA_DIR + "singleFile";
-			Path tgt  = TestUtils.getPathFromUriString(TGT_FILE1);
+			Path tgt  = FilesUtils.uriStringToAbsolutePath(TGT_FILE1);
 			Files.write(tgt, new ArrayList<String>(Arrays.asList("autre chose sur une ligne")));
 			assertThat(tgt).exists();
 			
 			ExecutorService scannerExecutor = Config.getScanExecutorService();
 			
 			final String SRC_FILE1 =  BUFFER_DATA_DIR + "singleFile";
-			Path src  = TestUtils.getPathFromUriString(SRC_FILE1);
+			Path src  = FilesUtils.uriStringToAbsolutePath(SRC_FILE1);
 			Files.write(src, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne")));
 			assertThat(src).exists();
 			
@@ -288,8 +285,8 @@ class BackUpScannerProcessorTest {
 			final String SRC_FILE1 = BUFFER_DATA_DIR + "singleFile";
 			final String TGT_FILE1 = TARGET_DATA_DIR + "doesNotExists";
 
-			Path src = TestUtils.getPathFromUriString(SRC_FILE1);
-			Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+			Path src = FilesUtils.uriStringToAbsolutePath(SRC_FILE1);
+			Path tgt = FilesUtils.uriStringToAbsolutePath(TGT_FILE1);
 
 			Files.write(src, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne")));
 			
@@ -327,8 +324,8 @@ class BackUpScannerProcessorTest {
 			final String SRC_FILE1 = BUFFER_DATA_DIR + "doesNotExists";
 			final String TGT_FILE1 = TARGET_DATA_DIR + "singleFile";
 
-			Path src = TestUtils.getPathFromUriString(SRC_FILE1);
-			Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+			Path src = FilesUtils.uriStringToAbsolutePath(SRC_FILE1);
+			Path tgt = FilesUtils.uriStringToAbsolutePath(TGT_FILE1);
 
 			Files.write(tgt, new ArrayList<String>(Arrays.asList("quelque chose sur une ligne")));
 
@@ -366,8 +363,8 @@ class BackUpScannerProcessorTest {
 			final String SRC_FILE1 = BUFFER_DATA_DIR + "doesNotExists";
 			final String TGT_FILE1 = TARGET_DATA_DIR + "targetDir/";
 
-			Path src = TestUtils.getPathFromUriString(SRC_FILE1);
-			Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+			Path src = FilesUtils.uriStringToAbsolutePath(SRC_FILE1);
+			Path tgt = FilesUtils.uriStringToAbsolutePath(TGT_FILE1);
 
 			Files.createDirectory(tgt);
 
@@ -408,8 +405,8 @@ class BackUpScannerProcessorTest {
 			final String SRC_FILE1 = BUFFER_DATA_DIR + "doesNotExists";
 			final String TGT_FILE1 = TARGET_DATA_DIR + "doesNotExists";
 
-			Path src = TestUtils.getPathFromUriString(SRC_FILE1);
-			Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+			Path src = FilesUtils.uriStringToAbsolutePath(SRC_FILE1);
+			Path tgt = FilesUtils.uriStringToAbsolutePath(TGT_FILE1);
 
 			BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 
@@ -432,8 +429,8 @@ class BackUpScannerProcessorTest {
 	static void deleteTestData() {
 		
 		try {
-			Path bufferDataDir = Paths.get(new URI(BUFFER_DATA_DIR));
-			Path targetDataDir = Paths.get(new URI(TARGET_DATA_DIR));
+			Path bufferDataDir = FilesUtils.uriStringToAbsolutePath(BUFFER_DATA_DIR);
+			Path targetDataDir = FilesUtils.uriStringToAbsolutePath(TARGET_DATA_DIR);
 
 			boolean b1 = FilesUtils.deleteDirectoryTree(bufferDataDir, true, log);
 			boolean b2 = FilesUtils.deleteDirectoryTree(targetDataDir, true, log);

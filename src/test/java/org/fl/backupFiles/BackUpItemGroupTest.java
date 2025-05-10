@@ -27,6 +27,7 @@ package org.fl.backupFiles;
 import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,6 +38,7 @@ import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 import org.fl.backupFiles.scanner.PathPairBasicAttributes;
 import org.fl.util.file.FileComparator;
+import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -47,16 +49,16 @@ class BackUpItemGroupTest {
 	
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles.properties";
 	
-	private static final String EXISTANT_FOLDER = "file:///C:/ForTests/BackUpFiles/TestDir1/";
-	private static final String UNEXISTANT_FOLDER = "file:///C:/ForTests/BackUpFiles/doesNotExists";
+	private static final String EXISTANT_FOLDER = "file:///ForTests/BackUpFiles/TestDir1/";
+	private static final String UNEXISTANT_FOLDER = "file:///ForTests/BackUpFiles/doesNotExists";
 	private static final String SRC_FILE1 = EXISTANT_FOLDER + "File1.pdf";
-	private static final String TGT_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir2/File1.pdf";
+	private static final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
 	
-	private static final Path EXISTANT_FOLDER_PATH = TestUtils.getPathFromUriString(EXISTANT_FOLDER);
-	private static final Path UNEXISTANT_FOLDER_PATH = TestUtils.getPathFromUriString(UNEXISTANT_FOLDER);
-	private static final Path EXISTANT_SOURCE = TestUtils.getPathFromUriString(SRC_FILE1);
-	private static final Path UNEXISTANT_TARGET = TestUtils.getPathFromUriString(TGT_FILE1);
-	private static final Path FOLDER_PATH_FROM_A_DIFFERENT_GROUP = TestUtils.getPathFromUriString("file:///C:/FredericPersonnel/ecrins/");
+	private static Path EXISTANT_FOLDER_PATH;
+	private static Path UNEXISTANT_FOLDER_PATH;
+	private static Path EXISTANT_SOURCE;
+	private static Path UNEXISTANT_TARGET;
+	private static Path FOLDER_PATH_FROM_A_DIFFERENT_GROUP;
 	
 	private static BackUpTask backUpTask;
 	
@@ -67,9 +69,14 @@ class BackUpItemGroupTest {
 	}
 	
 	@BeforeAll
-	static void initConfig() throws IOException {
+	static void initConfig() throws IOException, URISyntaxException {
 
-		Path sourcePathForDirectoryMap = TestUtils.getPathFromUriString("file:///C:/ForTests/BackUpFiles/TestDir1/");
+		EXISTANT_FOLDER_PATH = FilesUtils.uriStringToAbsolutePath(EXISTANT_FOLDER);
+		UNEXISTANT_FOLDER_PATH = FilesUtils.uriStringToAbsolutePath(UNEXISTANT_FOLDER);
+		EXISTANT_SOURCE = FilesUtils.uriStringToAbsolutePath(SRC_FILE1);
+		UNEXISTANT_TARGET = FilesUtils.uriStringToAbsolutePath(TGT_FILE1);
+		FOLDER_PATH_FROM_A_DIFFERENT_GROUP = FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/ecrins/");
+		Path sourcePathForDirectoryMap = FilesUtils.uriStringToAbsolutePath("file:///ForTests/BackUpFiles/TestDir1/");
 		Config.initConfig(DEFAULT_PROP_FILE);
 		DirectoryGroupConfiguration directoryGroupConfiguration = new DirectoryGroupConfiguration(Config.getBackupGroupConfiguration());
 		backUpTask = new BackUpTask(EXISTANT_FOLDER_PATH, EXISTANT_FOLDER_PATH, new DirectoryGroupMap(sourcePathForDirectoryMap, sourcePathForDirectoryMap, directoryGroupConfiguration), 0);

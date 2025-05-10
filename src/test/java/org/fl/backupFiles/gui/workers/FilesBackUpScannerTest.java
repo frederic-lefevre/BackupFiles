@@ -26,6 +26,7 @@ package org.fl.backupFiles.gui.workers;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -38,7 +39,6 @@ import org.fl.backupFiles.BackUpJob.JobTaskType;
 import org.fl.backupFiles.BackUpJobList;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.JobsChoice;
-import org.fl.backupFiles.TestUtils;
 import org.fl.backupFiles.gui.BackUpJobInfoTableModel;
 import org.fl.backupFiles.gui.BackUpTableModel;
 import org.fl.backupFiles.gui.ProgressInformationPanel;
@@ -46,6 +46,7 @@ import org.fl.backupFiles.gui.UiControl;
 import org.fl.backupFiles.scanner.BackUpScannerThread;
 import org.fl.util.FilterCounter;
 import org.fl.util.FilterCounter.LogRecordCounter;
+import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -63,10 +64,10 @@ class FilesBackUpScannerTest {
 	private static int threadPoolSize;
 	
 	@BeforeAll
-	static void generateTestData() {	
+	static void generateTestData() throws URISyntaxException {	
 
 		// Get the different config path
-		configFileDir = TestUtils.getPathFromUriString(TestDataManager.CONFIG_FILE_FOLDER_URI);
+		configFileDir = FilesUtils.uriStringToAbsolutePath(TestDataManager.CONFIG_FILE_FOLDER_URI);
 
 		// Number of backup thread (defined in property file, but it cannot be loaded before data generation)
 		threadPoolSize = 25;
