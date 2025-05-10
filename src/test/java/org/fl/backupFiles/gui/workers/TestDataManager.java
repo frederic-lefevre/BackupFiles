@@ -34,7 +34,6 @@ import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.fl.backupFiles.TestUtils;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 import org.fl.backupFiles.directoryGroup.GroupPolicy;
 import org.fl.util.file.FilesUtils;
@@ -79,11 +78,11 @@ public class TestDataManager {
 	private final static String CONFIG_FILE_NAME = "config.json";
 	private final static String DIRECTORY_GROUP_FILE_NAME = "directoryGroup.json";
 	
-	public TestDataManager(Logger l) {
+	public TestDataManager(Logger l) throws URISyntaxException {
 
 		bLog = l;
-		configFilesDir = TestUtils.getPathFromUriString(CONFIG_FILE_FOLDER_URI);
-		directoryGroupFileDir = TestUtils.getPathFromUriString(DIRECTORY_GROUP_FOLDER_URI);
+		configFilesDir = FilesUtils.uriStringToAbsolutePath(CONFIG_FILE_FOLDER_URI);
+		directoryGroupFileDir = FilesUtils.uriStringToAbsolutePath(DIRECTORY_GROUP_FOLDER_URI);
 	}
 
 	public boolean generateTestData(int nbDirToGenerate) {

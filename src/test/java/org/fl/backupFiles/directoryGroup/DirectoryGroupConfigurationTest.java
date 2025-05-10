@@ -27,7 +27,6 @@ package org.fl.backupFiles.directoryGroup;
 import static org.assertj.core.api.Assertions.*;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,6 +37,7 @@ import org.fl.backupFiles.directoryGroup.core.DirectoryGroupBuilder;
 import org.fl.backupFiles.directoryGroup.core.DirectoryGroupSub;
 import org.fl.util.FilterCounter;
 import org.fl.util.FilterCounter.LogRecordCounter;
+import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.Test;
 
 class DirectoryGroupConfigurationTest {
@@ -61,17 +61,17 @@ class DirectoryGroupConfigurationTest {
 		assertThat(directoryGroupList).isNotNull().isNotEmpty()
 			.satisfiesExactlyInAnyOrder(
 					group -> {
-						assertThat(group.getPath()).isEqualTo(Paths.get("C:\\FredericPersonnel\\photos"));
+						assertThat(group.getPath()).isEqualTo(FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/photos"));
 						assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.HIGH);
 						assertThat(group.getGroupPolicy()).isEqualTo(GroupPolicy.DO_NOT_GROUP);
 						assertThat(group).isInstanceOf(DirectoryGroup.class); },
 					group -> { 
-						assertThat(group.getPath()).isEqualTo(Paths.get("C:\\FredericPersonnel\\tmp\\low\\insideMedium"));
+						assertThat(group.getPath()).isEqualTo(FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/tmp/low/insideMedium"));
 						assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.LOW);
 						assertThat(group.getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_ALL);
 						assertThat(group).isInstanceOf(DirectoryGroupAll.class); },
 					group -> {
-						assertThat(group.getPath()).isEqualTo(Paths.get("C:\\FredericPersonnel\\tmp"));
+						assertThat(group.getPath()).isEqualTo(FilesUtils.uriStringToAbsolutePath("file:///FredericPersonnel/tmp"));
 						assertThat(group.getPermanenceLevel()).isEqualTo(DirectoryPermanenceLevel.MEDIUM);
 						assertThat(group.getGroupPolicy()).isEqualTo(GroupPolicy.GROUP_SUB_ITEMS);
 						assertThat(group).isInstanceOf(DirectoryGroupSub.class); }

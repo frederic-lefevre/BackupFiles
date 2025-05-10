@@ -26,14 +26,34 @@ package org.fl.backupFiles.scanner;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.fl.backupFiles.TestUtils;
+import org.fl.util.file.FilesUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class PathPairBasicAttributesTest {
 
+	private static final String EXISTANT_FOLDER = "file:///ForTests/BackUpFiles/TestDir1/";
+	private static final String EXISTANT_FILE = EXISTANT_FOLDER + "File1.pdf";
+	private static final String UNEXISTANT_FOLDER = "file:///ForTests/BackUpFiles/doesNotExists";
+	private static final String UNEXISTANT_FILE = EXISTANT_FOLDER + "doesNotExists.pdf";
+
+	private static Path EXISTANT_FOLDER_PATH;
+	private static Path EXISTANT_FILE_PATH;
+	private static Path UNEXISTANT_FOLDER_PATH;
+	private static Path UNEXISTANT_FILE_PATH;
+	
+	@BeforeAll
+	static void init() throws URISyntaxException {
+		EXISTANT_FOLDER_PATH = FilesUtils.uriStringToAbsolutePath(EXISTANT_FOLDER);
+		EXISTANT_FILE_PATH = FilesUtils.uriStringToAbsolutePath(EXISTANT_FILE);
+		UNEXISTANT_FOLDER_PATH = FilesUtils.uriStringToAbsolutePath(UNEXISTANT_FOLDER);
+		UNEXISTANT_FILE_PATH = FilesUtils.uriStringToAbsolutePath(UNEXISTANT_FILE);
+	}
+	
 	@Test
 	void testNullPaths() {
 		
@@ -134,17 +154,6 @@ public class PathPairBasicAttributesTest {
 		assertThat(pathPairBasicAttributes.getSourceSize()).isPositive();
 		assertThat(pathPairBasicAttributes.getTargetSize()).isPositive();
 	}
-	
-	private static final String EXISTANT_FOLDER = "file:///ForTests/BackUpFiles/TestDir1/";
-	private static final String EXISTANT_FILE = EXISTANT_FOLDER + "File1.pdf";
-	private static final String UNEXISTANT_FOLDER = "file:///ForTests/BackUpFiles/doesNotExists";
-	private static final String UNEXISTANT_FILE = EXISTANT_FOLDER + "doesNotExists.pdf";
-
-	private static final Path EXISTANT_FOLDER_PATH = TestUtils.getPathFromUriString(EXISTANT_FOLDER);
-	private static final Path EXISTANT_FILE_PATH = TestUtils.getPathFromUriString(EXISTANT_FILE);
-	private static final Path UNEXISTANT_FOLDER_PATH = TestUtils.getPathFromUriString(UNEXISTANT_FOLDER);
-	private static final Path UNEXISTANT_FILE_PATH = TestUtils.getPathFromUriString(UNEXISTANT_FILE);
-
 	
 	@Test
 	void testUnexistantTargetFile() {

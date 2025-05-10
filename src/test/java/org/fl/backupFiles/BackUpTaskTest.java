@@ -27,6 +27,7 @@ package org.fl.backupFiles;
 import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,22 +50,22 @@ class BackUpTaskTest {
 	private static DirectoryGroupMap directoryGroupMap;
 	
 	@BeforeAll
-	static void initConfig() throws IOException {
+	static void initConfig() throws IOException, URISyntaxException {
 
-		Path sourcePathForDirectoryMap = TestUtils.getPathFromUriString("file:///C:/ForTests/BackUpFiles/TestDir1/");
+		Path sourcePathForDirectoryMap = FilesUtils.uriStringToAbsolutePath("file:///ForTests/BackUpFiles/TestDir1/");
 		Config.initConfig(DEFAULT_PROP_FILE);
 		DirectoryGroupConfiguration directoryGroupConfiguration = new DirectoryGroupConfiguration(Config.getBackupGroupConfiguration());
 		directoryGroupMap = new DirectoryGroupMap(sourcePathForDirectoryMap, sourcePathForDirectoryMap, directoryGroupConfiguration);
 	}
 	
 	@Test
-	void test1() throws IOException {
+	void test1() throws IOException, URISyntaxException {
 		
-		final String SRC_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir1/File1.pdf";
-		final String TGT_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir2/File1.pdf";
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
 
-		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
-		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+		Path src = FilesUtils.uriStringToAbsolutePath(SRC_FILE1);
+		Path tgt = FilesUtils.uriStringToAbsolutePath(TGT_FILE1);
 
 		BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 
@@ -77,13 +78,13 @@ class BackUpTaskTest {
 	}
 
 	@Test
-	void test2() throws IOException {
+	void test2() throws IOException, URISyntaxException {
 		
-		final String SRC_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir1/File1.pdf";
-		final String TGT_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir2/File1.pdf";
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
 
-		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
-		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+		Path src = FilesUtils.uriStringToAbsolutePath(SRC_FILE1);
+		Path tgt = FilesUtils.uriStringToAbsolutePath(TGT_FILE1);
 
 		BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 		BackUpTask backUpTask2 = new BackUpTask(src, tgt, directoryGroupMap, 1);
@@ -92,19 +93,19 @@ class BackUpTaskTest {
 	}	
 
 	@Test
-	void test3() throws IOException {
+	void test3() throws IOException, URISyntaxException {
 		
-		final String SRC_FILE1 = "file://C://ForTests/BackUpFiles/TestDir1/File1.pdf";
-		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
+		final String SRC_FILE1 = "file://CForTests/BackUpFiles/TestDir1/File1.pdf";
+		Path src = FilesUtils.uriStringToAbsolutePath(SRC_FILE1);
 
 		assertThatIllegalArgumentException().isThrownBy(() -> new BackUpTask(src, null, directoryGroupMap, 0));
 	}
 	
 	@Test
-	void test4() throws IOException {
+	void test4() throws IOException, URISyntaxException {
 
-		final String TGT_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir2/File1.pdf";
-		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
+		Path tgt = FilesUtils.uriStringToAbsolutePath(TGT_FILE1);
 
 		assertThatIllegalArgumentException().isThrownBy(() -> new BackUpTask(null, tgt, directoryGroupMap, 0));
 	}
@@ -116,15 +117,15 @@ class BackUpTaskTest {
 	}
 	
 	@Test
-	void test6() throws IOException {
+	void test6() throws IOException, URISyntaxException {
 		
-		final String SRC_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir1/File1.pdf";
-		final String TGT_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir2/File1.pdf";
-		final String SRC_FILE2 = "file:///C:/ForTests/BackUpFiles/TestDir1/File2.pdf";
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
+		final String SRC_FILE2 = "file:///ForTests/BackUpFiles/TestDir1/File2.pdf";
 
-		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
-		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
-		Path src2 = TestUtils.getPathFromUriString(SRC_FILE2);
+		Path src = FilesUtils.uriStringToAbsolutePath(SRC_FILE1);
+		Path tgt = FilesUtils.uriStringToAbsolutePath(TGT_FILE1);
+		Path src2 = FilesUtils.uriStringToAbsolutePath(SRC_FILE2);
 
 		BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 		BackUpTask backUpTask2 = new BackUpTask(src2, tgt, directoryGroupMap, 0);
@@ -133,15 +134,15 @@ class BackUpTaskTest {
 	}
 	
 	@Test
-	void test7() throws IOException {
+	void test7() throws IOException, URISyntaxException {
 		
-		final String SRC_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir1/File1.pdf";
-		final String TGT_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir2/File1.pdf";
-		final String TGT_FILE2 = "file:///C:/ForTests/BackUpFiles/TestDir1/File2.pdf";
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
+		final String TGT_FILE2 = "file:///ForTests/BackUpFiles/TestDir1/File2.pdf";
 
-		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
-		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
-		Path tgt2 = TestUtils.getPathFromUriString(TGT_FILE2);
+		Path src = FilesUtils.uriStringToAbsolutePath(SRC_FILE1);
+		Path tgt = FilesUtils.uriStringToAbsolutePath(TGT_FILE1);
+		Path tgt2 = FilesUtils.uriStringToAbsolutePath(TGT_FILE2);
 
 		BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 		BackUpTask backUpTask2 = new BackUpTask(src, tgt2, directoryGroupMap, 0);
@@ -150,13 +151,13 @@ class BackUpTaskTest {
 	}
 	
 	@Test
-	void testFileStore() throws IOException {
+	void testFileStore() throws IOException, URISyntaxException {
 		
-		final String SRC_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir1/File1.pdf";
-		final String TGT_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir2/File1.pdf";
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
 
-		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
-		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+		Path src = FilesUtils.uriStringToAbsolutePath(SRC_FILE1);
+		Path tgt = FilesUtils.uriStringToAbsolutePath(TGT_FILE1);
 
 		BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 		
@@ -165,13 +166,13 @@ class BackUpTaskTest {
 	}
 	
 	@Test
-	void testDirectoryGroupMap() throws IOException {
+	void testDirectoryGroupMap() throws IOException, URISyntaxException {
 		
-		final String SRC_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir1/File1.pdf";
-		final String TGT_FILE1 = "file:///C:/ForTests/BackUpFiles/TestDir2/File1.pdf";
+		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
+		final String TGT_FILE1 = "file:///ForTests/BackUpFiles/TestDir2/File1.pdf";
 
-		Path src = TestUtils.getPathFromUriString(SRC_FILE1);
-		Path tgt = TestUtils.getPathFromUriString(TGT_FILE1);
+		Path src = FilesUtils.uriStringToAbsolutePath(SRC_FILE1);
+		Path tgt = FilesUtils.uriStringToAbsolutePath(TGT_FILE1);
 
 		BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 		
