@@ -25,12 +25,10 @@ SOFTWARE.
 package org.fl.backupFiles.gui.workers;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -71,10 +69,10 @@ public class TestDataManager {
 	private final static String TARGET_BASE_URI = "file:///C:/ForTests/BackUpFiles/FP_Test_Target2/";
 	private final static String BUFFER_BASE_URI = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer2/";
 
-	private final static String TESTDATA_URI = "file:///C:/ForTests/BackUpFiles/TestDataForMultiThread";
+	private final static String TESTDATA_URI = "file:///ForTests/BackUpFiles/TestDataForMultiThread";
 
-	protected final static String CONFIG_FILE_FOLDER_URI = "file:///C:/ForTests/BackUpFiles/configTest2/";
-	protected final static String DIRECTORY_GROUP_FOLDER_URI = "file:///C:/ForTests/BackUpFiles/directoryGroup2/";
+	protected final static String CONFIG_FILE_FOLDER_URI = "file:///ForTests/BackUpFiles/configTest2/";
+	protected final static String DIRECTORY_GROUP_FOLDER_URI = "file:///ForTests/BackUpFiles/directoryGroup2/";
 	private final static String CONFIG_FILE_NAME = "config.json";
 	private final static String DIRECTORY_GROUP_FILE_NAME = "directoryGroup.json";
 	
@@ -91,7 +89,7 @@ public class TestDataManager {
 		nbMediumPermanenceGenerated = 0;
 		nbLowPermanenceGenerated = 0;
 		try {
-			Path testDataDir = Paths.get(new URI(TESTDATA_URI));
+			Path testDataDir = FilesUtils.uriStringToAbsolutePath(TESTDATA_URI);
 
 			ObjectNode confJson = JsonNodeFactory.instance.objectNode();
 			ArrayNode groupJson = JsonNodeFactory.instance.arrayNode();
@@ -141,14 +139,14 @@ public class TestDataManager {
 				groupJson.add(oneDirectoryGroup);
 				
 				// Copy test data to source and buffer
-				Path srcPath = Paths.get(new URI(srcUri));
-				Path bufPath = Paths.get(new URI(bufUri));
+				Path srcPath = FilesUtils.uriStringToAbsolutePath(srcUri);
+				Path bufPath = FilesUtils.uriStringToAbsolutePath(bufUri);
 				boolean b1 = FilesUtils.copyDirectoryTree(testDataDir, srcPath, bLog);
 				boolean b2 = FilesUtils.copyDirectoryTree(testDataDir, bufPath, bLog);
 				if (!(b1 && b2)) {
 					return false;
 				}
-				Path tgtPath = Paths.get(new URI(tgtUri + SUB_DIRECTORY_FOR_GROUP));
+				Path tgtPath = FilesUtils.uriStringToAbsolutePath(tgtUri + SUB_DIRECTORY_FOR_GROUP);
 				Files.createDirectories(tgtPath);
 			}
 
@@ -206,7 +204,7 @@ public class TestDataManager {
 	}
 
 	private boolean deteleOneDirContent(String uri) throws IOException, URISyntaxException {
-		return Files.list(Paths.get(new URI(uri)))
+		return Files.list(FilesUtils.uriStringToAbsolutePath(uri))
 				 .map(path -> {
 					try {
 						return FilesUtils.deleteDirectoryTree(path, true, bLog);
