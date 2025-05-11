@@ -353,6 +353,9 @@ public class BackUpJobTest {
 		
 		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		
+		assertThat(logCounter.getLogRecords()).singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).contains("No buffer and target"));
 	}
 	
 	@Test
