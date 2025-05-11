@@ -51,30 +51,30 @@ public class TestDataManager {
 	private long nbLowPermanenceGenerated;
 
 	// Json property name for config
-	private final static String TITLE = "titre";
-	private final static String ITEMS = "items";
-	private final static String SOURCE = "source";
-	private final static String TARGET = "target";
-	private final static String BUFFER = "buffer";
+	private static final String TITLE = "titre";
+	private static final String ITEMS = "items";
+	private static final String SOURCE = "source";
+	private static final String TARGET = "target";
+	private static final String BUFFER = "buffer";
 
 	// Json property names for directoryGroup
-	private final static String PATH = "path";
-	private final static String PERMANENCE = "permanence";
-	private final static String GROUP_POLICY = "groupPolicy";
+	private static final String PATH = "path";
+	private static final String PERMANENCE = "permanence";
+	private static final String GROUP_POLICY = "groupPolicy";
 		
-	private final static String SOURCE_BASE_DIR = "/ForTests/BackUpFiles/FP_Test_Source2/";
-	private final static String SUB_DIRECTORY_FOR_GROUP = "/Concert/";
+	private static final String SOURCE_BASE_DIR = "/ForTests/BackUpFiles/FP_Test_Source2/";
+	private static final String SUB_DIRECTORY_FOR_GROUP = "/Concert/";
 	
-	private final static String SOURCE_BASE_URI = "file:///C:/ForTests/BackUpFiles/FP_Test_Source2/";
-	private final static String TARGET_BASE_URI = "file:///C:/ForTests/BackUpFiles/FP_Test_Target2/";
-	private final static String BUFFER_BASE_URI = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer2/";
+	private static final String SOURCE_BASE_URI = "file:///C:/ForTests/BackUpFiles/FP_Test_Source2/";
+	private static final String TARGET_BASE_URI = "file:///C:/ForTests/BackUpFiles/FP_Test_Target2/";
+	private static final String BUFFER_BASE_URI = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer2/";
 
-	private final static String TESTDATA_URI = "file:///ForTests/BackUpFiles/TestDataForMultiThread";
+	private static final String TESTDATA_URI = "file:///ForTests/BackUpFiles/TestDataForMultiThread";
 
-	protected final static String CONFIG_FILE_FOLDER_URI = "file:///ForTests/BackUpFiles/configTest2/";
-	protected final static String DIRECTORY_GROUP_FOLDER_URI = "file:///ForTests/BackUpFiles/directoryGroup2/";
-	private final static String CONFIG_FILE_NAME = "config.json";
-	private final static String DIRECTORY_GROUP_FILE_NAME = "directoryGroup.json";
+	protected static final String CONFIG_FILE_FOLDER_URI = "file:///ForTests/BackUpFiles/configTest2/";
+	protected static final String DIRECTORY_GROUP_FOLDER_URI = "file:///ForTests/BackUpFiles/directoryGroup2/";
+	private static final String CONFIG_FILE_NAME = "config.json";
+	private static final String DIRECTORY_GROUP_FILE_NAME = "directoryGroup.json";
 	
 	public TestDataManager(Logger l) throws URISyntaxException {
 
