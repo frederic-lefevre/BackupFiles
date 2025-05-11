@@ -243,7 +243,7 @@ public class BackUpJobTest {
 		
 		String json ="""		
 				{ 
-						"titre" : "Parallel json",
+						"titre" : "Unmodifiable list test",
 						"items" : [
 							{
 								"source" : "file:///FredericPersonnel/",
@@ -273,6 +273,43 @@ public class BackUpJobTest {
 		
 		assertThatExceptionOfType(UnsupportedOperationException.class)
 			.isThrownBy(() -> bTt.clear());
+	}
+	
+	@Test
+	void testNoBufferAndTarget() {
+		
+		String json ="""		
+				{ 
+						"titre" : "No Buffer and Target",
+						"items" : [
+							{
+								"source" : "file:///FredericPersonnel/"
+							}, 
+							{ 
+								"source" : "file:///ForTests/", 
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/ForTests/"
+							},
+							{
+								"source" : "file:///pApps/",
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/pApps/"
+							}
+						]
+					}
+	""" ;
+		
+		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpJob.class.getName()));
+		
+		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration) ;
+		
+		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
+		assertThat(bTt)
+			.isNotNull()
+			.hasSize(2);
+		
+		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
 	}
 	
 	private long nbFileInDir(String dir) throws URISyntaxException {
