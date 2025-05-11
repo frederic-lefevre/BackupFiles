@@ -65,9 +65,9 @@ public class TestDataManager {
 	private static final String SOURCE_BASE_DIR = "/ForTests/BackUpFiles/FP_Test_Source2/";
 	private static final String SUB_DIRECTORY_FOR_GROUP = "/Concert/";
 	
-	private static final String SOURCE_BASE_URI = "file:///C:/ForTests/BackUpFiles/FP_Test_Source2/";
-	private static final String TARGET_BASE_URI = "file:///C:/ForTests/BackUpFiles/FP_Test_Target2/";
-	private static final String BUFFER_BASE_URI = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer2/";
+	private static final String SOURCE_BASE_URI = "file:///ForTests/BackUpFiles/FP_Test_Source2/";
+	private static final String TARGET_BASE_URI = "file:///ForTests/BackUpFiles/FP_Test_Target2/";
+	private static final String BUFFER_BASE_URI = "file:///ForTests/BackUpFiles/FP_Test_Buffer2/";
 
 	private static final String TESTDATA_URI = "file:///ForTests/BackUpFiles/TestDataForMultiThread";
 
