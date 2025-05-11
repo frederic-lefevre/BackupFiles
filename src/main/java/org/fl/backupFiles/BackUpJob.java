@@ -25,11 +25,10 @@ SOFTWARE.
 package org.fl.backupFiles;
 
 import java.io.IOException;
-import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,6 +41,7 @@ import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
+import org.fl.util.file.FilesUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -178,7 +178,7 @@ public class BackUpJob {
 		}
 	}
 	
-	private void getBackUpTasks(ArrayNode jItems) {
+	private void getBackUpTasks(ArrayNode jItems) throws URISyntaxException {
 
 		for (JsonNode jObjItem : jItems) {
 
@@ -306,12 +306,12 @@ public class BackUpJob {
 		}
 	}
 	
-	private Path getPathElement(JsonNode jObjItem, String prop) {
+	private Path getPathElement(JsonNode jObjItem, String prop) throws URISyntaxException {
 
 		Path returnPath = null;
 		JsonNode elem = jObjItem.get(prop);
 		if (elem != null) {
-			returnPath = Paths.get(URI.create(elem.asText()));
+			returnPath = FilesUtils.uriStringToAbsolutePath(elem.asText());
 		}
 		return returnPath;
 	}

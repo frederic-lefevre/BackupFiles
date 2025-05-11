@@ -25,16 +25,13 @@ SOFTWARE.
 package org.fl.backupFiles.gui.workers;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.fl.backupFiles.TestUtils;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 import org.fl.backupFiles.directoryGroup.GroupPolicy;
 import org.fl.util.file.FilesUtils;
@@ -54,36 +51,36 @@ public class TestDataManager {
 	private long nbLowPermanenceGenerated;
 
 	// Json property name for config
-	private final static String TITLE = "titre";
-	private final static String ITEMS = "items";
-	private final static String SOURCE = "source";
-	private final static String TARGET = "target";
-	private final static String BUFFER = "buffer";
+	private static final String TITLE = "titre";
+	private static final String ITEMS = "items";
+	private static final String SOURCE = "source";
+	private static final String TARGET = "target";
+	private static final String BUFFER = "buffer";
 
 	// Json property names for directoryGroup
-	private final static String PATH = "path";
-	private final static String PERMANENCE = "permanence";
-	private final static String GROUP_POLICY = "groupPolicy";
+	private static final String PATH = "path";
+	private static final String PERMANENCE = "permanence";
+	private static final String GROUP_POLICY = "groupPolicy";
 		
-	private final static String SOURCE_BASE_DIR = "/ForTests/BackUpFiles/FP_Test_Source2/";
-	private final static String SUB_DIRECTORY_FOR_GROUP = "/Concert/";
+	private static final String SOURCE_BASE_DIR = "/ForTests/BackUpFiles/FP_Test_Source2/";
+	private static final String SUB_DIRECTORY_FOR_GROUP = "/Concert/";
 	
-	private final static String SOURCE_BASE_URI = "file:///C:/ForTests/BackUpFiles/FP_Test_Source2/";
-	private final static String TARGET_BASE_URI = "file:///C:/ForTests/BackUpFiles/FP_Test_Target2/";
-	private final static String BUFFER_BASE_URI = "file:///C:/ForTests/BackUpFiles/FP_Test_Buffer2/";
+	private static final String SOURCE_BASE_URI = "file:///ForTests/BackUpFiles/FP_Test_Source2/";
+	private static final String TARGET_BASE_URI = "file:///ForTests/BackUpFiles/FP_Test_Target2/";
+	private static final String BUFFER_BASE_URI = "file:///ForTests/BackUpFiles/FP_Test_Buffer2/";
 
-	private final static String TESTDATA_URI = "file:///C:/ForTests/BackUpFiles/TestDataForMultiThread";
+	private static final String TESTDATA_URI = "file:///ForTests/BackUpFiles/TestDataForMultiThread";
 
-	protected final static String CONFIG_FILE_FOLDER_URI = "file:///C:/ForTests/BackUpFiles/configTest2/";
-	protected final static String DIRECTORY_GROUP_FOLDER_URI = "file:///C:/ForTests/BackUpFiles/directoryGroup2/";
-	private final static String CONFIG_FILE_NAME = "config.json";
-	private final static String DIRECTORY_GROUP_FILE_NAME = "directoryGroup.json";
+	protected static final String CONFIG_FILE_FOLDER_URI = "file:///ForTests/BackUpFiles/configTest2/";
+	protected static final String DIRECTORY_GROUP_FOLDER_URI = "file:///ForTests/BackUpFiles/directoryGroup2/";
+	private static final String CONFIG_FILE_NAME = "config.json";
+	private static final String DIRECTORY_GROUP_FILE_NAME = "directoryGroup.json";
 	
-	public TestDataManager(Logger l) {
+	public TestDataManager(Logger l) throws URISyntaxException {
 
 		bLog = l;
-		configFilesDir = TestUtils.getPathFromUriString(CONFIG_FILE_FOLDER_URI);
-		directoryGroupFileDir = TestUtils.getPathFromUriString(DIRECTORY_GROUP_FOLDER_URI);
+		configFilesDir = FilesUtils.uriStringToAbsolutePath(CONFIG_FILE_FOLDER_URI);
+		directoryGroupFileDir = FilesUtils.uriStringToAbsolutePath(DIRECTORY_GROUP_FOLDER_URI);
 	}
 
 	public boolean generateTestData(int nbDirToGenerate) {
@@ -92,7 +89,7 @@ public class TestDataManager {
 		nbMediumPermanenceGenerated = 0;
 		nbLowPermanenceGenerated = 0;
 		try {
-			Path testDataDir = Paths.get(new URI(TESTDATA_URI));
+			Path testDataDir = FilesUtils.uriStringToAbsolutePath(TESTDATA_URI);
 
 			ObjectNode confJson = JsonNodeFactory.instance.objectNode();
 			ArrayNode groupJson = JsonNodeFactory.instance.arrayNode();
@@ -142,14 +139,14 @@ public class TestDataManager {
 				groupJson.add(oneDirectoryGroup);
 				
 				// Copy test data to source and buffer
-				Path srcPath = Paths.get(new URI(srcUri));
-				Path bufPath = Paths.get(new URI(bufUri));
+				Path srcPath = FilesUtils.uriStringToAbsolutePath(srcUri);
+				Path bufPath = FilesUtils.uriStringToAbsolutePath(bufUri);
 				boolean b1 = FilesUtils.copyDirectoryTree(testDataDir, srcPath, bLog);
 				boolean b2 = FilesUtils.copyDirectoryTree(testDataDir, bufPath, bLog);
 				if (!(b1 && b2)) {
 					return false;
 				}
-				Path tgtPath = Paths.get(new URI(tgtUri + SUB_DIRECTORY_FOR_GROUP));
+				Path tgtPath = FilesUtils.uriStringToAbsolutePath(tgtUri + SUB_DIRECTORY_FOR_GROUP);
 				Files.createDirectories(tgtPath);
 			}
 
@@ -207,7 +204,7 @@ public class TestDataManager {
 	}
 
 	private boolean deteleOneDirContent(String uri) throws IOException, URISyntaxException {
-		return Files.list(Paths.get(new URI(uri)))
+		return Files.list(FilesUtils.uriStringToAbsolutePath(uri))
 				 .map(path -> {
 					try {
 						return FilesUtils.deleteDirectoryTree(path, true, bLog);

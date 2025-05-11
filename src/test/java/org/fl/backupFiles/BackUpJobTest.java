@@ -27,10 +27,9 @@ package org.fl.backupFiles;
 import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
-import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +39,7 @@ import org.fl.backupFiles.BackUpJob.JobTaskType;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.util.FilterCounter;
 import org.fl.util.FilterCounter.LogRecordCounter;
+import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -95,33 +95,33 @@ public class BackUpJobTest {
 	@Test
 	void testRegularJson() {
 		
-		String json = "	{\r\n" + 
-				"		\"titre\" : \"FredericPersonnel sur USB S:\" ,\r\n" + 
-				"		\"items\" : [\r\n" + 
-				"			{\r\n" + 
-				"				\"source\" : \"file:///C:/FredericPersonnel/\",\r\n" + 
-				"				\"target\" : \"file:///S:/FredericPersonnel/\",\r\n" + 
-				"				\"buffer\" : \"file:///C:/FP_BackUpBuffer/FredericPersonnel/\"\r\n" + 
-				"			},\r\n" + 
-				"			{\r\n" + 
-				"				\"source\" : \"file:///C:/ForTests/\",\r\n" + 
-				"				\"target\" : \"file:///S:/ForTests/\",\r\n" + 
-				"				\"buffer\" : \"file:///C:/FP_BackUpBuffer/ForTests/\"\r\n" + 
-				"			},\r\n" + 
-				"			{\r\n" + 
-				"				\"source\" : \"file:///C:/pApps/\",\r\n" + 
-				"				\"target\" : \"file:///S:/pApps/\",\r\n" + 
-				"				\"buffer\" : \"file:///C:/FP_BackUpBuffer/pApps/\"\r\n" + 
-				"			}\r\n" + 
-				"		]\r\n" + 
-				"	}" ;
-		
-		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpTask.class.getName()));
+		String json ="""		
+				{ 
+						"titre" : "Regular json",
+						"items" : [
+							{
+								"source" : "file:///FredericPersonnel/",
+								"target" : "file:///ForTests/",
+								"buffer" : "file:///FP_BackUpBuffer/FredericPersonnel/"
+							}, 
+							{ 
+								"source" : "file:///ForTests/", 
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/ForTests/"
+							},
+							{
+								"source" : "file:///pApps/",
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/pApps/"
+							}
+						]
+					}
+	""" ;
 		
 		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration);
 		assertThat(bupj.toString())
 			.isNotNull()
-			.isEqualTo("FredericPersonnel sur USB S:");
+			.isEqualTo("Regular json");
 		
 		List<BackUpTask> bTt1 = bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER);
 		assertThat(bTt1).isNotNull().hasSize(3);
@@ -129,43 +129,77 @@ public class BackUpJobTest {
 		List<BackUpTask> bTt2 = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
 		assertThat(bTt2).isNotNull().hasSize(3);
 		
-		int nbBackUpTasks = bTt1.size() + bTt2.size();
-		
-		if (Files.exists(Path.of(URI.create("file:///S:/")))) {
-			assertThat(logCounter.getLogRecordCount()).isZero();
-		} else {
-			assertThat(logCounter.getLogRecordCount()).isEqualTo(nbBackUpTasks);
-			assertThat(logCounter.getLogRecordCount(Level.WARNING)).isEqualTo(nbBackUpTasks);
-		}
+		List<BackUpTask> bTt3 = bupj.getTasks(JobTaskType.SOURCE_TO_TARGET);
+		assertThat(bTt3).isNotNull().isEmpty();
 	}
 	
 	@Test
-	void testParallelJson() {
+	void testSourceToTargetJson() {
 		
-		String json = "	{\r\n" + 
-				"		\"titre\" : \"FredericPersonnel sur USB S:\" ,\r\n" + 
-				"		\"items\" : [\r\n" + 
-				"			{\r\n" + 
-				"				\"source\" : \"file:///C:/FredericPersonnel/\",\r\n" + 
-				"				\"target\" : \"file:///S:/FredericPersonnel/\",\r\n" + 
-				"				\"buffer\" : \"file:///C:/FP_BackUpBuffer/FredericPersonnel/\",\r\n" + 
-				"				\"parallelScan\" : true\r\n" +
-				"			},\r\n" + 
-				"			{\r\n" + 
-				"				\"source\" : \"file:///C:/ForTests/\",\r\n" + 
-				"				\"target\" : \"file:///S:/ForTests/\",\r\n" + 
-				"				\"buffer\" : \"file:///C:/FP_BackUpBuffer/ForTests/\"\r\n" + 
-				"			},\r\n" + 
-				"			{\r\n" + 
-				"				\"source\" : \"file:///C:/pApps/\",\r\n" + 
-				"				\"target\" : \"file:///S:/pApps/\",\r\n" + 
-				"				\"buffer\" : \"file:///C:/FP_BackUpBuffer/pApps/\",\r\n" + 
-				"				\"parallelScan\" : false\r\n" +
-				"			}\r\n" + 
-				"		]\r\n" + 
-				"	}";
+		String json ="""		
+				{ 
+						"titre" : "Regular json",
+						"items" : [
+							{
+								"source" : "file:///FredericPersonnel/",
+								"target" : "file:///ForTests/"
+							}, 
+							{ 
+								"source" : "file:///ForTests/", 
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/ForTests/"
+							},
+							{
+								"source" : "file:///pApps/",
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/pApps/"
+							}
+						]
+					}
+	""" ;
 		
-		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpTask.class.getName()));
+		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration);
+		assertThat(bupj.toString())
+			.isNotNull()
+			.isEqualTo("Regular json");
+		
+		List<BackUpTask> bTt1 = bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER);
+		assertThat(bTt1).isNotNull().hasSize(2);
+		
+		List<BackUpTask> bTt2 = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
+		assertThat(bTt2).isNotNull().hasSize(2);
+		
+		List<BackUpTask> bTt3 = bupj.getTasks(JobTaskType.SOURCE_TO_TARGET);
+		assertThat(bTt3).isNotNull().hasSize(1);
+	}
+	
+	@Test
+	void testParallelJson() throws URISyntaxException {
+		
+		String json ="""		
+				{ 
+						"titre" : "Parallel json",
+						"items" : [
+							{
+								"source" : "file:///FredericPersonnel/",
+								"target" : "file:///ForTests/Empty_Target",
+								"buffer" : "file:///FP_BackUpBuffer/FredericPersonnel/",
+								"parallelScan" : true
+							}, 
+							{ 
+								"source" : "file:///ForTests/", 
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/ForTests/"
+							},
+							{
+								"source" : "file:///pApps/",
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/pApps/",
+								"parallelScan" : false
+							}
+						]
+					}
+	""" ;
 		
 		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration) ;
 		
@@ -175,34 +209,30 @@ public class BackUpJobTest {
 		assertThat(sTb).isNotNull();
 		assertThat(bupj.toString())
 			.isNotNull()
-			.hasToString("FredericPersonnel sur USB S:");
+			.hasToString("Parallel json");
 		
-		long expectedNbTasks = nbFileInDir("file:///C:/FredericPersonnel/") + 2;
+		long expectedNbTasks = nbFileInDir("file:///FredericPersonnel/") + 2;
 		assertThat(sTb).hasSize((int) expectedNbTasks);
 		assertThat(bTt).hasSize((int) expectedNbTasks);
 
-		if (Files.exists(Path.of(URI.create("file:///S:/")))) {
-			assertThat(logCounter.getLogRecordCount()).isZero();
-		} else {
-			assertThat(logCounter.getLogRecordCount()).isEqualTo(expectedNbTasks*2);
-			assertThat(logCounter.getLogRecordCount(Level.WARNING)).isEqualTo(expectedNbTasks*2);
-		}
 	}
 	
 	@Test
-	void testParallelJson2() throws IOException {
+	void testParallelJson2() throws IOException, URISyntaxException {
 		
-		String json = "	{\r\n" + 
-				"		\"titre\" : \"Parrallel test with delete\" ,\r\n" + 
-				"		\"items\" : [\r\n" + 
-				"			{\r\n" + 
-				"				\"source\" : \"file:///C:/ForTests/BackUpFiles/FP_Test_Source3/\",\r\n" + 
-				"				\"target\" : \"file:///C:/ForTests/BackUpFiles/FP_Test_Target3/\",\r\n" + 
-				"				\"buffer\" : \"file:///C:/ForTests/BackUpFiles/FP_Test_Buffer3/\",\r\n" + 
-				"				\"parallelScan\" : true\r\n" +
-				"			}" +
-				"		]\r\n" + 
-				"	}";
+		String json ="""		
+				{ 
+						"titre" : "Parrallel test with delete",
+						"items" : [
+							{
+								"source" : "file:///ForTests/BackUpFiles/FP_Test_Source3/",
+								"target" : "file:///ForTests/BackUpFiles/FP_Test_Target3/",
+								"buffer" : "file:///ForTests/BackUpFiles/FP_Test_Buffer3/",
+								"parallelScan" : true
+							}
+						]
+					}
+	""" ;
 		
 		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration) ;
 		
@@ -219,7 +249,7 @@ public class BackUpJobTest {
 		assertThat(bTt).hasSize((int) 5);
 
 		// Add a folder in target
-		Path tgtPath = Paths.get(URI.create("file:///C:/ForTests/BackUpFiles/FP_Test_Target3"));
+		Path tgtPath = FilesUtils.uriStringToAbsolutePath("file:///ForTests/BackUpFiles/FP_Test_Target3");
 		
 		Path newFolderPath = tgtPath.resolve("aNewFolder");
 		Files.createDirectory(newFolderPath);
@@ -254,28 +284,28 @@ public class BackUpJobTest {
 	@Test
 	void testUnmodifiableList() {
 		
-		String json = "	{\r\n" + 
-				"		\"titre\" : \"FredericPersonnel sur USB S:\" ,\r\n" + 
-				"		\"items\" : [\r\n" + 
-				"			{\r\n" + 
-				"				\"source\" : \"file:///C:/FredericPersonnel/\",\r\n" + 
-				"				\"target\" : \"file:///S:/FredericPersonnel/\",\r\n" + 
-				"				\"buffer\" : \"file:///C:/FP_BackUpBuffer/FredericPersonnel/\"\r\n" + 
-				"			},\r\n" + 
-				"			{\r\n" + 
-				"				\"source\" : \"file:///C:/ForTests/\",\r\n" + 
-				"				\"target\" : \"file:///S:/ForTests/\",\r\n" + 
-				"				\"buffer\" : \"file:///C:/FP_BackUpBuffer/FredericPersonnel2/\"\r\n" + 
-				"			},\r\n" + 
-				"			{\r\n" + 
-				"				\"source\" : \"file:///C:/pApps/\",\r\n" + 
-				"				\"target\" : \"file:///S:/pApps/\",\r\n" + 
-				"				\"buffer\" : \"file:///C:/FP_BackUpBuffer/pApps/\"\r\n" + 
-				"			}\r\n" + 
-				"		]\r\n" + 
-				"	}" ;
-		
-		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpTask.class.getName()));
+		String json ="""		
+				{ 
+						"titre" : "Unmodifiable list test",
+						"items" : [
+							{
+								"source" : "file:///FredericPersonnel/",
+								"target" : "file:///ForTests/Empty_Target",
+								"buffer" : "file:///FP_BackUpBuffer/FredericPersonnel/"
+							}, 
+							{ 
+								"source" : "file:///ForTests/", 
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/ForTests/"
+							},
+							{
+								"source" : "file:///pApps/",
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/pApps/"
+							}
+						]
+					}
+	""" ;
 		
 		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration) ;
 		
@@ -284,22 +314,93 @@ public class BackUpJobTest {
 			.isNotNull()
 			.hasSize(3);
 		
-		int nbBackUpTasks = bTt.size();
-		
-		if (Files.exists(Path.of(URI.create("file:///S:/")))) {
-			assertThat(logCounter.getLogRecordCount()).isZero();
-		} else {
-			assertThat(logCounter.getLogRecordCount()).isEqualTo(nbBackUpTasks);
-			assertThat(logCounter.getLogRecordCount(Level.WARNING)).isEqualTo(nbBackUpTasks);
-		}
-		
 		assertThatExceptionOfType(UnsupportedOperationException.class)
 			.isThrownBy(() -> bTt.clear());
 	}
 	
-	private long nbFileInDir(String dir) {
+	@Test
+	void testNoBufferAndTarget() {
 		
-		Path dirPath = Paths.get(URI.create(dir)) ;
+		String json ="""		
+				{ 
+						"titre" : "No Buffer and Target",
+						"items" : [
+							{
+								"source" : "file:///FredericPersonnel/"
+							}, 
+							{ 
+								"source" : "file:///ForTests/", 
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/ForTests/"
+							},
+							{
+								"source" : "file:///pApps/",
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/pApps/"
+							}
+						]
+					}
+	""" ;
+		
+		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpJob.class.getName()));
+		
+		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration) ;
+		
+		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
+		assertThat(bTt)
+			.isNotNull()
+			.hasSize(2);
+		
+		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+		
+		assertThat(logCounter.getLogRecords()).singleElement()
+			.satisfies(logRecord -> assertThat(logRecord.getMessage()).contains("No buffer and target"));
+	}
+	
+	@Test
+	void testInvalidURI() {
+		
+		String json ="""		
+				{ 
+						"titre" : "Wrong URI",
+						"items" : [
+							{
+								"source" : "file:///FredericPersonnel/",
+								"target" : "**** WRONG URI",
+								"buffer" : "file:///FP_BackUpBuffer/FredericPersonnel/"
+							}, 
+							{ 
+								"source" : "file:///ForTests/", 
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/ForTests/"
+							},
+							{
+								"source" : "file:///pApps/",
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/pApps/"
+							}
+						]
+					}
+	""" ;
+		
+		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(BackUpJob.class.getName()));
+		
+		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration) ;
+		
+		List<BackUpTask> bTt = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
+		assertThat(bTt)
+			.isNotNull()
+			.isEmpty();
+		
+		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
+		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
+
+	}
+	
+	private long nbFileInDir(String dir) throws URISyntaxException {
+		
+		Path dirPath = FilesUtils.uriStringToAbsolutePath(dir);
 		long res = 0;
 		try (Stream<Path> sourceFileStream = Files.list(dirPath)) {		 
 			res = sourceFileStream.count();

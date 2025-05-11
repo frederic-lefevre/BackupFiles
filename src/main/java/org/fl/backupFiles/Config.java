@@ -41,6 +41,7 @@ import org.fl.backupFiles.gui.BackUpItemCustomActionListener.CustomAction;
 import org.fl.backupFiles.gui.BackupFilesGui;
 import org.fl.util.AdvancedProperties;
 import org.fl.util.RunningContext;
+import org.fl.util.file.FilesUtils;
 
 public class Config {
 		
@@ -73,7 +74,7 @@ public class Config {
 
 			backupProperty = runningContext.getProps();
 
-			configFileDir = backupProperty.getPathFromURI("backupFiles.configFileDir");
+			configFileDir = FilesUtils.uriStringToAbsolutePath(backupProperty.getProperty("backupFiles.configFileDir"));
 			scanRefreshRate = backupProperty.getLong("backupFiles.scan.refreshRate", 2000);
 			backUpMaxRefreshInterval = backupProperty.getLong("backupFiles.backUp.maxRefreshInterval", 3000);
 			backUpRefreshRate = backupProperty.getInt("backupFiles.backUp.refreshRate", 1);

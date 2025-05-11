@@ -27,6 +27,7 @@ package org.fl.backupFiles;
 import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,6 +36,7 @@ import java.util.logging.Logger;
 
 import org.fl.util.FilterCounter;
 import org.fl.util.FilterCounter.LogRecordCounter;
+import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.Test;
 
 public class TargetFileStoresTest {
@@ -50,10 +52,10 @@ public class TargetFileStoresTest {
 	}
 
 	@Test
-	void unexistantPathShouldReturnTargetFileStore() {
+	void unexistantPathShouldReturnTargetFileStore() throws URISyntaxException {
 
-		Path path1 = TestUtils.getPathFromUriString( "file:///ForTests/BackUpFiles/doesNotExists");
-		Path path2 = TestUtils.getPathFromUriString( "file:///ForTests");
+		Path path1 = FilesUtils.uriStringToAbsolutePath( "file:///ForTests/BackUpFiles/doesNotExists");
+		Path path2 = FilesUtils.uriStringToAbsolutePath( "file:///ForTests");
 		TargetFileStores targetFileStores = new TargetFileStores();
 		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(path1, 5);
 		TargetFileStore targetFileStore2 = targetFileStores.addTargetFileStore(path2, 5);
@@ -64,10 +66,10 @@ public class TargetFileStoresTest {
 
 	
 	@Test
-	void twoPathInSameFileStoreShouldReturnSameFileStore() {
+	void twoPathInSameFileStoreShouldReturnSameFileStore() throws URISyntaxException {
 
-		Path path1 = TestUtils.getPathFromUriString( "file:///ForTests/BackUpFiles/TestDir1/File1.pdf");
-		Path path2 = TestUtils.getPathFromUriString("file:///ForTests/BackUpFiles/backupFiles.properties");
+		Path path1 = FilesUtils.uriStringToAbsolutePath( "file:///ForTests/BackUpFiles/TestDir1/File1.pdf");
+		Path path2 = FilesUtils.uriStringToAbsolutePath("file:///ForTests/BackUpFiles/backupFiles.properties");
 		
 		TargetFileStores targetFileStores = new TargetFileStores();
 		TargetFileStore targetFileStore1 = targetFileStores.addTargetFileStore(path1, 5);
