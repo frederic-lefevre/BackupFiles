@@ -110,6 +110,7 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 		targetMenuItems.add(addMenuItem("Afficher le dossier parent de la cible", tgtParentActionListener));
 	}
 
+	@Override
 	public void mousePressed(MouseEvent evt) {
 		if (evt.isPopupTrigger()) {
 			enableMenuItems();
@@ -117,6 +118,7 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 		}
 	}
 
+	@Override
 	public void mouseReleased(MouseEvent evt) {
 		if (evt.isPopupTrigger()) {
 			enableMenuItems();
