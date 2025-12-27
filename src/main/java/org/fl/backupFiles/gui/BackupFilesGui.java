@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 
+import org.fl.backupFiles.BackUpJobList;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.BackUpJob.JobTaskType;
 import org.fl.util.swing.ApplicationTabbedPane;
@@ -92,8 +93,14 @@ public class BackupFilesGui  extends JFrame {
 	private BackupFilesGui() {
 
 		Path configFileDir = Config.getConfigFileDir();
+		
 		if (configFileDir != null) {
 		// Display GUI
+			
+			// List of all possible back up jobs
+			// The back up jobs are defined in JSON files (one file per back up job)
+			// The first user action is to choose the back up job to execute
+			BackUpJobList backUpJobs = new BackUpJobList(configFileDir);
 			
 			setBounds(10, 10, WINDOW_WIDTH, WINDOW_HEIGHT);
 			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -113,7 +120,7 @@ public class BackupFilesGui  extends JFrame {
 			}
 						
 			//  Tabbed Panel to choose back up configuration. Add it in the first position
-			BackUpConfigChoicePane configChoicePane = new BackUpConfigChoicePane(configFileDir, backUpPanes) ;
+			BackUpConfigChoicePane configChoicePane = new BackUpConfigChoicePane(backUpJobs, backUpPanes) ;
 			mainApplicationTabbedPanel.add(configChoicePane, "Configuration", 0);
 			tabIndex++;
 	
