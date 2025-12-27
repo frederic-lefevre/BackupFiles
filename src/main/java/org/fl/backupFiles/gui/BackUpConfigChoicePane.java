@@ -143,7 +143,7 @@ public class BackUpConfigChoicePane extends JPanel {
 				JobsChoice jobsChoice = new JobsChoice(jobsChoiceList);
 			
 				for (JobTaskType jtt : JobTaskType.values()) {					
-					jobConfigTasksElement.get(jtt).setBackUpTasks(jobsChoice.getTasks(jtt));;			
+					jobConfigTasksElement.get(jtt).setBackUpTasks(jobsChoice.getTasks(jtt));		
 				}
 				
 				for (BackUpPane backUpPane : backUpPanes) {
