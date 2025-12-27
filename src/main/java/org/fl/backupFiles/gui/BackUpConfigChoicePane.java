@@ -97,6 +97,10 @@ public class BackUpConfigChoicePane extends JPanel {
 		
 		// Each time a back up job is chosen, the backUpTasks are updated accordingly
 		backUpJobChoice.addListSelectionListener(new ChooseJobs());
+		
+		if (backUpJobs.size() == 1) {
+			backUpJobChoice.setSelectedIndex(0);
+		}
 	}
 
 	private static class JobTaskTypeConfigElement {
@@ -126,7 +130,7 @@ public class BackUpConfigChoicePane extends JPanel {
 	}
 	
 	// Each time back up jobs are chosen, the back up panes are informed
-	private class ChooseJobs  implements ListSelectionListener {
+	private class ChooseJobs implements ListSelectionListener {
 
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
