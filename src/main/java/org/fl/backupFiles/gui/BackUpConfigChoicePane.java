@@ -24,7 +24,6 @@ SOFTWARE.
 
 package org.fl.backupFiles.gui;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +54,7 @@ public class BackUpConfigChoicePane extends JPanel {
 	
 	private final Map<JobTaskType, JobTaskTypeConfigElement> jobConfigTasksElement;
 	
-	public BackUpConfigChoicePane(Path configFileDir, List<BackUpPane> bps) {
+	public BackUpConfigChoicePane(BackUpJobList backUpJobs, List<BackUpPane> bps) {
 		super();
 		
 		backUpPanes = bps;
@@ -65,11 +64,6 @@ public class BackUpConfigChoicePane extends JPanel {
 		// Backup configuration choice
 		JPanel bkpChoicePanel = new JPanel();
 		bkpChoicePanel.setLayout(new BoxLayout(bkpChoicePanel, BoxLayout.X_AXIS));
-		
-		// List of all possible back up jobs
-		// The back up jobs are defined in JSON files (one file per back up job)
-		// The first user action is to choose the back up job to execute
-		BackUpJobList backUpJobs = new BackUpJobList(configFileDir);
 		
 		JLabel choiceLbl = new JLabel("Choix de la configuration de sauvegarde");
 		choiceLbl.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
