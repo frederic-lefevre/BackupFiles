@@ -24,6 +24,7 @@ SOFTWARE.
 
 package org.fl.backupFiles.gui;
 
+import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -32,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -45,6 +48,7 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 
 	private final JPopupMenu localJPopupMenu;
 	private final BackUpJTable backUpJTable;
+	private final JLabel popupMenuTitle;
 
 	// Menu items
 	private final List<JMenuItem> sourceMenuItems;
@@ -57,6 +61,11 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 		super();
 		this.backUpJTable = backupItemTablet;
 		localJPopupMenu = new JPopupMenu();
+		popupMenuTitle = new JLabel();
+		popupMenuTitle.setForeground(Color.BLUE);
+		popupMenuTitle.setBorder(BorderFactory.createEmptyBorder(5,15,5,15));
+		localJPopupMenu.add(popupMenuTitle);
+		localJPopupMenu.addSeparator();
 
 		sourceMenuItems = new ArrayList<JMenuItem>();
 		targetMenuItems = new ArrayList<JMenuItem>();
@@ -110,6 +119,7 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 		targetMenuItems.add(addMenuItem("Afficher le dossier parent de la cible", tgtParentActionListener));
 	}
 
+	@Override
 	public void mousePressed(MouseEvent evt) {
 		if (evt.isPopupTrigger()) {
 			enableMenuItems();
@@ -117,6 +127,7 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 		}
 	}
 
+	@Override
 	public void mouseReleased(MouseEvent evt) {
 		if (evt.isPopupTrigger()) {
 			enableMenuItems();
@@ -130,12 +141,14 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 		localJPopupMenu.add(localJMenuItem);
 		return localJMenuItem;
 	}
-	
+
 	private void enableMenuItems() {
 		
 		AbstractBackUpItem selectedEntry = backUpJTable.getSelectedBackUpItem() ;
 		
 		if (selectedEntry != null)  {
+			
+			popupMenuTitle.setText(getPopupMenuTitle(selectedEntry));
 			
 			if (selectedEntry instanceof BackUpItem backUpItem) {
 		
@@ -163,6 +176,17 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 			menuItem.setVisible(visible);
 			menuItem.setEnabled(enable);
 		};
+	}
+	
+	private String getPopupMenuTitle(AbstractBackUpItem backupItem) {
+		
+		if (backupItem.getSourcePath() != null) {
+			return backupItem.getSourcePath().toString();
+		} else if (backupItem.getTargetPath() != null) {
+			return backupItem.getTargetPath().toString();
+		} else {
+			return "";
+		}
 	}
 
 }
