@@ -131,6 +131,10 @@ public class BackUpJobTest {
 		
 		List<BackUpTask> bTt3 = bupj.getTasks(JobTaskType.SOURCE_TO_TARGET);
 		assertThat(bTt3).isNotNull().isEmpty();
+		
+		assertThat(bupj.getAllJobTaskType())
+			.isNotEmpty()
+			.hasSameElementsAs(List.of(JobTaskType.SOURCE_TO_BUFFER, JobTaskType.BUFFER_TO_TARGET));
 	}
 	
 	@Test
@@ -171,6 +175,44 @@ public class BackUpJobTest {
 		
 		List<BackUpTask> bTt3 = bupj.getTasks(JobTaskType.SOURCE_TO_TARGET);
 		assertThat(bTt3).isNotNull().hasSize(1);
+		
+		assertThat(bupj.getAllJobTaskType())
+			.isNotEmpty()
+			.hasSameElementsAs(List.of(JobTaskType.SOURCE_TO_TARGET, JobTaskType.SOURCE_TO_BUFFER, JobTaskType.BUFFER_TO_TARGET));
+	}
+	
+	@Test
+	void testSourceToTargetOnlyJson() {
+		
+		String json ="""		
+				{ 
+						"titre" : "Regular json",
+						"items" : [
+							{
+								"source" : "file:///FredericPersonnel/",
+								"target" : "file:///ForTests/"
+							}
+						]
+					}
+	""" ;
+		
+		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration);
+		assertThat(bupj.toString())
+			.isNotNull()
+			.isEqualTo("Regular json");
+		
+		List<BackUpTask> bTt1 = bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER);
+		assertThat(bTt1).isNotNull().isEmpty();
+		
+		List<BackUpTask> bTt2 = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
+		assertThat(bTt2).isNotNull().isEmpty();
+		
+		List<BackUpTask> bTt3 = bupj.getTasks(JobTaskType.SOURCE_TO_TARGET);
+		assertThat(bTt3).isNotNull().hasSize(1);
+		
+		assertThat(bupj.getAllJobTaskType())
+			.isNotEmpty()
+			.hasSameElementsAs(List.of(JobTaskType.SOURCE_TO_TARGET));
 	}
 	
 	@Test

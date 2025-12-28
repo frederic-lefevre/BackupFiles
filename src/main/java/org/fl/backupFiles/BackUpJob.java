@@ -38,6 +38,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
@@ -304,6 +306,13 @@ public class BackUpJob {
 		} else {
 			return Collections.unmodifiableList(backUpTasks.get(jobTaskType));
 		}
+	}
+	
+	public Set<JobTaskType> getAllJobTaskType() {
+		
+		return Stream.of(JobTaskType.values())
+			.filter(jtt -> !backUpTasks.get(jtt).isEmpty())
+			.collect(Collectors.toSet());
 	}
 	
 	private Path getPathElement(JsonNode jObjItem, String prop) throws URISyntaxException {
