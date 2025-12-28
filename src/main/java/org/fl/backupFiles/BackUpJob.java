@@ -37,7 +37,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
@@ -143,6 +142,15 @@ public class BackUpJob {
 			this.targetPath = tgtPath;
 			this.scanInParallel = scanInParallel;
 			this.sizeWarningLimit = sizeWarningLimit;
+		}
+		
+		public Set<JobTaskType> getJobTaskTypes() {
+			
+			if (bufferPath == null) {
+				return Set.of(JobTaskType.SOURCE_TO_TARGET);
+			} else {
+				return Set.of(JobTaskType.SOURCE_TO_BUFFER, JobTaskType.BUFFER_TO_TARGET);
+			}
 		}
 		
 		public List<BackUpTask> getBackUpTasks(JobTaskType jobTaskType) throws IOException {
@@ -290,8 +298,8 @@ public class BackUpJob {
 	
 	public Set<JobTaskType> getAllJobTaskType() {
 		
-		return Stream.of(JobTaskType.values())
-			.filter(jtt -> !getTasks(jtt).isEmpty())
+		return fullBackUpTaskList.stream()
+			.flatMap(f -> f.getJobTaskTypes().stream())
 			.collect(Collectors.toSet());
 	}
 	

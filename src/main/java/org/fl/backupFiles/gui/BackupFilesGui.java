@@ -29,6 +29,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -101,6 +102,7 @@ public class BackupFilesGui  extends JFrame {
 			// The back up jobs are defined in JSON files (one file per back up job)
 			// The first user action is to choose the back up job to execute
 			BackUpJobList backUpJobs = new BackUpJobList(configFileDir);
+			Set<JobTaskType> jobTaskTypes = backUpJobs.getJobTaskTypes();
 			
 			setBounds(10, 10, WINDOW_WIDTH, WINDOW_HEIGHT);
 			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -114,9 +116,11 @@ public class BackupFilesGui  extends JFrame {
 			ArrayList<BackUpPane> backUpPanes = new ArrayList<BackUpPane>();
 			int tabIndex = 0;
 			for (JobTaskType jtt : JobTaskType.values()) {
-				BackUpPane taskTypePane = new BackUpPane(jtt, jobInformationTable);
-				backUpPanes.add(taskTypePane);
-				mainApplicationTabbedPanel.add(taskTypePane, jtt.toString(), tabIndex++);
+				if (jobTaskTypes.contains(jtt)) {
+					BackUpPane taskTypePane = new BackUpPane(jtt, jobInformationTable);
+					backUpPanes.add(taskTypePane);
+					mainApplicationTabbedPanel.add(taskTypePane, jtt.toString(), tabIndex++);
+				}
 			}
 						
 			//  Tabbed Panel to choose back up configuration. Add it in the first position
