@@ -50,7 +50,7 @@ public class BackupFilesGui  extends JFrame {
 
 	private static final String DEFAULT_PROP_FILE = "file:///FredericPersonnel/Program/PortableApps/BackUpFiles/backupFiles.properties";
 	
-	private static final Logger bLog = Logger.getLogger(BackupFilesGui.class.getName());
+	private static Logger bLog;
 
 	public static final int WINDOW_WIDTH = 1880;
 	public static final int WINDOW_HEIGHT = 1000;
@@ -70,6 +70,11 @@ public class BackupFilesGui  extends JFrame {
 					
 					// Init config
 					Config.initConfig(getPropertyFile());
+					
+					bLog = Logger.getLogger(BackupFilesGui.class.getName());
+					bLog.severe("sun.java.command=" + System.getProperties().get("sun.java.command").toString());
+					bLog.severe("arg0=" + propertyFileUriString);
+					bLog.severe("arg number=" + args.length);
 					
 					try {
 						BackupFilesGui window = new BackupFilesGui();
@@ -95,6 +100,15 @@ public class BackupFilesGui  extends JFrame {
 
 		Path configFileDir = Config.getConfigFileDir();
 		
+		BackUpJobInfoTableModel jobInformationTable = new BackUpJobInfoTableModel();
+		// Tabbed Panel for configuration, tables and controls, and history
+		ApplicationTabbedPane mainApplicationTabbedPanel = new ApplicationTabbedPane(Config.getRunningContext());
+		
+		setBounds(10, 10, WINDOW_WIDTH, WINDOW_HEIGHT);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setTitle("Sauvegarde de fichiers") ;
+		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));	
+		
 		if (configFileDir != null) {
 		// Display GUI
 			
@@ -103,16 +117,7 @@ public class BackupFilesGui  extends JFrame {
 			// The first user action is to choose the back up job to execute
 			BackUpJobList backUpJobs = new BackUpJobList(configFileDir);
 			Set<JobTaskType> jobTaskTypes = backUpJobs.getJobTaskTypes();
-			
-			setBounds(10, 10, WINDOW_WIDTH, WINDOW_HEIGHT);
-			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			setTitle("Sauvegarde de fichiers") ;
-			getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));		
-					
-			BackUpJobInfoTableModel jobInformationTable = new BackUpJobInfoTableModel();
-			// Tabbed Panel for configuration, tables and controls, and history
-			ApplicationTabbedPane mainApplicationTabbedPanel = new ApplicationTabbedPane(Config.getRunningContext());
-				
+						
 			ArrayList<BackUpPane> backUpPanes = new ArrayList<BackUpPane>();
 			int tabIndex = 0;
 			for (JobTaskType jtt : JobTaskType.values()) {
@@ -136,12 +141,13 @@ public class BackupFilesGui  extends JFrame {
 			
 			mainApplicationTabbedPanel.setSelectedIndex(0);
 			
-			getContentPane().add(mainApplicationTabbedPanel);
-			
-			addWindowListener(new ShutdownAppli());
 		} else {
 			bLog.severe("Config files directory is null");
 		}
+		
+		getContentPane().add(mainApplicationTabbedPanel);
+		
+		addWindowListener(new ShutdownAppli());
 	}
 	
 	private class ShutdownAppli extends WindowAdapter {

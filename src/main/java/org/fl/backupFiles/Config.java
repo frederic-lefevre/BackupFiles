@@ -25,6 +25,7 @@ SOFTWARE.
 package org.fl.backupFiles;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ import org.fl.util.file.FilesUtils;
 
 public class Config {
 		
-	private static final Logger rootLogger = Logger.getLogger("");
+	private static final Logger logger = Logger.getLogger(Config.class.getName());
 	
 	private static RunningContext runningContext;
 	private static AdvancedProperties backupProperty;
@@ -67,14 +68,38 @@ public class Config {
 	
 	public static void initConfig(String propertyFile) {
 
+		URI propUri;
+		URISyntaxException uriExp = null;
+		
+		try {
+			propUri = new URI(propertyFile);
+		} catch (URISyntaxException e) {
+			uriExp = e;
+			propUri = null;
+			// Wait logger init to log that
+		}
+		
+		// Get context, properties, logger
+		runningContext = new RunningContext("org.fl.backupFiles", propUri);
+		
+		if (uriExp != null) {
+			logger.log(Level.SEVERE, "Invalid property file URI " + propertyFile, uriExp);
+		}
+		
 		try {
 
-			// Get context, properties, logger
-			runningContext = new RunningContext("org.fl.backupFiles", new URI(propertyFile));
-
 			backupProperty = runningContext.getProps();
+			if (backupProperty.isEmpty()) {
+				logger.severe("The backup properties are empty, coming from file " + propertyFile);
+			}
 
-			configFileDir = FilesUtils.uriStringToAbsolutePath(backupProperty.getProperty("backupFiles.configFileDir"));
+			String configFileDirString = backupProperty.getProperty("backupFiles.configFileDir");
+			if ((configFileDirString != null) && !configFileDirString.isEmpty()) {
+				configFileDir = FilesUtils.uriStringToAbsolutePath(configFileDirString);
+			} else {
+				configFileDir = null;
+			}
+			
 			scanRefreshRate = backupProperty.getLong("backupFiles.scan.refreshRate", 2000);
 			backUpMaxRefreshInterval = backupProperty.getLong("backupFiles.backUp.maxRefreshInterval", 3000);
 			backUpRefreshRate = backupProperty.getInt("backupFiles.backUp.refreshRate", 1);
@@ -116,7 +141,7 @@ public class Config {
 			acionOnSameTargetContentButNewer = getBackUpAction("backupFiles.actionOnTargetWithSameContentButNewer", BackupAction.ADJUST_TIME);
 			
 		} catch (Exception e) {
-			rootLogger.log(Level.SEVERE, "Exception caught in Config init (see default prop file processing)", e);
+			logger.log(Level.SEVERE, "Exception caught in Config init (see default prop file processing)", e);
 		}
 
 		initialized = true;
@@ -132,7 +157,7 @@ public class Config {
 				return defaultAction;
 			}
 		} else {
-			rootLogger.warning("Cannot find in configuration file BackUpAction for prperty " + property);
+			logger.warning("Cannot find in configuration file BackUpAction for property " + property);
 			return defaultAction;
 		}
 	}
