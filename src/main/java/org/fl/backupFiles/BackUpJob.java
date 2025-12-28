@@ -311,7 +311,7 @@ public class BackUpJob {
 	public Set<JobTaskType> getAllJobTaskType() {
 		
 		return Stream.of(JobTaskType.values())
-			.filter(jtt -> !backUpTasks.get(jtt).isEmpty())
+			.filter(jtt -> !getTasks(jtt).isEmpty())
 			.collect(Collectors.toSet());
 	}
 	
