@@ -31,13 +31,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
@@ -76,9 +75,7 @@ public class BackUpJob {
         public String toString() { 
 			return jobName; 
 		} 
-	} ;
-	
-	private Map<JobTaskType, List<BackUpTask>> backUpTasks;
+	};
 
 	private static final String TITLE = "titre";
 	private static final String ITEMS = "items";
@@ -98,8 +95,6 @@ public class BackUpJob {
 
 		fullBackUpTaskList = new ArrayList<FullBackUpTask>();
 		this.directoryGroupConfiguration = directoryGroupConfiguration;
-		
-		initBackUpTasksMap();
 
 		if ((jsonConfig != null) && !jsonConfig.isEmpty()) {
 
@@ -117,7 +112,7 @@ public class BackUpJob {
 				if (jBackupItems == null) {
 					bLog.severe("No items found in JSON configuration: " + jsonConfig);					
 				} else if (jBackupItems.isArray()){
-					getBackUpTasks((ArrayNode) jBackupItems);
+					addFullBackUpTasks((ArrayNode) jBackupItems);
 				} else {
 					bLog.severe("The items property in JSON configuration should be an array: " + jsonConfig);					
 				}
@@ -131,54 +126,139 @@ public class BackUpJob {
 			bLog.severe("JSON configuration null or empty");
 		}
 	}
-
-	private void initBackUpTasksMap() {
-		
-		backUpTasks = new HashMap<JobTaskType, List<BackUpTask>>();
-		for (JobTaskType jtt : JobTaskType.values()) {
-			backUpTasks.put(jtt, new ArrayList<BackUpTask>());
-		}
-	}
 	
 	private class FullBackUpTask {
 		
-		private final Path srcPath;
-		private final Path bufPath;
-		private final Path tgtPath;
+		private final Path sourcePath;
+		private final Path bufferPath;
+		private final Path targetPath;
 		private final boolean scanInParallel;
 		private final long sizeWarningLimit;
 
 		public FullBackUpTask(Path srcPath, Path bufPath, Path tgtPath, boolean scanInParallel, long sizeWarningLimit) {
 			super();
-			this.srcPath = srcPath;
-			this.bufPath = bufPath;
-			this.tgtPath = tgtPath;
+			this.sourcePath = srcPath;
+			this.bufferPath = bufPath;
+			this.targetPath = tgtPath;
 			this.scanInParallel = scanInParallel;
 			this.sizeWarningLimit = sizeWarningLimit;
 		}
 		
-		public Path getSrcPath() {
-			return srcPath;
-		}
-
-		public Path getBufPath() {
-			return bufPath;
-		}
-
-		public Path getTgtPath() {
-			return tgtPath;
+		public Set<JobTaskType> getJobTaskTypes() {
+			
+			if (bufferPath == null) {
+				return Set.of(JobTaskType.SOURCE_TO_TARGET);
+			} else {
+				return Set.of(JobTaskType.SOURCE_TO_BUFFER, JobTaskType.BUFFER_TO_TARGET);
+			}
 		}
 		
-		public boolean isScanInParallel() {
-			return scanInParallel;
-		}
+		public List<BackUpTask> getBackUpTasks(JobTaskType jobTaskType) throws IOException {
+			
+			if (scanInParallel) {
+				
+				List<BackUpTask> backUpTasks = new ArrayList<BackUpTask>();
+				
+				Set<Path> srcFilenameSet = new HashSet<Path>();
+				Set<Path> bufFilenameSet = new HashSet<Path>();
 
-		public long getSizeWarningLimit() {
-			return sizeWarningLimit;
+				try (DirectoryStream<Path> sourceFileStream = Files.newDirectoryStream(sourcePath)) {
+
+					for (Path sourceSubPath : sourceFileStream) {
+
+						Path bufSubPath = bufferPath.resolve(sourcePath.relativize(sourceSubPath));
+						Path tgtSubPath = targetPath.resolve(sourcePath.relativize(sourceSubPath));
+						backUpTasks.addAll(
+								getSimpleBackUpTasks(jobTaskType, sourceSubPath, bufSubPath, tgtSubPath, sizeWarningLimit));
+						srcFilenameSet.add(sourceSubPath.getFileName());
+					}
+				} catch (Exception e) {
+					bLog.log(Level.SEVERE, "Exception when scanning directory to create parallel scan " + sourcePath, e);
+				}
+
+				if (Files.exists(bufferPath)) {
+					try (DirectoryStream<Path> bufferFileStream = Files.newDirectoryStream(bufferPath)) {
+
+						for (Path bufferSubPath : bufferFileStream) {
+
+							if (!srcFilenameSet.contains(bufferSubPath.getFileName())) {
+								Path srcSubPath = sourcePath.resolve(bufferPath.relativize(bufferSubPath));
+								Path tgtSubPath = targetPath.resolve(bufferPath.relativize(bufferSubPath));
+								backUpTasks.addAll(
+										getSimpleBackUpTasks(jobTaskType, srcSubPath, bufferSubPath, tgtSubPath, sizeWarningLimit));
+								bufFilenameSet.add(bufferSubPath.getFileName());
+							}
+						}
+					} catch (Exception e) {
+						bLog.log(Level.SEVERE, "Exception when scanning directory to create parallel scan " + bufferPath, e);
+					}
+				}
+
+				if (Files.exists(targetPath)) {
+					try (DirectoryStream<Path> targetFileStream = Files.newDirectoryStream(targetPath)) {
+
+						for (Path targetSubPath : targetFileStream) {
+							if ((!srcFilenameSet.contains(targetSubPath.getFileName()))
+									&& (!bufFilenameSet.contains(targetSubPath.getFileName()))) {
+								Path srcSubPath = sourcePath.resolve(targetPath.relativize(targetSubPath));
+								Path bufSubPath = bufferPath.resolve(targetPath.relativize(targetSubPath));
+								backUpTasks.addAll(
+										getSimpleBackUpTasks(jobTaskType, srcSubPath, bufSubPath, targetSubPath, sizeWarningLimit));
+							}
+						}
+
+					} catch (Exception e) {
+						bLog.log(Level.SEVERE, "Exception when scanning directory to create parallel scan " + targetPath, e);
+					}
+				}
+				return backUpTasks;
+			} else {
+				return getSimpleBackUpTasks(jobTaskType, sourcePath, bufferPath, targetPath, sizeWarningLimit);
+			}
 		}
+		
+		private List<BackUpTask> getSimpleBackUpTasks(JobTaskType jobTaskType, Path srcPath, Path bufPath, Path tgtPath, long sizeWarningLimit) throws IOException {
+			
+			List<BackUpTask> backUpTasks = new ArrayList<BackUpTask>();
+			
+			if ((srcPath != null)) {
+				
+				if (bufPath != null) {
+					if (Files.isRegularFile(srcPath)) {
+						Path bufFile = bufPath.resolve(srcPath.getFileName());
+						DirectoryGroupMap directoryGroupMapForThisBackUpTask = new DirectoryGroupMap(srcPath, srcPath, directoryGroupConfiguration);
+						if (jobTaskType == JobTaskType.SOURCE_TO_BUFFER) {
+							backUpTasks.add(new BackUpTask(srcPath, bufFile, directoryGroupMapForThisBackUpTask, sizeWarningLimit));
+						}
+					} else {
+						if (jobTaskType == JobTaskType.SOURCE_TO_BUFFER) {
+							DirectoryGroupMap directoryGroupMapForThisBackUpTask = new DirectoryGroupMap(srcPath, srcPath, directoryGroupConfiguration);
+							backUpTasks.add(new BackUpTask(srcPath, bufPath, directoryGroupMapForThisBackUpTask, sizeWarningLimit));
+						}
+					}
+					if (tgtPath != null) {
+						if (jobTaskType == JobTaskType.BUFFER_TO_TARGET) {
+							DirectoryGroupMap directoryGroupMapForThisBackUpTask = new DirectoryGroupMap(srcPath, bufPath, directoryGroupConfiguration);
+							backUpTasks.add(new BackUpTask(bufPath, tgtPath, directoryGroupMapForThisBackUpTask, sizeWarningLimit));
+						}
+					}
+				} else if (tgtPath != null) {
+					if (jobTaskType == JobTaskType.SOURCE_TO_TARGET) {
+						DirectoryGroupMap directoryGroupMapForThisBackUpTask = new DirectoryGroupMap(srcPath, srcPath, directoryGroupConfiguration);
+						backUpTasks.add(new BackUpTask(srcPath, tgtPath, directoryGroupMapForThisBackUpTask, sizeWarningLimit));
+					}
+				} else {
+					bLog.severe("No buffer and target element definition for back up job " + title);
+				}
+				
+			} else {
+				bLog.severe("No source element definition for back up job " + title);
+			}
+			return backUpTasks;
+		}	
 	}
 	
-	private void getBackUpTasks(ArrayNode jItems) throws URISyntaxException {
+	private void addFullBackUpTasks(ArrayNode jItems) throws URISyntaxException {
 
 		for (JsonNode jObjItem : jItems) {
 
@@ -193,86 +273,6 @@ public class BackUpJob {
 		}
 	}
 	
-	private void addParallelBackUpTasks(Path srcPath, Path bufPath, Path tgtPath, long sizeWarningLimit) {
-
-		Set<Path> srcFilenameSet = new HashSet<Path>();
-		Set<Path> bufFilenameSet = new HashSet<Path>();
-
-		try (DirectoryStream<Path> sourceFileStream = Files.newDirectoryStream(srcPath)) {
-
-			for (Path sourceSubPath : sourceFileStream) {
-
-				Path bufSubPath = bufPath.resolve(srcPath.relativize(sourceSubPath));
-				Path tgtSubPath = tgtPath.resolve(srcPath.relativize(sourceSubPath));
-				addBackUpTask(sourceSubPath, bufSubPath, tgtSubPath, sizeWarningLimit);
-				srcFilenameSet.add(sourceSubPath.getFileName());
-			}
-		} catch (Exception e) {
-			bLog.log(Level.SEVERE, "Exception when scanning directory to create parallel scan " + srcPath, e);
-		}
-
-		if (Files.exists(bufPath)) {
-			try (DirectoryStream<Path> bufferFileStream = Files.newDirectoryStream(bufPath)) {
-
-				for (Path bufferSubPath : bufferFileStream) {
-
-					if (!srcFilenameSet.contains(bufferSubPath.getFileName())) {
-						Path srcSubPath = srcPath.resolve(bufPath.relativize(bufferSubPath));
-						Path tgtSubPath = tgtPath.resolve(bufPath.relativize(bufferSubPath));
-						addBackUpTask(srcSubPath, bufferSubPath, tgtSubPath, sizeWarningLimit);
-						bufFilenameSet.add(bufferSubPath.getFileName());
-					}
-				}
-			} catch (Exception e) {
-				bLog.log(Level.SEVERE, "Exception when scanning directory to create parallel scan " + bufPath, e);
-			}
-		}
-
-		if (Files.exists(tgtPath)) {
-			try (DirectoryStream<Path> targetFileStream = Files.newDirectoryStream(tgtPath)) {
-
-				for (Path targetSubPath : targetFileStream) {
-					if ((!srcFilenameSet.contains(targetSubPath.getFileName()))
-							&& (!bufFilenameSet.contains(targetSubPath.getFileName()))) {
-						Path srcSubPath = srcPath.resolve(tgtPath.relativize(targetSubPath));
-						Path bufSubPath = bufPath.resolve(tgtPath.relativize(targetSubPath));
-						addBackUpTask(srcSubPath, bufSubPath, targetSubPath, sizeWarningLimit);
-					}
-				}
-
-			} catch (Exception e) {
-				bLog.log(Level.SEVERE, "Exception when scanning directory to create parallel scan " + tgtPath, e);
-			}
-		}
-	}
-	
-	private void addBackUpTask(Path srcPath, Path bufPath, Path tgtPath, long sizeWarningLimit) throws IOException {
-		if ((srcPath != null)) {
-			if (bufPath != null) {
-				if (Files.isRegularFile(srcPath)) {
-					Path bufFile = bufPath.resolve(srcPath.getFileName());
-					DirectoryGroupMap directoryGroupMapForThisBackUpTask = new DirectoryGroupMap(srcPath, srcPath, directoryGroupConfiguration);
-					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufFile, directoryGroupMapForThisBackUpTask, sizeWarningLimit));
-				} else {
-					DirectoryGroupMap directoryGroupMapForThisBackUpTask = new DirectoryGroupMap(srcPath, srcPath, directoryGroupConfiguration);
-					backUpTasks.get(JobTaskType.SOURCE_TO_BUFFER).add(new BackUpTask(srcPath, bufPath, directoryGroupMapForThisBackUpTask, sizeWarningLimit));
-				}
-				if (tgtPath != null) {
-					DirectoryGroupMap directoryGroupMapForThisBackUpTask = new DirectoryGroupMap(srcPath, bufPath, directoryGroupConfiguration);
-					backUpTasks.get(JobTaskType.BUFFER_TO_TARGET).add(new BackUpTask(bufPath, tgtPath, directoryGroupMapForThisBackUpTask, sizeWarningLimit));
-				}
-			} else if (tgtPath != null) {
-				DirectoryGroupMap directoryGroupMapForThisBackUpTask = new DirectoryGroupMap(srcPath, srcPath, directoryGroupConfiguration);
-				backUpTasks.get(JobTaskType.SOURCE_TO_TARGET).add(new BackUpTask(srcPath, tgtPath, directoryGroupMapForThisBackUpTask, sizeWarningLimit));
-			} else {
-				bLog.severe("No buffer and target element definition for back up job " + title);
-			}
-		} else {
-			bLog.severe("No source element definition for back up job " + title);
-		}
-
-	}
-	
 	public static void setDefaultWarningSizeLimit(long defaultWarningSizeLimit) {
 		BackUpJob.defaultWarningSizeLimit = defaultWarningSizeLimit;
 	}
@@ -283,27 +283,24 @@ public class BackUpJob {
 
 	public List<BackUpTask> getTasks(JobTaskType jobTaskType) {
 		
-		initBackUpTasksMap();
+		List<BackUpTask> backUpTasks = new ArrayList<BackUpTask>();
 		
 		fullBackUpTaskList.forEach(fullBackUpTask -> {
-						
-			if (fullBackUpTask.isScanInParallel()) {
-				addParallelBackUpTasks(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath(), fullBackUpTask.getSizeWarningLimit());
-			} else {
-				try {
-					addBackUpTask(fullBackUpTask.getSrcPath(), fullBackUpTask.getBufPath(), fullBackUpTask.getTgtPath(), fullBackUpTask.getSizeWarningLimit());
-				} catch (IOException e) {
-					bLog.log(Level.SEVERE, "Exception when creating backup task with target path" + fullBackUpTask.getTgtPath(), e);
-				}
+			try {
+				backUpTasks.addAll(fullBackUpTask.getBackUpTasks(jobTaskType));
+			} catch (IOException e) {
+				bLog.log(Level.SEVERE, "Exception when creating backup task", e);
 			}
-			
 		});
 		
-		if (backUpTasks.get(jobTaskType) == null) {
-			return null;
-		} else {
-			return Collections.unmodifiableList(backUpTasks.get(jobTaskType));
-		}
+		return Collections.unmodifiableList(backUpTasks);		
+	}
+	
+	public Set<JobTaskType> getAllJobTaskType() {
+		
+		return fullBackUpTaskList.stream()
+			.flatMap(f -> f.getJobTaskTypes().stream())
+			.collect(Collectors.toSet());
 	}
 	
 	private Path getPathElement(JsonNode jObjItem, String prop) throws URISyntaxException {

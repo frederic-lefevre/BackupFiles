@@ -28,10 +28,12 @@ import static org.assertj.core.api.Assertions.*;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import org.fl.backupFiles.BackUpJob.JobTaskType;
 import org.fl.util.FilterCounter;
 import org.fl.util.FilterCounter.LogRecordCounter;
 import org.fl.util.file.FilesUtils;
@@ -52,6 +54,13 @@ class BackUpJobListTest {
 			
 			assertThat(jobs).isNotNull().hasSize((int) configFileNumber);
 			
+			assertThat(jobs).allSatisfy(job -> 
+				assertThat(job.getAllJobTaskType())
+					.hasSameElementsAs(Set.of(JobTaskType.SOURCE_TO_BUFFER, JobTaskType.BUFFER_TO_TARGET)));
+			
+			assertThat(jobs.getJobTaskTypes()).isNotNull()
+				.hasSameElementsAs(Set.of(JobTaskType.SOURCE_TO_BUFFER, JobTaskType.BUFFER_TO_TARGET));
+			
 		} catch (Exception e) {
 			fail(e);
 		}
@@ -69,6 +78,8 @@ class BackUpJobListTest {
 			BackUpJobList jobs = new BackUpJobList(configPath);
 			
 			assertThat(jobs).isNotNull().isEmpty();
+			
+			assertThat(jobs.getJobTaskTypes()).isNotNull().isEmpty();
 			
 			assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
 			assertThat(logCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);

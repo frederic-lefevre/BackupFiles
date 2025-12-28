@@ -28,10 +28,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
+import org.fl.backupFiles.BackUpJob.JobTaskType;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 
 public class BackUpJobList extends Vector<BackUpJob> {
@@ -65,4 +68,8 @@ public class BackUpJobList extends Vector<BackUpJob> {
 		}
 	}
 
+	public Set<JobTaskType> getJobTaskTypes() {
+		
+		return stream().flatMap(buj -> buj.getAllJobTaskType().stream()).collect(Collectors.toSet());
+	}
 }
