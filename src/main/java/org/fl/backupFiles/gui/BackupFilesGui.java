@@ -44,7 +44,7 @@ import org.fl.backupFiles.BackUpJob.JobTaskType;
 import org.fl.util.swing.ApplicationTabbedPane;
 
 // Main class for the back up files application
-public class BackupFilesGui  extends JFrame {
+public class BackupFilesGui extends JFrame {
 	
 	private static final long serialVersionUID = -2691160306708075667L;
 
