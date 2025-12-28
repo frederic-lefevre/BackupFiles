@@ -50,7 +50,7 @@ public class BackupFilesGui extends JFrame {
 
 	private static final String DEFAULT_PROP_FILE = "file:///FredericPersonnel/Program/PortableApps/BackUpFiles/backupFiles.properties";
 	
-	private static Logger bLog = Logger.getLogger(BackupFilesGui.class.getName());
+	private static final Logger bLog = Logger.getLogger(BackupFilesGui.class.getName());
 
 	public static final int WINDOW_WIDTH = 1880;
 	public static final int WINDOW_HEIGHT = 1000;
