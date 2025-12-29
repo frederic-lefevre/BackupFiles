@@ -29,6 +29,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -137,7 +138,7 @@ public class BackupFilesGui extends JFrame {
 			mainApplicationTabbedPanel.setSelectedIndex(0);
 			
 		} else {
-			bLog.severe("Config files directory is null");
+			bLog.severe("Config files directory is null. Backup property file: " + Objects.toString(Config.getRunningContext().getPropertiesLocation()));
 		}
 		
 		getContentPane().add(mainApplicationTabbedPanel);
