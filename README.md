@@ -20,3 +20,5 @@ It has acceptable performances (something like 400K files scanning in 20 seconds
 
 It has a content comparison option (which slows down the process naturally).
 
+The property file can be passed in argument : 
+> java -jar backupFiles.jar -props=myProperties.properties
