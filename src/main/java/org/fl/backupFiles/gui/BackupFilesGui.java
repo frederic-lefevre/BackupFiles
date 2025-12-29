@@ -42,6 +42,7 @@ import javax.swing.JFrame;
 import org.fl.backupFiles.BackUpJobList;
 import org.fl.backupFiles.Config;
 import org.fl.backupFiles.BackUpJob.JobTaskType;
+import org.fl.util.RunningContext;
 import org.fl.util.swing.ApplicationTabbedPane;
 
 // Main class for the back up files application
@@ -56,12 +57,15 @@ public class BackupFilesGui extends JFrame {
 	public static final int WINDOW_WIDTH = 1880;
 	public static final int WINDOW_HEIGHT = 1000;
 	
+	private static String PROPERTY_FILE_ARG_PREFIX = "-props=";
+	
 	private static String propertyFileUriString = DEFAULT_PROP_FILE;
 	
 	public static void main(String[] args) {
 		
-		if ((args != null) && (args.length > 0)) {
-			propertyFileUriString = args[0];
+		String propertyFileArgument = RunningContext.getProgramArgWithPrefix(PROPERTY_FILE_ARG_PREFIX, args);
+		if (propertyFileArgument != null) {
+			propertyFileUriString = propertyFileArgument;
 		}
 		
 		EventQueue.invokeLater(new Runnable() {
