@@ -76,6 +76,11 @@ public class Config {
 				logger.severe("The backup properties are empty, coming from file " + propertyFile);
 			}
 
+			int threadPoolSize = backupProperty.getInt("backupFiles.scan.threadPoolSize", 10);
+			int schedulerPoolSize = backupProperty.getInt("backupFiles.scan.schedulerPoolSize", 1);
+			scanExecutorService = Executors.newFixedThreadPool(threadPoolSize);
+			scheduler = Executors.newScheduledThreadPool(schedulerPoolSize);
+			
 			String configFileDirString = backupProperty.getProperty("backupFiles.configFileDir");
 			if ((configFileDirString != null) && !configFileDirString.isEmpty()) {
 				configFileDir = FilesUtils.uriStringToAbsolutePath(configFileDirString);
@@ -87,11 +92,6 @@ public class Config {
 			backUpMaxRefreshInterval = backupProperty.getLong("backupFiles.backUp.maxRefreshInterval", 3000);
 			backUpRefreshRate = backupProperty.getInt("backupFiles.backUp.refreshRate", 1);
 			maxDepth = backupProperty.getInt("backupFiles.scan.maxDepth", 200);
-
-			int threadPoolSize = backupProperty.getInt("backupFiles.scan.threadPoolSize", 10);
-			int schedulerPoolSize = backupProperty.getInt("backupFiles.scan.schedulerPoolSize", 1);
-			scanExecutorService = Executors.newFixedThreadPool(threadPoolSize);
-			scheduler = Executors.newScheduledThreadPool(schedulerPoolSize);
 
 			long fileSizeWarningThreshold = backupProperty.getLong("backupFiles.fileSize.warningThreshold",
 					Long.MAX_VALUE);
