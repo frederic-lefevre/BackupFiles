@@ -36,7 +36,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 
 import org.fl.backupFiles.BackUpJobList;
@@ -107,7 +106,6 @@ public class BackupFilesGui extends JFrame {
 		setBounds(10, 10, WINDOW_WIDTH, WINDOW_HEIGHT);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("Sauvegarde de fichiers") ;
-		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));	
 		
 		if (configFileDir != null) {
 		// Display GUI
