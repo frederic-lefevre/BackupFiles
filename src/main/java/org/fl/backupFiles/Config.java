@@ -24,8 +24,6 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -67,24 +65,9 @@ public class Config {
 	}
 	
 	public static void initConfig(String propertyFile) {
-
-		URI propUri;
-		URISyntaxException uriExp = null;
-		
-		try {
-			propUri = new URI(propertyFile);
-		} catch (URISyntaxException e) {
-			uriExp = e;
-			propUri = null;
-			// Wait logger init to log that
-		}
 		
 		// Get context, properties, logger
-		runningContext = new RunningContext("org.fl.backupFiles", propUri);
-		
-		if (uriExp != null) {
-			logger.log(Level.SEVERE, "Invalid property file URI " + propertyFile, uriExp);
-		}
+		runningContext = new RunningContext("org.fl.backupFiles", propertyFile);
 		
 		try {
 
