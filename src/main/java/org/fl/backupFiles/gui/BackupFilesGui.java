@@ -96,10 +96,7 @@ public class BackupFilesGui extends JFrame {
 	}
 	
 	private BackupFilesGui() {
-
-		Path configFileDir = Config.getConfigFileDir();
 		
-		BackUpJobInfoTableModel jobInformationTable = new BackUpJobInfoTableModel();
 		// Tabbed Panel for configuration, tables and controls, and history
 		ApplicationTabbedPane mainApplicationTabbedPanel = new ApplicationTabbedPane(Config.getRunningContext());
 		
@@ -107,44 +104,51 @@ public class BackupFilesGui extends JFrame {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("Sauvegarde de fichiers") ;
 		
-		if (configFileDir != null) {
-		// Display GUI
-			
-			// List of all possible back up jobs
-			// The back up jobs are defined in JSON files (one file per back up job)
-			// The first user action is to choose the back up job to execute
-			BackUpJobList backUpJobs = new BackUpJobList(configFileDir);
-			Set<JobTaskType> jobTaskTypes = backUpJobs.getJobTaskTypes();
-						
-			ArrayList<BackUpPane> backUpPanes = new ArrayList<BackUpPane>();
-			int tabIndex = 0;
-			for (JobTaskType jtt : JobTaskType.values()) {
-				if (jobTaskTypes.contains(jtt)) {
-					BackUpPane taskTypePane = new BackUpPane(jtt, jobInformationTable);
-					backUpPanes.add(taskTypePane);
-					mainApplicationTabbedPanel.add(taskTypePane, jtt.toString(), tabIndex++);
+		try {
+			Path configFileDir = Config.getConfigFileDir();
+
+			if (configFileDir != null) {
+				// Display GUI
+
+				BackUpJobInfoTableModel jobInformationTable = new BackUpJobInfoTableModel();
+
+				// List of all possible back up jobs
+				// The back up jobs are defined in JSON files (one file per back up job)
+				// The first user action is to choose the back up job to execute
+				BackUpJobList backUpJobs = new BackUpJobList(configFileDir);
+				Set<JobTaskType> jobTaskTypes = backUpJobs.getJobTaskTypes();
+
+				ArrayList<BackUpPane> backUpPanes = new ArrayList<BackUpPane>();
+				int tabIndex = 0;
+				for (JobTaskType jtt : JobTaskType.values()) {
+					if (jobTaskTypes.contains(jtt)) {
+						BackUpPane taskTypePane = new BackUpPane(jtt, jobInformationTable);
+						backUpPanes.add(taskTypePane);
+						mainApplicationTabbedPanel.add(taskTypePane, jtt.toString(), tabIndex++);
+					}
 				}
+
+				//  Tabbed Panel to choose back up configuration. Add it in the first position
+				BackUpConfigChoicePane configChoicePane = new BackUpConfigChoicePane(backUpJobs, backUpPanes) ;
+				mainApplicationTabbedPanel.add(configChoicePane, "Configuration", 0);
+				tabIndex++;
+
+				// Tabbed Panel to display a summary of operations done. Add it before the standard tabs provided by ApplicationTabbedPane
+				BackUpJobInfoPanel historiqueTab = new BackUpJobInfoPanel(jobInformationTable);
+				mainApplicationTabbedPanel.add(historiqueTab, "Historique", tabIndex++);
+
+				mainApplicationTabbedPanel.add(new CaptionPane(), "Légende", tabIndex++);
+
+				mainApplicationTabbedPanel.setSelectedIndex(0);
+
+			} else {
+				bLog.severe("Config files directory is null. Backup property file: " + Objects.toString(Config.getRunningContext().getPropertiesLocation()));
 			}
-						
-			//  Tabbed Panel to choose back up configuration. Add it in the first position
-			BackUpConfigChoicePane configChoicePane = new BackUpConfigChoicePane(backUpJobs, backUpPanes) ;
-			mainApplicationTabbedPanel.add(configChoicePane, "Configuration", 0);
-			tabIndex++;
-	
-			// Tabbed Panel to display a summary of operations done. Add it before the standard tabs provided by ApplicationTabbedPane
-			BackUpJobInfoPanel historiqueTab = new BackUpJobInfoPanel(jobInformationTable);
-			mainApplicationTabbedPanel.add(historiqueTab, "Historique", tabIndex++);
-			
-			mainApplicationTabbedPanel.add(new CaptionPane(), "Légende", tabIndex++);
-			
-			mainApplicationTabbedPanel.setSelectedIndex(0);
-			
-		} else {
-			bLog.severe("Config files directory is null. Backup property file: " + Objects.toString(Config.getRunningContext().getPropertiesLocation()));
+		} catch (Exception e) {
+			bLog.log(Level.SEVERE, "Exception in application startup", e);
 		}
 		
 		getContentPane().add(mainApplicationTabbedPanel);
-		
 		addWindowListener(new ShutdownAppli());
 	}
 	
