@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -56,6 +56,8 @@ public class BackupFilesGui extends JFrame {
 	public static final int WINDOW_WIDTH = 1880;
 	public static final int WINDOW_HEIGHT = 1000;
 	
+	private static RunningContext runningContext;
+	
 	private static String PROPERTY_FILE_ARG_PREFIX = "-props=";
 	
 	private static String propertyFileUriString = DEFAULT_PROP_FILE;
@@ -69,29 +71,24 @@ public class BackupFilesGui extends JFrame {
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-
 				try {
-					
-					// Init config
-					Config.initConfig(getPropertyFile());
-					
-					try {
-						BackupFilesGui window = new BackupFilesGui();
-						window.setVisible(true);
-					} catch (Exception e) {
-						bLog.log(Level.SEVERE, "Exception in main", e);
-					}
-					
+					BackupFilesGui window = new BackupFilesGui();
+					window.setVisible(true);
 				} catch (Exception e) {
-					bLog.log(Level.SEVERE, "Exception caught in Main (see default prop file processing) ", e);
-					System.out.println("Exception caught in Main (see default prop file processing) " + e.getMessage());
-					e.printStackTrace();
-				}				
+					bLog.log(Level.SEVERE, "Exception in main", e);
+				}
 			}
 		});
 	}
 	
-	public static String getPropertyFile() {
+	public static RunningContext getRunningContext() {
+		if (runningContext == null) {
+			runningContext = new RunningContext("org.fl.backupFiles", getPropertyFile());
+		}
+		return runningContext;
+	}
+	
+	private static String getPropertyFile() {
 		return propertyFileUriString;
 	}
 	
