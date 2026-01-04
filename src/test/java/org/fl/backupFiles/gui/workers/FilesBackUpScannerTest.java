@@ -86,7 +86,6 @@ class FilesBackUpScannerTest {
 	void test() {
 		try {	
 			
-//			Config.setRunningContextSupplier(() -> new RunningContext("org.fl.backupFiles", DEFAULT_PROP_FILE));
 			LogRecordCounter logCounterForFilesBackUpScanner = 
 					FilterCounter.getLogRecordCounter(Logger.getLogger(FilesBackUpScanner.class.getName()));
 			
@@ -194,6 +193,5 @@ class FilesBackUpScannerTest {
 	static void deleteTestData() {
 		// clean generated config, source files, buffer and target
 		testDataManager.deleteTestData();
-	}
-	
+	}	
 }
