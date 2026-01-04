@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,34 +48,50 @@ public class Config {
 		
 	private static final Logger logger = Logger.getLogger(Config.class.getName());
 	
-	private static RunningContext runningContext;
-	private static AdvancedProperties backupProperty;
-	private static Path configFileDir;
-	private static long scanRefreshRate;
-	private static long backUpMaxRefreshInterval;
-	private static long fileStoreRemainingSpaceWarningThreshold;
-	private static int backUpRefreshRate;
-	private static int maxDepth;
-	private static ExecutorService scanExecutorService;
-	private static ScheduledExecutorService scheduler;
-	private static List<OsAction> osActions;
-	private static String backupGroupConfiguration;
-	private static boolean initialized = false;
-	private static BackupAction acionOnSameTargetContentButNewer;
+	private static Config configInstance;
+	
+	private RunningContext runningContext;
+	private AdvancedProperties backupProperty;
+	private Path configFileDir;
+	private long scanRefreshRate;
+	private long backUpMaxRefreshInterval;
+	private long fileStoreRemainingSpaceWarningThreshold;
+	private int backUpRefreshRate;
+	private int maxDepth;
+	private ExecutorService scanExecutorService;
+	private ScheduledExecutorService scheduler;
+	private List<OsAction> osActions;
+	private String backupGroupConfiguration;
+	private BackupAction acionOnSameTargetContentButNewer;
 
+
+	private static Supplier<RunningContext> runningContextSupplier = () -> BackupFilesGui.getRunningContext();
+	
+	// For test purpose
+	public static void setRunningContextSupplier(Supplier<RunningContext> rcs) {
+		runningContextSupplier = rcs;
+		configInstance = null;
+	}
+	
+	private static Config getInstance() {
+		if (configInstance == null) {
+			configInstance = new Config(runningContextSupplier.get());
+		}
+		return configInstance;
+	}
+	
 	private Config() {
 	}
 	
-	public static void initConfig(String propertyFile) {
+	private Config(RunningContext runningContext) {
 		
-		// Get context, properties, logger
-		runningContext = new RunningContext("org.fl.backupFiles", propertyFile);
+		this.runningContext = runningContext;
 		
 		try {
 
 			backupProperty = runningContext.getProps();
 			if (backupProperty.isEmpty()) {
-				logger.severe("The backup properties are empty, coming from file " + propertyFile);
+				logger.severe("The backup properties are empty, coming from file " + Objects.toString(runningContext.getPropertiesLocation()));
 			}
 
 			int threadPoolSize = backupProperty.getInt("backupFiles.scan.threadPoolSize", 10);
@@ -121,16 +139,14 @@ public class Config {
 
 			backupGroupConfiguration = backupProperty.getFileContentFromURI("backupFiles.backupGroupFile", StandardCharsets.UTF_8);
 
-			acionOnSameTargetContentButNewer = getBackUpAction("backupFiles.actionOnTargetWithSameContentButNewer", BackupAction.ADJUST_TIME);
+			acionOnSameTargetContentButNewer = getBackUpAction(backupProperty, "backupFiles.actionOnTargetWithSameContentButNewer", BackupAction.ADJUST_TIME);
 			
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Exception caught in Config init (see default prop file processing)", e);
 		}
-
-		initialized = true;
 	}
-
-	private static BackupAction getBackUpAction(String property, BackupAction defaultAction) {
+	
+	private BackupAction getBackUpAction(AdvancedProperties backupProperty, String property, BackupAction defaultAction) {
 		
 		String backupAction = backupProperty.getProperty("backupFiles.actionOnTargetWithSameContentButNewer");
 		if ((backupAction != null) && !backupAction.isEmpty()) {
@@ -146,86 +162,50 @@ public class Config {
 	}
 	
 	public static RunningContext getRunningContext() {
-		if (!initialized) {
-			initConfig(BackupFilesGui.getPropertyFile());
-		}
-		return runningContext;
+		return  getInstance().runningContext;
 	}
 	
 	public static Path getConfigFileDir() {
-		if (!initialized) {
-			initConfig(BackupFilesGui.getPropertyFile());
-		}
-		return configFileDir;
+		return getInstance().configFileDir;
 	}
 
 	public static long getScanRefreshRate() {
-		if (!initialized) {
-			initConfig(BackupFilesGui.getPropertyFile());
-		}
-		return scanRefreshRate;
+		return getInstance().scanRefreshRate;
 	}
 
 	public static long getBackUpMaxRefreshInterval() {
-		if (!initialized) {
-			initConfig(BackupFilesGui.getPropertyFile());
-		}
-		return backUpMaxRefreshInterval;
+		return getInstance().backUpMaxRefreshInterval;
 	}
 
 	public static int getBackUpRefreshRate() {
-		if (!initialized) {
-			initConfig(BackupFilesGui.getPropertyFile());
-		}
-		return backUpRefreshRate;
+		return getInstance().backUpRefreshRate;
 	}
 
 	public static int getMaxDepth() {
-		if (!initialized) {
-			initConfig(BackupFilesGui.getPropertyFile());
-		}
-		return maxDepth;
+		return getInstance().maxDepth;
 	}
 
 	public static long getFileStoreRemainingSpaceWarningThreshold() {
-		if (!initialized) {
-			initConfig(BackupFilesGui.getPropertyFile());
-		}
-		return fileStoreRemainingSpaceWarningThreshold;
+		return getInstance().fileStoreRemainingSpaceWarningThreshold;
 	}
 	
 	public static ExecutorService getScanExecutorService() {
-		if (!initialized) {
-			initConfig(BackupFilesGui.getPropertyFile());
-		}
-		return scanExecutorService;
+		return getInstance().scanExecutorService;
 	}
 
 	public static ScheduledExecutorService getScheduler() {
-		if (!initialized) {
-			initConfig(BackupFilesGui.getPropertyFile());
-		}
-		return scheduler;
+		return getInstance().scheduler;
 	}
 
 	public static List<OsAction> getOsActions() {
-		if (!initialized) {
-			initConfig(BackupFilesGui.getPropertyFile());
-		}
-		return osActions;
+		return getInstance().osActions;
 	}
 
 	public static String getBackupGroupConfiguration() {
-		if (!initialized) {
-			initConfig(BackupFilesGui.getPropertyFile());
-		}
-		return backupGroupConfiguration;
+		return getInstance().backupGroupConfiguration;
 	}
 
 	public static BackupAction getAcionOnSameTargetContentButNewer() {
-		if (!initialized) {
-			initConfig(BackupFilesGui.getPropertyFile());
-		}
-		return acionOnSameTargetContentButNewer;
+		return getInstance().acionOnSameTargetContentButNewer;
 	}
 }

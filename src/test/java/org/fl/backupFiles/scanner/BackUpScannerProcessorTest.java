@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,7 @@ import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 import org.fl.backupFiles.directoryGroup.GroupPolicy;
+import org.fl.util.RunningContext;
 import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -74,7 +75,7 @@ class BackUpScannerProcessorTest {
 	static void generateTestData() {
 		
 		try {
-			Config.initConfig(DEFAULT_PROP_FILE);
+			Config.setRunningContextSupplier(() -> new RunningContext("org.fl.backupFiles", DEFAULT_PROP_FILE));
 
 			// Copy test data
 			Path srcPath1 = FilesUtils.uriStringToAbsolutePath(SOURCE_DATA_DIR1);

@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -45,6 +45,7 @@ import org.fl.backupFiles.gui.ProgressInformationPanel;
 import org.fl.backupFiles.gui.UiControl;
 import org.fl.backupFiles.scanner.BackUpScannerThread;
 import org.fl.util.FilterCounter;
+import org.fl.util.RunningContext;
 import org.fl.util.FilterCounter.LogRecordCounter;
 import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -66,6 +67,8 @@ class FilesBackUpScannerTest {
 	@BeforeAll
 	static void generateTestData() throws URISyntaxException {	
 
+		Config.setRunningContextSupplier(() -> new RunningContext("org.fl.backupFiles", DEFAULT_PROP_FILE));
+		
 		// Get the different config path
 		configFileDir = FilesUtils.uriStringToAbsolutePath(TestDataManager.CONFIG_FILE_FOLDER_URI);
 
@@ -77,7 +80,6 @@ class FilesBackUpScannerTest {
 		if (!genearationSuccessful) {
 			fail("Fail to generate test data");
 		}
-		Config.initConfig(DEFAULT_PROP_FILE);
 	}
 	
 	@Test
@@ -191,6 +193,5 @@ class FilesBackUpScannerTest {
 	static void deleteTestData() {
 		// clean generated config, source files, buffer and target
 		testDataManager.deleteTestData();
-	}
-	
+	}	
 }

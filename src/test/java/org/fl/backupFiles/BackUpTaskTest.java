@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,7 @@ import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.backupFiles.directoryGroup.DirectoryPermanenceLevel;
 import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
+import org.fl.util.RunningContext;
 import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,7 @@ class BackUpTaskTest {
 	static void initConfig() throws IOException, URISyntaxException {
 
 		Path sourcePathForDirectoryMap = FilesUtils.uriStringToAbsolutePath("file:///ForTests/BackUpFiles/TestDir1/");
-		Config.initConfig(DEFAULT_PROP_FILE);
+		Config.setRunningContextSupplier(() -> new RunningContext("org.fl.backupFiles", DEFAULT_PROP_FILE));
 		DirectoryGroupConfiguration directoryGroupConfiguration = new DirectoryGroupConfiguration(Config.getBackupGroupConfiguration());
 		directoryGroupMap = new DirectoryGroupMap(sourcePathForDirectoryMap, sourcePathForDirectoryMap, directoryGroupConfiguration);
 	}
