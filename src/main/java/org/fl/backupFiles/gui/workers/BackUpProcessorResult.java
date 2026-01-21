@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2023 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,15 +26,20 @@ package org.fl.backupFiles.gui.workers;
 
 public class BackUpProcessorResult {
 
-	private final long 	  duration ;
-	private final boolean success ;
+	private final long duration;
+	private final boolean success;
 
 	public BackUpProcessorResult(boolean s, long d) {
 		super();
-		success  = s ;
-		duration = d ;
+		success = s;
+		duration = d;
 	}
 
-	public boolean isSuccessfull() { return success;  } 
-	public long    getDuration()   { return duration; }
+	public boolean isSuccessfull() {
+		return success;
+	}
+
+	public long getDuration() {
+		return duration;
+	}
 }
