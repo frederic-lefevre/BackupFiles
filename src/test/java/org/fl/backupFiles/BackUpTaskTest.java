@@ -31,7 +31,6 @@ import java.net.URISyntaxException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
@@ -43,8 +42,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class BackUpTaskTest {
-
-	private static final Logger logger = Logger.getLogger(BackUpTaskTest.class.getName());
 	
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles.properties";
 	
@@ -163,7 +160,7 @@ class BackUpTaskTest {
 		BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 		
 		FileStore fileStore = backUpTask.getTargetFileStore();
-		assertThat(fileStore).isNotNull().isEqualTo(Files.getFileStore(src)).isEqualTo(FilesUtils.findFileStore(tgt, logger));
+		assertThat(fileStore).isNotNull().isEqualTo(Files.getFileStore(src)).isEqualTo(FilesUtils.findFileStore(tgt));
 	}
 	
 	@Test

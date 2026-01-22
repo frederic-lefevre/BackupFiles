@@ -29,14 +29,11 @@ import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.util.file.FilesUtils;
 
 public class BackUpTask {
-	
-	private static final Logger bLog = Logger.getLogger(BackUpTask.class.getName());
 	
 	private final Path source;
 	private final Path target;
@@ -63,7 +60,7 @@ public class BackUpTask {
 			throw new IllegalArgumentException("Null path argument when creating back up task. sourcePath=" + Objects.toString(source) + " targetPath="  + Objects.toString(source));
 		}
 
-		targetFileStore = FilesUtils.findFileStore(target, bLog);
+		targetFileStore = FilesUtils.findFileStore(target);
 		this.directoryGroupMap = directoryGroupMap;
 
 		compareContent = false;

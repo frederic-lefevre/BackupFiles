@@ -49,7 +49,7 @@ public class TargetFileStores {
 		
 		if (path != null) {
 			try {
-				FileStore fileStore = FilesUtils.findFileStore(path, tLog);
+				FileStore fileStore = FilesUtils.findFileStore(path);
 
 				if (fileStore == null) {
 					return null;
