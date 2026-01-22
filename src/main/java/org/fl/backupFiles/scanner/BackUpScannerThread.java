@@ -60,7 +60,6 @@ public class BackUpScannerThread {
 	private BackUpItemList backUpItemList;
 
 	private final BackUpCounters backUpCounters;
-
 	private final BackUpTask backUpTask;
 
 	private final FileComparator fileComparator;
@@ -79,7 +78,7 @@ public class BackUpScannerThread {
 		maxDepth = Config.getMaxDepth();
 
 		TargetFileStores targetFileStores = new TargetFileStores();
-		targetFileStores.addTargetFileStore(backUpTask.getTarget(), Config.getFileStoreRemainingSpaceWarningThreshold());
+		targetFileStores.addTargetFileStore(backUpTask.getTarget(), backUpTask.getTargetFileStore(), Config.getFileStoreRemainingSpaceWarningThreshold());
 		backUpCounters = new BackUpCounters(targetFileStores, OperationType.SCAN);
 		done = false;
 

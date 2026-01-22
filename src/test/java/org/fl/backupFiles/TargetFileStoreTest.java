@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 
 import org.fl.util.FilterCounter;
 import org.fl.util.FilterCounter.LogRecordCounter;
+import org.fl.util.file.FilesUtils;
 import org.junit.jupiter.api.Test;
 
 public class TargetFileStoreTest {
@@ -45,7 +46,7 @@ public class TargetFileStoreTest {
 	void targetFileStoreCreationTest() throws IOException {
 		
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, FilesUtils.findFileStore(pathForTargetFileStore), 5);
 		
 		assertThat(targetFileStore).isNotNull();
 		
@@ -67,7 +68,7 @@ public class TargetFileStoreTest {
 	void targetFileStoreResetTest() throws IOException {
 		
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, FilesUtils.findFileStore(pathForTargetFileStore), 5);
 		
 		assertThat(targetFileStore.getPotentialSizeChange()).isZero();
 		
@@ -86,7 +87,7 @@ public class TargetFileStoreTest {
 		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(TargetFileStore.class.getName()));
 		
 		TargetFileStores targetFileStores = new TargetFileStores();
-		targetFileStores.addTargetFileStore(pathForTargetFileStore, 90);
+		targetFileStores.addTargetFileStore(pathForTargetFileStore, FilesUtils.findFileStore(pathForTargetFileStore), 90);
 		
 		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logCounter.getLogRecordCount(Level.WARNING)).isEqualTo(1);

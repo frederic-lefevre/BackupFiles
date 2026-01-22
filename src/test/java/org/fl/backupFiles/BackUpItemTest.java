@@ -26,6 +26,7 @@ package org.fl.backupFiles;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,6 +53,7 @@ public class BackUpItemTest {
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles.properties";
 
 	private static final Path pathForTargetFileStore = Paths.get("/");
+	private static FileStore fileStore;
 	
 	private static Logger log = Logger.getLogger(BackUpItemTest.class.getName());
 
@@ -72,6 +74,7 @@ public class BackUpItemTest {
 	@BeforeAll
 	static void initConfig() throws IOException, URISyntaxException {
 
+		fileStore = Files.getFileStore(pathForTargetFileStore);
 		EXISTANT_SOURCE_FOLDER = FilesUtils.uriStringToAbsolutePath(SRC_FOLDER);
 		EXISTANT_SOURCE = FilesUtils.uriStringToAbsolutePath(SRC_FILE1);
 		UNEXISTANT_TARGET = FilesUtils.uriStringToAbsolutePath(TGT_FILE1);
@@ -86,7 +89,7 @@ public class BackUpItemTest {
 
 	private static TargetFileStores newTargetFileStores() {
 		TargetFileStores targetFileStores = new TargetFileStores();
-		targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
+		targetFileStores.addTargetFileStore(pathForTargetFileStore, fileStore, 5);
 		return targetFileStores;
 	}
 	

@@ -47,7 +47,7 @@ class BackUpCountersTest {
 	
 	private static TargetFileStores newTargetFileStores() {
 		TargetFileStores targetFileStores = new TargetFileStores();
-		targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
+		targetFileStores.addTargetFileStore(pathForTargetFileStore, fileStore, 5);
 		return targetFileStores;
 	}
 	

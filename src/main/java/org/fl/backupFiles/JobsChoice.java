@@ -149,7 +149,8 @@ public class JobsChoice {
 	}
 	
 	private void initTargetFileStores(JobTaskType jobTaskType, long warningThreshold) {
-		getTasks(jobTaskType).forEach(backUpTask -> targetFileStores.addTargetFileStore(backUpTask.getTarget(), warningThreshold));
+		getTasks(jobTaskType).forEach(backUpTask ->
+			targetFileStores.addTargetFileStore(backUpTask.getTarget(), backUpTask.getTargetFileStore(), warningThreshold));
 	}
 
 	public boolean compareContent() {

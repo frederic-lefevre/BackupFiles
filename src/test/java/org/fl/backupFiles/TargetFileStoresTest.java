@@ -45,20 +45,20 @@ public class TargetFileStoresTest {
 	void nullPathShouldReturnNullTargetFileStore() {
 
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(null, 5);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(null, null, 5);
 		assertThat(targetFileStore).isNull();
 		
 		assertThat(targetFileStores.getAllTargetFileStore()).isEmpty();
 	}
 
 	@Test
-	void unexistantPathShouldReturnTargetFileStore() throws URISyntaxException {
+	void unexistantPathShouldReturnTargetFileStore() throws URISyntaxException, IOException {
 
 		Path path1 = FilesUtils.uriStringToAbsolutePath( "file:///ForTests/BackUpFiles/doesNotExists");
 		Path path2 = FilesUtils.uriStringToAbsolutePath( "file:///ForTests");
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(path1, 5);
-		TargetFileStore targetFileStore2 = targetFileStores.addTargetFileStore(path2, 5);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(path1, FilesUtils.findFileStore(path1), 5);
+		TargetFileStore targetFileStore2 = targetFileStores.addTargetFileStore(path2, FilesUtils.findFileStore(path2), 5);
 		assertThat(targetFileStore).isNotNull().isEqualTo(targetFileStore2);
 		
 		assertThat(targetFileStores.getAllTargetFileStore()).hasSize(1);
@@ -66,14 +66,14 @@ public class TargetFileStoresTest {
 
 	
 	@Test
-	void twoPathInSameFileStoreShouldReturnSameFileStore() throws URISyntaxException {
+	void twoPathInSameFileStoreShouldReturnSameFileStore() throws URISyntaxException, IOException {
 
 		Path path1 = FilesUtils.uriStringToAbsolutePath( "file:///ForTests/BackUpFiles/TestDir1/File1.pdf");
 		Path path2 = FilesUtils.uriStringToAbsolutePath("file:///ForTests/BackUpFiles/backupFiles.properties");
 		
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore1 = targetFileStores.addTargetFileStore(path1, 5);
-		TargetFileStore targetFileStore2 = targetFileStores.addTargetFileStore(path2, 5);
+		TargetFileStore targetFileStore1 = targetFileStores.addTargetFileStore(path1, FilesUtils.findFileStore(path1), 5);
+		TargetFileStore targetFileStore2 = targetFileStores.addTargetFileStore(path2, FilesUtils.findFileStore(path2), 5);
 		
 		assertThat(targetFileStore1).isNotNull().isEqualTo(targetFileStore2);
 		
@@ -85,7 +85,7 @@ public class TargetFileStoresTest {
 		
 		Path pathForTargetFileStore = Paths.get("/");
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, FilesUtils.findFileStore(pathForTargetFileStore), 5);
 		
 		assertThat(targetFileStore).isNotNull();
 		
@@ -99,7 +99,7 @@ public class TargetFileStoresTest {
 		
 		Path pathForTargetFileStore = Paths.get("/");
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, FilesUtils.findFileStore(pathForTargetFileStore), 5);
 		
 		assertThat(targetFileStore.getFileStore()).isEqualTo(Files.getFileStore(pathForTargetFileStore));
 		assertThat(targetFileStores.getPotentialSizeChange(targetFileStore.getFileStore())).isZero();
@@ -122,7 +122,7 @@ public class TargetFileStoresTest {
 		
 		Path pathForTargetFileStore = Paths.get("/");
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, FilesUtils.findFileStore(pathForTargetFileStore), 5);
 		
 		assertThat(targetFileStores.getPotentialSizeChange(targetFileStore.getFileStore())).isZero();
 		assertThat(targetFileStores.getTotalPotentialSizeChange()).isZero();
@@ -142,10 +142,10 @@ public class TargetFileStoresTest {
 		
 		Path pathForTargetFileStore = Paths.get("/");
 		TargetFileStores targetFileStores = new TargetFileStores();
-		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
+		TargetFileStore targetFileStore = targetFileStores.addTargetFileStore(pathForTargetFileStore, FilesUtils.findFileStore(pathForTargetFileStore), 5);
 		
 		TargetFileStores targetFileStores2 = new TargetFileStores();
-		TargetFileStore targetFileStore2 = targetFileStores2.addTargetFileStore(pathForTargetFileStore, 5);
+		TargetFileStore targetFileStore2 = targetFileStores2.addTargetFileStore(pathForTargetFileStore, FilesUtils.findFileStore(pathForTargetFileStore), 5);
 		
 		assertThat(targetFileStore.getFileStore())
 			.isEqualTo(targetFileStore.getFileStore())
@@ -174,11 +174,11 @@ public class TargetFileStoresTest {
 	}
 	
 	@Test
-	void testNullFileStore() {
+	void testNullFileStore() throws IOException {
 		
 		Path pathForTargetFileStore = Paths.get("/");
 		TargetFileStores targetFileStores = new TargetFileStores();
-		targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
+		targetFileStores.addTargetFileStore(pathForTargetFileStore, FilesUtils.findFileStore(pathForTargetFileStore), 5);
 		
 		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(TargetFileStores.class.getName()));
 		
@@ -189,11 +189,11 @@ public class TargetFileStoresTest {
 	}
 	
 	@Test
-	void testNullFileStore2() {
+	void testNullFileStore2() throws IOException {
 		
 		Path pathForTargetFileStore = Paths.get("/");
 		TargetFileStores targetFileStores = new TargetFileStores();
-		targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
+		targetFileStores.addTargetFileStore(pathForTargetFileStore, FilesUtils.findFileStore(pathForTargetFileStore), 5);
 		
 		LogRecordCounter logCounter = FilterCounter.getLogRecordCounter(Logger.getLogger(TargetFileStores.class.getName()));
 		

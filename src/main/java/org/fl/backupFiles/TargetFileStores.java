@@ -45,15 +45,11 @@ public class TargetFileStores {
 		targetFileStores = new HashMap<FileStore, TargetFileStore>();
 	}
 	
-	public TargetFileStore addTargetFileStore(Path path, long sizeWarningThreshold) {
+	public TargetFileStore addTargetFileStore(Path path, FileStore fileStore, long sizeWarningThreshold) {
 		
-		if (path != null) {
+		if ((path != null) &&  (fileStore != null)) {
 			try {
-				FileStore fileStore = FilesUtils.findFileStore(path);
-
-				if (fileStore == null) {
-					return null;
-				} else if (! targetFileStores.containsKey(fileStore)) {
+				if (! targetFileStores.containsKey(fileStore)) {
 					Path mountPoint = FilesUtils.findMountPoint(path, tLog);
 					TargetFileStore targetFileStore = new TargetFileStore(fileStore, mountPoint, sizeWarningThreshold);
 					targetFileStores.put(fileStore, targetFileStore);
@@ -65,7 +61,7 @@ public class TargetFileStores {
 				tLog.log(Level.SEVERE, "Exception when getting filestore and mount point for " + path, e);
 			}
 		}
-		return  null;
+		return null;
 	}
 	
 	public Collection<TargetFileStore> getAllTargetFileStore() {
