@@ -282,6 +282,7 @@ public class BackUpJob {
 		BackUpJob.defaultWarningSizeLimit = defaultWarningSizeLimit;
 	}
 
+	@Override
 	public String toString() {
 		return title;
 	}
