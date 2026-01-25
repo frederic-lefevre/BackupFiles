@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ class BackUpCountersTest {
 	
 	private static TargetFileStores newTargetFileStores() {
 		TargetFileStores targetFileStores = new TargetFileStores();
-		targetFileStores.addTargetFileStore(pathForTargetFileStore, 5);
+		targetFileStores.addTargetFileStore(pathForTargetFileStore, fileStore, 5);
 		return targetFileStores;
 	}
 	

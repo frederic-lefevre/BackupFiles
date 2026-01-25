@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -63,15 +64,19 @@ class BackUpItemGroupTest {
 	
 	private static BackUpTask backUpTask;
 	
+	private static final Path pathForTargetFileStore = Paths.get("/");
+	private static FileStore fileStore;
+	
 	private static TargetFileStores newTargetFileStores() {
 		TargetFileStores targetFileStores = new TargetFileStores();
-		targetFileStores.addTargetFileStore(Paths.get("/"), 5);
+		targetFileStores.addTargetFileStore(pathForTargetFileStore, fileStore, 5);
 		return targetFileStores;
 	}
 	
 	@BeforeAll
 	static void initConfig() throws IOException, URISyntaxException {
 
+		fileStore = Files.getFileStore(pathForTargetFileStore);
 		EXISTANT_FOLDER_PATH = FilesUtils.uriStringToAbsolutePath(EXISTANT_FOLDER);
 		UNEXISTANT_FOLDER_PATH = FilesUtils.uriStringToAbsolutePath(UNEXISTANT_FOLDER);
 		EXISTANT_SOURCE = FilesUtils.uriStringToAbsolutePath(SRC_FILE1);

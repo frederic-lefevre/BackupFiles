@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
@@ -36,24 +37,37 @@ import org.fl.util.file.FilesUtils;
 
 public class BackUpTask {
 	
-	private static final Logger bLog = Logger.getLogger(BackUpTask.class.getName());
+	private static final Logger logger = Logger.getLogger(BackUpTask.class.getName());
 	
 	private final Path source;
 	private final Path target;
 	private final long sizeWarningLimit;
-	private final FileStore targetFileStore;
+	private FileStore targetFileStore;
 	private final DirectoryGroupMap directoryGroupMap;
 	
 	private boolean compareContent;
 	private boolean compareContentOnAmbiguous;
 	
-	private static final String warning1 = "  Attention : les chemins origine et destination n'existent pas";
-	private static final String warning2 = "  Attention : le chemin origine n'existe pas";
-	private static final String warning3 = "  Attention : le chemin destination n'existe pas";
-	private static final String noWarning = "" ;
+	public enum TaskStatus {
+		
+		UNEXISTANT_ORIGIN_AND_TARGET("  Attention : les chemins origine et destination n'existent pas"),
+		UNEXISTANT_ORIGIN("  Attention : le chemin origine n'existe pas"),
+		UNEXISTANT_TARGET("  Attention : le chemin destination n'existe pas"),
+		NORMAL("");
+		
+		String statusWarning;
+		
+		private TaskStatus(String statusWarning) {
+			this.statusWarning = statusWarning;
+		}
+		
+		public String getStatusWarning() {
+			return statusWarning;
+		}
+	}
 	
 	// A back up task is a source directory or file to back up to a destination directory or file
-	public BackUpTask(Path src, Path tgt, DirectoryGroupMap directoryGroupMap, long sizeWarningLimit) throws IOException {
+	public BackUpTask(Path src, Path tgt, DirectoryGroupMap directoryGroupMap, long sizeWarningLimit) {
 		
 		source = src;
 		target = tgt;
@@ -63,7 +77,6 @@ public class BackUpTask {
 			throw new IllegalArgumentException("Null path argument when creating back up task. sourcePath=" + Objects.toString(source) + " targetPath="  + Objects.toString(source));
 		}
 
-		targetFileStore = FilesUtils.findFileStore(target, bLog);
 		this.directoryGroupMap = directoryGroupMap;
 
 		compareContent = false;
@@ -87,9 +100,18 @@ public class BackUpTask {
 	}
 
 	public FileStore getTargetFileStore() {
+		if (targetFileStore == null) {
+			try {
+				targetFileStore = FilesUtils.findFileStore(target);
+			} catch (IOException e) {
+				targetFileStore = null;
+				logger.log(Level.SEVERE, "IOException getting FileStore for " + Objects.toString(target), e);
+			}
+		}
 		return targetFileStore;
 	}
 
+	@Override
 	public String toString() {
 		String toString;
 		if ((source != null) && (target != null)) {
@@ -100,23 +122,19 @@ public class BackUpTask {
 		return toString;
 	}
 
-	public String eventualWarning() {
-
-		String warning = null;
-		if ((source != null) && (target != null)) {
-			boolean sourceExists = Files.exists(source);
-			boolean targetExists = Files.exists(target);
-			if (!sourceExists && !targetExists) {
-				warning = warning1;
-			} else if (!sourceExists) {
-				warning = warning2;
-			} else if (!targetExists) {
-				warning = warning3;
-			} else {
-				warning = noWarning;
-			}
+	public TaskStatus getTaskStatus() {
+		
+		boolean sourceExists = Files.exists(source);
+		boolean targetExists = Files.exists(target);
+		if (!sourceExists && !targetExists) {
+			return TaskStatus.UNEXISTANT_ORIGIN_AND_TARGET;
+		} else if (!sourceExists) {
+			return TaskStatus.UNEXISTANT_ORIGIN;
+		} else if (!targetExists) {
+			return TaskStatus.UNEXISTANT_TARGET;
+		} else {
+			return TaskStatus.NORMAL;
 		}
-		return warning;
 	}
 
 	public boolean compareContent() {

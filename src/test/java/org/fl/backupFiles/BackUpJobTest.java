@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import org.fl.backupFiles.BackUpJob.JobStatus;
 import org.fl.backupFiles.BackUpJob.JobTaskType;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.util.FilterCounter;
@@ -67,6 +68,7 @@ public class BackUpJobTest {
 			);
 		
 		assertThat(bupj.toString()).isNull();
+		assertThat(bupj.getJobRunStatus()).isEqualTo(JobStatus.NOT_RUNABLE);
 		
 		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
@@ -87,6 +89,7 @@ public class BackUpJobTest {
 		);
 		
 		assertThat(bupj.toString()).isNull();
+		assertThat(bupj.getJobRunStatus()).isEqualTo(JobStatus.NOT_RUNABLE);
 		
 		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);
@@ -135,6 +138,55 @@ public class BackUpJobTest {
 		assertThat(bupj.getAllJobTaskType())
 			.isNotEmpty()
 			.hasSameElementsAs(List.of(JobTaskType.SOURCE_TO_BUFFER, JobTaskType.BUFFER_TO_TARGET));
+		
+		assertThat(bupj.getJobRunStatus()).isEqualTo(JobStatus.RUNABLE);
+	}
+	
+	@Test
+	void testNoFileStoreForTargetJson() {
+		
+		String json ="""		
+				{ 
+						"titre" : "Regular json",
+						"items" : [
+							{
+								"source" : "file:///FredericPersonnel/",
+								"target" : "file:///X:/ForTests/",
+								"buffer" : "file:///FP_BackUpBuffer/FredericPersonnel/"
+							}, 
+							{ 
+								"source" : "file:///ForTests/", 
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/ForTests/"
+							},
+							{
+								"source" : "file:///pApps/",
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/pApps/"
+							}
+						]
+					}
+	""" ;
+		
+		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration);
+		assertThat(bupj.toString())
+			.isNotNull()
+			.isEqualTo("Regular json");
+		
+		List<BackUpTask> bTt1 = bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER);
+		assertThat(bTt1).isNotNull().hasSize(3);
+		
+		List<BackUpTask> bTt2 = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
+		assertThat(bTt2).isNotNull().hasSize(3);
+		
+		List<BackUpTask> bTt3 = bupj.getTasks(JobTaskType.SOURCE_TO_TARGET);
+		assertThat(bTt3).isNotNull().isEmpty();
+		
+		assertThat(bupj.getAllJobTaskType())
+			.isNotEmpty()
+			.hasSameElementsAs(List.of(JobTaskType.SOURCE_TO_BUFFER, JobTaskType.BUFFER_TO_TARGET));
+		
+		assertThat(bupj.getJobRunStatus()).isEqualTo(JobStatus.PARTIALLY_RUNABLE);
 	}
 	
 	@Test
@@ -179,6 +231,8 @@ public class BackUpJobTest {
 		assertThat(bupj.getAllJobTaskType())
 			.isNotEmpty()
 			.hasSameElementsAs(List.of(JobTaskType.SOURCE_TO_TARGET, JobTaskType.SOURCE_TO_BUFFER, JobTaskType.BUFFER_TO_TARGET));
+		
+		assertThat(bupj.getJobRunStatus()).isEqualTo(JobStatus.RUNABLE);
 	}
 	
 	@Test
@@ -213,6 +267,62 @@ public class BackUpJobTest {
 		assertThat(bupj.getAllJobTaskType())
 			.isNotEmpty()
 			.hasSameElementsAs(List.of(JobTaskType.SOURCE_TO_TARGET));
+		
+		assertThat(bupj.getJobRunStatus()).isEqualTo(JobStatus.RUNABLE);
+	}
+	
+	@Test
+	void testSourceToTargetOnlyJsonWithUnexistantTarget() {
+		
+		String json ="""		
+				{ 
+						"titre" : "Regular json",
+						"items" : [
+							{
+								"source" : "file:///FredericPersonnel/",
+								"target" : "file:///ForTests/DoesNotExists"
+							}
+						]
+					}
+	""" ;
+		
+		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration);
+		assertThat(bupj.toString())
+			.isNotNull()
+			.isEqualTo("Regular json");
+		
+		assertThat(bupj.getAllJobTaskType())
+			.isNotEmpty()
+			.hasSameElementsAs(List.of(JobTaskType.SOURCE_TO_TARGET));
+		
+		assertThat(bupj.getJobRunStatus()).isEqualTo(JobStatus.NOT_RUNABLE);
+	}
+	
+	@Test
+	void testSourceToTargetOnlyJsonWithUnexistantSource() {
+		
+		String json ="""		
+				{ 
+						"titre" : "Regular json",
+						"items" : [
+							{
+								"source" : "file:///FredericPersonnel/DoesNotExists/",
+								"target" : "file:///ForTests/"
+							}
+						]
+					}
+	""" ;
+		
+		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration);
+		assertThat(bupj.toString())
+			.isNotNull()
+			.isEqualTo("Regular json");
+		
+		assertThat(bupj.getAllJobTaskType())
+			.isNotEmpty()
+			.hasSameElementsAs(List.of(JobTaskType.SOURCE_TO_TARGET));
+		
+		assertThat(bupj.getJobRunStatus()).isEqualTo(JobStatus.NOT_RUNABLE);
 	}
 	
 	@Test
@@ -257,6 +367,7 @@ public class BackUpJobTest {
 		assertThat(sTb).hasSize((int) expectedNbTasks);
 		assertThat(bTt).hasSize((int) expectedNbTasks);
 
+		assertThat(bupj.getJobRunStatus()).isEqualTo(JobStatus.PARTIALLY_RUNABLE);
 	}
 	
 	@Test
@@ -398,6 +509,8 @@ public class BackUpJobTest {
 		
 		assertThat(logCounter.getLogRecords()).singleElement()
 			.satisfies(logRecord -> assertThat(logRecord.getMessage()).contains("No buffer and target"));
+		
+		assertThat(bupj.getJobRunStatus()).isEqualTo(JobStatus.RUNABLE);
 	}
 	
 	@Test
@@ -434,6 +547,7 @@ public class BackUpJobTest {
 		assertThat(bTt)
 			.isNotNull()
 			.isEmpty();
+		assertThat(bupj.getJobRunStatus()).isEqualTo(JobStatus.NOT_RUNABLE);
 		
 		assertThat(logCounter.getLogRecordCount()).isEqualTo(1);
 		assertThat(logCounter.getLogRecordCount(Level.SEVERE)).isEqualTo(1);

@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ public class JobConfigTableModel extends AbstractTableModel  {
 
 	private static final long serialVersionUID = 1L;
 
-	private final static String[] entetes = {"Chemin origine", "Chemin destination", "Commentaires"};
+	private static final String[] entetes = {"Chemin origine", "Chemin destination", "Commentaires"};
 	
 	// underlying data
 	private List<BackUpTask> backUpTasks;
@@ -68,7 +68,7 @@ public class JobConfigTableModel extends AbstractTableModel  {
 		return switch (columnIndex) {
 			case 0 -> backUpTasks.get(rowIndex).getSource();
 			case 1 -> backUpTasks.get(rowIndex).getTarget();
-			case 2 -> backUpTasks.get(rowIndex).eventualWarning();
+			case 2 -> backUpTasks.get(rowIndex).getTaskStatus().getStatusWarning();
 			default -> null;
 		};
 	}

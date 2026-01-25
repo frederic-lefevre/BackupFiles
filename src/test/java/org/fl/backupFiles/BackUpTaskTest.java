@@ -31,7 +31,6 @@ import java.net.URISyntaxException;
 import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
@@ -43,8 +42,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class BackUpTaskTest {
-
-	private static final Logger logger = Logger.getLogger(BackUpTaskTest.class.getName());
 	
 	private static final String DEFAULT_PROP_FILE = "file:///ForTests/BackUpFiles/backupFiles.properties";
 	
@@ -72,6 +69,7 @@ class BackUpTaskTest {
 
 		assertThat(backUpTask.compareContent()).isFalse();
 		assertThat(backUpTask.compareContentOnAmbiguous()).isTrue();
+		assertThat(backUpTask.getTaskStatus()).isNotNull().isEqualTo(BackUpTask.TaskStatus.UNEXISTANT_TARGET);
 
 		BackUpTask backUpTask2 = new BackUpTask(src, tgt, directoryGroupMap, 0);
 
@@ -152,6 +150,74 @@ class BackUpTaskTest {
 	}
 	
 	@Test
+	void test8() throws IOException, URISyntaxException {
+		
+		final String SRC_PATH1 = "file:///ForTests/BackUpFiles/TestDir1/";
+		final String TGT_PATH1 = "file:///ForTests/BackUpFiles/TestDir2/";
+
+		Path src = FilesUtils.uriStringToAbsolutePath(SRC_PATH1);
+		Path tgt = FilesUtils.uriStringToAbsolutePath(TGT_PATH1);
+
+		BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
+
+		assertThat(backUpTask.compareContent()).isFalse();
+		assertThat(backUpTask.compareContentOnAmbiguous()).isTrue();
+		assertThat(backUpTask.getTaskStatus()).isNotNull().isEqualTo(BackUpTask.TaskStatus.NORMAL);
+	}
+	
+	@Test
+	void test9() throws IOException, URISyntaxException {
+		
+		final String SRC_PATH1 = "file:///ForTests/BackUpFiles/TestDir1/";
+		final String TGT_PATH1 = "file:///X:/ForTests/BackUpFiles/TestDir2/";
+
+		Path src = FilesUtils.uriStringToAbsolutePath(SRC_PATH1);
+		Path tgt = FilesUtils.uriStringToAbsolutePath(TGT_PATH1);
+		assertThat(FilesUtils.findFileStore(tgt)).isNull();
+
+		BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
+
+		assertThat(backUpTask.compareContent()).isFalse();
+		assertThat(backUpTask.compareContentOnAmbiguous()).isTrue();
+		assertThat(backUpTask.getTaskStatus()).isNotNull().isEqualTo(BackUpTask.TaskStatus.UNEXISTANT_TARGET);
+	}
+	
+	@Test
+	void test10() throws IOException, URISyntaxException {
+		
+		final String SRC_PATH1 = "file:///X:/ForTests/BackUpFiles/TestDir1/";
+		final String TGT_PATH1 = "file:///ForTests/BackUpFiles/TestDir2/";
+
+		Path src = FilesUtils.uriStringToAbsolutePath(SRC_PATH1);
+		Path tgt = FilesUtils.uriStringToAbsolutePath(TGT_PATH1);
+		assertThat(FilesUtils.findFileStore(src)).isNull();
+
+		BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
+
+		assertThat(backUpTask.compareContent()).isFalse();
+		assertThat(backUpTask.compareContentOnAmbiguous()).isTrue();
+		assertThat(backUpTask.getTaskStatus()).isNotNull().isEqualTo(BackUpTask.TaskStatus.UNEXISTANT_ORIGIN);
+	}
+	
+	@Test
+	void test11() throws IOException, URISyntaxException {
+		
+		final String SRC_PATH1 = "file:///X:/ForTests/BackUpFiles/TestDir1/";
+		final String TGT_PATH1 = "file:///X:/ForTests/BackUpFiles/TestDir2/";
+
+		Path src = FilesUtils.uriStringToAbsolutePath(SRC_PATH1);
+		Path tgt = FilesUtils.uriStringToAbsolutePath(TGT_PATH1);
+		assertThat(FilesUtils.findFileStore(src)).isNull();
+		assertThat(FilesUtils.findFileStore(tgt)).isNull();
+
+		BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
+
+		assertThat(backUpTask.compareContent()).isFalse();
+		assertThat(backUpTask.compareContentOnAmbiguous()).isTrue();
+		assertThat(backUpTask.getTaskStatus()).isNotNull().isEqualTo(BackUpTask.TaskStatus.UNEXISTANT_ORIGIN_AND_TARGET);
+	}
+	
+	@Test
 	void testFileStore() throws IOException, URISyntaxException {
 		
 		final String SRC_FILE1 = "file:///ForTests/BackUpFiles/TestDir1/File1.pdf";
@@ -163,7 +229,8 @@ class BackUpTaskTest {
 		BackUpTask backUpTask = new BackUpTask(src, tgt, directoryGroupMap, 0);
 		
 		FileStore fileStore = backUpTask.getTargetFileStore();
-		assertThat(fileStore).isNotNull().isEqualTo(Files.getFileStore(src)).isEqualTo(FilesUtils.findFileStore(tgt, logger));
+		assertThat(fileStore).isNotNull().isEqualTo(Files.getFileStore(src)).isEqualTo(FilesUtils.findFileStore(tgt));
+		assertThat(backUpTask.getTaskStatus()).isNotNull().isEqualTo(BackUpTask.TaskStatus.UNEXISTANT_TARGET);
 	}
 	
 	@Test

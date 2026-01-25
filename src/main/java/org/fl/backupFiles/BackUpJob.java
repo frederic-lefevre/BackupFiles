@@ -1,7 +1,7 @@
 /*
  * MIT License
 
-Copyright (c) 2017, 2025 Frederic Lefevre
+Copyright (c) 2017, 2026 Frederic Lefevre
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import org.fl.backupFiles.BackUpTask.TaskStatus;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.util.file.FilesUtils;
@@ -77,6 +78,10 @@ public class BackUpJob {
 		} 
 	};
 
+	public enum JobStatus {		
+		RUNABLE, PARTIALLY_RUNABLE, NOT_RUNABLE
+	}
+	
 	private static final String TITLE = "titre";
 	private static final String ITEMS = "items";
 	private static final String SOURCE = "source";
@@ -277,6 +282,7 @@ public class BackUpJob {
 		BackUpJob.defaultWarningSizeLimit = defaultWarningSizeLimit;
 	}
 
+	@Override
 	public String toString() {
 		return title;
 	}
@@ -294,6 +300,32 @@ public class BackUpJob {
 		});
 		
 		return Collections.unmodifiableList(backUpTasks);		
+	}
+	
+	public JobStatus getJobRunStatus() {
+		
+		if (fullBackUpTaskList.isEmpty()) {
+			return JobStatus.NOT_RUNABLE;
+		}
+		
+		for (BackUpTask backUpTask : getTasks(JobTaskType.SOURCE_TO_TARGET)) {
+			if (backUpTask.getTaskStatus() != TaskStatus.NORMAL) {
+				return JobStatus.NOT_RUNABLE;
+			}
+		}
+		
+		for (BackUpTask backUpTask : getTasks(JobTaskType.SOURCE_TO_BUFFER)) {
+			if (backUpTask.getTaskStatus() != TaskStatus.NORMAL) {
+				return JobStatus.NOT_RUNABLE;
+			}
+		}
+		
+		for (BackUpTask backUpTask : getTasks(JobTaskType.BUFFER_TO_TARGET)) {
+			if (backUpTask.getTaskStatus() != TaskStatus.NORMAL) {
+				return JobStatus.PARTIALLY_RUNABLE;
+			}
+		}
+		return JobStatus.RUNABLE;
 	}
 	
 	public Set<JobTaskType> getAllJobTaskType() {
