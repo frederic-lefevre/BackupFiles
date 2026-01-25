@@ -231,6 +231,8 @@ public class BackUpJobTest {
 		assertThat(bupj.getAllJobTaskType())
 			.isNotEmpty()
 			.hasSameElementsAs(List.of(JobTaskType.SOURCE_TO_TARGET, JobTaskType.SOURCE_TO_BUFFER, JobTaskType.BUFFER_TO_TARGET));
+		
+		assertThat(bupj.getJobRunStatus()).isEqualTo(JobStatus.RUNABLE);
 	}
 	
 	@Test
