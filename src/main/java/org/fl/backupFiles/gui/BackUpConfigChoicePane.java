@@ -73,7 +73,6 @@ public class BackUpConfigChoicePane extends JPanel {
 		choiceLbl.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		bkpChoicePanel.add(choiceLbl);
 		backUpJobChoice = new JList<BackUpJob>(backUpJobs);
-		backUpJobChoice.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 		bkpChoicePanel.add(backUpJobChoice);
 			
 		add(bkpChoicePanel);
@@ -166,6 +165,7 @@ public class BackUpConfigChoicePane extends JPanel {
 				boolean isSelected, boolean cellHasFocus) {
 			
 			setText(value.toString());
+			setBorder(BorderFactory.createEmptyBorder(2,10,2,10));
 			if (isSelected) {
 	             setBackground(Color.LIGHT_GRAY);
 	         } else if (value.getJobRunStatus() == JobStatus.NOT_RUNABLE) {
