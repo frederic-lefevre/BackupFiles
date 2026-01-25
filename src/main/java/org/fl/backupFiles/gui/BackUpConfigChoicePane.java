@@ -24,6 +24,8 @@ SOFTWARE.
 
 package org.fl.backupFiles.gui;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +37,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListCellRenderer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -42,6 +45,7 @@ import org.fl.backupFiles.BackUpJob;
 import org.fl.backupFiles.BackUpJobList;
 import org.fl.backupFiles.BackUpTask;
 import org.fl.backupFiles.JobsChoice;
+import org.fl.backupFiles.BackUpJob.JobStatus;
 import org.fl.backupFiles.BackUpJob.JobTaskType;
 
 public class BackUpConfigChoicePane extends JPanel {
@@ -98,6 +102,8 @@ public class BackUpConfigChoicePane extends JPanel {
 		// Each time a back up job is chosen, the backUpTasks are updated accordingly
 		backUpJobChoice.addListSelectionListener(new ChooseJobs());
 		
+		backUpJobChoice.setCellRenderer(new JobCellRenderer());
+		
 		if (backUpJobs.size() == 1) {
 			backUpJobChoice.setSelectedIndex(0);
 		}
@@ -151,5 +157,27 @@ public class BackUpConfigChoicePane extends JPanel {
 		}
 	}
 	
+	private class JobCellRenderer extends JLabel implements ListCellRenderer<BackUpJob> {
 
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Component getListCellRendererComponent(JList<? extends BackUpJob> list, BackUpJob value, int index,
+				boolean isSelected, boolean cellHasFocus) {
+			
+			setText(value.toString());
+			if (isSelected) {
+	             setBackground(Color.LIGHT_GRAY);
+	         } else if (value.getJobRunStatus() == JobStatus.NOT_RUNABLE) {
+	        	 setBackground(Color.RED);
+	         } else if (value.getJobRunStatus() == JobStatus.PARTIALLY_RUNABLE) {
+	        	 setBackground(Color.PINK);
+	         } else {
+	             setBackground(Color.WHITE);
+	         }
+			setOpaque(true);
+			return this;
+		}
+		
+	}
 }
