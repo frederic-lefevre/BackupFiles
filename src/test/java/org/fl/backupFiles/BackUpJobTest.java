@@ -138,6 +138,51 @@ public class BackUpJobTest {
 	}
 	
 	@Test
+	void testNoFileStoreForTargetJson() {
+		
+		String json ="""		
+				{ 
+						"titre" : "Regular json",
+						"items" : [
+							{
+								"source" : "file:///FredericPersonnel/",
+								"target" : "file:///X:/ForTests/",
+								"buffer" : "file:///FP_BackUpBuffer/FredericPersonnel/"
+							}, 
+							{ 
+								"source" : "file:///ForTests/", 
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/ForTests/"
+							},
+							{
+								"source" : "file:///pApps/",
+								"target" : "file:///tmp/",
+								"buffer" : "file:///FP_BackUpBuffer/pApps/"
+							}
+						]
+					}
+	""" ;
+		
+		BackUpJob bupj = new BackUpJob(json, directoryGroupConfiguration);
+		assertThat(bupj.toString())
+			.isNotNull()
+			.isEqualTo("Regular json");
+		
+		List<BackUpTask> bTt1 = bupj.getTasks(JobTaskType.SOURCE_TO_BUFFER);
+		assertThat(bTt1).isNotNull().hasSize(3);
+		
+		List<BackUpTask> bTt2 = bupj.getTasks(JobTaskType.BUFFER_TO_TARGET);
+		assertThat(bTt2).isNotNull().hasSize(3);
+		
+		List<BackUpTask> bTt3 = bupj.getTasks(JobTaskType.SOURCE_TO_TARGET);
+		assertThat(bTt3).isNotNull().isEmpty();
+		
+		assertThat(bupj.getAllJobTaskType())
+			.isNotEmpty()
+			.hasSameElementsAs(List.of(JobTaskType.SOURCE_TO_BUFFER, JobTaskType.BUFFER_TO_TARGET));
+	}
+	
+	@Test
 	void testSourceToTargetJson() {
 		
 		String json ="""		

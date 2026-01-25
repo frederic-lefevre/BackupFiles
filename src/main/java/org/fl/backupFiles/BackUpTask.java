@@ -44,10 +44,10 @@ public class BackUpTask {
 	private boolean compareContent;
 	private boolean compareContentOnAmbiguous;
 	
-	private static final String warning1 = "  Attention : les chemins origine et destination n'existent pas";
-	private static final String warning2 = "  Attention : le chemin origine n'existe pas";
-	private static final String warning3 = "  Attention : le chemin destination n'existe pas";
-	private static final String noWarning = "" ;
+	protected static final String UNEXISTANT_ORIGIN_AND_TARGET = "  Attention : les chemins origine et destination n'existent pas";
+	protected static final String UNEXISTANT_ORIGIN = "  Attention : le chemin origine n'existe pas";
+	protected static final String UNEXISTANT_TARGET = "  Attention : le chemin destination n'existe pas";
+	protected static final String NO_WARNING = "" ;
 	
 	// A back up task is a source directory or file to back up to a destination directory or file
 	public BackUpTask(Path src, Path tgt, DirectoryGroupMap directoryGroupMap, long sizeWarningLimit) throws IOException {
@@ -87,6 +87,7 @@ public class BackUpTask {
 		return targetFileStore;
 	}
 
+	@Override
 	public String toString() {
 		String toString;
 		if ((source != null) && (target != null)) {
@@ -104,13 +105,13 @@ public class BackUpTask {
 			boolean sourceExists = Files.exists(source);
 			boolean targetExists = Files.exists(target);
 			if (!sourceExists && !targetExists) {
-				warning = warning1;
+				warning = UNEXISTANT_ORIGIN_AND_TARGET;
 			} else if (!sourceExists) {
-				warning = warning2;
+				warning = UNEXISTANT_ORIGIN;
 			} else if (!targetExists) {
-				warning = warning3;
+				warning = UNEXISTANT_TARGET;
 			} else {
-				warning = noWarning;
+				warning = NO_WARNING;
 			}
 		}
 		return warning;
