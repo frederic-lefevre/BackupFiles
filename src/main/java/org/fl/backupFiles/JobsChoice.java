@@ -37,16 +37,12 @@ public class JobsChoice {
 	private final String jobsTitleString;
 	private final String jobsTitleHtml;
 	private final String compareOperationAsHtml;
-	private final String jobsDetail;
 
 	private boolean compareContent;
 	private boolean compareContentOnAmbiguous;
 
 	private static final String HTML_BEGIN = "<html><body>";
 	private static final String HTML_END = "</body></html>";
-	private static final String jobSeparator = "\n__________________________\n";
-	private static final String taskJobSeparator = "\n\n";
-	private static final String taskSeparator = "\n";
 
 	private final Map<JobTaskType, ArrayList<BackUpTask>> backUpTasks;
 
@@ -73,18 +69,15 @@ public class JobsChoice {
 		compareOperationAsHtml = buildCompareOperationAsHtml();
 
 		long fileStoreRemainingSpaceWarningThreshold = Config.getFileStoreRemainingSpaceWarningThreshold();
-		StringBuilder details = new StringBuilder(1024);
 		backUpTasks = new HashMap<JobTaskType, ArrayList<BackUpTask>>();
 		for (JobTaskType jtt : JobTaskType.values()) {
 			ArrayList<BackUpTask> tasksForJtt = new ArrayList<BackUpTask>();
-			details.append(jobSeparator).append(jtt.toString()).append(taskJobSeparator);
 			backUpTasks.put(jtt, tasksForJtt);
 			for (BackUpJob backUpJob : backUpJobs) {
-				addAllTasks(tasksForJtt, backUpJob.getTasks(jtt), details);
+				addAllTasks(tasksForJtt, backUpJob.getTasks(jtt));
 			}
 			initTargetFileStores(jtt, fileStoreRemainingSpaceWarningThreshold);
 		}
-		jobsDetail = details.toString();
 
 	}
 
@@ -102,10 +95,6 @@ public class JobsChoice {
 
 	public String getCompareOperationAsHtml() {
 		return compareOperationAsHtml;
-	}
-	
-	public String printDetail() {
-		return jobsDetail;
 	}
 
 	public List<BackUpTask> getTasks(JobTaskType jobTaskType) {
@@ -139,11 +128,10 @@ public class JobsChoice {
 		return compareType.toString();
 	}
 	
-	private void addAllTasks(List<BackUpTask> tasks, List<BackUpTask> tasksToAdd, StringBuilder details) {
+	private void addAllTasks(List<BackUpTask> tasks, List<BackUpTask> tasksToAdd) {
 		for (BackUpTask taskToAdd : tasksToAdd) {
 			if (! tasks.contains(taskToAdd)) {
 				tasks.add(taskToAdd) ;
-				details.append(taskToAdd.toString()).append(taskToAdd.eventualWarning()).append(taskSeparator);
 			}
 		}
 	}
