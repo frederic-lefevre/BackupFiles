@@ -29,16 +29,20 @@ import java.nio.file.FileStore;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.util.file.FilesUtils;
 
 public class BackUpTask {
 	
+	private static final Logger logger = Logger.getLogger(BackUpTask.class.getName());
+	
 	private final Path source;
 	private final Path target;
 	private final long sizeWarningLimit;
-	private final FileStore targetFileStore;
+	private FileStore targetFileStore;
 	private final DirectoryGroupMap directoryGroupMap;
 	
 	private boolean compareContent;
@@ -49,8 +53,16 @@ public class BackUpTask {
 	protected static final String UNEXISTANT_TARGET = "  Attention : le chemin destination n'existe pas";
 	protected static final String NO_WARNING = "" ;
 	
+	public enum TaskStatus {
+		
+		UNEXISTANT_ORIGIN_AND_TARGET,
+		UNEXISTANT_ORIGIN,
+		UNEXISTANT_TARGET,
+		NORMAL
+	}
+	
 	// A back up task is a source directory or file to back up to a destination directory or file
-	public BackUpTask(Path src, Path tgt, DirectoryGroupMap directoryGroupMap, long sizeWarningLimit) throws IOException {
+	public BackUpTask(Path src, Path tgt, DirectoryGroupMap directoryGroupMap, long sizeWarningLimit) {
 		
 		source = src;
 		target = tgt;
@@ -60,7 +72,6 @@ public class BackUpTask {
 			throw new IllegalArgumentException("Null path argument when creating back up task. sourcePath=" + Objects.toString(source) + " targetPath="  + Objects.toString(source));
 		}
 
-		targetFileStore = FilesUtils.findFileStore(target);
 		this.directoryGroupMap = directoryGroupMap;
 
 		compareContent = false;
@@ -84,6 +95,14 @@ public class BackUpTask {
 	}
 
 	public FileStore getTargetFileStore() {
+		if (targetFileStore == null) {
+			try {
+				targetFileStore = FilesUtils.findFileStore(target);
+			} catch (IOException e) {
+				targetFileStore = null;
+				logger.log(Level.SEVERE, "IOException getting FileStore for " + Objects.toString(target), e);
+			}
+		}
 		return targetFileStore;
 	}
 
