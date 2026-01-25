@@ -69,7 +69,7 @@ class BackUpTaskTest {
 
 		assertThat(backUpTask.compareContent()).isFalse();
 		assertThat(backUpTask.compareContentOnAmbiguous()).isTrue();
-		assertThat(backUpTask.eventualWarning()).isNotNull().isEqualTo(BackUpTask.UNEXISTANT_TARGET);
+		assertThat(backUpTask.getTaskStatus()).isNotNull().isEqualTo(BackUpTask.TaskStatus.UNEXISTANT_TARGET);
 
 		BackUpTask backUpTask2 = new BackUpTask(src, tgt, directoryGroupMap, 0);
 
@@ -162,7 +162,7 @@ class BackUpTaskTest {
 
 		assertThat(backUpTask.compareContent()).isFalse();
 		assertThat(backUpTask.compareContentOnAmbiguous()).isTrue();
-		assertThat(backUpTask.eventualWarning()).isNotNull().isEqualTo(BackUpTask.NO_WARNING);
+		assertThat(backUpTask.getTaskStatus()).isNotNull().isEqualTo(BackUpTask.TaskStatus.NORMAL);
 	}
 	
 	@Test
@@ -179,7 +179,7 @@ class BackUpTaskTest {
 
 		assertThat(backUpTask.compareContent()).isFalse();
 		assertThat(backUpTask.compareContentOnAmbiguous()).isTrue();
-		assertThat(backUpTask.eventualWarning()).isNotNull().isEqualTo(BackUpTask.UNEXISTANT_TARGET);
+		assertThat(backUpTask.getTaskStatus()).isNotNull().isEqualTo(BackUpTask.TaskStatus.UNEXISTANT_TARGET);
 	}
 	
 	@Test
@@ -195,7 +195,7 @@ class BackUpTaskTest {
 		
 		FileStore fileStore = backUpTask.getTargetFileStore();
 		assertThat(fileStore).isNotNull().isEqualTo(Files.getFileStore(src)).isEqualTo(FilesUtils.findFileStore(tgt));
-		assertThat(backUpTask.eventualWarning()).isNotNull().isEqualTo(BackUpTask.UNEXISTANT_TARGET);
+		assertThat(backUpTask.getTaskStatus()).isNotNull().isEqualTo(BackUpTask.TaskStatus.UNEXISTANT_TARGET);
 	}
 	
 	@Test

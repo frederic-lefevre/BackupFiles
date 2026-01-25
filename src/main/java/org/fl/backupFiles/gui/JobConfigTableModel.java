@@ -68,7 +68,7 @@ public class JobConfigTableModel extends AbstractTableModel  {
 		return switch (columnIndex) {
 			case 0 -> backUpTasks.get(rowIndex).getSource();
 			case 1 -> backUpTasks.get(rowIndex).getTarget();
-			case 2 -> backUpTasks.get(rowIndex).eventualWarning();
+			case 2 -> backUpTasks.get(rowIndex).getTaskStatus().getStatusWarning();
 			default -> null;
 		};
 	}

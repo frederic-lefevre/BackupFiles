@@ -48,17 +48,22 @@ public class BackUpTask {
 	private boolean compareContent;
 	private boolean compareContentOnAmbiguous;
 	
-	protected static final String UNEXISTANT_ORIGIN_AND_TARGET = "  Attention : les chemins origine et destination n'existent pas";
-	protected static final String UNEXISTANT_ORIGIN = "  Attention : le chemin origine n'existe pas";
-	protected static final String UNEXISTANT_TARGET = "  Attention : le chemin destination n'existe pas";
-	protected static final String NO_WARNING = "" ;
-	
 	public enum TaskStatus {
 		
-		UNEXISTANT_ORIGIN_AND_TARGET,
-		UNEXISTANT_ORIGIN,
-		UNEXISTANT_TARGET,
-		NORMAL
+		UNEXISTANT_ORIGIN_AND_TARGET("  Attention : les chemins origine et destination n'existent pas"),
+		UNEXISTANT_ORIGIN("  Attention : le chemin origine n'existe pas"),
+		UNEXISTANT_TARGET("  Attention : le chemin destination n'existe pas"),
+		NORMAL("");
+		
+		String statusWarning;
+		
+		private TaskStatus(String statusWarning) {
+			this.statusWarning = statusWarning;
+		}
+		
+		public String getStatusWarning() {
+			return statusWarning;
+		}
 	}
 	
 	// A back up task is a source directory or file to back up to a destination directory or file
@@ -117,23 +122,19 @@ public class BackUpTask {
 		return toString;
 	}
 
-	public String eventualWarning() {
-
-		String warning = null;
-		if ((source != null) && (target != null)) {
-			boolean sourceExists = Files.exists(source);
-			boolean targetExists = Files.exists(target);
-			if (!sourceExists && !targetExists) {
-				warning = UNEXISTANT_ORIGIN_AND_TARGET;
-			} else if (!sourceExists) {
-				warning = UNEXISTANT_ORIGIN;
-			} else if (!targetExists) {
-				warning = UNEXISTANT_TARGET;
-			} else {
-				warning = NO_WARNING;
-			}
+	public TaskStatus getTaskStatus() {
+		
+		boolean sourceExists = Files.exists(source);
+		boolean targetExists = Files.exists(target);
+		if (!sourceExists && !targetExists) {
+			return TaskStatus.UNEXISTANT_ORIGIN_AND_TARGET;
+		} else if (!sourceExists) {
+			return TaskStatus.UNEXISTANT_ORIGIN;
+		} else if (!targetExists) {
+			return TaskStatus.UNEXISTANT_TARGET;
+		} else {
+			return TaskStatus.NORMAL;
 		}
-		return warning;
 	}
 
 	public boolean compareContent() {
