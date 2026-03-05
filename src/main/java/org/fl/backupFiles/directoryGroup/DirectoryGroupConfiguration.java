@@ -35,9 +35,9 @@ import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
 import org.fl.backupFiles.directoryGroup.core.DirectoryGroupBuilder;
 import org.fl.util.file.FilesUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 public class DirectoryGroupConfiguration {
 
@@ -64,9 +64,9 @@ public class DirectoryGroupConfiguration {
 
 					for (JsonNode jPathPermanence : jPathsNode) {
 
-						Path sPath = FilesUtils.uriStringToAbsolutePath(URI_FILE_SCHEME + jPathPermanence.get(PATH).asText());
-						DirectoryPermanenceLevel permanenceLevel = DirectoryPermanenceLevel.valueOf(jPathPermanence.get(PERMANENCE).asText());
-						GroupPolicy groupPolicy = GroupPolicy.valueOf(jPathPermanence.get(GROUP_POLICY).asText());
+						Path sPath = FilesUtils.uriStringToAbsolutePath(URI_FILE_SCHEME + jPathPermanence.get(PATH).asString());
+						DirectoryPermanenceLevel permanenceLevel = DirectoryPermanenceLevel.valueOf(jPathPermanence.get(PERMANENCE).asString());
+						GroupPolicy groupPolicy = GroupPolicy.valueOf(jPathPermanence.get(GROUP_POLICY).asString());
 						
 						directoryGroupList.add(DirectoryGroupBuilder.build(sPath, permanenceLevel, groupPolicy));
 					}
@@ -74,7 +74,7 @@ public class DirectoryGroupConfiguration {
 				} else {
 					bLog.severe("Json null or not an array:\n" + jsonConfig);
 				}
-			} catch (JsonProcessingException e) {
+			} catch (JacksonException e) {
 				bLog.log(Level.SEVERE, "Invalid JSON configuration: " + jsonConfig, e);
 			} catch (Exception e) {
 				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig, e);

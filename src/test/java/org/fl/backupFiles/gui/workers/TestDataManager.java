@@ -37,9 +37,9 @@ import org.fl.backupFiles.directoryGroup.GroupPolicy;
 import org.fl.util.file.FilesUtils;
 import org.fl.util.json.JsonUtils;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 public class TestDataManager {
 

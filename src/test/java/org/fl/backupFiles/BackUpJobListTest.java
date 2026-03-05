@@ -75,6 +75,8 @@ class BackUpJobListTest {
 		
 		try (Stream<Path> pathStream = Files.list(configPath)) {
 			
+			assertThat(pathStream).isNotNull().isEmpty();
+			
 			BackUpJobList jobs = new BackUpJobList(configPath);
 			
 			assertThat(jobs).isNotNull().isEmpty();
