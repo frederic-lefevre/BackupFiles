@@ -35,8 +35,8 @@ import java.nio.file.Paths;
 import org.fl.util.RunningContext;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 
 class ConfigTest {
 
@@ -77,11 +77,11 @@ class ConfigTest {
 		.satisfiesExactlyInAnyOrder(
 				buildInfo -> { 
 					assertThat(buildInfo.get("moduleName")).isNotNull();
-					assertThat(buildInfo.get("moduleName").asText()).isEqualTo(APPLICATION_NAME);
+					assertThat(buildInfo.get("moduleName").asString()).isEqualTo(APPLICATION_NAME);
 				},
 				buildInfo -> { 
 					assertThat(buildInfo.get("moduleName")).isNotNull();
-					assertThat(buildInfo.get("moduleName").asText()).isEqualTo("org.fl.util");
+					assertThat(buildInfo.get("moduleName").asString()).isEqualTo("org.fl.util");
 				}
 				);
 	}
@@ -94,7 +94,7 @@ class ConfigTest {
 	}
 	
 	@Test
-	void buildInformationTest() throws JsonProcessingException, URISyntaxException {
+	void buildInformationTest() throws JacksonException, URISyntaxException {
 		
 		RunningContext runningContext = Config.getRunningContext();
 		
@@ -113,7 +113,7 @@ class ConfigTest {
 	private void assertModuleBuildInfo(JsonNode buildInfo, String moduleName) {
 		assertThat(buildInfo).hasSize(11);
 		assertThat(buildInfo.get("moduleName")).isNotNull();
-		assertThat(buildInfo.get("moduleName").asText()).isEqualTo(moduleName);
+		assertThat(buildInfo.get("moduleName").asString()).isEqualTo(moduleName);
 		assertThat(buildInfo.has("version")).isTrue();
 		assertThat(buildInfo.has("buildtime")).isTrue();
 		assertThat(buildInfo.has("builder")).isTrue();

@@ -43,10 +43,10 @@ import org.fl.backupFiles.directoryGroup.DirectoryGroupConfiguration;
 import org.fl.backupFiles.directoryGroup.DirectoryGroupMap;
 import org.fl.util.file.FilesUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
 
 public class BackUpJob {
 
@@ -108,7 +108,7 @@ public class BackUpJob {
 
 				JsonNode jTitle = jsonObjectConf.get(TITLE);
 				if (jTitle != null) {
-					title = jTitle.asText();
+					title = jTitle.asString();
 				} else {
 					bLog.severe("No title found in JSON configuration: " + jsonConfig);
 				}
@@ -122,7 +122,7 @@ public class BackUpJob {
 					bLog.severe("The items property in JSON configuration should be an array: " + jsonConfig);					
 				}
 
-			} catch (JsonProcessingException e) {
+			} catch (JacksonException e) {
 				bLog.log(Level.SEVERE, "Invalid JSON configuration: " + jsonConfig, e);
 			} catch (Exception e) {
 				bLog.log(Level.SEVERE, "Exception when creating JSON configuration: " + jsonConfig, e);
@@ -340,7 +340,7 @@ public class BackUpJob {
 		Path returnPath = null;
 		JsonNode elem = jObjItem.get(prop);
 		if (elem != null) {
-			returnPath = FilesUtils.uriStringToAbsolutePath(elem.asText());
+			returnPath = FilesUtils.uriStringToAbsolutePath(elem.asString());
 		}
 		return returnPath;
 	}
