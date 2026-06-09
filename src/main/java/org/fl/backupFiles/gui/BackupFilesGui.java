@@ -99,7 +99,7 @@ public class BackupFilesGui extends JFrame {
 		
 		setBounds(10, 10, WINDOW_WIDTH, WINDOW_HEIGHT);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setTitle("Sauvegarde de fichiers") ;
+		setTitle("Sauvegarde de fichiers [" + getRunningContext().getVersion() + "]") ;
 		
 		try {
 			Path configFileDir = Config.getConfigFileDir();
