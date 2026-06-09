@@ -111,7 +111,10 @@ class ConfigTest {
 	}
 	
 	private void assertModuleBuildInfo(JsonNode buildInfo, String moduleName) {
-		assertThat(buildInfo).hasSize(11);
+		assertThat(buildInfo).hasSize(14);
+		assertThat(buildInfo.has("builderName")).isTrue();
+		assertThat(buildInfo.has("builderEmail")).isTrue();
+		assertThat(buildInfo.has("gitCommitIdDescribe")).isTrue();
 		assertThat(buildInfo.get("moduleName")).isNotNull();
 		assertThat(buildInfo.get("moduleName").asString()).isEqualTo(moduleName);
 		assertThat(buildInfo.has("version")).isTrue();
