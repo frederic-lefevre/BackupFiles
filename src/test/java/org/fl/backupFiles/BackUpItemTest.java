@@ -518,7 +518,7 @@ public class BackUpItemTest {
 
 	private long getTotalCounters(BackUpCounters counters) {
 
-		return counters.ambiguousNb + counters.contentDifferentNb + counters.copyNewNb + counters.copyReplaceNb
+		return counters.ambiguousNb + counters.contentDifferentNb + counters.contentCompareNb + counters.copyNewNb + counters.copyReplaceNb
 				+ counters.copyTreeNb + counters.deleteDirNb + counters.deleteNb + counters.copyTargetNb + counters.adjustTimeNb
 				+ counters.nbSourceFilesFailed + counters.nbSourceFilesProcessed + counters.nbTargetFilesFailed
 				+ counters.nbTargetFilesProcessed;

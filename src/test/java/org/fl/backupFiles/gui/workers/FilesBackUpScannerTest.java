@@ -132,6 +132,7 @@ class FilesBackUpScannerTest {
 			assertThat(backUpCounters.deleteNb).isZero();
 			assertThat(backUpCounters.backupWithSizeAboveThreshold).isZero();
 			assertThat(backUpCounters.contentDifferentNb).isZero();
+			assertThat(backUpCounters.contentCompareNb).isZero();
 			assertThat(backUpCounters.nbHighPermanencePath).isZero();
 			assertThat(backUpCounters.nbMediumPermanencePath).isZero();
 			assertThat(backUpCounters.nbSourceFilesFailed).isZero();
@@ -164,6 +165,7 @@ class FilesBackUpScannerTest {
 			assertThat(backUpCounters.deleteNb).isZero();
 			assertThat(backUpCounters.backupWithSizeAboveThreshold).isZero();
 			assertThat(backUpCounters.contentDifferentNb).isZero();
+			assertThat(backUpCounters.contentCompareNb).isZero();
 			assertThat(backUpCounters.nbHighPermanencePath).isEqualTo(NB_SUB_DIR_UNDER_CONCERT*testDataManager.getNbHighPermanenceGenerated());
 			assertThat(backUpCounters.nbMediumPermanencePath).isEqualTo(NB_SUB_DIR_UNDER_CONCERT*testDataManager.getNbMediumPermanenceGenerated());
 			assertThat(backUpCounters.nbSourceFilesFailed).isZero();

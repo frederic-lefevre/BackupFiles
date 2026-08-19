@@ -128,6 +128,7 @@ class BackUpScannerProcessorTest {
 			assertThat(backUpCounters.deleteNb).isZero();
 			assertThat(backUpCounters.backupWithSizeAboveThreshold).isEqualTo(2);
 			assertThat(backUpCounters.contentDifferentNb).isZero();
+			assertThat(backUpCounters.contentCompareNb).isZero();
 			assertThat(backUpCounters.nbHighPermanencePath).isZero();
 			assertThat(backUpCounters.nbMediumPermanencePath).isEqualTo(2);
 			assertThat(backUpCounters.nbSourceFilesFailed).isZero();
@@ -160,6 +161,7 @@ class BackUpScannerProcessorTest {
 			assertThat(backUpCounters.deleteNb).isZero();
 			assertThat(backUpCounters.backupWithSizeAboveThreshold).isEqualTo(2);
 			assertThat(backUpCounters.contentDifferentNb).isZero();
+			assertThat(backUpCounters.contentCompareNb).isZero();
 			assertThat(backUpCounters.nbHighPermanencePath).isZero();
 			assertThat(backUpCounters.nbMediumPermanencePath).isEqualTo(2);
 			assertThat(backUpCounters.nbSourceFilesFailed).isZero();
@@ -215,6 +217,7 @@ class BackUpScannerProcessorTest {
 			assertThat(backUpCounters.deleteNb).isZero();
 			assertThat(backUpCounters.backupWithSizeAboveThreshold).isEqualTo(1);
 			assertThat(backUpCounters.contentDifferentNb).isZero();
+			assertThat(backUpCounters.contentCompareNb).isZero();
 			assertThat(backUpCounters.nbHighPermanencePath).isZero();
 			assertThat(backUpCounters.nbMediumPermanencePath).isEqualTo(1);
 			assertThat(backUpCounters.nbSourceFilesFailed).isZero();

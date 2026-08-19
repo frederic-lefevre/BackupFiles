@@ -285,6 +285,7 @@ public class BackUpScannerThread {
 			BackupAction backupActionOnDifferent,
 			BackupAction backupActionOnEqual) {
 		
+		backUpCounters.contentCompareNb++;
 		if (! fileComparator.haveSameContent(pathPairBasicAttributes.getSourcePath(), pathPairBasicAttributes.getTargetPath())) {
 			// file content are not the same (or there has been an error)
 			if (fileComparator.isOnError()) {

@@ -50,6 +50,7 @@ public class BackUpCounters {
 	public long copyTargetNb;
 	public long adjustTimeNb;
 	public long contentDifferentNb;
+	public long contentCompareNb;
 	
 	public long nbSourceFilesProcessed;
 	public long nbTargetFilesProcessed;
@@ -77,6 +78,7 @@ public class BackUpCounters {
 	private static final String TARGET_KO_LABEL = "Eléments cible en erreur: ";
 
 	private static final String CONTENT_DIFFERENT_LABEL = "Fichiers avec contenu différent:  ";
+	private static final String CONTENT_COMPARE_LABEL = "Nombre de comparaison de fichiers:  ";
 	private static final String SIZE_ABOVE_LIMIT_LABEL = "Fichiers avec tailles importantes: ";
 	private static final String HIGH_PERMANENCE_LABEL = "Fichiers à haute permanence: ";
 	private static final String MEDIUM_PERMANENCE_LABEL = "Fichiers à moyenne permanence: ";
@@ -98,6 +100,7 @@ public class BackUpCounters {
 		copyTargetNb = 0;
 		adjustTimeNb = 0;
 		contentDifferentNb = 0;
+		contentCompareNb = 0;
 		nbSourceFilesProcessed = 0;
 		nbTargetFilesProcessed = 0;
 		nbSourceFilesFailed = 0;
@@ -127,6 +130,7 @@ public class BackUpCounters {
 		copyTargetNb = copyTargetNb + counters.copyTargetNb;
 		adjustTimeNb = adjustTimeNb + counters.adjustTimeNb;
 		contentDifferentNb = contentDifferentNb + counters.contentDifferentNb;
+		contentCompareNb = contentCompareNb + counters.contentCompareNb;
 		nbSourceFilesProcessed = nbSourceFilesProcessed + counters.nbSourceFilesProcessed;
 		nbTargetFilesProcessed = nbTargetFilesProcessed + counters.nbTargetFilesProcessed;
 		nbSourceFilesFailed = nbSourceFilesFailed + counters.nbSourceFilesFailed;
@@ -159,6 +163,10 @@ public class BackUpCounters {
 
 		if (contentDifferentNb != 0) {
 			res.append(CONTENT_DIFFERENT_LABEL).append(contentDifferentNb).append("\n");
+		}
+		
+		if (contentCompareNb != 0) {
+			res.append(CONTENT_COMPARE_LABEL).append(contentCompareNb).append("\n");
 		}
 		
 		res.append("Stockage de fichiers, espace restant utilisable:\n");
@@ -198,6 +206,11 @@ public class BackUpCounters {
 		if (contentDifferentNb != 0) {
 			res.append(NEW_ROW);
 			appendCellCouple(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, null);
+		}
+		
+		if (contentCompareNb != 0) {
+			res.append(NEW_ROW);
+			appendCellCouple(res, CONTENT_COMPARE_LABEL, contentCompareNb, null);
 		}
 		res.append(ROW_AND_TABLE_END);
 	}
@@ -357,6 +370,7 @@ public class BackUpCounters {
 				counters.copyTargetNb == copyTargetNb &&
 				counters.adjustTimeNb == adjustTimeNb &&
 				counters.contentDifferentNb == contentDifferentNb &&
+				counters.contentCompareNb == contentCompareNb &&
 				counters.backupWithSizeAboveThreshold == backupWithSizeAboveThreshold;
 	}
 }
