@@ -148,7 +148,7 @@ public class BackUpScannerThread {
 		Path sourceDirectory = pathPairBasicAttributes.getSourcePath();
 		Path targetDirectory = pathPairBasicAttributes.getTargetPath();
 		
-		HashMap<Path,PathPairBasicAttributes> filesBasicAttributes = new HashMap<Path, PathPairBasicAttributes>();
+		Map<Path,PathPairBasicAttributes> filesBasicAttributes = new HashMap<Path, PathPairBasicAttributes>();
 		
 		// Get source directory files attributes
 		if (! stopAsked) {
