@@ -66,7 +66,7 @@ public class BackUpScannerThread {
 	private final BackupAction acionOnSameTargetContentButNewer;
 	
 	private Path currentFile;	
-	private String status;	
+	private StringBuilder status;	
 	private boolean done;
 	private final int maxDepth;
 	private int	currDepth;
@@ -85,7 +85,8 @@ public class BackUpScannerThread {
 		backUpCounters = new BackUpCounters(targetFileStores, OperationType.SCAN);
 		done = false;
 
-		status = backUpTask.toString() + " ";
+		status = new StringBuilder(300);
+		status.append(backUpTask.toString()).append(" ");
 		fileComparator = new FileComparator(pLog);
 		acionOnSameTargetContentButNewer = Config.getAcionOnSameTargetContentButNewer();
 	}
@@ -97,10 +98,10 @@ public class BackUpScannerThread {
 	public String getCurrentStatus() {
 		
 		if (done) {
-			return status ;
+			return status.toString();
 		} else {
-			long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed ;
-			return status + nbFilesProcessed + " " + currentFile ;
+			long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
+			return status.toString() + nbFilesProcessed + " " + currentFile;
 		}
 	}
 
@@ -134,12 +135,12 @@ public class BackUpScannerThread {
 		backUpCounters.nbSourceFilesProcessed++;
 
 		long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
-		status = status + "| Scan done ";
+		status.append("| Scan done ");
 		done = true;
 		if (backUpTask.compareContent()) {
-			status = status + "with content compare ";
+			status.append("with content compare ");
 		} else if (backUpTask.compareContentOnAmbiguous()) {
-			status = status + "with content compare on ambiguous files ";
+			status.append("with content compare on ambiguous files ");
 		}
 		
 		long diskDurationPerFile = diskProcessDuration / nbFilesProcessed;
@@ -150,8 +151,14 @@ public class BackUpScannerThread {
 		} else {
 			diskDurationRatio = diskProcessDuration / scanDuration;
 		}
-		status = status + "| Number of files processed: " + nbFilesProcessed + " | Disk duration per file (nano seconds): " + diskDurationPerFile + " | Disk duration ratio: " + diskDurationRatio ;
-		ScannerThreadResponse resp = new ScannerThreadResponse(backUpTask, backUpItemList, backUpCounters, filesVisitFailed, status);
+		status.append("| Number of files processed: ")
+			.append(done)
+			.append(nbFilesProcessed)
+			.append(" | Disk duration per file (nano seconds): ")
+			.append(diskDurationPerFile)
+			.append(" | Disk duration ratio: ")
+			.append(diskDurationRatio);
+		ScannerThreadResponse resp = new ScannerThreadResponse(backUpTask, backUpItemList, backUpCounters, filesVisitFailed, status.toString());
 		return resp ;
 	}
 		
