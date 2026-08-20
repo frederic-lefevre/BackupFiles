@@ -215,8 +215,8 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 		try {
 			BackUpScannerResult results = get();
-			List<ScannerThreadResponse> taskResults = results.getTaskResults();
-			long duration = results.getDuration();
+			List<ScannerThreadResponse> taskResults = results.taskResults();
+			long duration = results.duration();
 			
 			
 			if ((taskResults == null) || (taskResults.isEmpty())) {
