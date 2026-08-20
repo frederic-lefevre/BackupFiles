@@ -138,7 +138,7 @@ class BackUpScannerProcessorTest {
 			assertThat(backUpCounters.copyTargetNb).isZero();
 			
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList() ;
-			assertThat(backUpItemList)
+			assertThat(backUpItemList.getBackUpItems())
 				.isNotNull()
 				.singleElement()
 				.asInstanceOf(InstanceOfAssertFactories.type(BackUpItemGroup.class))
@@ -150,7 +150,7 @@ class BackUpScannerProcessorTest {
 
 			// Execute backup
 			backUpCounters.reset() ;
-			for (AbstractBackUpItem backUpItem : backUpItemList) {
+			for (AbstractBackUpItem backUpItem : backUpItemList.getBackUpItems()) {
 				backUpItem.execute(backUpCounters);
 			}
 			assertThat(backUpCounters.ambiguousNb).isZero();
@@ -178,7 +178,7 @@ class BackUpScannerProcessorTest {
 			scannerResp = backUpRes.get() ;
 			backUpItemList = scannerResp.getBackUpItemList() ;
 			
-			assertThat(backUpItemList)
+			assertThat(backUpItemList.getBackUpItems())
 				.isNotNull()
 				.isEmpty();
 			
@@ -227,11 +227,11 @@ class BackUpScannerProcessorTest {
 			assertThat(backUpCounters.copyTargetNb).isZero();
 
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList();
-			assertThat(backUpItemList)
+			assertThat(backUpItemList.getBackUpItems())
 				.isNotNull()
 				.hasSize(1);
 
-			AbstractBackUpItem backUpItem = backUpItemList.get(0);
+			AbstractBackUpItem backUpItem = backUpItemList.getBackUpItems().get(0);
 			assertThat(backUpItem).isNotNull();
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.COPY_TREE);
 
@@ -265,11 +265,11 @@ class BackUpScannerProcessorTest {
 		
 			ScannerThreadResponse scannerResp = backUpRes.get();
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList();
-			assertThat(backUpItemList)
+			assertThat(backUpItemList.getBackUpItems())
 				.isNotNull()
 				.hasSize(1);
 
-			AbstractBackUpItem backUpItem = backUpItemList.get(0);
+			AbstractBackUpItem backUpItem = backUpItemList.getBackUpItems().get(0);
 			assertThat(backUpItem).isNotNull();
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.COPY_REPLACE);
 
@@ -304,11 +304,11 @@ class BackUpScannerProcessorTest {
 		
 			ScannerThreadResponse scannerResp = backUpRes.get();
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList();
-			assertThat(backUpItemList)
+			assertThat(backUpItemList.getBackUpItems())
 				.isNotNull()
 				.hasSize(1);
 			
-			AbstractBackUpItem backUpItem = backUpItemList.get(0);
+			AbstractBackUpItem backUpItem = backUpItemList.getBackUpItems().get(0);
 			assertThat(backUpItem).isNotNull();
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.COPY_NEW);
 
@@ -343,11 +343,11 @@ class BackUpScannerProcessorTest {
 
 			ScannerThreadResponse scannerResp = backUpRes.get();
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList();
-			assertThat(backUpItemList)
+			assertThat(backUpItemList.getBackUpItems())
 				.isNotNull()
 				.hasSize(1);
 			
-			AbstractBackUpItem backUpItem = backUpItemList.get(0);
+			AbstractBackUpItem backUpItem = backUpItemList.getBackUpItems().get(0);
 			assertThat(backUpItem).isNotNull();
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.DELETE);
 
@@ -382,11 +382,11 @@ class BackUpScannerProcessorTest {
 
 			ScannerThreadResponse scannerResp = backUpRes.get();
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList();
-			assertThat(backUpItemList)
+			assertThat(backUpItemList.getBackUpItems())
 				.isNotNull()
 				.hasSize(1);
 			
-			AbstractBackUpItem backUpItem = backUpItemList.get(0);
+			AbstractBackUpItem backUpItem = backUpItemList.getBackUpItems().get(0);
 			assertThat(backUpItem).isNotNull();
 			assertThat(backUpItem.getBackupAction()).isEqualTo(BackupAction.DELETE_DIR);
 
@@ -419,7 +419,7 @@ class BackUpScannerProcessorTest {
 
 			ScannerThreadResponse scannerResp = backUpRes.get();
 			BackUpItemList backUpItemList = scannerResp.getBackUpItemList();
-			assertThat(backUpItemList)
+			assertThat(backUpItemList.getBackUpItems())
 				.isNotNull()
 				.isEmpty();
 

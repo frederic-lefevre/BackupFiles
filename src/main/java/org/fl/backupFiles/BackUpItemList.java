@@ -24,40 +24,41 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
+import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.fl.backupFiles.directoryGroup.GroupPolicy;
 import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
 
-public class BackUpItemList extends LinkedList<AbstractBackUpItem> {
-
-	private static final long serialVersionUID = 1L;
+public class BackUpItemList {
+	
+	private final LinkedList<AbstractBackUpItem> backUpItemList;
 	
 	private BackUpItemList() {
-		super();
+		backUpItemList = new LinkedList<AbstractBackUpItem>();
 	}
 	
 	public static BackUpItemList build() {
 		return new BackUpItemList();
 	}
 	
-	@Override
 	public boolean add(AbstractBackUpItem item) {
 
 		if (item instanceof BackUpItem backUpItem) {
 			DirectoryGroup directoryGroup = backUpItem.getDirectoryGroup();
 			GroupPolicy groupPolicy = directoryGroup.getGroupPolicy();
 			return switch (groupPolicy) {
-				   	case DO_NOT_GROUP -> super.add(backUpItem);
+				   	case DO_NOT_GROUP -> backUpItemList.add(backUpItem);
 					case GROUP_SUB_ITEMS -> {
 						if (getBackUpItemSourceClosestExistingPathLength(backUpItem) < directoryGroup.getDirectoryGroupPathNameCount() + 2) {
 							// the item path (reported to DirectoryGroup) is directly under the DirectoryGroup path. It does not belong to a subpath
-							super.add(backUpItem);
+							backUpItemList.add(backUpItem);
 						} else {
 							BackUpItemGroup backUpItemGroup = directoryGroup.addBackUpItem(backUpItem);
 							if (backUpItemGroup != null) {
 								// new BackUpItemGroup created, so not yet in the BackUpItemList
-								super.add(backUpItemGroup);
+								backUpItemList.add(backUpItemGroup);
 							}
 						}					
 						yield true;
@@ -66,7 +67,7 @@ public class BackUpItemList extends LinkedList<AbstractBackUpItem> {
 						BackUpItemGroup backUpItemGroup = directoryGroup.addBackUpItem(backUpItem);
 						if (backUpItemGroup != null) {
 							// new BackUpItemGroup created, so not yet in the BackUpItemList
-							super.add(backUpItemGroup);
+							backUpItemList.add(backUpItemGroup);
 						}
 						yield true;
 					}
@@ -77,16 +78,36 @@ public class BackUpItemList extends LinkedList<AbstractBackUpItem> {
 	}
 	
 	public void removeItemsDone() {
-		removeIf(i -> i.getBackupStatus().equals(BackupStatus.DONE));
+		backUpItemList.removeIf(i -> i.getBackupStatus().equals(BackupStatus.DONE));
 	}
 	
 	private int getBackUpItemSourceClosestExistingPathLength(BackUpItem item) {
 		return item.getSourceClosestExistingPath().getNameCount();
 	}
-
+	
+	public int size() {
+		return backUpItemList.size();
+	}
+	
+	public void clear() {
+		backUpItemList.clear();
+	}
+	
+	public <T extends AbstractBackUpItem> void addAll(Collection<T> items) {
+		backUpItemList.addAll(items);
+	}
+	
+	public void addAll(BackUpItemList backUpItemList2) {
+		backUpItemList.addAll(backUpItemList2.backUpItemList);
+	}
+	
+	public List<AbstractBackUpItem> getBackUpItems() {
+		return backUpItemList;
+	}
+	
 	public BackUpCounters sumIndividualCounters() {
 		BackUpCounters backUpCounters = new BackUpCounters(new TargetFileStores(), OperationType.SCAN);
-		forEach(backUpItem -> backUpItem.sumIndividualCounters(backUpCounters));
+		backUpItemList.forEach(backUpItem -> backUpItem.sumIndividualCounters(backUpCounters));
 		return backUpCounters;
 	}
 }

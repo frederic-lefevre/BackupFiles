@@ -50,7 +50,7 @@ public class BackUpItemGroupActionListener implements java.awt.event.ActionListe
 
 		if ((selectedEntry != null) && (selectedEntry instanceof BackUpItemGroup backUpItemGroup)) {
 			
-			BackUpItemList backUpItemList = backUpItemGroup.getBackUpItems();
+			BackUpItemList backUpItemList = backUpItemGroup.getBackUpItemList();
 			
 			BackUpTableModel backUpTableModel = new BackUpTableModel(backUpItemList);
 			

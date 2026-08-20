@@ -44,12 +44,16 @@ public class BackUpItemGroup extends AbstractBackUpItem {
 		isAboveFileSizeLimitThreshold = false;
 	}
 	
-	public BackUpItemList getBackUpItems() {
+	public BackUpItemList getBackUpItemList() {
 		BackUpItemList backUpItemList = BackUpItemList.build();
 		backUpItemList.addAll(backUpItems);
 		return backUpItemList;
 	}
 
+	public List<BackUpItem> getBackUpItems() {
+		return backUpItems;
+	}
+	
 	public boolean addBackUpItem(BackUpItem backUpItem) {
 		
 		if (backUpItem.getBackupAction() != backupAction) {

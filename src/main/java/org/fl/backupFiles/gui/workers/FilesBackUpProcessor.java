@@ -96,7 +96,7 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 		boolean backupSuccess = true;
 		backUpCounters.reset();
 		int nbActionDone = 0;
-		Iterator<AbstractBackUpItem> backupItemIterator = backUpItemList.iterator();
+		Iterator<AbstractBackUpItem> backupItemIterator = backUpItemList.getBackUpItems().iterator();
 		long lastRefreshTime = System.currentTimeMillis();
 
 		while ((backupItemIterator.hasNext()) && (!uiControl.isStopAsked())) {
