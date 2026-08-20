@@ -38,11 +38,11 @@ public class ScannerThreadResponse {
 
 	private final BackUpItemList backUpItemList;
 	private final BackUpCounters backUpCounters;
-	private final String status;
+	private final CharSequence status;
 
 	private boolean hasNotBeenProcessed;
 
-	public ScannerThreadResponse(BackUpTask but, BackUpItemList bil, BackUpCounters buc, List<Path> fvf, String st) {
+	public ScannerThreadResponse(BackUpTask but, BackUpItemList bil, BackUpCounters buc, List<Path> fvf, CharSequence st) {
 
 		backUpTask = but;
 		backUpItemList = bil;
@@ -69,7 +69,7 @@ public class ScannerThreadResponse {
 		return backUpCounters;
 	}
 
-	public String getStatus() {
+	public CharSequence getStatus() {
 		return status;
 	}
 

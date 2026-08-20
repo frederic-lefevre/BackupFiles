@@ -180,7 +180,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				jobProgress.append(HTML_END);
 				
 				// Refresh progress information
-				publish(new BackupScannerInformation(jobProgress.toString(), null));
+				publish(new BackupScannerInformation(jobProgress, null));
 			}
 		}
 	}
@@ -203,10 +203,10 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		BackupScannerInformation latestResult = chunks.get(chunks.size() - 1);
 
 		backUpTableModel.fireTableDataChanged();
-		String lastInfo = latestResult.getInformation();
+		CharSequence lastInfo = latestResult.getInformation();
 		if ((lastInfo != null) && (!lastInfo.isEmpty())) {
 			long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
-			progressPanel.setStepInfos(lastInfo, nbFilesProcessed);
+			progressPanel.setStepInfos(lastInfo.toString(), nbFilesProcessed);
 		}
 	}
 	

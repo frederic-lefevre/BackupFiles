@@ -167,7 +167,7 @@ public class BackUpScannerThread {
 			.append(diskDurationPerFile)
 			.append(" | Disk duration ratio: ")
 			.append(diskDurationRatio);
-		ScannerThreadResponse resp = new ScannerThreadResponse(backUpTask, backUpItemList, backUpCounters, filesVisitFailed, status.toString());
+		ScannerThreadResponse resp = new ScannerThreadResponse(backUpTask, backUpItemList, backUpCounters, filesVisitFailed, status);
 		return resp ;
 	}
 		

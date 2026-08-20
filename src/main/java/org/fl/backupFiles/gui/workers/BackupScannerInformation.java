@@ -31,15 +31,15 @@ public class BackupScannerInformation {
 	// Stocke une information sur la progression du scanner
 	// et le résultat si il est terminé
 
-	private final String information;
+	private final CharSequence information;
 	private final ScannerThreadResponse scannerThreadResponse;
 
-	public BackupScannerInformation(String info, ScannerThreadResponse str) {
+	public BackupScannerInformation(CharSequence info, ScannerThreadResponse str) {
 		information = info;
 		scannerThreadResponse = str;
 	}
 
-	public String getInformation() {
+	public CharSequence getInformation() {
 		return information;
 	}
 
