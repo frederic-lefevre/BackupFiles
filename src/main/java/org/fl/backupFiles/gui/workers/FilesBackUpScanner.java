@@ -259,8 +259,8 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 				progressPanel.setProcessStatus(finalStatus.toString());
 				
 				// Log info
-				StringBuilder infoScanner = new StringBuilder(1024);
-				infoScanner.append(jobsChoice.getTitleAsString()).append("\n");
+				StringBuilder infoScanner = new StringBuilder(4096);
+				infoScanner.append("Scan results for ").append(jobsChoice.getTitleAsString()).append("\n");
 				for (ScannerThreadResponse oneResult : taskResults) {
 					infoScanner.append(oneResult.getStatus()).append("\n");
 				}
