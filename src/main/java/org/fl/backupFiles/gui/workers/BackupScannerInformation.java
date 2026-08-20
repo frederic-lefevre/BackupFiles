@@ -26,24 +26,5 @@ package org.fl.backupFiles.gui.workers;
 
 import org.fl.backupFiles.scanner.ScannerThreadResponse;
 
-public class BackupScannerInformation {
-
-	// Stocke une information sur la progression du scanner
-	// et le résultat si il est terminé
-
-	private final CharSequence information;
-	private final ScannerThreadResponse scannerThreadResponse;
-
-	public BackupScannerInformation(CharSequence info, ScannerThreadResponse str) {
-		information = info;
-		scannerThreadResponse = str;
-	}
-
-	public CharSequence getInformation() {
-		return information;
-	}
-
-	public ScannerThreadResponse getScannerThreadResponse() {
-		return scannerThreadResponse;
-	}
+public record BackupScannerInformation(CharSequence information, ScannerThreadResponse scannerThreadResponse) {
 }

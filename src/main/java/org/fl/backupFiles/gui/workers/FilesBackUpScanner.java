@@ -190,7 +190,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 		for (BackupScannerInformation scannerInfo : chunks) {
 			
-			ScannerThreadResponse scannerResp = scannerInfo.getScannerThreadResponse();
+			ScannerThreadResponse scannerResp = scannerInfo.scannerThreadResponse();
 			if ((scannerResp != null) && (scannerResp.hasNotBeenProcessed())) {
 				// One scanner thread has ended
 				// It is necessary to test if the result has not been processed
@@ -203,7 +203,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		BackupScannerInformation latestResult = chunks.get(chunks.size() - 1);
 
 		backUpTableModel.fireTableDataChanged();
-		CharSequence lastInfo = latestResult.getInformation();
+		CharSequence lastInfo = latestResult.information();
 		if ((lastInfo != null) && (!lastInfo.isEmpty())) {
 			long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
 			progressPanel.setStepInfos(lastInfo.toString(), nbFilesProcessed);
@@ -268,7 +268,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 
 				// Update history tab
 				BackUpJobInformation jobInfo = 
-						new BackUpJobInformation( jobsChoice.getTitleAsHtml(), System.currentTimeMillis(), scannerInfoHtml, jobsChoice.getCompareOperationAsHtml(), jobTaskType.toString()) ;
+						new BackUpJobInformation( jobsChoice.getTitleAsHtml(), System.currentTimeMillis(), scannerInfoHtml, jobsChoice.getCompareOperationAsHtml(), jobTaskType.toString());
 				backUpJobInfoTableModel.add(jobInfo);
 			}
 		} catch (InterruptedException | ExecutionException e) {
