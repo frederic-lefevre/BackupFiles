@@ -141,7 +141,7 @@ public class FilesBackUpScanner extends SwingWorker<BackUpScannerResult,BackupSc
 		public ScannerProgress(List<BackUpScannerTask> results) {
 			super();
 			this.results = results;
-			jobProgress = new StringBuilder(1024);
+			jobProgress = new StringBuilder(results.size()*(BackUpScannerThread.STATUS_MAX_LENGTH + 10));
 		}
 
 		public void getProgress() {

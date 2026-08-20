@@ -53,6 +53,9 @@ public class BackUpScannerThread {
 
 	private static final Logger pLog = Logger.getLogger(BackUpScannerThread.class.getName());
 	
+	public static final int STATUS_MAX_LENGTH = 300;
+	private static final String STATUS_BLANKS = " ".repeat(STATUS_MAX_LENGTH);
+	
 	private boolean stopAsked;
 
 	private List<Path> filesVisitFailed;
@@ -66,7 +69,8 @@ public class BackUpScannerThread {
 	private final BackupAction acionOnSameTargetContentButNewer;
 	
 	private Path currentFile;	
-	private StringBuilder status;	
+	private final StringBuilder status;
+	private final int prefixStatusLength;
 	private boolean done;
 	private final int maxDepth;
 	private int	currDepth;
@@ -85,8 +89,11 @@ public class BackUpScannerThread {
 		backUpCounters = new BackUpCounters(targetFileStores, OperationType.SCAN);
 		done = false;
 
-		status = new StringBuilder(300);
-		status.append(backUpTask.name()).append(" ");
+		String taskNameString = backUpTask.name() + " ";
+		status = new StringBuilder(STATUS_BLANKS);
+		status.replace(0, taskNameString.length(), backUpTask.name() + " ");
+		prefixStatusLength = taskNameString.length();
+		
 		fileComparator = new FileComparator(pLog);
 		acionOnSameTargetContentButNewer = Config.getAcionOnSameTargetContentButNewer();
 	}
@@ -95,13 +102,15 @@ public class BackUpScannerThread {
 		stopAsked = b;
 	}
 	
-	public String getCurrentStatus() {
+	public StringBuilder getCurrentStatus() {
 		
 		if (done) {
-			return status.toString();
+			return status;
 		} else {
 			long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
-			return status.toString() + nbFilesProcessed + " " + currentFile;
+			status.setLength(prefixStatusLength);
+			status.append(nbFilesProcessed).append(" ").append(currentFile.toString());
+			return status;
 		}
 	}
 
@@ -135,6 +144,7 @@ public class BackUpScannerThread {
 		backUpCounters.nbSourceFilesProcessed++;
 
 		long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
+		status.setLength(prefixStatusLength);
 		status.append("| Scan done ");
 		done = true;
 		if (backUpTask.compareContent()) {
