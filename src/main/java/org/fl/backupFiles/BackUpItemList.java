@@ -24,8 +24,8 @@ SOFTWARE.
 
 package org.fl.backupFiles;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.fl.backupFiles.directoryGroup.GroupPolicy;
@@ -33,10 +33,10 @@ import org.fl.backupFiles.directoryGroup.core.DirectoryGroup;
 
 public class BackUpItemList {
 	
-	private final LinkedList<AbstractBackUpItem> backUpItemList;
+	private final List<AbstractBackUpItem> backUpItemList;
 	
 	private BackUpItemList() {
-		backUpItemList = new LinkedList<AbstractBackUpItem>();
+		backUpItemList = new ArrayList<AbstractBackUpItem>();
 	}
 	
 	public static BackUpItemList build() {
