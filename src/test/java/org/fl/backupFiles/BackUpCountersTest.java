@@ -302,11 +302,27 @@ class BackUpCountersTest {
 		assertThat(bc1.equalsIndividualCounters(bc2)).isFalse();
 	}
 	
+	@Test
+	void individualCountersShouldNotBeEquals11() {
+		
+		BackUpCounters bc1 = new BackUpCounters(newTargetFileStores(), OperationType.SCAN);
+		BackUpCounters bc2 = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
+
+		setFieldValueWithIncrement(bc1, 12);
+		setFieldValueWithIncrement(bc2, 12);
+		
+		assertThat(bc1.equalsIndividualCounters(bc2)).isTrue();
+
+		bc1.contentCompareNb++;
+		assertThat(bc1.equalsIndividualCounters(bc2)).isFalse();
+	}
+	
 	private static void assertFieldValue(BackUpCounters bc, long val) {
 		
 		assertThat(bc.ambiguousNb).isEqualTo(val);
 		assertThat(bc.backupWithSizeAboveThreshold).isEqualTo(val);
 		assertThat(bc.contentDifferentNb).isEqualTo(val);
+		assertThat(bc.contentCompareNb).isEqualTo(val);
 		assertThat(bc.copyNewNb).isEqualTo(val);
 		assertThat(bc.copyReplaceNb).isEqualTo(val);
 		assertThat(bc.copyTreeNb).isEqualTo(val);
@@ -339,7 +355,8 @@ class BackUpCountersTest {
 		assertThat(bc.nbTargetFilesFailed).isEqualTo(val+12*m);
 		assertThat(bc.nbTargetFilesProcessed).isEqualTo(val+13*m);
 		assertThat(bc.copyTargetNb).isEqualTo(val+14*m);
-		assertThat(bc.getTargetFileStores().getPotentialSizeChange(fileStore)).isNotNull().isEqualTo(val + 15*m);
+		assertThat(bc.contentCompareNb).isEqualTo(val+15*m);
+		assertThat(bc.getTargetFileStores().getPotentialSizeChange(fileStore)).isNotNull().isEqualTo(val + 16*m);
 	}
 	
 	private static void setFieldValue(BackUpCounters bc, long val) {
@@ -347,6 +364,7 @@ class BackUpCountersTest {
 		bc.ambiguousNb = val;
 		bc.backupWithSizeAboveThreshold = val;
 		bc.contentDifferentNb = val;
+		bc.contentCompareNb = val;
 		bc.copyNewNb = val;
 		bc.copyReplaceNb = val;
 		bc.copyTreeNb = val;
@@ -379,6 +397,7 @@ class BackUpCountersTest {
 		bc.nbTargetFilesFailed = val + 12;
 		bc.nbTargetFilesProcessed = val + 13;
 		bc.copyTargetNb = val + 14;
-		bc.recordPotentialSizeChange(fileStore, val + 15);
+		bc.contentCompareNb = val + 15;
+		bc.recordPotentialSizeChange(fileStore, val + 16);
 	}
 }

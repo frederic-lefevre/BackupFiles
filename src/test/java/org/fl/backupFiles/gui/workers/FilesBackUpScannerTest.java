@@ -113,7 +113,7 @@ class FilesBackUpScannerTest {
 			
 			// SOURCE_TO_BUFFER
 			FilesBackUpScanner filesBackUpScanner = new FilesBackUpScanner(uicS2B, JobTaskType.SOURCE_TO_BUFFER, jobsChoice, btm, pip, bujitm);
-			assertThat(backUpItems).isEmpty();
+			assertThat(backUpItems.getBackUpItems()).isEmpty();
 
 			filesBackUpScanner.execute();
 
@@ -132,6 +132,7 @@ class FilesBackUpScannerTest {
 			assertThat(backUpCounters.deleteNb).isZero();
 			assertThat(backUpCounters.backupWithSizeAboveThreshold).isZero();
 			assertThat(backUpCounters.contentDifferentNb).isZero();
+			assertThat(backUpCounters.contentCompareNb).isZero();
 			assertThat(backUpCounters.nbHighPermanencePath).isZero();
 			assertThat(backUpCounters.nbMediumPermanencePath).isZero();
 			assertThat(backUpCounters.nbSourceFilesFailed).isZero();
@@ -142,11 +143,11 @@ class FilesBackUpScannerTest {
 			assertThat(backUpCounters.getTargetFileStores()).isNotNull();
 			assertThat(backUpCounters.getTargetFileStores().getTotalPotentialSizeChange()).isZero();
 
-			assertThat(backUpItems).isEmpty();
+			assertThat(backUpItems.getBackUpItems()).isEmpty();
 			
 			// BUFFER_TO_TARGET
 			filesBackUpScanner = new FilesBackUpScanner(uicB2T, JobTaskType.BUFFER_TO_TARGET, jobsChoice, btm, pip, bujitm);
-			assertThat(backUpItems).isEmpty();
+			assertThat(backUpItems.getBackUpItems()).isEmpty();
 
 			filesBackUpScanner.execute();
 
@@ -164,6 +165,7 @@ class FilesBackUpScannerTest {
 			assertThat(backUpCounters.deleteNb).isZero();
 			assertThat(backUpCounters.backupWithSizeAboveThreshold).isZero();
 			assertThat(backUpCounters.contentDifferentNb).isZero();
+			assertThat(backUpCounters.contentCompareNb).isZero();
 			assertThat(backUpCounters.nbHighPermanencePath).isEqualTo(NB_SUB_DIR_UNDER_CONCERT*testDataManager.getNbHighPermanenceGenerated());
 			assertThat(backUpCounters.nbMediumPermanencePath).isEqualTo(NB_SUB_DIR_UNDER_CONCERT*testDataManager.getNbMediumPermanenceGenerated());
 			assertThat(backUpCounters.nbSourceFilesFailed).isZero();
@@ -174,7 +176,7 @@ class FilesBackUpScannerTest {
 			assertThat(backUpCounters.getTargetFileStores()).isNotNull();
 			assertThat(backUpCounters.getTargetFileStores().getTotalPotentialSizeChange()).isEqualTo(2498700L);
 		
-			assertThat(backUpItems).hasSize(710);
+			assertThat(backUpItems.getBackUpItems()).hasSize(710);
 			
 			assertThat(logCounterForFilesBackUpScanner.getLogRecordCount()).isEqualTo(2);
 			assertThat(logCounterForFilesBackUpScanner.getLogRecordCount(Level.INFO)).isEqualTo(2);

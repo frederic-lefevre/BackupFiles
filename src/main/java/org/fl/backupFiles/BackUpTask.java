@@ -41,6 +41,7 @@ public class BackUpTask {
 	
 	private final Path source;
 	private final Path target;
+	private final String name;
 	private final long sizeWarningLimit;
 	private FileStore targetFileStore;
 	private final DirectoryGroupMap directoryGroupMap;
@@ -77,6 +78,8 @@ public class BackUpTask {
 			throw new IllegalArgumentException("Null path argument when creating back up task. sourcePath=" + Objects.toString(source) + " targetPath="  + Objects.toString(source));
 		}
 
+		name = source.toString() + " ==> " + target.toString();
+
 		this.directoryGroupMap = directoryGroupMap;
 
 		compareContent = false;
@@ -111,15 +114,8 @@ public class BackUpTask {
 		return targetFileStore;
 	}
 
-	@Override
-	public String toString() {
-		String toString;
-		if ((source != null) && (target != null)) {
-			toString = source.toString() + " ==> " + target.toString();
-		} else {
-			toString = null;
-		}
-		return toString;
+	public String name() {
+		return name;
 	}
 
 	public TaskStatus getTaskStatus() {
@@ -151,48 +147,5 @@ public class BackUpTask {
 
 	public void setCompareContentOnAmbiguous(boolean compareContentOnAmbiguous) {
 		this.compareContentOnAmbiguous = compareContentOnAmbiguous;
-	}
-	
-	// Hashcode with lazy init
-	private int hashcode = 0;
-
-	@Override
-	public int hashCode() {
-
-		int result = hashcode;
-
-		if (result == 0) {
-			final int prime = 31;
-			result = 1;
-			result = prime * result + ((source == null) ? 0 : source.hashCode());
-			result = prime * result + ((target == null) ? 0 : target.hashCode());
-		}
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (obj instanceof BackUpTask other) {
-			if (source == null) {
-				if (other.source != null)
-					return false;
-			} else if (!source.equals(other.source)) {
-				return false;
-			}
-			if (target == null) {
-				if (other.target != null)
-					return false;
-			} else if (!target.equals(other.target)) {
-				return false;
-			}
-		} else {
-			return false;
-		}
-		return true;
 	}
 }

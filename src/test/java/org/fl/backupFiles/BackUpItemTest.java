@@ -120,7 +120,7 @@ public class BackUpItemTest {
 		assertThat(getTotalCounters(counters)).isEqualTo(1);
 
 		counters.reset();
-		boolean result1 = backUpItem.execute(counters);
+		boolean result1 = backUpItem.execute(counters, _ -> {});
 		assertThat(result1).isTrue();
 		assertThat(backUpItem.getBackupStatus()).isEqualTo(BackupStatus.DONE);
 
@@ -143,7 +143,7 @@ public class BackUpItemTest {
 		assertThat(getTotalCounters(counters)).isEqualTo(1);
 
 		counters.reset();
-		boolean result2 = backUpItem.execute(counters);
+		boolean result2 = backUpItem.execute(counters, _ -> {});
 		assertThat(result2).isTrue();
 		assertThat(backUpItem.getBackupStatus()).isEqualTo(BackupStatus.DONE);
 
@@ -423,7 +423,7 @@ public class BackUpItemTest {
 		assertThat(counters.copyTargetNb).isEqualTo(1);
 
 		counters.reset();
-		boolean result = backUpItem.execute(counters);
+		boolean result = backUpItem.execute(counters, _ -> {});
 		assertThat(result).isTrue();
 
 		assertThat(counters.copyTargetNb).isEqualTo(1);
@@ -484,7 +484,7 @@ public class BackUpItemTest {
 		assertThat(counters.adjustTimeNb).isEqualTo(1);
 
 		counters.reset();
-		boolean result = backUpItem.execute(counters);
+		boolean result = backUpItem.execute(counters, _ -> {});
 		assertThat(result).isTrue();
 
 		// Check with Files.getLastModifiedTime
@@ -518,7 +518,7 @@ public class BackUpItemTest {
 
 	private long getTotalCounters(BackUpCounters counters) {
 
-		return counters.ambiguousNb + counters.contentDifferentNb + counters.copyNewNb + counters.copyReplaceNb
+		return counters.ambiguousNb + counters.contentDifferentNb + counters.contentCompareNb + counters.copyNewNb + counters.copyReplaceNb
 				+ counters.copyTreeNb + counters.deleteDirNb + counters.deleteNb + counters.copyTargetNb + counters.adjustTimeNb
 				+ counters.nbSourceFilesFailed + counters.nbSourceFilesProcessed + counters.nbTargetFilesFailed
 				+ counters.nbTargetFilesProcessed;

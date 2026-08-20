@@ -96,16 +96,16 @@ public class BackupItemMouseAdapter extends MouseAdapter {
 
 		for (OsAction osAction : osActions) {
 
-			if (osAction.paramSeparated()) {
-				ActionListener actionSourceListener = new BackUpItemCommandListener(backupItemTablet, osAction.getActionCommand(), FileElement.Source);
-				ActionListener actionCibleListener = new BackUpItemCommandListener(backupItemTablet, osAction.getActionCommand(), FileElement.Cible);
+			if (osAction.separateParam()) {
+				ActionListener actionSourceListener = new BackUpItemCommandListener(backupItemTablet, osAction.actionCommand(), FileElement.Source);
+				ActionListener actionCibleListener = new BackUpItemCommandListener(backupItemTablet, osAction.actionCommand(), FileElement.Cible);
 
-				sourceMenuItems.add(addMenuItem(osAction.getActionTitle() + " source", actionSourceListener));
-				targetMenuItems.add(addMenuItem(osAction.getActionTitle() + " cible", actionCibleListener));
+				sourceMenuItems.add(addMenuItem(osAction.actionTitle() + " source", actionSourceListener));
+				targetMenuItems.add(addMenuItem(osAction.actionTitle() + " cible", actionCibleListener));
 			} else {
-				ActionListener actionBothListener = new BackUpItemCommandListener(backupItemTablet, osAction.getActionCommand(), FileElement.Both);
+				ActionListener actionBothListener = new BackUpItemCommandListener(backupItemTablet, osAction.actionCommand(), FileElement.Both);
 
-				bothMenuItems.add(addMenuItem(osAction.getActionTitle(), actionBothListener));
+				bothMenuItems.add(addMenuItem(osAction.actionTitle(), actionBothListener));
 			}
 		}
 

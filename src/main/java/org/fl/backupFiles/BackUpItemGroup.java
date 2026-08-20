@@ -28,11 +28,14 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class BackUpItemGroup extends AbstractBackUpItem {
 
 	private final List<BackUpItem> backUpItems;
 	private boolean isAboveFileSizeLimitThreshold;
+	
+	private static final int REFRESH_RATE = Config.getBackUpRefreshRate();
 	
 	public BackUpItemGroup(Path sourcePath, Path targetPath, Path sourceClosestExistingPath, BackupAction backupAction, BackupStatus backupStatus, BackUpTask backUpTask) {
 		
@@ -44,12 +47,16 @@ public class BackUpItemGroup extends AbstractBackUpItem {
 		isAboveFileSizeLimitThreshold = false;
 	}
 	
-	public BackUpItemList getBackUpItems() {
+	public BackUpItemList getBackUpItemList() {
 		BackUpItemList backUpItemList = BackUpItemList.build();
 		backUpItemList.addAll(backUpItems);
 		return backUpItemList;
 	}
 
+	public List<BackUpItem> getBackUpItems() {
+		return backUpItems;
+	}
+	
 	public boolean addBackUpItem(BackUpItem backUpItem) {
 		
 		if (backUpItem.getBackupAction() != backupAction) {
@@ -71,11 +78,16 @@ public class BackUpItemGroup extends AbstractBackUpItem {
 	}
 
 	@Override
-	public boolean execute(BackUpCounters backUpCounters) {
+	public boolean execute(BackUpCounters backUpCounters, Consumer<Integer> publisher) {
 		
 		boolean success = true;
+		int nbActionDone = 0;
 		for (AbstractBackUpItem backUpItem : backUpItems) {
-			success &= backUpItem.execute(backUpCounters);
+			success &= backUpItem.execute(backUpCounters, publisher);
+			
+			if ((nbActionDone++ % REFRESH_RATE) == 0) {
+				publisher.accept(0);
+			}
 		}
 		if (success) {
 			backupStatus = BackupStatus.DONE;

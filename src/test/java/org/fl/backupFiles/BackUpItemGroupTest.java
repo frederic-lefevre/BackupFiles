@@ -148,7 +148,7 @@ class BackUpItemGroupTest {
 		
 		backUpItemGroup.addBackUpItem(backUpItem);
 		counters.reset();
-		boolean result = backUpItemGroup.execute(counters);
+		boolean result = backUpItemGroup.execute(counters, _ -> {});
 
 		assertThat(result).isTrue();
 		assertThat(backUpItem.getBackupStatus()).isEqualTo(BackupStatus.DONE);

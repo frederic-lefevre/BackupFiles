@@ -33,6 +33,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -185,7 +186,7 @@ public class BackUpItem extends AbstractBackUpItem {
 	}
 
 	@Override
-	public boolean execute(BackUpCounters backUpCounters) {
+	public boolean execute(BackUpCounters backUpCounters, Consumer<Integer> publisher) {
 		
 		try {
 			if (executeAction(backUpCounters)) {

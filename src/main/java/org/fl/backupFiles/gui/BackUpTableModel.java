@@ -25,6 +25,7 @@ SOFTWARE.
 package org.fl.backupFiles.gui;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -49,11 +50,13 @@ public class BackUpTableModel extends AbstractTableModel {
 	private final static String[] entetes = {"Chemin origine", "Groupé", "Taille", "Permanence", "Action", "Etat", "Chemin destination"};
 	
 	// Underlying data
+	private List<AbstractBackUpItem> backUpItemsList;
 	private BackUpItemList backUpItems;
 	
-	public BackUpTableModel(BackUpItemList bt) {
+	public BackUpTableModel(BackUpItemList backUpItems) {
 		super();
-		backUpItems = bt;		
+		this.backUpItems = backUpItems;	
+		backUpItemsList = backUpItems.getBackUpItems();
 	}
 
 	public BackUpItemList getBackUpItems() {
@@ -95,18 +98,18 @@ public class BackUpTableModel extends AbstractTableModel {
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		return switch(columnIndex){
-        	case SOURCE_PATH_COL_IDX -> backUpItems.get(rowIndex).getSourcePath();
-        	case GROUP_COL_IDX -> backUpItems.get(rowIndex);
-        	case SIZE_DIFF_COL_IDX -> backUpItems.get(rowIndex);
-        	case PERMANENCE_COL_IDX -> backUpItems.get(rowIndex).getPermanenceLevel();
-        	case ACTION_COL_IDX -> backUpItems.get(rowIndex).getBackupAction();
-        	case STATUS_COL_IDX -> backUpItems.get(rowIndex).getBackupStatus();
-        	case TARGET_PATH_COL_IDX -> backUpItems.get(rowIndex).getTargetPath();
+        	case SOURCE_PATH_COL_IDX -> backUpItemsList.get(rowIndex).getSourcePath();
+        	case GROUP_COL_IDX -> backUpItemsList.get(rowIndex);
+        	case SIZE_DIFF_COL_IDX -> backUpItemsList.get(rowIndex);
+        	case PERMANENCE_COL_IDX -> backUpItemsList.get(rowIndex).getPermanenceLevel();
+        	case ACTION_COL_IDX -> backUpItemsList.get(rowIndex).getBackupAction();
+        	case STATUS_COL_IDX -> backUpItemsList.get(rowIndex).getBackupStatus();
+        	case TARGET_PATH_COL_IDX -> backUpItemsList.get(rowIndex).getTargetPath();
         	default -> null;
 		};
 	}
 
 	public AbstractBackUpItem getBackUpItemAt(int rowIndex) {
-		return backUpItems.get(rowIndex);
+		return backUpItemsList.get(rowIndex);
 	}
 }
