@@ -158,7 +158,7 @@ public class BackUpJob {
 			}
 		}
 		
-		public List<BackUpTask> getBackUpTasks(JobTaskType jobTaskType) throws IOException {
+		private List<BackUpTask> getBackUpTasks(JobTaskType jobTaskType) throws IOException {
 			
 			if (scanInParallel) {
 				
