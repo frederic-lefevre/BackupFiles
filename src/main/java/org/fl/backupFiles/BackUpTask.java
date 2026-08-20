@@ -41,6 +41,7 @@ public class BackUpTask {
 	
 	private final Path source;
 	private final Path target;
+	private final String name;
 	private final long sizeWarningLimit;
 	private FileStore targetFileStore;
 	private final DirectoryGroupMap directoryGroupMap;
@@ -77,6 +78,8 @@ public class BackUpTask {
 			throw new IllegalArgumentException("Null path argument when creating back up task. sourcePath=" + Objects.toString(source) + " targetPath="  + Objects.toString(source));
 		}
 
+		name = source.toString() + " ==> " + target.toString();
+
 		this.directoryGroupMap = directoryGroupMap;
 
 		compareContent = false;
@@ -111,15 +114,8 @@ public class BackUpTask {
 		return targetFileStore;
 	}
 
-	@Override
-	public String toString() {
-		String toString;
-		if ((source != null) && (target != null)) {
-			toString = source.toString() + " ==> " + target.toString();
-		} else {
-			toString = null;
-		}
-		return toString;
+	public String name() {
+		return name;
 	}
 
 	public TaskStatus getTaskStatus() {

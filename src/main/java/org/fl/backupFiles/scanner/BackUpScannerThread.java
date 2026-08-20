@@ -86,7 +86,7 @@ public class BackUpScannerThread {
 		done = false;
 
 		status = new StringBuilder(300);
-		status.append(backUpTask.toString()).append(" ");
+		status.append(backUpTask.name()).append(" ");
 		fileComparator = new FileComparator(pLog);
 		acionOnSameTargetContentButNewer = Config.getAcionOnSameTargetContentButNewer();
 	}
