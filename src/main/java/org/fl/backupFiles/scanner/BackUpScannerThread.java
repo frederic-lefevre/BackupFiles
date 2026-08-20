@@ -152,7 +152,6 @@ public class BackUpScannerThread {
 			diskDurationRatio = diskProcessDuration / scanDuration;
 		}
 		status.append("| Number of files processed: ")
-			.append(done)
 			.append(nbFilesProcessed)
 			.append(" | Disk duration per file (nano seconds): ")
 			.append(diskDurationPerFile)
