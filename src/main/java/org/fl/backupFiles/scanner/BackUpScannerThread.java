@@ -71,11 +71,14 @@ public class BackUpScannerThread {
 	private final int maxDepth;
 	private int	currDepth;
 
+	private long diskProcessDuration;
+	
 	public BackUpScannerThread(BackUpTask but) {
 		
 		stopAsked = false;
 		backUpTask = but;
 		maxDepth = Config.getMaxDepth();
+		diskProcessDuration = 0;
 
 		TargetFileStores targetFileStores = new TargetFileStores();
 		targetFileStores.addTargetFileStore(backUpTask.getTarget(), backUpTask.getTargetFileStore(), Config.getFileStoreRemainingSpaceWarningThreshold());
@@ -103,6 +106,8 @@ public class BackUpScannerThread {
 
 	public ScannerThreadResponse scan() {
 
+		long scanStartTime = System.currentTimeMillis();
+		
 		Path sourcePath = backUpTask.getSource();
 		Path targetPath = backUpTask.getTarget();
 
@@ -136,7 +141,16 @@ public class BackUpScannerThread {
 		} else if (backUpTask.compareContentOnAmbiguous()) {
 			status = status + "with content compare on ambiguous files ";
 		}
-		status = status + "| Number of files processed: " + nbFilesProcessed;
+		
+		long diskDurationPerFile = diskProcessDuration / nbFilesProcessed;
+		long scanDuration = System.currentTimeMillis() - scanStartTime;
+		long diskDurationRatio;	
+		if (scanDuration == 0) {
+			diskDurationRatio = 0;
+		} else {
+			diskDurationRatio = diskProcessDuration / scanDuration;
+		}
+		status = status + "| Number of files processed: " + nbFilesProcessed + " | Disk duration per file: " + diskDurationPerFile + " | Disk duration ratio: " + diskDurationRatio ;
 		ScannerThreadResponse resp = new ScannerThreadResponse(backUpTask, backUpItemList, backUpCounters, filesVisitFailed, status);
 		return resp ;
 	}
@@ -220,7 +234,9 @@ public class BackUpScannerThread {
 				
 				PathPairBasicAttributes pairBasicAttributes = entry.getValue();
 				Path srcPath = pairBasicAttributes.getSourcePath();
-				BasicFileAttributes sourceAttributes = pairBasicAttributes.getSourceBasicAttributes();			
+				long start1 = System.currentTimeMillis();
+				BasicFileAttributes sourceAttributes = pairBasicAttributes.getSourceBasicAttributes();
+				diskProcessDuration = diskProcessDuration + (System.currentTimeMillis() - start1);
 				currentFile = srcPath;
 				if (sourceAttributes != null) {
 					if (pairBasicAttributes.noTargetPath()) {
@@ -254,7 +270,9 @@ public class BackUpScannerThread {
 						} else {
 							// source is a file
 							
+							long start2 = System.currentTimeMillis();
 							BasicFileAttributes targetAttributes = pairBasicAttributes.getTargetBasicAttributes();
+							diskProcessDuration = diskProcessDuration + (System.currentTimeMillis() - start2);
 							
 							if (targetAttributes != null) {
 								if (targetAttributes.isDirectory()) {
