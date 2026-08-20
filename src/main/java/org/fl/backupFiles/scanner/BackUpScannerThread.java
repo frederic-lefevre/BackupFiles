@@ -106,7 +106,7 @@ public class BackUpScannerThread {
 
 	public ScannerThreadResponse scan() {
 
-		long scanStartTime = System.currentTimeMillis();
+		long scanStartTime = System.nanoTime();
 		
 		Path sourcePath = backUpTask.getSource();
 		Path targetPath = backUpTask.getTarget();
@@ -143,14 +143,14 @@ public class BackUpScannerThread {
 		}
 		
 		long diskDurationPerFile = diskProcessDuration / nbFilesProcessed;
-		long scanDuration = System.currentTimeMillis() - scanStartTime;
+		long scanDuration = System.nanoTime() - scanStartTime;
 		long diskDurationRatio;	
 		if (scanDuration == 0) {
 			diskDurationRatio = 0;
 		} else {
 			diskDurationRatio = diskProcessDuration / scanDuration;
 		}
-		status = status + "| Number of files processed: " + nbFilesProcessed + " | Disk duration per file: " + diskDurationPerFile + " | Disk duration ratio: " + diskDurationRatio ;
+		status = status + "| Number of files processed: " + nbFilesProcessed + " | Disk duration per file (nano seconds): " + diskDurationPerFile + " | Disk duration ratio: " + diskDurationRatio ;
 		ScannerThreadResponse resp = new ScannerThreadResponse(backUpTask, backUpItemList, backUpCounters, filesVisitFailed, status);
 		return resp ;
 	}
@@ -234,9 +234,9 @@ public class BackUpScannerThread {
 				
 				PathPairBasicAttributes pairBasicAttributes = entry.getValue();
 				Path srcPath = pairBasicAttributes.getSourcePath();
-				long start1 = System.currentTimeMillis();
+				long start1 = System.nanoTime();
 				BasicFileAttributes sourceAttributes = pairBasicAttributes.getSourceBasicAttributes();
-				diskProcessDuration = diskProcessDuration + (System.currentTimeMillis() - start1);
+				diskProcessDuration = diskProcessDuration + (System.nanoTime() - start1);
 				currentFile = srcPath;
 				if (sourceAttributes != null) {
 					if (pairBasicAttributes.noTargetPath()) {
@@ -270,9 +270,9 @@ public class BackUpScannerThread {
 						} else {
 							// source is a file
 							
-							long start2 = System.currentTimeMillis();
+							long start2 = System.nanoTime();
 							BasicFileAttributes targetAttributes = pairBasicAttributes.getTargetBasicAttributes();
-							diskProcessDuration = diskProcessDuration + (System.currentTimeMillis() - start2);
+							diskProcessDuration = diskProcessDuration + (System.nanoTime() - start2);
 							
 							if (targetAttributes != null) {
 								if (targetAttributes.isDirectory()) {
