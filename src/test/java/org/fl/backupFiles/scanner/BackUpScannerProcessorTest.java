@@ -151,7 +151,7 @@ class BackUpScannerProcessorTest {
 			// Execute backup
 			backUpCounters.reset() ;
 			for (AbstractBackUpItem backUpItem : backUpItemList.getBackUpItems()) {
-				backUpItem.execute(backUpCounters);
+				backUpItem.execute(backUpCounters, _ -> {});
 			}
 			assertThat(backUpCounters.ambiguousNb).isZero();
 			assertThat(backUpCounters.copyNewNb).isZero();

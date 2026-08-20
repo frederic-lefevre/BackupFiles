@@ -120,7 +120,7 @@ public class BackUpItemTest {
 		assertThat(getTotalCounters(counters)).isEqualTo(1);
 
 		counters.reset();
-		boolean result1 = backUpItem.execute(counters);
+		boolean result1 = backUpItem.execute(counters, _ -> {});
 		assertThat(result1).isTrue();
 		assertThat(backUpItem.getBackupStatus()).isEqualTo(BackupStatus.DONE);
 
@@ -143,7 +143,7 @@ public class BackUpItemTest {
 		assertThat(getTotalCounters(counters)).isEqualTo(1);
 
 		counters.reset();
-		boolean result2 = backUpItem.execute(counters);
+		boolean result2 = backUpItem.execute(counters, _ -> {});
 		assertThat(result2).isTrue();
 		assertThat(backUpItem.getBackupStatus()).isEqualTo(BackupStatus.DONE);
 
@@ -423,7 +423,7 @@ public class BackUpItemTest {
 		assertThat(counters.copyTargetNb).isEqualTo(1);
 
 		counters.reset();
-		boolean result = backUpItem.execute(counters);
+		boolean result = backUpItem.execute(counters, _ -> {});
 		assertThat(result).isTrue();
 
 		assertThat(counters.copyTargetNb).isEqualTo(1);
@@ -484,7 +484,7 @@ public class BackUpItemTest {
 		assertThat(counters.adjustTimeNb).isEqualTo(1);
 
 		counters.reset();
-		boolean result = backUpItem.execute(counters);
+		boolean result = backUpItem.execute(counters, _ -> {});
 		assertThat(result).isTrue();
 
 		// Check with Files.getLastModifiedTime

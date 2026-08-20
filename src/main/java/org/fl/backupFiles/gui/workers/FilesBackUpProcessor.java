@@ -105,7 +105,8 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 				publish(nbActionDone);
 				lastRefreshTime = System.currentTimeMillis();
 			}
-			backupSuccess &= backupItemIterator.next().execute(backUpCounters);
+			final int nbActionDone2 = nbActionDone;
+			backupSuccess &= backupItemIterator.next().execute(backUpCounters, _ -> publish(nbActionDone2));
 			nbActionDone++;
 		}
 
