@@ -255,9 +255,7 @@ public class BackUpScannerThread {
 				
 				PathPairBasicAttributes pairBasicAttributes = entry.getValue();
 				Path srcPath = pairBasicAttributes.getSourcePath();
-				long start1 = System.nanoTime();
 				BasicFileAttributes sourceAttributes = pairBasicAttributes.getSourceBasicAttributes();
-				diskProcessDuration = diskProcessDuration + (System.nanoTime() - start1);
 				currentFile = srcPath;
 				if (sourceAttributes != null) {
 					if (pairBasicAttributes.noTargetPath()) {
@@ -291,9 +289,7 @@ public class BackUpScannerThread {
 						} else {
 							// source is a file
 							
-							long start2 = System.nanoTime();
 							BasicFileAttributes targetAttributes = pairBasicAttributes.getTargetBasicAttributes();
-							diskProcessDuration = diskProcessDuration + (System.nanoTime() - start2);
 							
 							if (targetAttributes != null) {
 								if (targetAttributes.isDirectory()) {
@@ -315,6 +311,7 @@ public class BackUpScannerThread {
 					pLog.severe("Failed to get source file attributes for " + Objects.toString(srcPath));
 					filesVisitFailed.add(srcPath);
 				}
+				diskProcessDuration = diskProcessDuration + pairBasicAttributes.getDiskProcessDuration();
 			}
 		}
 	}
