@@ -91,7 +91,7 @@ public class BackUpScannerThread {
 
 		String taskNameString = backUpTask.name() + " ";
 		status = new StringBuilder(STATUS_BLANKS);
-		status.replace(0, taskNameString.length(), backUpTask.name() + " ");
+		status.replace(0, taskNameString.length(), taskNameString);
 		prefixStatusLength = taskNameString.length();
 		
 		fileComparator = new FileComparator(pLog);
@@ -138,12 +138,12 @@ public class BackUpScannerThread {
 			} else {
 				topLevelFileCompare(pathPairBasicAttributes);
 			}
+			diskProcessDuration = diskProcessDuration + pathPairBasicAttributes.getDiskProcessDuration();
 		} catch (Exception e) {
 			pLog.log(Level.SEVERE, "Exception when comparing directory " + sourcePath + " with " + targetPath, e);
 		}
 		backUpCounters.nbSourceFilesProcessed++;
 
-		long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
 		status.setLength(prefixStatusLength);
 		status.append("| Scan done ");
 		done = true;
@@ -153,24 +153,30 @@ public class BackUpScannerThread {
 			status.append("with content compare on ambiguous files ");
 		}
 		
+		long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
 		long diskDurationPerFile = diskProcessDuration / nbFilesProcessed;
 		long scanDuration = System.nanoTime() - scanStartTime;
-		long diskDurationRatio;	
-		if (scanDuration == 0) {
-			diskDurationRatio = 0;
-		} else {
-			diskDurationRatio = diskProcessDuration / scanDuration;
-		}
+		
 		status.append("| Number of files processed: ")
 			.append(nbFilesProcessed)
+			.append(" | Scan duration (ms): ")
+			.append(scanDuration/1000000)
 			.append(" | Disk duration per file (nano seconds): ")
 			.append(diskDurationPerFile)
 			.append(" | Disk duration ratio: ")
-			.append(diskDurationRatio);
+			.append(processRatio(diskProcessDuration, scanDuration));
 		ScannerThreadResponse resp = new ScannerThreadResponse(backUpTask, backUpItemList, backUpCounters, filesVisitFailed, status);
 		return resp ;
 	}
-		
+
+	private static  String processRatio(long l1, long l2) {
+		if (l2 == 0) {
+			return "0%";
+		} else {
+			return ((l1 * 100) / l2) + "%";
+		}
+	}
+	
 	 // Walk directory tree without using SimpleFileVisitor class (much faster)
 	private void directoryCompare(PathPairBasicAttributes pathPairBasicAttributes) {
 		
@@ -217,7 +223,7 @@ public class BackUpScannerThread {
 								action = BackupAction.DELETE;
 							}
 							backUpItemList.add(new BackUpItem(onlyTargetNotNull, action, pathPairBasicAttributes, backUpCounters, backUpTask));
-
+							diskProcessDuration = diskProcessDuration + onlyTargetNotNull.getDiskProcessDuration();
 						} else {
 							pairFiles.setTargetPath(targetFile);
 						}
@@ -250,9 +256,7 @@ public class BackUpScannerThread {
 				
 				PathPairBasicAttributes pairBasicAttributes = entry.getValue();
 				Path srcPath = pairBasicAttributes.getSourcePath();
-				long start1 = System.nanoTime();
 				BasicFileAttributes sourceAttributes = pairBasicAttributes.getSourceBasicAttributes();
-				diskProcessDuration = diskProcessDuration + (System.nanoTime() - start1);
 				currentFile = srcPath;
 				if (sourceAttributes != null) {
 					if (pairBasicAttributes.noTargetPath()) {
@@ -286,9 +290,7 @@ public class BackUpScannerThread {
 						} else {
 							// source is a file
 							
-							long start2 = System.nanoTime();
 							BasicFileAttributes targetAttributes = pairBasicAttributes.getTargetBasicAttributes();
-							diskProcessDuration = diskProcessDuration + (System.nanoTime() - start2);
 							
 							if (targetAttributes != null) {
 								if (targetAttributes.isDirectory()) {
@@ -309,9 +311,10 @@ public class BackUpScannerThread {
 				} else {
 					pLog.severe("Failed to get source file attributes for " + Objects.toString(srcPath));
 					filesVisitFailed.add(srcPath);
-				}
+				}			
 			}
 		}
+		diskProcessDuration = diskProcessDuration + filesBasicAttributes.values().stream().mapToLong(ba -> ba.getDiskProcessDuration()).sum();
 	}
 	
 	private void compareFileContent(
@@ -320,7 +323,10 @@ public class BackUpScannerThread {
 			BackupAction backupActionOnEqual) {
 		
 		backUpCounters.contentCompareNb++;
-		if (! fileComparator.haveSameContent(pathPairBasicAttributes.getSourcePath(), pathPairBasicAttributes.getTargetPath())) {
+		long start = System.nanoTime();
+		boolean sameContent = fileComparator.haveSameContent(pathPairBasicAttributes.getSourcePath(), pathPairBasicAttributes.getTargetPath());
+		diskProcessDuration = diskProcessDuration +  (System.nanoTime() - start);
+		if (! sameContent) {
 			// file content are not the same (or there has been an error)
 			if (fileComparator.isOnError()) {
 				filesVisitFailed.add(pathPairBasicAttributes.getTargetPath());

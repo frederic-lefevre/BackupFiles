@@ -42,6 +42,7 @@ public class PathPairBasicAttributes {
 	private boolean targetPathAttributesKnown;
 	private boolean sourceExists;
 	private boolean targetExists;
+	private long diskProcessDuration;
 
 	private BasicFileAttributes sourceBasicAttributes;
 	private BasicFileAttributes targetBasicAttributes;
@@ -52,6 +53,7 @@ public class PathPairBasicAttributes {
 		this.targetPath = targetPath;
 		sourcePathAttributesKnown = false;
 		targetPathAttributesKnown = false;
+		diskProcessDuration = 0;
 	}
 	
 	public Path getSourcePath() {
@@ -72,7 +74,9 @@ public class PathPairBasicAttributes {
 				sourceExists = false;
 			} else {
 				try {
+					long start = System.nanoTime();
 					sourceBasicAttributes = sourcePath.getFileSystem().provider().readAttributesIfExists(sourcePath, BasicFileAttributes.class);
+					diskProcessDuration = diskProcessDuration + (System.nanoTime() - start);
 					sourcePathAttributesKnown = true;
 					sourceExists = sourceBasicAttributes != null;
 				} catch (Exception e) {
@@ -93,7 +97,9 @@ public class PathPairBasicAttributes {
 				targetExists = false;
 			} else {
 				try {
+					long start = System.nanoTime();
 					targetBasicAttributes = targetPath.getFileSystem().provider().readAttributesIfExists(targetPath, BasicFileAttributes.class);
+					diskProcessDuration = diskProcessDuration + (System.nanoTime() - start);
 					targetPathAttributesKnown = true;
 					targetExists = targetBasicAttributes != null;
 				} catch (Exception e) {
@@ -149,6 +155,10 @@ public class PathPairBasicAttributes {
 		targetPathAttributesKnown = false;
 	}
 	
+	public long getDiskProcessDuration() {
+		return diskProcessDuration;
+	}
+	
 	public static PathPairBasicAttributes getClosestExistingParentBasicAttributes(Path path) {
 		
 		Path parentPath = path.getParent();
@@ -156,6 +166,7 @@ public class PathPairBasicAttributes {
 			return null;
 		} else {
 			PathPairBasicAttributes pathPairBasicAttributes = new PathPairBasicAttributes(parentPath, null);
+			
 			if (pathPairBasicAttributes.sourceExists()) {
 				return pathPairBasicAttributes;
 			} else {
