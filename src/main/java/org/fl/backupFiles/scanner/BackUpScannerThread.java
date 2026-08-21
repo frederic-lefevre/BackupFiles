@@ -138,6 +138,7 @@ public class BackUpScannerThread {
 			} else {
 				topLevelFileCompare(pathPairBasicAttributes);
 			}
+			diskProcessDuration = diskProcessDuration + pathPairBasicAttributes.getDiskProcessDuration();
 		} catch (Exception e) {
 			pLog.log(Level.SEVERE, "Exception when comparing directory " + sourcePath + " with " + targetPath, e);
 		}
@@ -222,7 +223,7 @@ public class BackUpScannerThread {
 								action = BackupAction.DELETE;
 							}
 							backUpItemList.add(new BackUpItem(onlyTargetNotNull, action, pathPairBasicAttributes, backUpCounters, backUpTask));
-
+							diskProcessDuration = diskProcessDuration + onlyTargetNotNull.getDiskProcessDuration();
 						} else {
 							pairFiles.setTargetPath(targetFile);
 						}
@@ -310,10 +311,10 @@ public class BackUpScannerThread {
 				} else {
 					pLog.severe("Failed to get source file attributes for " + Objects.toString(srcPath));
 					filesVisitFailed.add(srcPath);
-				}
-				diskProcessDuration = diskProcessDuration + pairBasicAttributes.getDiskProcessDuration();
+				}			
 			}
 		}
+		diskProcessDuration = diskProcessDuration + filesBasicAttributes.values().stream().mapToLong(ba -> ba.getDiskProcessDuration()).sum();
 	}
 	
 	private void compareFileContent(
