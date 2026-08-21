@@ -74,6 +74,8 @@ public class PathPairBasicAttributesTest {
 		assertThat(pathPairBasicAttributes.targetExists()).isFalse();
 		assertThat(pathPairBasicAttributes.targetIsDirectory()).isFalse();
 		
+		assertThat(pathPairBasicAttributes.getDiskProcessDuration()).isZero();
+		
 		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.getSourceSize());
 		assertThatNullPointerException().isThrownBy(() -> pathPairBasicAttributes.getTargetSize());
 	}
@@ -145,14 +147,22 @@ public class PathPairBasicAttributesTest {
 		
 		assertThat(pathPairBasicAttributes.noTargetPath()).isFalse();
 		
+		assertThat(pathPairBasicAttributes.getDiskProcessDuration()).isZero();
+		
 		assertThat(pathPairBasicAttributes.sourceExists()).isTrue();
+		
+		long diskProcessDuration = pathPairBasicAttributes.getDiskProcessDuration();
+		assertThat(diskProcessDuration).isPositive();
+		
 		assertThat(pathPairBasicAttributes.targetExists()).isTrue();
+		
+		assertThat(pathPairBasicAttributes.getDiskProcessDuration() - diskProcessDuration).isPositive();
 		
 		assertThat(pathPairBasicAttributes.sourceIsDirectory()).isTrue();
 		assertThat(pathPairBasicAttributes.targetIsDirectory()).isTrue();
 		
 		assertThat(pathPairBasicAttributes.getSourceSize()).isPositive();
-		assertThat(pathPairBasicAttributes.getTargetSize()).isPositive();
+		assertThat(pathPairBasicAttributes.getTargetSize()).isPositive();	
 	}
 	
 	@Test
