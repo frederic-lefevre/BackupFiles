@@ -91,7 +91,7 @@ public class BackUpScannerThread {
 
 		String taskNameString = backUpTask.name() + " ";
 		status = new StringBuilder(STATUS_BLANKS);
-		status.replace(0, taskNameString.length(), backUpTask.name() + " ");
+		status.replace(0, taskNameString.length(), taskNameString);
 		prefixStatusLength = taskNameString.length();
 		
 		fileComparator = new FileComparator(pLog);
