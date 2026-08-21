@@ -323,7 +323,10 @@ public class BackUpScannerThread {
 			BackupAction backupActionOnEqual) {
 		
 		backUpCounters.contentCompareNb++;
-		if (! fileComparator.haveSameContent(pathPairBasicAttributes.getSourcePath(), pathPairBasicAttributes.getTargetPath())) {
+		long start = System.nanoTime();
+		boolean sameContent = fileComparator.haveSameContent(pathPairBasicAttributes.getSourcePath(), pathPairBasicAttributes.getTargetPath());
+		diskProcessDuration = diskProcessDuration +  (System.nanoTime() - start);
+		if (! sameContent) {
 			// file content are not the same (or there has been an error)
 			if (fileComparator.isOnError()) {
 				filesVisitFailed.add(pathPairBasicAttributes.getTargetPath());
