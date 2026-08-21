@@ -143,7 +143,6 @@ public class BackUpScannerThread {
 		}
 		backUpCounters.nbSourceFilesProcessed++;
 
-		long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
 		status.setLength(prefixStatusLength);
 		status.append("| Scan done ");
 		done = true;
@@ -153,24 +152,30 @@ public class BackUpScannerThread {
 			status.append("with content compare on ambiguous files ");
 		}
 		
+		long nbFilesProcessed = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
 		long diskDurationPerFile = diskProcessDuration / nbFilesProcessed;
 		long scanDuration = System.nanoTime() - scanStartTime;
-		long diskDurationRatio;	
-		if (scanDuration == 0) {
-			diskDurationRatio = 0;
-		} else {
-			diskDurationRatio = diskProcessDuration / scanDuration;
-		}
+		
 		status.append("| Number of files processed: ")
 			.append(nbFilesProcessed)
+			.append(" | Scan duration (ms): ")
+			.append(scanDuration/1000000)
 			.append(" | Disk duration per file (nano seconds): ")
 			.append(diskDurationPerFile)
 			.append(" | Disk duration ratio: ")
-			.append(diskDurationRatio);
+			.append(processRatio(diskProcessDuration, scanDuration));
 		ScannerThreadResponse resp = new ScannerThreadResponse(backUpTask, backUpItemList, backUpCounters, filesVisitFailed, status);
 		return resp ;
 	}
-		
+
+	private static  String processRatio(long l1, long l2) {
+		if (l2 == 0) {
+			return "0%";
+		} else {
+			return ((l1 * 100) / l2) + "%";
+		}
+	}
+	
 	 // Walk directory tree without using SimpleFileVisitor class (much faster)
 	private void directoryCompare(PathPairBasicAttributes pathPairBasicAttributes) {
 		
