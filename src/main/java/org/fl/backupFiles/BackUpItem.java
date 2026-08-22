@@ -335,16 +335,40 @@ public class BackUpItem extends AbstractBackUpItem {
 	public void sumIndividualCounters(BackUpCounters backUpCounters) {
 		
 		switch (backupAction) {
-			case COPY_REPLACE -> backUpCounters.copyReplaceNb++;
-			case COPY_NEW -> backUpCounters.copyNewNb++;
-			case DELETE -> backUpCounters.deleteNb++;
-			case COPY_TREE -> backUpCounters.copyTreeNb++;
-			case DELETE_DIR -> backUpCounters.deleteDirNb++;
-			case ADJUST_TIME -> backUpCounters.adjustTimeNb++;
-			case COPY_TARGET -> backUpCounters.copyTargetNb++;
-			case AMBIGUOUS -> backUpCounters.ambiguousNb++;
+			case COPY_REPLACE -> {
+				backUpCounters.copyReplaceNb++;
+				backUpCounters.nbSourceFilesProcessed++;
+				}
+			case COPY_NEW -> {
+				backUpCounters.copyNewNb++;
+				backUpCounters.nbSourceFilesProcessed++;
+			}
+			case DELETE -> {
+				backUpCounters.deleteNb++;
+				backUpCounters.nbTargetFilesProcessed++;
+			}
+			case COPY_TREE -> {
+				backUpCounters.copyTreeNb++;
+				backUpCounters.nbSourceFilesProcessed++;
+			}
+			case DELETE_DIR -> {
+				backUpCounters.deleteDirNb++;
+				backUpCounters.nbTargetFilesProcessed++;
+			}
+			case ADJUST_TIME -> {
+				backUpCounters.adjustTimeNb++;
+				backUpCounters.nbSourceFilesProcessed++;
+			}
+			case COPY_TARGET -> {
+				backUpCounters.copyTargetNb++;
+				backUpCounters.nbSourceFilesProcessed++;
+			}
+			case AMBIGUOUS -> {
+				backUpCounters.ambiguousNb++;
+				backUpCounters.nbSourceFilesProcessed++;
+			}
 		}
-		
+		 
 		if (backupStatus == BackupStatus.DIFF_BY_CONTENT) {
 			backUpCounters.contentDifferentNb++;
 		}
