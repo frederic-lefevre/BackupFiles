@@ -62,12 +62,13 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 	private final int refreshRate;
 	private final long maxRefreshInterval;
 
+	private long initialNumberOfFilesToBackUp;
 	private final BackUpCounters backUpCounters;
 
 	private final static String NB_ELEM = "Nombre d'éléments restant à traiter: ";
 	private final static String PROCESSED_ELEM = "<br/>Eléments déjà traités : ";
 		
-	public FilesBackUpProcessor(UiControl u,  JobTaskType jtt, JobsChoice jc, BackUpTableModel b, ProgressInformationPanel pip, BackUpJobInfoTableModel bj) {
+	public FilesBackUpProcessor(UiControl u, JobTaskType jtt, JobsChoice jc, BackUpTableModel b, ProgressInformationPanel pip, BackUpJobInfoTableModel bj) {
 
 		super();
 		uiControl = u;
@@ -94,6 +95,8 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 		pLog.info("Back up triggered for " + jobsChoice.getTitleAsString());
 
 		boolean backupSuccess = true;
+		BackUpCounters scanCounters = backUpItemList.sumIndividualCounters();
+		initialNumberOfFilesToBackUp = scanCounters.nbSourceFilesProcessed + scanCounters.nbTargetFilesProcessed;
 		backUpCounters.reset();
 		int nbActionDone = 0;
 		Iterator<AbstractBackUpItem> backupItemIterator = backUpItemList.getBackUpItems().iterator();
@@ -102,11 +105,10 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 		while ((backupItemIterator.hasNext()) && (!uiControl.isStopAsked())) {
 			if (((nbActionDone % refreshRate) == 0)
 					|| (System.currentTimeMillis() - lastRefreshTime > maxRefreshInterval)) {
-				publish(nbActionDone);
+				publish(0);
 				lastRefreshTime = System.currentTimeMillis();
 			}
-			final int nbActionDone2 = nbActionDone;
-			backupSuccess &= backupItemIterator.next().execute(backUpCounters, _ -> publish(nbActionDone2));
+			backupSuccess &= backupItemIterator.next().execute(backUpCounters, _ -> publish(0));
 			nbActionDone++;
 		}
 
@@ -117,18 +119,16 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 	@Override
 	protected void process(java.util.List<Integer> chunks) {
 
-		// Get the latest result from the list
-		int latestResult = chunks.get(chunks.size() - 1);
-
 		backUpTableModel.fireTableDataChanged();
 
-		StringBuilder infos = new StringBuilder(1024);
+		long nbFileBackUpCompleted = backUpCounters.nbSourceFilesProcessed + backUpCounters.nbTargetFilesProcessed;
+		StringBuilder infos = new StringBuilder(3000);
 		infos.append(HTML_BEGIN);
-		infos.append(NB_ELEM).append(backUpItemList.size() - latestResult);
+		infos.append(NB_ELEM).append(initialNumberOfFilesToBackUp - nbFileBackUpCompleted);
 		infos.append(PROCESSED_ELEM);
 		backUpCounters.appendCounterInfoInHtml(infos);
 		infos.append(HTML_END);
-		progressPanel.setStepInfos(infos.toString(), latestResult);     
+		progressPanel.setStepInfos(infos.toString(), nbFileBackUpCompleted);     
 	}
 	 
 	@Override
@@ -138,7 +138,7 @@ public class FilesBackUpProcessor extends SwingWorker<BackUpProcessorResult,Inte
 			BackUpProcessorResult result = get();
 
 			// Update progress info panel
-			StringBuilder finalStatus = new StringBuilder(1024);
+			StringBuilder finalStatus = new StringBuilder(3000);
 			if (result.isSuccessfull()) {
 				finalStatus.append("Sauvegarde de fichiers terminée (");
 			} else {

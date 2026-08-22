@@ -205,12 +205,12 @@ public class BackUpCounters {
 
 		if (contentDifferentNb != 0) {
 			res.append(NEW_ROW);
-			appendCellCouple(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, null);
+			appendCellCouple(res, CONTENT_DIFFERENT_LABEL, contentDifferentNb, "#ff8f00");
 		}
 		
 		if (contentCompareNb != 0) {
 			res.append(NEW_ROW);
-			appendCellCouple(res, CONTENT_COMPARE_LABEL, contentCompareNb, null);
+			appendCellCouple(res, CONTENT_COMPARE_LABEL, contentCompareNb, "#ff8f00");
 		}
 		res.append(ROW_AND_TABLE_END);
 	}
