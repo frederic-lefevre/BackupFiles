@@ -370,7 +370,6 @@ public class BackUpCounters {
 				counters.copyTargetNb == copyTargetNb &&
 				counters.adjustTimeNb == adjustTimeNb &&
 				counters.contentDifferentNb == contentDifferentNb &&
-				counters.contentCompareNb == contentCompareNb &&
 				counters.backupWithSizeAboveThreshold == backupWithSizeAboveThreshold;
 	}
 }
