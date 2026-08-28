@@ -303,7 +303,7 @@ class BackUpCountersTest {
 	}
 	
 	@Test
-	void individualCountersShouldNotBeEquals11() {
+	void individualCountersShouldBeEquals1() {
 		
 		BackUpCounters bc1 = new BackUpCounters(newTargetFileStores(), OperationType.SCAN);
 		BackUpCounters bc2 = new BackUpCounters(newTargetFileStores(), OperationType.BACKUP);
@@ -313,8 +313,8 @@ class BackUpCountersTest {
 		
 		assertThat(bc1.equalsIndividualCounters(bc2)).isTrue();
 
-		bc1.contentCompareNb++;
-		assertThat(bc1.equalsIndividualCounters(bc2)).isFalse();
+		bc1.contentCompareNb++;  // not an "individual" counter (as nbTargetFailed for instance)
+		assertThat(bc1.equalsIndividualCounters(bc2)).isTrue();
 	}
 	
 	private static void assertFieldValue(BackUpCounters bc, long val) {
