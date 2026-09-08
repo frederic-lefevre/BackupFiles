@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.fl</groupId>
 	<artifactId>backupFiles</artifactId>
-	<version>4.2.4</version>
+	<version>4.2.5</version>
 
 	<dependencyManagement>
 		<dependencies>
@@ -22,7 +22,7 @@
 		<dependency>
 			<groupId>org.fl</groupId>
 			<artifactId>FlUtils</artifactId>
-			<version>12.1.1</version>
+			<version>12.1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -98,10 +98,9 @@
                         </execution>
                     </executions>
                     <configuration>
+                    	<prefix>backup</prefix>
                     	<dateFormat>yyyy-MM-dd HH:mm:ss Z</dateFormat>
-                        <skipPoms>full</skipPoms>
                         <commitIdGenerationMode>full</commitIdGenerationMode>
-                        <injectAllReactorProjects>true</injectAllReactorProjects>
                     </configuration>
             </plugin>
 		</plugins>
